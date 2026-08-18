@@ -1,6 +1,15 @@
 ---
 name: scrolls-hide
 description: "Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the path references inside it and in CLAUDE.md so nothing breaks. Use this whenever the user runs /scrolls-hide, or asks to hide, dot, or re-hide the scrolls folder, go back to hiding project memory / docs/.scrolls, or rename scrolls to .scrolls. This is the retrofit path for a project that was set up visible and now wants it hidden — for a brand-new project, /scrolls-setup's default (no -u/--unhide flag) already creates it hidden and this skill isn't needed. By default checks one exact location (docs/scrolls under the current directory); supports -r/--recurse to sweep an entire directory tree instead (e.g. every package in a monorepo in one run), repeatable -p/--path to target specific locations, -t/--reporoot to target the git repository's top level regardless of which subdirectory you're in, -l/--local to target the current directory explicitly, and the DEFAULT_SCROLLS_RELPATH environment variable to change the default location. Works on macOS, Linux, and Windows (bash or PowerShell). The opposite of /scrolls-unhide."
+license: MIT
+compatibility: bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)
+disable-model-invocation: true
+metadata:
+  - name: scrolls-hide
+    type: skill
+    author: sugatoray
+    version: "1.0.0"
+    source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-hide
 ---
 
 # Hiding docs/scrolls/
