@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Update"
+  short_description: "Updates the Scrolls agentic memory."
+policy:
+  allow_implicit_invocation: false
