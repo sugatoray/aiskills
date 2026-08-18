@@ -20,4 +20,5 @@ Bad patterns or decisions to never take, and why they were rejected.
 ## Wisdom — best practices and Red/Green TDD
 Best practices worth reusing.
 
+- Always use Red/Green TDD while developing or fixing code.
 - (none recorded yet)

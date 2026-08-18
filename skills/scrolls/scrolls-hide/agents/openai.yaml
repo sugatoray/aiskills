@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Hide"
+  short_description: "Hides the Scrolls agentic memory folder: `scrolls` -->  `.scrolls`."
+policy:
+  allow_implicit_invocation: false

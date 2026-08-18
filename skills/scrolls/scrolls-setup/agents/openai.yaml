@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Setup"
+  short_description: "Sets up the Scrolls agentic memory inside the .scrolls folder."
+policy:
+  allow_implicit_invocation: false

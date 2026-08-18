@@ -1,11 +1,28 @@
 ---
 name: scrolls-help
 description: "Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide) — what each command does, their shared -p/-t/-l/-r/-u flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the four commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell)."
+license: MIT
+compatibility: bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)
+disable-model-invocation: true
+metadata:
+  - name: scrolls-help
+    type: skill
+    author: sugatoray
+    version: "1.0.0"
+    source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help
+    
 ---
 
 # Scrolls help
 
-This skill's job is to answer clearly and get out of the way — not to explore the codebase, not to check whether scrolls are actually set up here, not to make any changes.
+This skill's job is to answer clearly and get out of the way — not to
+explore the user's codebase, not to check whether scrolls are actually
+set up here, and not to modify anything outside its own reference file.
+
+> **Scope note:** The only file this skill ever writes to 
+> (for self-maintenance and used by the maintainer of the skill) is its own
+> `references/HELP.md`. It never modifies user code, user files, or
+> anything outside this skill's directory. See the section below for development notes for maintainers of this skill.
 
 ## Cross-platform
 
@@ -25,8 +42,14 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 4. **A specific question** (one command, one flag, one scenario like "how do I do this in a monorepo," or a command name mentioned on its own): lead with the directly relevant part of the doc, answered concisely, and mention that the rest is available via a bare `/scrolls-help` — don't dump the whole reference regardless of what was actually asked. This applies whether or not `-e` was also given — `-e` changes where the *full* doc goes, not whether a targeted question still gets a targeted answer first.
 5. Keep the reference file's own tone and formatting when you present it (in chat or via the rendered page) — it's already written to be crisp; don't editorialize, pad, or re-explain what it already says clearly.
 
-If you notice the reference has drifted from what the other four skills actually do (a flag behaves differently than documented, a new flag exists that isn't listed), fix `references/HELP.md` itself rather than just answering around the gap — this file needs to stay accurate as `scrolls-setup`/`scrolls-update`/`scrolls-hide`/`scrolls-unhide` evolve, since it's the thing users are told to trust, in chat and on the rendered page alike.
 
 ## Development
+
+> NOTE: THE FOLLOWING IS FOR SKILL MAINTAINERS ONLY. Users should never need to read or run this section.
+
+If you notice the reference has drifted from what the other four skills actually do (a flag behaves differently than documented, a new flag exists that isn't listed), Updating `references/HELP.md` itself.
+- If `references/HELP.md` is missing or stale, regenerate/update it —
+this is the skill's own reference file, not part of the user's project.
+- This file (`references/HELP.md`) needs to stay accurate as `scrolls-setup`/`scrolls-update`/`scrolls-hide`/`scrolls-unhide` evolve, since it's the thing users are told to trust, in chat and on the rendered page alike.
 
 `tests/` holds this script's Red/Green regression suite (bash + PowerShell), for maintaining `scripts/open_help.sh`/`scripts/open_help.ps1` themselves — it plays no part in carrying out a user's `/scrolls-help` request. Don't read or run it while executing this skill.

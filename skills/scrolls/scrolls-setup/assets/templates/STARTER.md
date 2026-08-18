@@ -17,6 +17,10 @@ You're picking up work on **{{PROJECT_NAME}}**{{PROJECT_TAGLINE}}. Before making
 - **PLAN.md**: whenever ticket status changes, or priorities shift based on new requests.
 - **WISDOM.md**: whenever you hit a new trap/bug, make a mistake worth not repeating, or land on a pattern worth reusing.
 
+## Development strategy
+
+- Always use Red/Green TDD while developing or fixing code. _This is also mentioned inside **WISDOM.md**_.
+
 ## Quick orientation
 {{QUICK_ORIENTATION}}
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Unhide"
+  short_description: "Unhides the Scrolls agentic memory folder: `.scrolls` -->  `scrolls`."
+policy:
+  allow_implicit_invocation: false
