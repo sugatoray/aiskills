@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls Help"
+  short_description: "Shows the help information for the Scrolls agentic memory management."
+policy:
+  allow_implicit_invocation: false
