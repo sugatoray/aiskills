@@ -2,14 +2,14 @@
 name: scrolls-help
 description: "Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide) — what each command does, their shared -p/-t/-l/-r/-u flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the four commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell)."
 license: MIT
-compatibility: bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)
+compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
 metadata:
   - name: scrolls-help
     type: skill
     author: sugatoray
     version: "1.0.0"
-    source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
     
 ---
 
