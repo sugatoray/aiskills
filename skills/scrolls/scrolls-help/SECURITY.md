@@ -23,11 +23,8 @@ runtime surface (the local server) from lingering unbounded."
   project, and nothing outside its own skill directory.
 - **Writes:** nothing, ever, while carrying out a `/scrolls-help` request.
   The one file this skill's source ever writes — `references/HELP.md` — is
-  updated only as a maintainer task (see `MAINTAINERS.md`), never as part
-  of answering a user. `SKILL.md` and `MAINTAINERS.md` are deliberately
-  kept as separate documents so an instruction aimed at maintainers can't
-  read as a runtime instruction to modify something the "no changes" scope
-  note just ruled out — see the Design notes below.
+  updated only as a maintainer task (see `MAINTAINERS.md` for that
+  workflow), never as part of answering a user.
 - **Never touches:** user code, user files, git state, or anything outside
   this skill's own directory.
 
