@@ -6,6 +6,8 @@ For people developing this skill — not read as part of answering a
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time.
+- `../CHANGELOG.md` — this skill's version history; update it alongside
+  `metadata.version` in `SKILL.md`.
 - `../scripts/` — `session_diff.sh` (bash), `session_diff.ps1`
   (PowerShell): cross-checks conversation memory against git for step 3.
 - `../tests/` — Red/Green regression suite for both.

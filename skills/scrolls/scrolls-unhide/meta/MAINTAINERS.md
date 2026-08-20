@@ -6,6 +6,8 @@ For people developing this skill — not read as part of answering a
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time.
+- `../CHANGELOG.md` — this skill's version history; update it alongside
+  `metadata.version` in `SKILL.md`.
 - `../scripts/` — `unhide.sh` (bash), `unhide.ps1` (PowerShell): the
   rename + reference-rewrite logic.
 - `../tests/` — Red/Green regression suite for both.

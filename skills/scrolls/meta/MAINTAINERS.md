@@ -39,6 +39,12 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   behavior); leave it alone for documentation-only or test-only
   changes. Each skill's own `meta/MAINTAINERS.md` states this rule for
   that skill specifically.
+- **Changelogs**: each skill has its own `CHANGELOG.md` at its top
+  level — update it in the same commit as any `metadata.version` bump,
+  under an `## [Unreleased]` heading for doc/test-only changes that
+  don't bump the version. This directory's own `CHANGELOG.md` is for
+  family-wide changes that aren't tied to a single skill's version (a
+  shared-flags table update, a `README.md` reorganization, and so on).
 - **`../README.md`** (this directory's README) is the user-facing
   overview across all five commands — update it whenever a skill's
   directory layout or shared-flag behavior changes, not just that

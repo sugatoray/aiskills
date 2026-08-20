@@ -6,6 +6,8 @@ For people developing this skill — not read as part of answering a
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time.
+- `../CHANGELOG.md` — this skill's version history; update it alongside
+  `metadata.version` in `SKILL.md`.
 - `../assets/templates/` — source templates for the seven scaffolded files
   (`STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`,
   `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`) plus three pointer blocks
