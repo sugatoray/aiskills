@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-help
     type: skill
     author: sugatoray
-    version: "1.2.0"
+    version: "1.3.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
     
 ---
@@ -23,7 +23,10 @@ set up here, and not to modify anything in the user's project.
 > anything outside its own directory while carrying out a `/scrolls-help`
 > request. Keeping its own `references/HELP.md` current is a separate,
 > unrelated maintenance task for people maintaining this skill — see
-> `MAINTAINERS.md` — not something done while answering a user.
+> `MAINTAINERS.md` — not something done while answering a user. For the
+> full security posture (file-system scope, the local `-e`/`--online`
+> server's network exposure and lifecycle), see `SECURITY.md` — reference
+> material, not something to act on while answering a request.
 
 ## Cross-platform
 
