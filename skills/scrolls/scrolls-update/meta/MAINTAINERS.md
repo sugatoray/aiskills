@@ -9,9 +9,17 @@ For people developing this skill — not read as part of answering a
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
 - `../scripts/` — `session_diff.sh` (bash), `session_diff.ps1`
-  (PowerShell): cross-checks conversation memory against git for step 3.
+  (PowerShell): cross-checks conversation memory against git for step 4.
 - `../tests/` — Red/Green regression suite for both.
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
+
+Step 2 (`SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill) reads its three
+pointer templates from `../../scrolls-setup/assets/templates/` rather
+than duplicating them — `SCROLLS_MD_BLOCK.md`, `CLAUDE_MD_BLOCK.md`,
+`AGENTS_MD_BLOCK.md`. That's `scrolls-setup`'s single source of truth
+for this content (see its own `meta/MAINTAINERS.md`); if you change what
+those templates say, this skill's backfill picks it up automatically —
+no synchronized edit needed here.
 
 ## Running tests
 

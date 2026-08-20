@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-setup
     type: skill
     author: sugatoray
-    version: "2.0.0"
+    version: "2.1.0"
     source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup
 ---
 
@@ -93,6 +93,8 @@ Templates are intentionally close to empty (placeholder bullets like "(none trac
 
 ### 4. Point SCROLLS.md, CLAUDE.md, and AGENTS.md at STARTER.md
 
+This step always runs, regardless of what was decided in step 1 about the scrolls folder's own seven files — even against a project that already had a fully populated `docs/.scrolls/` and was left untouched there, still check/backfill `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` here. That's what makes this skill idempotent and safe to re-run against an existing project purely to pick up this pointer chain: running it twice (or against a project set up by an older version of this skill, before `SCROLLS.md`/`AGENTS.md` existed) never duplicates or overwrites anything — each of the three checks below is create-if-missing / insert-if-not-already-referencing / leave-alone-if-already-correct.
+
 Read `assets/templates/SCROLLS_MD_BLOCK.md` and substitute `{{SCROLLS_PATH}}` in it the same way as `STARTER.md` — that's the content to install as `SCROLLS.md`.
 
 - **`-t`/`-l`/default (`BASE_DIR`-derived)**: `SCROLLS.md` (and `CLAUDE.md`, `AGENTS.md`, below) go at `BASE_DIR` — the same directory that now contains `docs`. This is fixed and unambiguous: `BASE_DIR` is exactly what `-t`/`-l`/the mismatch check in step 1 resolved, so there's no separate "project root" judgment call to make here anymore.
@@ -107,8 +109,8 @@ Once you know where they go:
 Then do the same, in that same directory, for `CLAUDE.md`. Its content is `assets/templates/CLAUDE_MD_BLOCK.md` verbatim — a fixed two-line pointer (`## Access Scrolls Agentic Memory` / `See @SCROLLS.md.`), not the `SCROLLS.md` content itself, and no `{{SCROLLS_PATH}}` substitution needed — it only ever references `SCROLLS.md`, which is always its own sibling regardless of which flags were used:
 
 - **No `CLAUDE.md` there yet**: create one containing exactly that block.
-- **`CLAUDE.md` exists but doesn't already reference `SCROLLS.md`**: insert the block near the top of the file (before other instructions, since "read this first" only works if it's read first), separated by blank lines from surrounding content.
-- **`CLAUDE.md` already references `SCROLLS.md`** (or, from before this file split existed, points straight at `SCROLLS_PATH/STARTER.md` itself): leave it alone; note this to the user instead of duplicating.
+- **`CLAUDE.md` exists but doesn't already reference `SCROLLS.md`**: insert the block near the top of the file (before other instructions, since "read this first" only works if it's read first), separated by blank lines from surrounding content — even if the file already points straight at `SCROLLS_PATH/STARTER.md` itself, from before this file split existed. That's a real, common case (a project set up by a pre-`1.2.0` version of this skill), and it's exactly the case this exists to catch: insert the stub anyway, so `CLAUDE.md` ends up pointing at `SCROLLS.md` regardless of what it already said. This is additive only — never remove or rewrite what was already there, even if that leaves both an old direct reference and the new stub in the same file.
+- **`CLAUDE.md` already references `SCROLLS.md`**: leave it alone; note this to the user instead of duplicating.
 
 Then do the same, in that same directory, for `AGENTS.md` — the convention several other agent harnesses (e.g. Codex CLI, and others following the [agents.md](https://agents.md) convention) read instead of `CLAUDE.md`. Its content is `assets/templates/AGENTS_MD_BLOCK.md` verbatim — a one-line pointer (`See @CLAUDE.md`), not `SCROLLS.md`'s content:
 

@@ -3,6 +3,25 @@
 All notable changes to the `scrolls-setup` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-08-20
+
+### Changed
+
+- Tightened step 4's `CLAUDE.md` leave-alone condition: previously, a
+  `CLAUDE.md` that already pointed straight at `SCROLLS_PATH/STARTER.md`
+  (the pre-`1.2.0` direct-embed convention) was left alone entirely,
+  even though it had no `SCROLLS.md` reference. Re-running
+  `/scrolls-setup` against such a project therefore never added the
+  `SCROLLS.md` pointer stub. Now the stub is inserted whenever
+  `CLAUDE.md` doesn't already reference `SCROLLS.md` specifically,
+  regardless of any older direct reference already there — additive
+  only, old and new references can coexist.
+- Made step 4's idempotency guarantee explicit: it always runs, even
+  against a project whose `docs/.scrolls/` was already fully populated
+  and left untouched in step 1 — re-running this skill purely to pick
+  up the pointer chain is safe and never duplicates or overwrites
+  anything.
+
 ## [2.0.0] - 2026-08-20
 
 ### Changed (breaking)

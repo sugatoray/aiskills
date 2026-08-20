@@ -8,6 +8,10 @@ Everything under `skills/scrolls/` is built and changed using Red/Green
 TDD: write or update a failing test in the relevant skill's `tests/`
 first, confirm it fails for the right reason, then make it pass.
 
+## Access Scrolls Agentic Memory
+
+See @SCROLLS.md.
+
 ## Installing
 
 Install the `scrolls` skills with the [`skills` CLI](https://skills.sh/)

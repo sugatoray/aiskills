@@ -3,6 +3,17 @@
 All notable changes to the `scrolls-unhide` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-08-20
+
+### Changed
+
+- Synced to `2.1.0` to keep this skill's version locked in step with
+  the other four `scrolls-*` skills (see `../meta/MAINTAINERS.md`'s
+  Versioning entry). No functional change of its own in this release —
+  the minor bump reflects `scrolls-setup`/`scrolls-update`'s new
+  idempotent `CLAUDE.md`/`SCROLLS.md`/`AGENTS.md` backfill, not
+  anything in `scrolls-unhide` itself. See `../CHANGELOG.md`.
+
 ## [2.0.0] - 2026-08-20
 
 ### Changed (breaking)

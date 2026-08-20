@@ -18,11 +18,35 @@ Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.0.0 |
-| `scrolls-update` | 2.0.0 |
-| `scrolls-hide` | 2.0.0 |
-| `scrolls-unhide` | 2.0.0 |
-| `scrolls-help` | 2.0.0 |
+| `scrolls-setup` | 2.1.0 |
+| `scrolls-update` | 2.1.0 |
+| `scrolls-hide` | 2.1.0 |
+| `scrolls-unhide` | 2.1.0 |
+| `scrolls-help` | 2.1.0 |
+
+## 2026-08-20 (2.1.0)
+
+- **Idempotent `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill.**
+  `scrolls-update` now backfills all three pointer files (step 2) for a
+  project set up by a pre-`2.0.0` `scrolls-setup` — not just the
+  one-time `/scrolls-setup`, which already did this in step 4. Since
+  `/scrolls-update` is the command people actually run every session,
+  this is the point where such a project catches up automatically,
+  without anyone having to remember to re-run `/scrolls-setup` by hand.
+  Minor, additive, backward-compatible: existing `CLAUDE.md` content is
+  never removed or rewritten, only the pointer stub is inserted if
+  missing — see `scrolls-update/CHANGELOG.md`.
+- **`CLAUDE.md` leave-alone condition tightened, both skills.**
+  Previously, a `CLAUDE.md` that already pointed straight at
+  `SCROLLS_PATH/STARTER.md` (the pre-`1.2.0` direct-embed convention,
+  from before `SCROLLS.md` existed) was left alone entirely — meaning
+  such a project's `CLAUDE.md` would never gain a `SCROLLS.md` pointer,
+  even on a fresh `/scrolls-setup` re-run. Now the stub is inserted
+  whenever `CLAUDE.md` doesn't already reference `SCROLLS.md`
+  specifically, regardless of any older direct reference already
+  there — additive only, so both the old reference and the new stub
+  can coexist. See `scrolls-setup/CHANGELOG.md` and
+  `scrolls-update/CHANGELOG.md`.
 
 ## 2026-08-20 (2.0.0)
 

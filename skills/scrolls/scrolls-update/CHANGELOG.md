@@ -3,6 +3,30 @@
 All notable changes to the `scrolls-update` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-08-20
+
+### Added
+
+- New step 2: idempotently backfills `SCROLLS.md`, `CLAUDE.md`, and
+  `AGENTS.md` for a project set up by a pre-`2.0.0` `scrolls-setup`.
+  Since `/scrolls-update` is the command people actually run every
+  session — not the one-time `/scrolls-setup` — this is the point
+  where such a project now catches up automatically. Reads its three
+  pointer templates from `scrolls-setup`'s own `assets/templates/`
+  rather than duplicating them. Safe on every run: create-if-missing /
+  insert-if-not-already-referencing / leave-alone-if-already-correct,
+  never overwrites or reorders existing content. Old steps 2-6
+  renumbered to 3-7 accordingly.
+
+### Changed
+
+- `CLAUDE.md` insertion condition matches the same tightening applied
+  in `scrolls-setup` `2.1.0`: the stub is inserted whenever `CLAUDE.md`
+  doesn't already reference `SCROLLS.md` specifically, even if it
+  already points straight at `SCROLLS_PATH/STARTER.md` directly (the
+  pre-`1.2.0` convention) — additive only, old and new references can
+  coexist.
+
 ## [2.0.0] - 2026-08-20
 
 ### Changed

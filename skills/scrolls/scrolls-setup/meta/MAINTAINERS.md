@@ -17,7 +17,10 @@ For people developing this skill — not read as part of answering a
   rather than the scrolls path directly), and `AGENTS_MD_BLOCK.md` (a
   fixed pointer installed as `AGENTS.md`, referencing `CLAUDE.md`). Edit
   these directly to change what gets scaffolded — the skill only ever
-  copies *from* them, never the reverse.
+  copies *from* them, never the reverse. `scrolls-update` also reads
+  these three directly (for its own idempotent backfill, see its
+  `meta/MAINTAINERS.md`) rather than keeping its own copies — a change
+  here propagates there automatically.
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
 
 Unlike the other four scrolls skills, this one has no bundled `.sh`/`.ps1`
