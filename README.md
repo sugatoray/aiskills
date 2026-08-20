@@ -34,6 +34,10 @@ use skill: /scrolls-setup
 use skill: /scrolls-update
 ```
 
+3. For help doc use: `/scrolls-help`.
+
+> 💡 For more information, refer to the [**Scrolls README.md**](skills/scrolls/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -43,8 +47,8 @@ use skill: /scrolls-update
 
 | Skill Group | Skill Name | Short Description | Badge | 
 |:---:|:---|:---|:---:|
-| [Scrolls](skills/scrolls/README.md) | `scrolls-setup`  | Setup a repository-local agentic memory using the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-setup]](https://www.skills.sh/sugatoray/aiskills/scrolls-setup) |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-setup`  | Setup a repository-local agentic memory using the scrolls system: scans your repo or subfolder (based on your context) and creates a `docs/.scrolls/` folder for the memory files. | [![badge-scrolls][#skills-sh-badge-scrolls-setup]](https://www.skills.sh/sugatoray/aiskills/scrolls-setup) |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-update` | Update the repository-local agentic memory using the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-update]](https://www.skills.sh/sugatoray/aiskills/scrolls-update) |
-| [Scrolls](skills/scrolls/README.md) | `scrolls-help`   | Setup a repository-local agentic memory using the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-help]](https://www.skills.sh/sugatoray/aiskills/scrolls-help) |
-| [Scrolls](skills/scrolls/README.md) | `scrolls-hide`   | Setup a repository-local agentic memory using the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-hide]](https://www.skills.sh/sugatoray/aiskills/scrolls-hide) |
-| [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | Setup a repository-local agentic memory using the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-help`   | Show help doc for the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-help]](https://www.skills.sh/sugatoray/aiskills/scrolls-help) |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-hide`   | Hide the folder: `docs/scrolls` --> `docs/.scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-hide]](https://www.skills.sh/sugatoray/aiskills/scrolls-hide) |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | Unhide the folder: `docs/.scrolls` --> `docs/scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) |
