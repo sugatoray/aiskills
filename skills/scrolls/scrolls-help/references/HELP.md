@@ -4,7 +4,7 @@ Scrolls are a small, checked-in `docs/.scrolls/` (or `docs/scrolls/`) file set t
 
 Every command here works the same way on macOS, Linux, and Windows — each bundled script ships as both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version with identical flags and behavior, and Claude picks whichever matches the current environment. Nothing about the examples below changes per platform.
 
-**Prefer a formatted page over chat text?** `/scrolls-help -e` (or `--online`) serves this same content locally and opens it in your browser.
+**Prefer a formatted page over chat text?** `/scrolls-help -e` (or `--online`) serves this same content locally and opens it in your browser. The server stops itself automatically after 30 minutes idle or 2 hours total, whichever comes first — or stop it sooner with `open_help.sh --stop <port>` (or `open_help.ps1 --stop <port>`; add `--all` instead of a port to stop every running instance).
 
 ## Quick start
 
