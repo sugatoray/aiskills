@@ -50,6 +50,8 @@ variable to change that default location.
 Every command's directory has:
 
 - `SKILL.md` — the skill's runtime instructions.
+- `README.md` — a minimal, human-facing pointer to the files below;
+  not read at invocation time.
 - `agents/openai.yaml` — OpenAI-agent interface metadata.
 - `meta/MAINTAINERS.md` — development notes: layout, versioning, and
   (where applicable) running tests.

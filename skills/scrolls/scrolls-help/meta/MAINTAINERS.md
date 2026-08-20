@@ -7,6 +7,8 @@ behind how this skill is built, see `SECURITY.md`.
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time.
+- `../README.md` — minimal, human-facing pointer to the files below;
+  not read at invocation time.
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
 - `references/HELP.md` — the canonical reference content presented to

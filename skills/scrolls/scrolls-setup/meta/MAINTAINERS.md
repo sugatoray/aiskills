@@ -6,6 +6,8 @@ For people developing this skill — not read as part of answering a
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time.
+- `../README.md` — minimal, human-facing pointer to the files below;
+  not read at invocation time.
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
 - `../assets/templates/` — source templates for the seven scaffolded files
