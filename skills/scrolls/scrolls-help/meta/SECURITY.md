@@ -1,8 +1,9 @@
 # Security posture: scrolls-help
 
 What this skill can touch, what it exposes, and why, for anyone auditing
-it (human or automated). See `SKILL.md` for behavior and `MAINTAINERS.md`
-for upkeep — this file is neither; it documents design decisions.
+it (human or automated). See `../SKILL.md` for behavior and
+`MAINTAINERS.md` for upkeep — this file is neither; it documents design
+decisions.
 
 ## Threat model
 
@@ -90,13 +91,13 @@ fetched over the network at runtime; the only bytes served come from
 
 ## Design notes: instruction hygiene
 
-`SKILL.md` is read by the agent as live instructions on every invocation.
-Mixing maintainer-only procedural text ("update this file") into the same
-document as a runtime scope restriction ("don't modify anything") reads,
-out of context, as a later instruction overriding an earlier constraint —
-a shape automated prompt-injection detectors are built to catch, and a
-real finding was raised against an earlier version of `SKILL.md` for
-exactly this. The fix wasn't to argue the instructions were compatible (a
+`../SKILL.md` is read by the agent as live instructions on every
+invocation. Mixing maintainer-only procedural text ("update this file")
+into the same document as a runtime scope restriction ("don't modify
+anything") reads, out of context, as a later instruction overriding an
+earlier constraint — a shape automated prompt-injection detectors are
+built to catch, and a real finding was raised against an earlier version
+of `SKILL.md` for exactly this. The fix wasn't to argue the instructions were compatible (a
 human reading both paragraphs already sees the file was always the one
 documented exception); it was to stop putting mixed-audience instructions
 in the document the agent reads at invocation time — maintainer procedure

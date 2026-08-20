@@ -1,12 +1,12 @@
 # Maintaining scrolls-help
 
 For people developing this skill — not read as part of answering a
-`/scrolls-help` request (that's `SKILL.md`). For the security rationale
+`/scrolls-help` request (that's `../SKILL.md`). For the security rationale
 behind how this skill is built, see `SECURITY.md`.
 
 ## Layout
 
-- `SKILL.md` — the only file read at invocation time.
+- `../SKILL.md` — the only file read at invocation time.
 - `references/HELP.md` — the canonical reference content presented to
   users, in chat or via the local page.
 - `scripts/` — `open_help.sh` (bash), `open_help.ps1` (PowerShell), and
@@ -37,6 +37,6 @@ Covers: URL/PID reporting, the server actually answering a real request,
 
 ## Versioning
 
-Bump `metadata.version` in `SKILL.md`'s frontmatter when something visible
+Bump `metadata.version` in `../SKILL.md`'s frontmatter when something visible
 to a `/scrolls-help` invocation changes (new flag, changed default,
 changed behavior) — not for pure documentation or test-only changes.

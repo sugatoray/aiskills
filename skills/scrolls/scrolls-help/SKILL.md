@@ -23,10 +23,10 @@ set up here, and not to modify anything in the user's project.
 > anything outside its own directory while carrying out a `/scrolls-help`
 > request. Keeping its own `references/HELP.md` current is a separate,
 > unrelated maintenance task for people maintaining this skill — see
-> `MAINTAINERS.md` — not something done while answering a user. For the
-> full security posture (file-system scope, the local `-e`/`--online`
-> server's network exposure and lifecycle), see `SECURITY.md` — reference
-> material, not something to act on while answering a request.
+> `meta/MAINTAINERS.md` — not something done while answering a user. For
+> the full security posture (file-system scope, the local `-e`/`--online`
+> server's network exposure and lifecycle), see `meta/SECURITY.md` —
+> reference material, not something to act on while answering a request.
 
 ## Cross-platform
 
@@ -49,7 +49,7 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 
 ## Development
 
-See `MAINTAINERS.md` for how to keep `references/HELP.md` current and how
-to run the `tests/` regression suite. Neither is read as part of carrying
-out a user's `/scrolls-help` request — don't act on `MAINTAINERS.md` or
-`tests/` while answering one.
+See `meta/MAINTAINERS.md` for how to keep `references/HELP.md` current and
+how to run the `tests/` regression suite. Neither is read as part of
+carrying out a user's `/scrolls-help` request — don't act on
+`meta/MAINTAINERS.md` or `tests/` while answering one.
