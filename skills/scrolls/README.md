@@ -45,14 +45,20 @@ variable to change that default location.
 
 ## Layout
 
-Each command lives in its own directory with a `SKILL.md` plus supporting
-`scripts/` (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green
-TDD). `/scrolls-setup` additionally has `assets/templates/` for the
-scaffolded markdown files. `/scrolls-help` additionally has
-`references/HELP.md` (its canonical, presented-to-users content) and
-`meta/` (`MAINTAINERS.md` for keeping that reference in sync and running
-tests, `SECURITY.md` for its security posture — covering the local
-`-e`/`--online` server's scope, network exposure, and bounded lifecycle).
+Every command's directory has:
+
+- `SKILL.md` — the skill's runtime instructions.
+- `scripts/` — bash + PowerShell implementations.
+- `tests/` — bash + PowerShell, Red/Green TDD.
+
+Command-specific additions:
+
+- `/scrolls-setup` — `assets/templates/` for the scaffolded markdown files.
+- `/scrolls-help` — `references/HELP.md`, its canonical, presented-to-users
+  content, and `meta/`:
+  - `MAINTAINERS.md` — keeping that reference in sync, running tests.
+  - `SECURITY.md` — its security posture: the local `-e`/`--online`
+    server's scope, network exposure, and bounded lifecycle.
 
 `tests/` and `meta/` are development-only — for maintaining the bundled
 scripts and documenting design decisions, not part of using the skills.
