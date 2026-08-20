@@ -1,6 +1,6 @@
 ---
 name: scrolls-unhide
-description: "Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the path references inside it and in CLAUDE.md so nothing breaks. Use this whenever the user runs /scrolls-unhide, or asks to unhide, un-dot, or show the scrolls folder, stop hiding project memory / docs/.scrolls, or rename .scrolls to scrolls. This is the retrofit path for a project that was set up hidden and now wants it visible — for a brand-new project, /scrolls-setup's own -u/--unhide flag does this in one step and this skill isn't needed. By default checks one exact location (docs/.scrolls under the current directory); supports -r/--recurse to sweep an entire directory tree instead (e.g. every package in a monorepo in one run), repeatable -p/--path to target specific locations, -t/--reporoot to target the git repository's top level regardless of which subdirectory you're in, -l/--local to target the current directory explicitly, and the DEFAULT_SCROLLS_RELPATH environment variable to change the default location. Works on macOS, Linux, and Windows (bash or PowerShell). The opposite of /scrolls-hide."
+description: "Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the path references inside it and in SCROLLS.md so nothing breaks. Use this whenever the user runs /scrolls-unhide, or asks to unhide, un-dot, or show the scrolls folder, stop hiding project memory / docs/.scrolls, or rename .scrolls to scrolls. This is the retrofit path for a project that was set up hidden and now wants it visible — for a brand-new project, /scrolls-setup's own -u/--unhide flag does this in one step and this skill isn't needed. By default checks one exact location (docs/.scrolls under the current directory); supports -r/--recurse to sweep an entire directory tree instead (e.g. every package in a monorepo in one run), repeatable -p/--path to target specific locations, -t/--reporoot to target the git repository's top level regardless of which subdirectory you're in, -l/--local to target the current directory explicitly, and the DEFAULT_SCROLLS_RELPATH environment variable to change the default location. Works on macOS, Linux, and Windows (bash or PowerShell). The opposite of /scrolls-hide."
 license: MIT
 compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-unhide
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "1.1.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-unhide"
 ---
 
@@ -50,8 +50,8 @@ Pass through whatever flags the user gave, in the same forms, to whichever of th
 For each match found (either way):
 
 1. Skips it (reporting why) if a `scrolls` folder already sits alongside it; otherwise renames it with `git mv` when the repo and file are git-tracked (preserving history), falling back to a plain `mv` otherwise.
-2. Rewrites the reference to the old path inside the *moved folder's own files* (this catches `STARTER.md`, which references its own path throughout) and, if present, in the one `CLAUDE.md` file that's an exact sibling of `docs` for that folder — never a broader search for `CLAUDE.md`. `/scrolls-setup` writes a short, portable reference (`docs/.scrolls`) relative to wherever `CLAUDE.md` itself lives, so in a multi-location sweep two different scrolls folders can legitimately share that exact same short string; a "helpfully" broader search for matching `CLAUDE.md` files would risk rewriting an unrelated sibling package's file. (The rewrite also tries the full path as discovered, for scrolls folders set up with a custom `--path` under the older convention.)
-3. Prints any other files nearby that still mention the old path — these are **reported, not edited**, and are excluded from *inside* other scrolls folders (a common source of false positives under the shared short-form convention) but can still include a false-positive sibling `CLAUDE.md` occasionally — that's expected, see step 2 below. The script deliberately doesn't touch files outside the scrolls folder and its own `CLAUDE.md`, since rewriting arbitrary prose (READMEs, CI configs, other docs) without reading it first risks corrupting unrelated content.
+2. Rewrites the reference to the old path inside the *moved folder's own files* (this catches `STARTER.md`, which references its own path throughout) and, if present, in the one `SCROLLS.md` file that's an exact sibling of `docs` for that folder — never a broader search for `SCROLLS.md`. `CLAUDE.md` itself is never touched: `/scrolls-setup` writes it as a fixed pointer to `SCROLLS.md`, not a direct scrolls-path reference, so there's nothing in it to rewrite. `/scrolls-setup` writes a short, portable reference (`docs/.scrolls`) relative to wherever `SCROLLS.md` itself lives, so in a multi-location sweep two different scrolls folders can legitimately share that exact same short string; a "helpfully" broader search for matching `SCROLLS.md` files would risk rewriting an unrelated sibling package's file. (The rewrite also tries the full path as discovered, for scrolls folders set up with a custom `--path` under the older convention.)
+3. Prints any other files nearby that still mention the old path — these are **reported, not edited**, and are excluded from *inside* other scrolls folders (a common source of false positives under the shared short-form convention) but can still include a false-positive sibling `SCROLLS.md` occasionally — that's expected, see step 2 below. The script deliberately doesn't touch files outside the scrolls folder and its own `SCROLLS.md`, since rewriting arbitrary prose (READMEs, CI configs, other docs) without reading it first risks corrupting unrelated content.
 
 Exits with an error if a given base directory has no matching folder — without `-r`, that's the signal to check the path, try `-t` if you expected the repo root, or add `-r` if it might be nested deeper; otherwise point the user at `/scrolls-setup`.
 
@@ -61,7 +61,7 @@ For each file the script lists under "Other references... left for manual review
 
 ### 3. Report back
 
-List each folder that was unhidden (old path → new path), what was auto-fixed for each (its own files, `CLAUDE.md`), any that were skipped and why (target already existed), and what you fixed manually in step 2, if anything.
+List each folder that was unhidden (old path → new path), what was auto-fixed for each (its own files, `SCROLLS.md`), any that were skipped and why (target already existed), and what you fixed manually in step 2, if anything.
 
 ## Development
 

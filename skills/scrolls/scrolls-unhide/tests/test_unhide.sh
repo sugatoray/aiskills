@@ -7,8 +7,8 @@
 # Mirrors the scenarios covered by test_unhide.ps1, including the two
 # real bugs caught during this script's own development: (1) absolute-
 # path roots producing references that don't match the relative text
-# actually written in STARTER.md/CLAUDE.md, and (2) a same-string-prefix
-# sibling package's CLAUDE.md getting wrongly rewritten during a
+# actually written in STARTER.md/SCROLLS.md, and (2) a same-string-prefix
+# sibling package's SCROLLS.md getting wrongly rewritten during a
 # recursive sweep.
 set -uo pipefail
 
@@ -72,14 +72,14 @@ new_git_repo() {
 }
 
 # base, rel_docs_dir (e.g. "docs" or "packages/api/docs"), ref_form (what
-# STARTER.md/CLAUDE.md reference internally, e.g. "docs/.scrolls")
+# STARTER.md/SCROLLS.md reference internally, e.g. "docs/.scrolls")
 new_scrolls_fixture() {
   local base="$1" rel_docs_dir="$2" ref_form="$3"
   mkdir -p "$base/$rel_docs_dir/.scrolls"
   printf '# STARTER.md\nRead %s/SPEC.md first.\n' "$ref_form" > "$base/$rel_docs_dir/.scrolls/STARTER.md"
   local base_of_docs
   base_of_docs="$(dirname "$base/$rel_docs_dir")"
-  printf '# Project instructions\nRead %s/STARTER.md first.\n' "$ref_form" > "$base_of_docs/CLAUDE.md"
+  printf '# Scrolls — Project Memory\nRead %s/STARTER.md first.\n' "$ref_form" > "$base_of_docs/SCROLLS.md"
 }
 
 # ============================================================
@@ -94,7 +94,7 @@ new_scrolls_fixture "$d1" "docs" "docs/.scrolls"
 assert "docs/scrolls exists after unhide" test -d "$d1/docs/scrolls"
 assert "docs/.scrolls no longer exists" bash -c "[ ! -d '$d1/docs/.scrolls' ]"
 assert_match "$(cat "$d1/docs/scrolls/STARTER.md")" "docs/scrolls/SPEC\.md" "STARTER.md self-reference rewritten to docs/scrolls"
-assert_match "$(cat "$d1/CLAUDE.md")" "docs/scrolls/STARTER\.md" "CLAUDE.md reference rewritten to docs/scrolls"
+assert_match "$(cat "$d1/SCROLLS.md")" "docs/scrolls/STARTER\.md" "SCROLLS.md reference rewritten to docs/scrolls"
 rm -rf "$d1"
 
 echo
@@ -114,11 +114,11 @@ starter2="$(cat "$d2/docs/scrolls/STARTER.md")"
 assert_match "$starter2" '^# STARTER\.md$' "STARTER.md rewritten to the SHORT form (docs/scrolls), not an absolute path"
 assert_match "$starter2" "docs/scrolls/SPEC\.md" "STARTER.md contains the short-form reference"
 assert_not_contains_literal "$starter2" "$d2" "STARTER.md does NOT contain the absolute scratch-dir path (would be a portability bug)"
-assert_match "$(cat "$d2/CLAUDE.md")" "docs/scrolls/STARTER\.md" "CLAUDE.md rewritten to the short form too"
+assert_match "$(cat "$d2/SCROLLS.md")" "docs/scrolls/STARTER\.md" "SCROLLS.md rewritten to the short form too"
 rm -rf "$d2"
 
 echo
-echo "=== Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's CLAUDE.md ==="
+echo "=== Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's SCROLLS.md ==="
 d3="$(new_scratch_dir)"
 new_git_repo "$d3"
 new_scrolls_fixture "$d3" "docs" "docs/.scrolls"
@@ -127,12 +127,12 @@ new_scrolls_fixture "$d3" "packages/api/docs" "docs/.scrolls"
 ( cd "$d3" && bash "$SCRIPT" -r >/dev/null 2>&1 )
 assert "root scrolls folder unhidden" test -d "$d3/docs/scrolls"
 assert "nested package scrolls folder unhidden too" test -d "$d3/packages/api/docs/scrolls"
-root_claude3="$(cat "$d3/CLAUDE.md")"
-pkg_claude3="$(cat "$d3/packages/api/CLAUDE.md")"
-assert_match "$root_claude3" "docs/scrolls/STARTER\.md" "root CLAUDE.md correctly rewritten"
-assert_match "$pkg_claude3" "docs/scrolls/STARTER\.md" "package CLAUDE.md correctly rewritten to its OWN short form"
-assert_not_match "$root_claude3" "\.scrolls" "root CLAUDE.md has no leftover .scrolls reference"
-assert_not_match "$pkg_claude3" "\.scrolls" "package CLAUDE.md has no leftover .scrolls reference"
+root_scrolls_md3="$(cat "$d3/SCROLLS.md")"
+pkg_scrolls_md3="$(cat "$d3/packages/api/SCROLLS.md")"
+assert_match "$root_scrolls_md3" "docs/scrolls/STARTER\.md" "root SCROLLS.md correctly rewritten"
+assert_match "$pkg_scrolls_md3" "docs/scrolls/STARTER\.md" "package SCROLLS.md correctly rewritten to its OWN short form"
+assert_not_match "$root_scrolls_md3" "\.scrolls" "root SCROLLS.md has no leftover .scrolls reference"
+assert_not_match "$pkg_scrolls_md3" "\.scrolls" "package SCROLLS.md has no leftover .scrolls reference"
 rm -rf "$d3"
 
 echo

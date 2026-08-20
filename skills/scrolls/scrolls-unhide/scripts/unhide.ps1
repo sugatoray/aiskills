@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Renames .scrolls folder(s) to scrolls (visible), rewriting the path
-# references inside the moved folder and in any CLAUDE.md that mentions
+# references inside the moved folder and in any SCROLLS.md that mentions
 # it. Reports (never auto-edits) any other stray references it finds
 # nearby.
 #
@@ -13,7 +13,7 @@
 # itself (old_dir, docs_dir, base_dir, the short/full reference strings)
 # is kept forward-slash-only, never using Join-Path/Split-Path's
 # OS-native separators. Two reasons: (1) these values get WRITTEN INTO
-# committed markdown text (STARTER.md/CLAUDE.md references), where the
+# committed markdown text (STARTER.md/SCROLLS.md references), where the
 # established convention across this whole project is forward slashes
 # regardless of which OS generated them — a Windows-native backslash
 # path baked into checked-in docs would be a portability regression, not
@@ -191,18 +191,20 @@ function Invoke-ProcessOne {
         Update-FileReferences -Path $f -OldDir $OldDir -NewDir $newDir -ShortOld $shortOld -ShortNew $shortNew
     }
 
-    # CLAUDE.md is always an exact, direct sibling of "docs" by construction
+    # SCROLLS.md is always an exact, direct sibling of "docs" by construction
     # -- check that ONE specific file, never a recursive search. A search
     # scoped to base_dir sounds safe but isn't: when base_dir is itself the
     # repo root (the common case), that's no restriction at all, and a
-    # sibling package's CLAUDE.md sharing the same short reference string
-    # would get wrongly rewritten.
-    $claudeMd = "$baseDir/CLAUDE.md"
-    if (Test-Path -LiteralPath $claudeMd -PathType Leaf) {
+    # sibling package's SCROLLS.md sharing the same short reference string
+    # would get wrongly rewritten. CLAUDE.md itself never needs rewriting
+    # here -- scrolls-setup writes it as a fixed pointer to SCROLLS.md,
+    # never a direct scrolls-path reference.
+    $scrollsMd = "$baseDir/SCROLLS.md"
+    if (Test-Path -LiteralPath $scrollsMd -PathType Leaf) {
         $text = $null
-        try { $text = Get-Content -LiteralPath $claudeMd -Raw -ErrorAction Stop } catch { $text = $null }
+        try { $text = Get-Content -LiteralPath $scrollsMd -Raw -ErrorAction Stop } catch { $text = $null }
         if ($text -and ($text.Contains($OldDir) -or $text.Contains($shortOld))) {
-            Update-FileReferences -Path $claudeMd -OldDir $OldDir -NewDir $newDir -ShortOld $shortOld -ShortNew $shortNew
+            Update-FileReferences -Path $scrollsMd -OldDir $OldDir -NewDir $newDir -ShortOld $shortOld -ShortNew $shortNew
         }
     }
 

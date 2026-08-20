@@ -7,8 +7,8 @@
 # pointing directly at a scrolls folder, conflicts, the "already exists"
 # skip, and — most importantly — the two real bugs caught along the way:
 # (1) absolute-path roots producing references that don't match the
-# relative text actually written in STARTER.md/CLAUDE.md, and (2) a
-# same-string-prefix sibling package's CLAUDE.md getting wrongly rewritten
+# relative text actually written in STARTER.md/SCROLLS.md, and (2) a
+# same-string-prefix sibling package's SCROLLS.md getting wrongly rewritten
 # during a recursive sweep. Both are asserted directly, not just implied.
 #
 # Each scenario runs inside Invoke-Scenario, which catches any unexpected
@@ -120,13 +120,13 @@ function Invoke-Sh {
 function New-ScrollsFixture {
     param([string]$Base, [string]$RelDocsDir, [string]$RefForm)
     # RelDocsDir e.g. "docs" or "packages/api/docs"; RefForm is what STARTER.md
-    # and CLAUDE.md reference internally ("docs/.scrolls", matching the
+    # and SCROLLS.md reference internally ("docs/.scrolls", matching the
     # short-form convention scrolls-setup writes for -t/-l/default).
     $scrollsPath = Join-Path $Base "$RelDocsDir/.scrolls"
     New-Item -ItemType Directory -Path $scrollsPath -Force | Out-Null
     Set-Content -Path (Join-Path $scrollsPath "STARTER.md") -Value "# STARTER.md`nRead $RefForm/SPEC.md first."
     $baseOfDocs = Split-Path -Parent (Join-Path $Base $RelDocsDir)
-    Set-Content -Path (Join-Path $baseOfDocs "CLAUDE.md") -Value "# Project instructions`nRead $RefForm/STARTER.md first."
+    Set-Content -Path (Join-Path $baseOfDocs "SCROLLS.md") -Value "# Scrolls — Project Memory`nRead $RefForm/STARTER.md first."
 }
 
 # ============================================================
@@ -142,8 +142,8 @@ Invoke-Scenario "Scenario 1: default (exact-check) unhides docs/.scrolls at cwd"
     Assert-True (-not (Test-Path (Join-Path $d1 "docs/.scrolls"))) "ps1: docs/.scrolls no longer exists"
     $starterContent1 = Get-Content (Join-Path $d1 "docs/scrolls/STARTER.md") -Raw
     Assert-Match $starterContent1 "docs/scrolls/SPEC\.md" "ps1: STARTER.md self-reference rewritten to docs/scrolls"
-    $claudeContent1 = Get-Content (Join-Path $d1 "CLAUDE.md") -Raw
-    Assert-Match $claudeContent1 "docs/scrolls/STARTER\.md" "ps1: CLAUDE.md reference rewritten to docs/scrolls"
+    $scrollsMdContent1 = Get-Content (Join-Path $d1 "SCROLLS.md") -Raw
+    Assert-Match $scrollsMdContent1 "docs/scrolls/STARTER\.md" "ps1: SCROLLS.md reference rewritten to docs/scrolls"
     Remove-Item -Recurse -Force $d1
 }
 
@@ -163,12 +163,12 @@ Invoke-Scenario "Scenario 2: exact-check finds nothing from a subdirectory; -t f
     $starterContent2 = (Get-Content (Join-Path $d2 "docs/scrolls/STARTER.md") -Raw).Trim()
     Assert-Match $starterContent2 "^# STARTER\.md\nRead docs/scrolls/SPEC\.md first\.$" "ps1 -t: STARTER.md rewritten to the SHORT form (docs/scrolls), not an absolute path"
     Assert-NotMatch $starterContent2 ([regex]::Escape($d2)) "ps1 -t: STARTER.md does NOT contain the absolute scratch-dir path (would be a portability bug)"
-    $claudeContent2 = Get-Content (Join-Path $d2 "CLAUDE.md") -Raw
-    Assert-Match $claudeContent2 "docs/scrolls/STARTER\.md" "ps1 -t: CLAUDE.md rewritten to the short form too"
+    $scrollsMdContent2 = Get-Content (Join-Path $d2 "SCROLLS.md") -Raw
+    Assert-Match $scrollsMdContent2 "docs/scrolls/STARTER\.md" "ps1 -t: SCROLLS.md rewritten to the short form too"
     Remove-Item -Recurse -Force $d2
 }
 
-Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's CLAUDE.md" {
+Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's SCROLLS.md" {
     $d3 = New-ScratchDir
     New-GitRepo $d3
     New-ScrollsFixture -Base $d3 -RelDocsDir "docs" -RefForm "docs/.scrolls"
@@ -178,12 +178,12 @@ Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-conta
     Invoke-Ps1 $d3 @("-r") | Out-Null
     Assert-True (Test-Path (Join-Path $d3 "docs/scrolls")) "ps1 -r: root scrolls folder unhidden"
     Assert-True (Test-Path (Join-Path $d3 "packages/api/docs/scrolls")) "ps1 -r: nested package scrolls folder unhidden too"
-    $rootClaude3 = Get-Content (Join-Path $d3 "CLAUDE.md") -Raw
-    Assert-Match $rootClaude3 "docs/scrolls/STARTER\.md" "ps1 -r: root CLAUDE.md correctly rewritten"
-    $pkgClaude3 = Get-Content (Join-Path $d3 "packages/api/CLAUDE.md") -Raw
-    Assert-Match $pkgClaude3 "docs/scrolls/STARTER\.md" "ps1 -r: package CLAUDE.md correctly rewritten to its OWN short form"
-    Assert-NotMatch $rootClaude3 "\.scrolls" "ps1 -r: root CLAUDE.md has no leftover .scrolls reference"
-    Assert-NotMatch $pkgClaude3 "\.scrolls" "ps1 -r: package CLAUDE.md has no leftover .scrolls reference"
+    $rootScrollsMd3 = Get-Content (Join-Path $d3 "SCROLLS.md") -Raw
+    Assert-Match $rootScrollsMd3 "docs/scrolls/STARTER\.md" "ps1 -r: root SCROLLS.md correctly rewritten"
+    $pkgScrollsMd3 = Get-Content (Join-Path $d3 "packages/api/SCROLLS.md") -Raw
+    Assert-Match $pkgScrollsMd3 "docs/scrolls/STARTER\.md" "ps1 -r: package SCROLLS.md correctly rewritten to its OWN short form"
+    Assert-NotMatch $rootScrollsMd3 "\.scrolls" "ps1 -r: root SCROLLS.md has no leftover .scrolls reference"
+    Assert-NotMatch $pkgScrollsMd3 "\.scrolls" "ps1 -r: package SCROLLS.md has no leftover .scrolls reference"
     Remove-Item -Recurse -Force $d3
 }
 
@@ -262,8 +262,8 @@ if ($HaveBash) {
         Invoke-Sh $dq @("-r") | Out-Null
         Assert-True (Test-Path (Join-Path $dq "docs/scrolls")) "sh -r: root scrolls folder unhidden"
         Assert-True (Test-Path (Join-Path $dq "packages/api/docs/scrolls")) "sh -r: nested package scrolls folder unhidden too"
-        $pkgClaudeQ = Get-Content (Join-Path $dq "packages/api/CLAUDE.md") -Raw
-        Assert-NotMatch $pkgClaudeQ "\.scrolls" "sh -r: package CLAUDE.md has no leftover .scrolls reference"
+        $pkgScrollsMdQ = Get-Content (Join-Path $dq "packages/api/SCROLLS.md") -Raw
+        Assert-NotMatch $pkgScrollsMdQ "\.scrolls" "sh -r: package SCROLLS.md has no leftover .scrolls reference"
         Remove-Item -Recurse -Force $dq
     }
 }

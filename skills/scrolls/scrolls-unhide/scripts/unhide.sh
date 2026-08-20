@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Renames .scrolls folder(s) to scrolls (visible), rewriting the path
-# references inside the moved folder and in any CLAUDE.md that mentions
+# references inside the moved folder and in any SCROLLS.md that mentions
 # it. Reports (never auto-edits) any other stray references it finds
 # nearby.
 #
@@ -116,7 +116,7 @@ process_one() {
   local docs_dir base_dir docs_name new_dir short_old short_new
 
   docs_dir="$(dirname "$old_dir")"        # .../docs
-  base_dir="$(dirname "$docs_dir")"        # whatever contains "docs" — where CLAUDE.md should live
+  base_dir="$(dirname "$docs_dir")"        # whatever contains "docs" — where SCROLLS.md should live
   docs_name="$(basename "$docs_dir")"      # normally "docs", but honors a custom --path basename
   new_dir="${docs_dir}/${TO_NAME}"
   short_old="${docs_name}/${FROM_NAME}"    # e.g. "docs/.scrolls" — the portable form scrolls-setup
@@ -154,16 +154,18 @@ process_one() {
     rewrite_file "$f"
   done < <(grep -rlF -e "$old_dir" -e "$short_old" "$new_dir" 2>/dev/null || true)
 
-  # CLAUDE.md is always an exact, direct sibling of "docs" by construction
+  # SCROLLS.md is always an exact, direct sibling of "docs" by construction
   # (that's the whole point of the short-form convention scrolls-setup
   # writes) — check that ONE specific file, never a recursive search.
   # A recursive search scoped to base_dir sounds safe but isn't: when
   # base_dir is itself the repo root (the common case), "scoped to
-  # base_dir" is no restriction at all, and a sibling package's CLAUDE.md
+  # base_dir" is no restriction at all, and a sibling package's SCROLLS.md
   # sharing the same short reference string would get wrongly rewritten.
-  local claude_md="${base_dir}/CLAUDE.md"
-  if [ -f "$claude_md" ] && grep -qF -e "$old_dir" -e "$short_old" "$claude_md" 2>/dev/null; then
-    rewrite_file "$claude_md"
+  # CLAUDE.md itself never needs rewriting here — scrolls-setup writes it
+  # as a fixed pointer to SCROLLS.md, never a direct scrolls-path reference.
+  local scrolls_md="${base_dir}/SCROLLS.md"
+  if [ -f "$scrolls_md" ] && grep -qF -e "$old_dir" -e "$short_old" "$scrolls_md" 2>/dev/null; then
+    rewrite_file "$scrolls_md"
   fi
 
   # Leftover-reference reporting is read-only, so a false positive here is

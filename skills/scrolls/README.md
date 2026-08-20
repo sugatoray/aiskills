@@ -4,8 +4,9 @@ Custom slash commands for managing `docs/.scrolls/` (or `docs/scrolls/`), a
 small set of markdown files that act as a project's working memory across
 sessions — what it does, what state it's in, what's known-missing and why,
 what's next, and what traps to avoid. `STARTER.md` inside that folder is the
-entry point; a `CLAUDE.md` pointer (and a matching `AGENTS.md` pointer to
-it, for other agent harnesses) tells new sessions to read it first.
+entry point; a `SCROLLS.md` file tells new sessions to read it first, with
+a short `CLAUDE.md` pointer to `SCROLLS.md` and a matching `AGENTS.md`
+pointer to `CLAUDE.md` for other agent harnesses.
 
 All five commands work the same way on macOS, Linux, and Windows. Every
 bundled script — all but `/scrolls-setup`, which needs none — ships as
@@ -18,7 +19,7 @@ to view it as a styled local web page instead of chat text).
 
 | Command | Purpose |
 | --- | --- |
-| [`/scrolls-setup`](scrolls-setup/) | Creates `docs/.scrolls/` for a project that doesn't have it yet: `STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`, plus a `CLAUDE.md` pointer and a matching `AGENTS.md` pointer to it. |
+| [`/scrolls-setup`](scrolls-setup/) | Creates `docs/.scrolls/` for a project that doesn't have it yet: `STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`, plus `SCROLLS.md`, a short `CLAUDE.md` pointer to it, and a matching `AGENTS.md` pointer to `CLAUDE.md`. |
 | [`/scrolls-update`](scrolls-update/) | Updates an existing `docs/.scrolls/` to reflect what happened in the current session, following each file's own update rule. The counterpart to `/scrolls-setup` — use this one for every session afterward. |
 | [`/scrolls-hide`](scrolls-hide/) | Renames an already-set-up `docs/scrolls/` to dotfile-hidden `docs/.scrolls/`, rewriting path references so nothing breaks. Retrofit path for a project set up visible. |
 | [`/scrolls-unhide`](scrolls-unhide/) | The opposite of `/scrolls-hide`: renames `docs/.scrolls/` to visible `docs/scrolls/`, rewriting path references so nothing breaks. |

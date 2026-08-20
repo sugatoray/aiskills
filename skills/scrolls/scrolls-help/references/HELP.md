@@ -1,6 +1,6 @@
 # Scrolls — Command Reference
 
-Scrolls are a small, checked-in `docs/.scrolls/` (or `docs/scrolls/`) file set that gives Claude cross-session memory for a project — what it does, what state it's in, what's known-missing, what's next, and what traps to avoid — plus a `CLAUDE.md` pointer that makes every future session read it first instead of re-discovering everything from scratch.
+Scrolls are a small, checked-in `docs/.scrolls/` (or `docs/scrolls/`) file set that gives Claude cross-session memory for a project — what it does, what state it's in, what's known-missing, what's next, and what traps to avoid — plus a `SCROLLS.md` pointer (with a short `CLAUDE.md` pointer to it) that makes every future session read it first instead of re-discovering everything from scratch.
 
 Every command here works the same way on macOS, Linux, and Windows — each bundled script ships as both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version with identical flags and behavior, and Claude picks whichever matches the current environment. Nothing about the examples below changes per platform.
 
@@ -91,11 +91,11 @@ Not sure exactly where the scrolls live relative to here:
 ## How the pieces fit together
 
 - `docs/.scrolls/STARTER.md` (or `docs/scrolls/STARTER.md`) is the entry point: it lists the other six files in reading order and says when to update each.
-- `CLAUDE.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory." `/scrolls-setup` also drops a matching `AGENTS.md` pointer (`See @CLAUDE.md`) in the same place, for harnesses that read that file instead.
+- `SCROLLS.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory." A short `CLAUDE.md` pointer (`See @SCROLLS.md.`) sits next to it, and a matching `AGENTS.md` pointer (`See @CLAUDE.md`) beside that, for harnesses that read those files instead.
 - The six other files: `SPEC.md` (features, updated when they ship), `HANDOFF.md` (session snapshot, overwritten each time, not appended), `GAP_ANALYSIS.md`/`GAP_CONTEXT.md` (known gaps and why they exist), `PLAN.md` (prioritized backlog), `WISDOM.md` (constraints, traps, ditches, and lessons worth reusing).
 
 ## Troubleshooting
 
 - **"It created a second scrolls system in a subdirectory I didn't expect."** You ran `/scrolls-setup` or `/scrolls-update` from somewhere other than the repo root without `-t`. Re-run with `-t` to target the repo root, or `-p`/`-l` to be explicit about where you meant.
 - **"hide/unhide didn't find anything."** By default they check exactly one location (`<base>/docs/.scrolls` or `.../scrolls`). Add `-r` to search recursively, or `-t` if you meant the repo root.
-- **"A monorepo package's `CLAUDE.md` got the wrong text after a sweep."** Shouldn't happen — hide/unhide only ever touch the one `CLAUDE.md` that's a direct sibling of the `docs` folder being renamed, never a broader search, specifically to avoid cross-wiring sibling packages that happen to share the same short reference text. If this happens, it's a bug worth reporting.
+- **"A monorepo package's `SCROLLS.md` got the wrong text after a sweep."** Shouldn't happen — hide/unhide only ever touch the one `SCROLLS.md` that's a direct sibling of the `docs` folder being renamed, never a broader search, specifically to avoid cross-wiring sibling packages that happen to share the same short reference text. `CLAUDE.md` itself is never touched by a sweep — it's a fixed pointer to `SCROLLS.md`, not a scrolls-path reference. If this happens, it's a bug worth reporting.
