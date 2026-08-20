@@ -24,6 +24,12 @@ function Resolve-Python {
 }
 $Python = Resolve-Python
 
+if ($args.Count -gt 0 -and $args[0] -eq "--stop") {
+    $rest = if ($args.Count -gt 1) { $args[1..($args.Count - 1)] } else { @() }
+    & $Python $ServeScript --stop @rest
+    exit $LASTEXITCODE
+}
+
 # Start-Process refuses to redirect stdout and stderr to the same file, so
 # use two and treat their concatenation as "the log" everywhere below.
 $StdoutLog = [System.IO.Path]::GetTempFileName()
@@ -44,8 +50,10 @@ $deadline = (Get-Date).AddSeconds(10)
 while ((Get-Date) -lt $deadline) {
     $log = Get-CombinedLog
     if ($log -match '(?m)^(https?://\S+)\s*$') {
-        Write-Host $Matches[1]
-        Write-Host "(pid $($proc.Id) — kill it to stop the server; log at $StdoutLog / $StderrLog)"
+        $url = $Matches[1]
+        Write-Host $url
+        $port = if ($url -match ':(\d+)/?$') { $Matches[1] } else { "" }
+        Write-Host "(pid $($proc.Id) — stop it with: $PSCommandPath --stop $port; it also shuts itself down after being idle; log at $StdoutLog / $StderrLog)"
         exit 0
     }
     if ($proc.HasExited) {
