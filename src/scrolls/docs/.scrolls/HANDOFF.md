@@ -14,7 +14,7 @@ Every install command form was run for real, in isolated scratch project/global 
 
 Documentation-only throughout: no `metadata.version` bump (per the family's own rule — nothing about how a `/scrolls-*` command runs changed), recorded instead as a new dated, unversioned entry in `skills/scrolls/CHANGELOG.md` (which explicitly covers `README.md` updates). Opened issue #24 for this work and updated this scroll set (`SPEC.md`, `GAP_ANALYSIS.md`/`GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`) accordingly.
 
-**Still to do this session**: refresh PR #7's title/body and mapped-issues list to include #24.
+PR #7's title/body and mapped-issues list have been refreshed to include #24.
 
 ## Known issues / open threads
 

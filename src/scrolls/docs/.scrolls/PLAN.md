@@ -11,7 +11,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Add a minimal `README.md` (purpose, `## Layout` tree, `## Installing` examples) to each of the five `scrolls-*` skill directories; open issue #24 for it.
 - [x] Verify every `npx skills add` form in the new `README.md`s against the real `skills` CLI in isolated scratch dirs, including the no-`--agent` auto-detection behavior, before writing them down.
 - [x] Record the new README work in `skills/scrolls/CHANGELOG.md` (family-level, documentation-only) and in this scroll set.
-- [ ] Update PR #7's description and mapped-issues list to include #24.
+- [x] Update PR #7's description and mapped-issues list to include #24.
 
 Longer-horizon, not yet ticketed in detail (tracked instead as GitHub issues #8–#24 until/unless they need local scroll entries too):
 - [ ] Merge PR #7 once ready, and close out issues #8–#24 accordingly.
