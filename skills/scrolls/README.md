@@ -71,3 +71,8 @@ scripts and documenting design decisions, not part of using the skills.
 `SKILL.md` may point to them by name, but only to say they're not part of
 carrying out a request — neither is ever read as instructions while a
 `/scrolls-*` command is actually running.
+
+This directory (`skills/scrolls/`) has its own `meta/MAINTAINERS.md` too
+— family-wide maintainer notes (shared conventions across all five,
+versioning, where the installable artifacts live) that don't belong in
+any single skill's own docs.
