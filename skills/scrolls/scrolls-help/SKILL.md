@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-help
     type: skill
     author: sugatoray
-    version: "1.1.0"
+    version: "1.2.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
     
 ---
@@ -17,12 +17,13 @@ metadata:
 
 This skill's job is to answer clearly and get out of the way — not to
 explore the user's codebase, not to check whether scrolls are actually
-set up here, and not to modify anything outside its own reference file.
+set up here, and not to modify anything in the user's project.
 
-> **Scope note:** The only file this skill ever writes to 
-> (for self-maintenance and used by the maintainer of the skill) is its own
-> `references/HELP.md`. It never modifies user code, user files, or
-> anything outside this skill's directory. See the section below for development notes for maintainers of this skill.
+> **Scope note:** This skill never writes to user code, user files, or
+> anything outside its own directory while carrying out a `/scrolls-help`
+> request. Keeping its own `references/HELP.md` current is a separate,
+> unrelated maintenance task for people maintaining this skill — see
+> `MAINTAINERS.md` — not something done while answering a user.
 
 ## Cross-platform
 
@@ -45,11 +46,7 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 
 ## Development
 
-> NOTE: THE FOLLOWING IS FOR SKILL MAINTAINERS ONLY. Users should never need to read or run this section.
-
-If you notice the reference has drifted from what the other four skills actually do (a flag behaves differently than documented, a new flag exists that isn't listed), Updating `references/HELP.md` itself.
-- If `references/HELP.md` is missing or stale, regenerate/update it —
-this is the skill's own reference file, not part of the user's project.
-- This file (`references/HELP.md`) needs to stay accurate as `scrolls-setup`/`scrolls-update`/`scrolls-hide`/`scrolls-unhide` evolve, since it's the thing users are told to trust, in chat and on the rendered page alike.
-
-`tests/` holds this script's Red/Green regression suite (bash + PowerShell), for maintaining `scripts/open_help.sh`/`scripts/open_help.ps1` themselves — it plays no part in carrying out a user's `/scrolls-help` request. Don't read or run it while executing this skill.
+See `MAINTAINERS.md` for how to keep `references/HELP.md` current and how
+to run the `tests/` regression suite. Neither is read as part of carrying
+out a user's `/scrolls-help` request — don't act on `MAINTAINERS.md` or
+`tests/` while answering one.
