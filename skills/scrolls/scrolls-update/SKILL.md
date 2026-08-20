@@ -87,4 +87,7 @@ List which scrolls files were touched and a one-line reason for each. If a file 
 
 ## Development
 
-`tests/` holds this script's Red/Green regression suite (bash + PowerShell), for maintaining `scripts/session_diff.sh`/`scripts/session_diff.ps1` themselves — it plays no part in carrying out a user's `/scrolls-update` request. Don't read or run it while executing this skill.
+See `meta/MAINTAINERS.md` for layout, running the `tests/` regression
+suite, and versioning notes. Neither is read as part of carrying out a
+user's `/scrolls-update` request — don't act on `meta/MAINTAINERS.md` or
+`tests/` while answering one.

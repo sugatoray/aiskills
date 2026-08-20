@@ -107,3 +107,9 @@ Once you know where `CLAUDE.md` goes:
 ### 5. Report back
 
 Summarize what was created vs. what already existed and was left untouched, and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
+
+## Development
+
+See `meta/MAINTAINERS.md` for layout and versioning notes. Not read as
+part of carrying out a user's `/scrolls-setup` request — don't act on
+`meta/MAINTAINERS.md` while answering one.

@@ -6,9 +6,9 @@ sessions — what it does, what state it's in, what's known-missing and why,
 what's next, and what traps to avoid. `STARTER.md` inside that folder is the
 entry point; a `CLAUDE.md` pointer tells new sessions to read it first.
 
-All five commands work the same way on macOS, Linux, and Windows — each
-bundled script ships as both a bash (`.sh`) and a PowerShell (`.ps1`,
-PowerShell 7+) version.
+All five commands work the same way on macOS, Linux, and Windows. Every
+bundled script — all but `/scrolls-setup`, which needs none — ships as
+both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version.
 
 Run `/scrolls-help` for the full example-driven reference (add `-e`/`--online`
 to view it as a styled local web page instead of chat text).
@@ -48,20 +48,25 @@ variable to change that default location.
 Every command's directory has:
 
 - `SKILL.md` — the skill's runtime instructions.
-- `scripts/` — bash + PowerShell implementations.
-- `tests/` — bash + PowerShell, Red/Green TDD.
+- `agents/openai.yaml` — OpenAI-agent interface metadata.
+- `meta/MAINTAINERS.md` — development notes: layout, versioning, and
+  (where applicable) running tests.
 
 Command-specific additions:
 
-- `/scrolls-setup` — `assets/templates/` for the scaffolded markdown files.
-- `/scrolls-help` — `references/HELP.md`, its canonical, presented-to-users
-  content, and `meta/`:
-  - `MAINTAINERS.md` — keeping that reference in sync, running tests.
-  - `SECURITY.md` — its security posture: the local `-e`/`--online`
-    server's scope, network exposure, and bounded lifecycle.
+- `/scrolls-setup` — `assets/templates/` for the scaffolded markdown
+  files. No bundled script or `tests/`: file creation goes through
+  Read/Write/Edit tools directly, not a script.
+- `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide` — `scripts/`
+  (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green TDD) for
+  their one bundled script.
+- `/scrolls-help` — `references/HELP.md`, its canonical,
+  presented-to-users content; `scripts/`/`tests/` for its `-e`/`--online`
+  local server; and `meta/SECURITY.md` alongside `MAINTAINERS.md`,
+  covering that server's scope, network exposure, and bounded lifecycle.
 
-`tests/` and `meta/` are development-only — for maintaining the bundled
+`tests/` and `meta/` are development-only — for maintaining bundled
 scripts and documenting design decisions, not part of using the skills.
-`SKILL.md` may point to them by name (scrolls-help's does, for both), but
-only to say they're not part of carrying out a request — neither is ever
-read as instructions while a `/scrolls-*` command is actually running.
+`SKILL.md` may point to them by name, but only to say they're not part of
+carrying out a request — neither is ever read as instructions while a
+`/scrolls-*` command is actually running.
