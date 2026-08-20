@@ -32,6 +32,28 @@ All five `scrolls-*` skills share a single version number instead of bumping ind
 
 A pointer at `src/scrolls/CLAUDE.md`, separate from the real skill artifacts at `skills/scrolls/`, documenting tested `npx skills add sugatoray/aiskills` install commands: local (project-level), global (user-level), and install-everywhere-for-every-supported-agent (`--all`) forms, plus `owner/repo#branch` pinning. Every command was actually run against the real repo before being written down, then fully cleaned up.
 
+## Per-skill `README.md`
+
+Each of the five `scrolls-*` skill directories now has its own minimal
+`README.md` — previously only `SKILL.md` (the runtime manifest, not
+rendered specially by GitHub) and the family-level `skills/scrolls/README.md`
+existed, so browsing into a skill folder directly on GitHub showed a bare
+file list. Each `README.md` has: purpose, how to run it, a `## Layout`
+section (a verified `tree`-style listing of that skill's actual files),
+a `## Installing` section (five tested `npx skills add` forms —
+interactive, this-skill-only, unattended all-five, unattended
+this-skill-only, and from-a-local-clone, with single-skill examples using
+that folder's own skill name), and links to `SKILL.md`/
+`meta/MAINTAINERS.md`/`CHANGELOG.md`. Not read at invocation time —
+purely for human readers; `SKILL.md` remains the only file read while a
+`/scrolls-*` command runs. Documentation-only, no version bump.
+
+The install examples confirmed a previously-undocumented `skills` CLI
+behavior: omitting `--agent` entirely (with `--yes`) makes the unattended
+form auto-detect whichever agents are already set up on the machine —
+the same set the interactive picker pre-checks — rather than requiring
+an explicit `--agent <name>` or `--agent '*'`.
+
 ## GitHub issue tracking for the above
 
-The safety-hardening, governance-rollout, and compatibility work above is tracked as three issue threads with real GitHub sub-issues (not just checklists): #8 (scrolls-help hardening, subs #9–#12), #13 (governance rollout, subs #14–#17), and #18 (AGENTS.md/SCROLLS.md compatibility, standalone). All reference PR #7, left open until it merges.
+The safety-hardening, governance-rollout, compatibility, and backfill work above is tracked as GitHub issues with real sub-issues (not just checklists) where the work had multiple distinct parts: #8 (scrolls-help hardening, subs #9–#12), #13 (governance rollout, subs #14–#17), #18 (AGENTS.md/SCROLLS.md compatibility, standalone), #19 (idempotent backfill, subs #20–#23), and #24 (per-skill README.md, standalone). All reference PR #7, left open until it merges.

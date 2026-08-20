@@ -24,6 +24,27 @@ Versioning entry) — one shared number across the family, currently:
 | `scrolls-unhide` | 2.1.0 |
 | `scrolls-help` | 2.1.0 |
 
+## 2026-08-20 (docs, no version bump)
+
+- **Per-skill `README.md` added to all five `scrolls-*` skills.** Each
+  skill directory previously had only `SKILL.md` (the runtime manifest)
+  and the family-level `README.md` here — browsing into a skill folder
+  directly on GitHub showed a bare file list. Each now has a minimal
+  `README.md`: purpose, how to run it, a `## Layout` section with a
+  verified `tree`-style listing of that skill's actual files, a
+  `## Installing` section with five tested `npx skills add` forms
+  (interactive, this-skill-only, unattended all-five, unattended
+  this-skill-only, and from-a-local-clone — single-skill examples using
+  that folder's own skill name), and links to `SKILL.md`/
+  `meta/MAINTAINERS.md`/`CHANGELOG.md`/this file. Every install command
+  was run in isolated scratch project/global directories against the
+  real `skills` CLI (v1.5.23) before being written down, then fully
+  cleaned up — including confirming that omitting `--agent` (with
+  `--yes`) auto-detects whichever agents are already set up on the
+  machine, the same set the interactive picker pre-checks. `README.md`
+  is not read at invocation time; `SKILL.md` remains the only file read
+  while a `/scrolls-*` command actually runs. Tracked as #24.
+
 ## 2026-08-20 (2.1.0)
 
 - **Idempotent `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill.**
