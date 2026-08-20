@@ -8,6 +8,31 @@ matching `AGENTS.md` pointer to `CLAUDE.md`.
 Run it with `/scrolls-setup`. For the full flag reference and usage
 examples, run `/scrolls-help`.
 
+## Layout
+
+```
+scrolls-setup/
+├── agents/
+│   └── openai.yaml
+├── assets/
+│   └── templates/
+│       ├── AGENTS_MD_BLOCK.md
+│       ├── CLAUDE_MD_BLOCK.md
+│       ├── GAP_ANALYSIS.md
+│       ├── GAP_CONTEXT.md
+│       ├── HANDOFF.md
+│       ├── PLAN.md
+│       ├── SCROLLS_MD_BLOCK.md
+│       ├── SPEC.md
+│       ├── STARTER.md
+│       └── WISDOM.md
+├── meta/
+│   └── MAINTAINERS.md
+├── CHANGELOG.md
+├── README.md
+└── SKILL.md
+```
+
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)

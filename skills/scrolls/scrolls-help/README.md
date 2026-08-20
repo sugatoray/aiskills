@@ -7,6 +7,29 @@ chat text.
 
 Run it with `/scrolls-help`.
 
+## Layout
+
+```
+scrolls-help/
+├── agents/
+│   └── openai.yaml
+├── meta/
+│   ├── MAINTAINERS.md
+│   └── SECURITY.md
+├── references/
+│   └── HELP.md
+├── scripts/
+│   ├── open_help.ps1
+│   ├── open_help.sh
+│   └── serve_help.py
+├── tests/
+│   ├── test_open_help.ps1
+│   └── test_open_help.sh
+├── CHANGELOG.md
+├── README.md
+└── SKILL.md
+```
+
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
 - **Reference content**: [`references/HELP.md`](references/HELP.md)
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
