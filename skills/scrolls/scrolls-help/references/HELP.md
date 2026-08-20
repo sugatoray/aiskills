@@ -91,7 +91,7 @@ Not sure exactly where the scrolls live relative to here:
 ## How the pieces fit together
 
 - `docs/.scrolls/STARTER.md` (or `docs/scrolls/STARTER.md`) is the entry point: it lists the other six files in reading order and says when to update each.
-- `CLAUDE.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory."
+- `CLAUDE.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory." `/scrolls-setup` also drops a matching `AGENTS.md` pointer (`See @CLAUDE.md`) in the same place, for harnesses that read that file instead.
 - The six other files: `SPEC.md` (features, updated when they ship), `HANDOFF.md` (session snapshot, overwritten each time, not appended), `GAP_ANALYSIS.md`/`GAP_CONTEXT.md` (known gaps and why they exist), `PLAN.md` (prioritized backlog), `WISDOM.md` (constraints, traps, ditches, and lessons worth reusing).
 
 ## Troubleshooting

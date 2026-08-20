@@ -1,6 +1,6 @@
 ---
 name: scrolls-setup
-description: "Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md) plus a CLAUDE.md pointer that tells future sessions to read STARTER.md first. Use this whenever the user runs /scrolls-setup, or asks to set up 'scrolls', a project-memory system, session handoff notes, a docs/.scrolls folder, or a CLAUDE.md that points new sessions at persistent project docs. Trigger even if the project has no docs/ folder or no CLAUDE.md yet — creating them is part of the job. Supports -p/--path for a custom docs location, -t/--reporoot to pin everything to the git repository's top level regardless of which subdirectory you're in, -l/--local to pin it explicitly to the current directory, -r/--recurse to scan recursively for an existing scrolls folder before creating a new one (avoiding accidental duplicates), and -u/--unhide to name the folder scrolls instead of .scrolls. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently create a second, disconnected scrolls system. Works on macOS, Linux, and Windows (bash or PowerShell)."
+description: "Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md) plus a CLAUDE.md pointer (and a matching AGENTS.md pointer to it, for other agent harnesses) that tells future sessions to read STARTER.md first. Use this whenever the user runs /scrolls-setup, or asks to set up 'scrolls', a project-memory system, session handoff notes, a docs/.scrolls folder, or a CLAUDE.md/AGENTS.md that points new sessions at persistent project docs. Trigger even if the project has no docs/ folder, no CLAUDE.md, or no AGENTS.md yet — creating them is part of the job. Supports -p/--path for a custom docs location, -t/--reporoot to pin everything to the git repository's top level regardless of which subdirectory you're in, -l/--local to pin it explicitly to the current directory, -r/--recurse to scan recursively for an existing scrolls folder before creating a new one (avoiding accidental duplicates), and -u/--unhide to name the folder scrolls instead of .scrolls. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently create a second, disconnected scrolls system. Works on macOS, Linux, and Windows (bash or PowerShell)."
 license: MIT
 compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
@@ -8,13 +8,13 @@ metadata:
   - name: scrolls-setup
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "1.1.0"
     source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup
 ---
 
 # Setting up docs/.scrolls/
 
-`docs/.scrolls/` is a small set of markdown files that act as a project's working memory across sessions: what it does, what state it's in, what's known-missing and why, what's next, and what traps to avoid. A `CLAUDE.md` pointer sends every future session to `docs/.scrolls/STARTER.md` first, so state gets picked up instead of re-discovered from scratch each time. This skill scaffolds that system for a project that doesn't have it yet.
+`docs/.scrolls/` is a small set of markdown files that act as a project's working memory across sessions: what it does, what state it's in, what's known-missing and why, what's next, and what traps to avoid. A `CLAUDE.md` pointer — plus a matching `AGENTS.md` pointer to it, for harnesses that read that file instead — sends every future session to `docs/.scrolls/STARTER.md` first, so state gets picked up instead of re-discovered from scratch each time. This skill scaffolds that system for a project that doesn't have it yet.
 
 This skill's own `assets/templates/` directory holds the source templates — copy from there, never edit those files in place.
 
@@ -91,7 +91,7 @@ This is the **minimal** set — exactly the six files `STARTER.md` walks through
 
 Templates are intentionally close to empty (placeholder bullets like "(none tracked yet)") — resist the urge to pre-populate `SPEC.md` with a guessed feature list or `PLAN.md` with invented tickets. A minimal scaffold's job is to hold the *shape*; the content accumulates from real sessions. The one exception is `STARTER.md`'s "Quick orientation" section, which is worth getting right since it's the one piece of static context every session leans on immediately.
 
-### 4. Point CLAUDE.md at STARTER.md
+### 4. Point CLAUDE.md and AGENTS.md at STARTER.md
 
 Read `assets/templates/CLAUDE_MD_BLOCK.md` and substitute `{{SCROLLS_PATH}}` in it the same way as `STARTER.md` — that's the block to install.
 
@@ -104,9 +104,15 @@ Once you know where `CLAUDE.md` goes:
 - **`CLAUDE.md` exists but has no scrolls-path reference**: insert the block near the top of the file (before other instructions, since "read this first" only works if it's read first), separated by blank lines from surrounding content. If the file already opens with its own top-level heading, add the block's heading as a subsection instead of a second top-level `# Project instructions` — match the existing file's heading structure rather than fighting it.
 - **`CLAUDE.md` already references `SCROLLS_PATH/STARTER.md`** (or the short form, if that's what applies here): leave it alone; note this to the user instead of duplicating the block.
 
+Then do the same, in that same directory, for `AGENTS.md` — the convention several other agent harnesses (e.g. Codex CLI, and others following the [agents.md](https://agents.md) convention) read instead of `CLAUDE.md`. Its content is `assets/templates/AGENTS_MD_BLOCK.md` verbatim — a one-line pointer (`See @CLAUDE.md`), not the full block, and no `{{SCROLLS_PATH}}` substitution needed:
+
+- **No `AGENTS.md` there yet**: create one containing exactly that line.
+- **`AGENTS.md` exists but doesn't already reference `CLAUDE.md`**: insert the line near the top, separated by blank lines from surrounding content, the same way as `CLAUDE.md` above — don't touch anything else already in the file.
+- **`AGENTS.md` already references `CLAUDE.md`** (or already points straight at `SCROLLS_PATH/STARTER.md` itself): leave it alone; note this to the user instead of duplicating.
+
 ### 5. Report back
 
-Summarize what was created vs. what already existed and was left untouched, and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
+Summarize what was created vs. what already existed and was left untouched — including whether `CLAUDE.md` and `AGENTS.md` were created, updated, or left alone — and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
 
 ## Development
 

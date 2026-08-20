@@ -8,9 +8,11 @@ For people developing this skill — not read as part of answering a
 - `../SKILL.md` — the only file read at invocation time.
 - `../assets/templates/` — source templates for the seven scaffolded files
   (`STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`,
-  `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`) plus `CLAUDE_MD_BLOCK.md`. Edit
-  these directly to change what gets scaffolded — the skill only ever
-  copies *from* them, never the reverse.
+  `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`) plus `CLAUDE_MD_BLOCK.md` and
+  `AGENTS_MD_BLOCK.md` (the two pointer blocks written into `CLAUDE.md` and
+  `AGENTS.md`, not into the scrolls folder itself). Edit these directly to
+  change what gets scaffolded — the skill only ever copies *from* them,
+  never the reverse.
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
 
 Unlike the other four scrolls skills, this one has no bundled `.sh`/`.ps1`
