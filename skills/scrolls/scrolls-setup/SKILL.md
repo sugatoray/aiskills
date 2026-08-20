@@ -1,6 +1,6 @@
 ---
 name: scrolls-setup
-description: "Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md) plus a CLAUDE.md pointer that tells future sessions to read STARTER.md first. Use this whenever the user runs /scrolls-setup, or asks to set up 'scrolls', a project-memory system, session handoff notes, a docs/.scrolls folder, or a CLAUDE.md that points new sessions at persistent project docs. Trigger even if the project has no docs/ folder or no CLAUDE.md yet — creating them is part of the job. Supports -p/--path for a custom docs location, -t/--reporoot to pin everything to the git repository's top level regardless of which subdirectory you're in, -l/--local to pin it explicitly to the current directory, -r/--recurse to scan recursively for an existing scrolls folder before creating a new one (avoiding accidental duplicates), and -u/--unhide to name the folder scrolls instead of .scrolls. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently create a second, disconnected scrolls system. Works on macOS, Linux, and Windows (bash or PowerShell)."
+description: "Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md) plus a SCROLLS.md file that points future sessions at STARTER.md, a short CLAUDE.md pointer to SCROLLS.md, and a matching AGENTS.md pointer to CLAUDE.md for other agent harnesses. Use this whenever the user runs /scrolls-setup, or asks to set up 'scrolls', a project-memory system, session handoff notes, a docs/.scrolls folder, or a CLAUDE.md/AGENTS.md/SCROLLS.md that points new sessions at persistent project docs. Trigger even if the project has no docs/ folder, no CLAUDE.md, no AGENTS.md, or no SCROLLS.md yet — creating them is part of the job. Supports -p/--path for a custom docs location, -t/--reporoot to pin everything to the git repository's top level regardless of which subdirectory you're in, -l/--local to pin it explicitly to the current directory, -r/--recurse to scan recursively for an existing scrolls folder before creating a new one (avoiding accidental duplicates), and -u/--unhide to name the folder scrolls instead of .scrolls. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently create a second, disconnected scrolls system. Works on macOS, Linux, and Windows (bash or PowerShell)."
 license: MIT
 compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
@@ -8,13 +8,13 @@ metadata:
   - name: scrolls-setup
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "2.1.0"
     source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup
 ---
 
 # Setting up docs/.scrolls/
 
-`docs/.scrolls/` is a small set of markdown files that act as a project's working memory across sessions: what it does, what state it's in, what's known-missing and why, what's next, and what traps to avoid. A `CLAUDE.md` pointer sends every future session to `docs/.scrolls/STARTER.md` first, so state gets picked up instead of re-discovered from scratch each time. This skill scaffolds that system for a project that doesn't have it yet.
+`docs/.scrolls/` is a small set of markdown files that act as a project's working memory across sessions: what it does, what state it's in, what's known-missing and why, what's next, and what traps to avoid. A `SCROLLS.md` file sends every future session to `docs/.scrolls/STARTER.md` first, so state gets picked up instead of re-discovered from scratch each time — with a short `CLAUDE.md` pointer to `SCROLLS.md`, and a matching `AGENTS.md` pointer to `CLAUDE.md` for harnesses that read that file instead. This skill scaffolds that system for a project that doesn't have it yet.
 
 This skill's own `assets/templates/` directory holds the source templates — copy from there, never edit those files in place.
 
@@ -26,7 +26,7 @@ Unlike the other four scrolls skills, this one has no bundled `.sh`/`.ps1` scrip
 
 The user may pass these after `/scrolls-setup` as plain text, in any order — there's no real argv parser here, so read the invocation text yourself and pull out:
 
-- **`-p <path>` / `--path=<path>` / `--path <path>`** — a custom docs folder, relative to the current working directory unless given as an absolute path (starts with `/`). Use this for monorepos or non-standard layouts, e.g. `--path=packages/api/docs` puts the scrolls at `packages/api/docs/.scrolls`. This is the one option where you're naming the docs folder directly rather than picking a base directory — see the CLAUDE.md placement note in step 4 for the tradeoff that comes with going deep.
+- **`-p <path>` / `--path=<path>` / `--path <path>`** — a custom docs folder, relative to the current working directory unless given as an absolute path (starts with `/`). Use this for monorepos or non-standard layouts, e.g. `--path=packages/api/docs` puts the scrolls at `packages/api/docs/.scrolls`. This is the one option where you're naming the docs folder directly rather than picking a base directory — see the `SCROLLS.md`/`CLAUDE.md` placement note in step 4 for the tradeoff that comes with going deep.
 - **`-t` / `--reporoot`** — pin everything to the git repository's top level (`$(git rev-parse --show-toplevel)`), regardless of which subdirectory you actually invoked this from. Fails with a clear message if the current directory isn't inside a git repository — there's no repo root to find.
 - **`-l` / `--local`** — pin everything to the current working directory explicitly. This is what happens by default anyway when none of `-p`/`-t`/`-l` are given — the flag exists so you (or the user) can say so on purpose, e.g. to skip the mismatch check in step 1.
 - **`-r` / `--recurse`** — before creating anything, scan recursively under `BASE_DIR` for a scrolls folder that already exists somewhere nearby (same bounded, pruned, `STARTER.md`-guarded search `/scrolls-hide`/`/scrolls-unhide` use), so a duplicate isn't created by accident. Doesn't change *where* the new scrolls folder goes if you proceed — see step 1.
@@ -38,7 +38,7 @@ The user may pass these after `/scrolls-setup` as plain text, in any order — t
 
 ### 1. Resolve BASE_DIR and don't clobber existing work
 
-Compute `BASE_DIR` — the directory that will contain both the `docs` folder and `CLAUDE.md`:
+Compute `BASE_DIR` — the directory that will contain the `docs` folder, `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md`:
 
 - **`-t`/`--reporoot` given**: `BASE_DIR = $(git rev-parse --show-toplevel)`. If that command fails (not inside a git repository), stop and tell the user — there's no repo root to pin to here; suggest `--path` instead.
 - **`-l`/`--local` given**, or **`-p`/`--path` given**: skip straight to computing `DOCS_BASE` below — `-l` uses `BASE_DIR = $(pwd)` and `-p` bypasses `BASE_DIR` entirely (see the note under `DOCS_BASE`).
@@ -56,7 +56,7 @@ SCROLLS_PATH = "${DOCS_BASE}/${SCROLLS_DIR}"
 
 `SCROLLS_PATH` replaces every `docs/.scrolls` you'll see referenced below and in the templates — the rest of this skill talks about "the scrolls path" generically. If the user already has a hidden `.scrolls` set up and wants it converted to visible later, that's a separate, dedicated operation — point them at `/scrolls-unhide` rather than re-running this skill.
 
-If `SCROLLS_PATH` already exists with files in it, stop and ask the user whether they want you to fill in only the missing files or leave it alone — never overwrite an existing scroll file silently, since `HANDOFF.md`/`PLAN.md`/etc. may hold real accumulated state. The same caution applies to `CLAUDE.md`: never blow away existing content. If `--unhide` was passed but a `.scrolls` folder already exists there (or vice versa), don't create a second, parallel scrolls folder — tell the user and point at `/scrolls-unhide` instead.
+If `SCROLLS_PATH` already exists with files in it, stop and ask the user whether they want you to fill in only the missing files or leave it alone — never overwrite an existing scroll file silently, since `HANDOFF.md`/`PLAN.md`/etc. may hold real accumulated state. The same caution applies to `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md`: never blow away existing content. If `--unhide` was passed but a `.scrolls` folder already exists there (or vice versa), don't create a second, parallel scrolls folder — tell the user and point at `/scrolls-unhide` instead.
 
 ### 2. Gather just enough project context
 
@@ -72,8 +72,8 @@ If any of this is ambiguous (e.g. a monorepo with several `package.json`s), a si
 
 Copy each file from `assets/templates/` into `SCROLLS_PATH` on disk, substituting the `{{PROJECT_NAME}}`, `{{PROJECT_TAGLINE}}`, `{{QUICK_ORIENTATION}}`, and `{{SCROLLS_PATH}}` placeholders with what you gathered in step 2 and computed above. `SCROLLS_PATH` is an absolute filesystem path when it came from `-t`/`-l`/the default (all resolve through `BASE_DIR`, which is always absolute) — that's fine for the actual file writes, but **the text you substitute for `{{SCROLLS_PATH}}` inside the templates is not the same string**:
 
-- **`-t`/`-l`/default (`BASE_DIR`-derived)**: substitute the *short* form, `docs/${SCROLLS_DIR}` (e.g. `docs/.scrolls`) — never the absolute `SCROLLS_PATH`. This is what keeps the files portable: `CLAUDE.md` always ends up living at `BASE_DIR` too (step 4), so a reference relative to `BASE_DIR` is correct regardless of whether `BASE_DIR` was `$(pwd)` or the git root, and regardless of which machine or clone reads it later. Baking in an absolute path here would break the moment the repo is cloned somewhere else.
-- **`-p`/`--path`**: substitute the full `DOCS_BASE`-based `SCROLLS_PATH` as given, unchanged from before (e.g. `packages/api/docs/.scrolls`) — this path is already relative, and where `CLAUDE.md` ends up for this case is judgment-dependent (see step 4), so keep the existing behavior rather than guessing at a shorter form.
+- **`-t`/`-l`/default (`BASE_DIR`-derived)**: substitute the *short* form, `docs/${SCROLLS_DIR}` (e.g. `docs/.scrolls`) — never the absolute `SCROLLS_PATH`. This is what keeps the files portable: `SCROLLS.md` always ends up living at `BASE_DIR` too (step 4), so a reference relative to `BASE_DIR` is correct regardless of whether `BASE_DIR` was `$(pwd)` or the git root, and regardless of which machine or clone reads it later. Baking in an absolute path here would break the moment the repo is cloned somewhere else.
+- **`-p`/`--path`**: substitute the full `DOCS_BASE`-based `SCROLLS_PATH` as given, unchanged from before (e.g. `packages/api/docs/.scrolls`) — this path is already relative, and where `SCROLLS.md` ends up for this case is judgment-dependent (see step 4), so keep the existing behavior rather than guessing at a shorter form.
 
 | Template | → | Purpose |
 |---|---|---|
@@ -87,23 +87,43 @@ Copy each file from `assets/templates/` into `SCROLLS_PATH` on disk, substitutin
 
 This is the **minimal** set — exactly the six files `STARTER.md` walks through, plus `STARTER.md` itself. Don't invent extra scroll files (security reviews, architecture-decision records, subsystem deep-dives) up front; those get added later, organically, by whoever's doing that specific work, following the pattern `STARTER.md`'s own last section describes. Leave `{{PROJECT_TAGLINE}}` blank (drop the placeholder entirely, don't leave literal `{{...}}` text) if you found nothing worth using — it reads fine as `You're picking up work on **Foo**.` with no tagline clause.
 
-`STARTER.md` and `CLAUDE_MD_BLOCK.md` are the only templates containing `{{SCROLLS_PATH}}` — substitute it per the rule above (short form for `-t`/`-l`/default, full `SCROLLS_PATH` for `-p`), not a placeholder string, and use the *same* substitution in both files.
+`STARTER.md` and `SCROLLS_MD_BLOCK.md` are the only templates containing `{{SCROLLS_PATH}}` — substitute it per the rule above (short form for `-t`/`-l`/default, full `SCROLLS_PATH` for `-p`), not a placeholder string, and use the *same* substitution in both files. `CLAUDE_MD_BLOCK.md` and `AGENTS_MD_BLOCK.md` need no substitution at all — see step 4.
 
 Templates are intentionally close to empty (placeholder bullets like "(none tracked yet)") — resist the urge to pre-populate `SPEC.md` with a guessed feature list or `PLAN.md` with invented tickets. A minimal scaffold's job is to hold the *shape*; the content accumulates from real sessions. The one exception is `STARTER.md`'s "Quick orientation" section, which is worth getting right since it's the one piece of static context every session leans on immediately.
 
-### 4. Point CLAUDE.md at STARTER.md
+### 4. Point SCROLLS.md, CLAUDE.md, and AGENTS.md at STARTER.md
 
-Read `assets/templates/CLAUDE_MD_BLOCK.md` and substitute `{{SCROLLS_PATH}}` in it the same way as `STARTER.md` — that's the block to install.
+This step always runs, regardless of what was decided in step 1 about the scrolls folder's own seven files — even against a project that already had a fully populated `docs/.scrolls/` and was left untouched there, still check/backfill `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` here. That's what makes this skill idempotent and safe to re-run against an existing project purely to pick up this pointer chain: running it twice (or against a project set up by an older version of this skill, before `SCROLLS.md`/`AGENTS.md` existed) never duplicates or overwrites anything — each of the three checks below is create-if-missing / insert-if-not-already-referencing / leave-alone-if-already-correct.
 
-- **`-t`/`-l`/default (`BASE_DIR`-derived)**: `CLAUDE.md` goes at `BASE_DIR` — the same directory that now contains `docs`. This is fixed and unambiguous: `BASE_DIR` is exactly what `-t`/`-l`/the mismatch check in step 1 resolved, so there's no separate "project root" judgment call to make here anymore.
-- **`-p`/`--path`**: where `CLAUDE.md` belongs is genuinely judgment-dependent, since a custom `--path` might point at an independent monorepo package (its own `CLAUDE.md`, short local references — closer to what `-l` would produce if you'd `cd`ed into that package first) or be one piece of a larger repo meant to stay under a single root `CLAUDE.md` referencing the full path. Use whatever `CLAUDE.md` location the project's other tooling already expects; if genuinely unclear, ask rather than guessing — this is the one case where a wrong guess is expensive (a broken reference baked into checked-in docs).
+Read `assets/templates/SCROLLS_MD_BLOCK.md` and substitute `{{SCROLLS_PATH}}` in it the same way as `STARTER.md` — that's the content to install as `SCROLLS.md`.
 
-Once you know where `CLAUDE.md` goes:
+- **`-t`/`-l`/default (`BASE_DIR`-derived)**: `SCROLLS.md` (and `CLAUDE.md`, `AGENTS.md`, below) go at `BASE_DIR` — the same directory that now contains `docs`. This is fixed and unambiguous: `BASE_DIR` is exactly what `-t`/`-l`/the mismatch check in step 1 resolved, so there's no separate "project root" judgment call to make here anymore.
+- **`-p`/`--path`**: where they belong is genuinely judgment-dependent, since a custom `--path` might point at an independent monorepo package (its own `SCROLLS.md`, short local references — closer to what `-l` would produce if you'd `cd`ed into that package first) or be one piece of a larger repo meant to stay under a single root set of pointer files referencing the full path. Use whatever location the project's other tooling already expects; if genuinely unclear, ask rather than guessing — this is the one case where a wrong guess is expensive (a broken reference baked into checked-in docs).
+
+Once you know where they go:
+
+- **No `SCROLLS.md` there yet**: create one containing exactly that content.
+- **`SCROLLS.md` exists but has no scrolls-path reference**: insert it near the top of the file, separated by blank lines from surrounding content. If the file already opens with its own top-level heading, add the block's heading as a subsection instead of a second top-level `# Scrolls — Project Memory` — match the existing file's heading structure rather than fighting it.
+- **`SCROLLS.md` already references `SCROLLS_PATH/STARTER.md`** (or the short form, if that's what applies here): leave it alone; note this to the user instead of duplicating the block.
+
+Then do the same, in that same directory, for `CLAUDE.md`. Its content is `assets/templates/CLAUDE_MD_BLOCK.md` verbatim — a fixed two-line pointer (`## Access Scrolls Agentic Memory` / `See @SCROLLS.md.`), not the `SCROLLS.md` content itself, and no `{{SCROLLS_PATH}}` substitution needed — it only ever references `SCROLLS.md`, which is always its own sibling regardless of which flags were used:
 
 - **No `CLAUDE.md` there yet**: create one containing exactly that block.
-- **`CLAUDE.md` exists but has no scrolls-path reference**: insert the block near the top of the file (before other instructions, since "read this first" only works if it's read first), separated by blank lines from surrounding content. If the file already opens with its own top-level heading, add the block's heading as a subsection instead of a second top-level `# Project instructions` — match the existing file's heading structure rather than fighting it.
-- **`CLAUDE.md` already references `SCROLLS_PATH/STARTER.md`** (or the short form, if that's what applies here): leave it alone; note this to the user instead of duplicating the block.
+- **`CLAUDE.md` exists but doesn't already reference `SCROLLS.md`**: insert the block near the top of the file (before other instructions, since "read this first" only works if it's read first), separated by blank lines from surrounding content — even if the file already points straight at `SCROLLS_PATH/STARTER.md` itself, from before this file split existed. That's a real, common case (a project set up by a pre-`1.2.0` version of this skill), and it's exactly the case this exists to catch: insert the stub anyway, so `CLAUDE.md` ends up pointing at `SCROLLS.md` regardless of what it already said. This is additive only — never remove or rewrite what was already there, even if that leaves both an old direct reference and the new stub in the same file.
+- **`CLAUDE.md` already references `SCROLLS.md`**: leave it alone; note this to the user instead of duplicating.
+
+Then do the same, in that same directory, for `AGENTS.md` — the convention several other agent harnesses (e.g. Codex CLI, and others following the [agents.md](https://agents.md) convention) read instead of `CLAUDE.md`. Its content is `assets/templates/AGENTS_MD_BLOCK.md` verbatim — a one-line pointer (`See @CLAUDE.md`), not `SCROLLS.md`'s content:
+
+- **No `AGENTS.md` there yet**: create one containing exactly that line.
+- **`AGENTS.md` exists but doesn't already reference `CLAUDE.md`**: insert the line near the top, separated by blank lines from surrounding content, the same way as above — don't touch anything else already in the file.
+- **`AGENTS.md` already references `CLAUDE.md`** (or already points straight at `SCROLLS.md`/`SCROLLS_PATH/STARTER.md` itself): leave it alone; note this to the user instead of duplicating.
 
 ### 5. Report back
 
-Summarize what was created vs. what already existed and was left untouched, and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
+Summarize what was created vs. what already existed and was left untouched — including whether `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md` were created, updated, or left alone — and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
+
+## Development
+
+See `meta/MAINTAINERS.md` for layout and versioning notes. Not read as
+part of carrying out a user's `/scrolls-setup` request — don't act on
+`meta/MAINTAINERS.md` while answering one.

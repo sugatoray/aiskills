@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-help
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "2.1.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
     
 ---
@@ -17,12 +17,16 @@ metadata:
 
 This skill's job is to answer clearly and get out of the way — not to
 explore the user's codebase, not to check whether scrolls are actually
-set up here, and not to modify anything outside its own reference file.
+set up here, and not to modify anything in the user's project.
 
-> **Scope note:** The only file this skill ever writes to 
-> (for self-maintenance and used by the maintainer of the skill) is its own
-> `references/HELP.md`. It never modifies user code, user files, or
-> anything outside this skill's directory. See the section below for development notes for maintainers of this skill.
+> **Scope note:** This skill never writes to user code, user files, or
+> anything outside its own directory while carrying out a `/scrolls-help`
+> request. Keeping its own `references/HELP.md` current is a separate,
+> unrelated maintenance task for people maintaining this skill — see
+> `meta/MAINTAINERS.md` — not something done while answering a user. For
+> the full security posture (file-system scope, the local `-e`/`--online`
+> server's network exposure and lifecycle), see `meta/SECURITY.md` —
+> reference material, not something to act on while answering a request.
 
 ## Cross-platform
 
@@ -35,7 +39,7 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 ## Steps
 
 1. Read `references/HELP.md` — that's the maintained, canonical content. Present it rather than reconstructing an explanation from memory of how these skills work: flag semantics here have changed across iterations (e.g. `-r` used to mean "repo root," now means "recurse"), and the reference file is the single source of truth that gets updated when that happens.
-2. **`-e`/`--online` given**: run `bash <skill-dir>/scripts/open_help.sh` or `pwsh <skill-dir>/scripts/open_help.ps1` (see "Cross-platform" above). It launches a small stdlib-only Python server (no dependencies to install) that renders `HELP.md` into a clean, self-contained HTML page and binds it to `127.0.0.1` on a port the OS assigns (never all interfaces; this is a local reference viewer, not something to expose on the network). The script waits for the server to confirm it's actually listening before printing anything, then prints the URL followed by the process's PID. Report that URL to the user as a clickable link and mention the PID so they can stop the server later if they want to (it keeps running after this skill finishes, so the link stays open) — a fresh invocation with `-e` starts another server on a new port rather than reusing one, which is fine but worth knowing if several accumulate over a long session. If the script's own browser-opening attempt didn't visibly do anything (e.g. a headless/remote environment with no display), that's expected — the URL is still valid and the report to the user is what matters.
+2. **`-e`/`--online` given**: run `bash <skill-dir>/scripts/open_help.sh` or `pwsh <skill-dir>/scripts/open_help.ps1` (see "Cross-platform" above). It launches a small stdlib-only Python server (no dependencies to install) that renders `HELP.md` into a clean, self-contained HTML page and binds it to `127.0.0.1` on a port the OS assigns (never all interfaces; this is a local reference viewer, not something to expose on the network). The script waits for the server to confirm it's actually listening before printing anything, then prints the URL followed by the process's PID. Report that URL to the user as a clickable link — it keeps running after this skill finishes, so the link stays open — and mention that it shuts itself down automatically after 30 minutes idle or 2 hours total (whichever comes first), and can be stopped sooner with `<script> --stop <port>` (or `--stop --all` to stop every instance) — no need to hunt down and `kill` a PID by hand. A fresh invocation with `-e` starts another server on a new port rather than reusing one, which is fine but worth knowing if several accumulate over a long session; each stops on its own even if never told to. If the script's own browser-opening attempt didn't visibly do anything (e.g. a headless/remote environment with no display), that's expected — the URL is still valid and the report to the user is what matters.
 
    The page has a small toolbar (top-right) with two independent toggles: **light/dark** (follows the system preference by default; the button forces either explicitly, persisted via `localStorage`) and **colorize/plain** (code blocks get a small GitHub-syntax-style token palette by default — commands, flags, and comments each colored distinctly, with separate light and dark values, in the spirit of a Pygments/pymdown-extensions theme; the button strips that back to plain text, also persisted). Mention both toggles are there when reporting the URL — they're not obvious from the link alone.
 3. **Bare `/scrolls-help`, or an open-ended question** ("what are the scrolls commands," "how does this work"), without `-e`: present the whole document, as markdown chat output. This is an answer, not a deliverable — don't write it to a file or publish it as an artifact unless the user separately asks for that.
@@ -45,11 +49,7 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 
 ## Development
 
-> NOTE: THE FOLLOWING IS FOR SKILL MAINTAINERS ONLY. Users should never need to read or run this section.
-
-If you notice the reference has drifted from what the other four skills actually do (a flag behaves differently than documented, a new flag exists that isn't listed), Updating `references/HELP.md` itself.
-- If `references/HELP.md` is missing or stale, regenerate/update it —
-this is the skill's own reference file, not part of the user's project.
-- This file (`references/HELP.md`) needs to stay accurate as `scrolls-setup`/`scrolls-update`/`scrolls-hide`/`scrolls-unhide` evolve, since it's the thing users are told to trust, in chat and on the rendered page alike.
-
-`tests/` holds this script's Red/Green regression suite (bash + PowerShell), for maintaining `scripts/open_help.sh`/`scripts/open_help.ps1` themselves — it plays no part in carrying out a user's `/scrolls-help` request. Don't read or run it while executing this skill.
+See `meta/MAINTAINERS.md` for how to keep `references/HELP.md` current and
+how to run the `tests/` regression suite. Neither is read as part of
+carrying out a user's `/scrolls-help` request — don't act on
+`meta/MAINTAINERS.md` or `tests/` while answering one.

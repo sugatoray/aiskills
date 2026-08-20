@@ -8,16 +8,34 @@ Binds to 127.0.0.1 only (never all interfaces) — this is a local reference
 viewer, not something meant to be reachable from the network.
 
 Prints the URL as the first line of output, then blocks serving requests
-until killed. Meant to be launched in the background by open_help.sh, which
-waits for that first line rather than guessing a fixed startup delay.
+until stopped — either automatically (idle/lifetime timeout, below) or via
+`serve_help.py --stop <port>` / `--stop --all`. Meant to be launched in the
+background by open_help.sh/.ps1, which wait for that first line rather than
+guessing a fixed startup delay.
+
+The server shuts itself down after SCROLLS_HELP_IDLE_TIMEOUT seconds with no
+requests, or SCROLLS_HELP_MAX_LIFETIME seconds total, whichever comes first
+(defaults: 30 minutes idle, 2 hours total) — a local docs viewer shouldn't be
+able to accumulate forever as an unbounded, unsupervised background process.
+Each running instance is tracked by a small state file (pid + port) under
+the system temp dir so `--stop` can find and terminate it without the caller
+needing to remember the PID.
 """
 import html as _html
 import http.server
+import json
 import os
 import re
-import socketserver
+import signal
 import sys
+import tempfile
+import threading
+import time
 import webbrowser
+
+IDLE_TIMEOUT = float(os.environ.get("SCROLLS_HELP_IDLE_TIMEOUT", 30 * 60))
+MAX_LIFETIME = float(os.environ.get("SCROLLS_HELP_MAX_LIFETIME", 2 * 60 * 60))
+CHECK_INTERVAL = float(os.environ.get("SCROLLS_HELP_CHECK_INTERVAL", 5))
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 HELP_MD = os.path.join(HERE, "..", "references", "HELP.md")
@@ -272,13 +290,93 @@ __BODY__
 """
 
 
-def main() -> None:
+def _state_dir() -> str:
+    d = os.path.join(tempfile.gettempdir(), "scrolls-help-servers")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def _pid_alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    return True
+
+
+def _prune_stale_state(dirpath: str) -> None:
+    for name in os.listdir(dirpath):
+        if not name.endswith(".json"):
+            continue
+        path = os.path.join(dirpath, name)
+        try:
+            with open(path, encoding="utf-8") as f:
+                info = json.load(f)
+            if _pid_alive(info["pid"]):
+                continue
+        except (OSError, ValueError, KeyError):
+            pass
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+
+def cmd_stop(args: list) -> int:
+    """Stop one running instance by port (`--stop <port>`) or every tracked
+    instance (`--stop --all`), using the state files main() writes below."""
+    dirpath = _state_dir()
+    _prune_stale_state(dirpath)
+
+    if args and args[0] == "--all":
+        targets = [n for n in os.listdir(dirpath) if n.endswith(".json")]
+    elif args:
+        targets = [f"{args[0]}.json"]
+    else:
+        print("Usage: serve_help.py --stop <port> | --stop --all", file=sys.stderr)
+        return 1
+
+    stopped = 0
+    for name in targets:
+        path = os.path.join(dirpath, name)
+        try:
+            with open(path, encoding="utf-8") as f:
+                info = json.load(f)
+        except (OSError, ValueError):
+            continue
+        pid = info.get("pid")
+        port = info.get("port", name[:-len(".json")])
+        if pid and _pid_alive(pid):
+            try:
+                os.kill(pid, signal.SIGTERM)
+                stopped += 1
+                print(f"Stopped server on port {port} (pid {pid})")
+            except OSError as e:
+                print(f"Could not stop pid {pid}: {e}", file=sys.stderr)
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+    if stopped == 0:
+        print("No matching running server found.")
+    return 0
+
+
+def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--stop":
+        return cmd_stop(sys.argv[2:])
+
     with open(HELP_MD, encoding="utf-8") as f:
         md = f.read()
     page = PAGE_TEMPLATE.replace("__BODY__", render_markdown(md)).encode("utf-8")
 
+    last_request = time.monotonic()
+
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
+            nonlocal last_request
+            last_request = time.monotonic()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(page)))
@@ -288,21 +386,52 @@ def main() -> None:
         def log_message(self, *args):
             pass  # keep stdout clean — the URL line is what the launcher waits for
 
-    class Server(socketserver.TCPServer):
-        allow_reuse_address = True
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    httpd.daemon_threads = True
+    port = httpd.server_address[1]
+    url = f"http://127.0.0.1:{port}/"
 
-    with Server(("127.0.0.1", 0), Handler) as httpd:
-        port = httpd.server_address[1]
-        url = f"http://127.0.0.1:{port}/"
-        print(url, flush=True)
+    dirpath = _state_dir()
+    _prune_stale_state(dirpath)
+    state_path = os.path.join(dirpath, f"{port}.json")
+    with open(state_path, "w", encoding="utf-8") as f:
+        json.dump({"pid": os.getpid(), "port": port, "started": time.time()}, f)
+
+    stop_event = threading.Event()
+
+    def handle_signal(signum, frame):
+        stop_event.set()
+
+    try:
+        signal.signal(signal.SIGTERM, handle_signal)
+        signal.signal(signal.SIGINT, handle_signal)
+    except ValueError:
+        pass  # not running in the main thread; external kill still works
+
+    print(url, flush=True)
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
+
+    server_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    server_thread.start()
+
+    start = time.monotonic()
+    try:
+        while not stop_event.is_set():
+            now = time.monotonic()
+            if now - start >= MAX_LIFETIME or now - last_request >= IDLE_TIMEOUT:
+                break
+            stop_event.wait(CHECK_INTERVAL)
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
         try:
-            webbrowser.open(url)
-        except Exception:
+            os.remove(state_path)
+        except OSError:
             pass
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            pass
+    return 0
 
 
 if __name__ == "__main__":

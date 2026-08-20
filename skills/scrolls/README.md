@@ -4,11 +4,13 @@ Custom slash commands for managing `docs/.scrolls/` (or `docs/scrolls/`), a
 small set of markdown files that act as a project's working memory across
 sessions — what it does, what state it's in, what's known-missing and why,
 what's next, and what traps to avoid. `STARTER.md` inside that folder is the
-entry point; a `CLAUDE.md` pointer tells new sessions to read it first.
+entry point; a `SCROLLS.md` file tells new sessions to read it first, with
+a short `CLAUDE.md` pointer to `SCROLLS.md` and a matching `AGENTS.md`
+pointer to `CLAUDE.md` for other agent harnesses.
 
-All five commands work the same way on macOS, Linux, and Windows — each
-bundled script ships as both a bash (`.sh`) and a PowerShell (`.ps1`,
-PowerShell 7+) version.
+All five commands work the same way on macOS, Linux, and Windows. Every
+bundled script — all but `/scrolls-setup`, which needs none — ships as
+both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version.
 
 Run `/scrolls-help` for the full example-driven reference (add `-e`/`--online`
 to view it as a styled local web page instead of chat text).
@@ -17,7 +19,7 @@ to view it as a styled local web page instead of chat text).
 
 | Command | Purpose |
 | --- | --- |
-| [`/scrolls-setup`](scrolls-setup/) | Creates `docs/.scrolls/` for a project that doesn't have it yet: `STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`, plus a `CLAUDE.md` pointer. |
+| [`/scrolls-setup`](scrolls-setup/) | Creates `docs/.scrolls/` for a project that doesn't have it yet: `STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`, plus `SCROLLS.md`, a short `CLAUDE.md` pointer to it, and a matching `AGENTS.md` pointer to `CLAUDE.md`. |
 | [`/scrolls-update`](scrolls-update/) | Updates an existing `docs/.scrolls/` to reflect what happened in the current session, following each file's own update rule. The counterpart to `/scrolls-setup` — use this one for every session afterward. |
 | [`/scrolls-hide`](scrolls-hide/) | Renames an already-set-up `docs/scrolls/` to dotfile-hidden `docs/.scrolls/`, rewriting path references so nothing breaks. Retrofit path for a project set up visible. |
 | [`/scrolls-unhide`](scrolls-unhide/) | The opposite of `/scrolls-hide`: renames `docs/.scrolls/` to visible `docs/scrolls/`, rewriting path references so nothing breaks. |
@@ -45,11 +47,37 @@ variable to change that default location.
 
 ## Layout
 
-Each command lives in its own directory with a `SKILL.md` plus supporting
-`scripts/` (bash + PowerShell), `tests/` (bash + PowerShell, Red/Green TDD),
-and, for `/scrolls-setup`, `assets/templates/` for the scaffolded markdown
-files.
+Every command's directory has:
 
-`tests/` is development-only — it's for maintaining the bundled scripts, not
-part of using the skills. No `SKILL.md` references it, so it's never loaded
-while a `/scrolls-*` command is actually running.
+- `SKILL.md` — the skill's runtime instructions.
+- `README.md` — a minimal, human-facing pointer to the files below;
+  not read at invocation time.
+- `agents/openai.yaml` — OpenAI-agent interface metadata.
+- `meta/MAINTAINERS.md` — development notes: layout, versioning, and
+  (where applicable) running tests.
+- `CHANGELOG.md` — that skill's own version history.
+
+Command-specific additions:
+
+- `/scrolls-setup` — `assets/templates/` for the scaffolded markdown
+  files. No bundled script or `tests/`: file creation goes through
+  Read/Write/Edit tools directly, not a script.
+- `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide` — `scripts/`
+  (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green TDD) for
+  their one bundled script.
+- `/scrolls-help` — `references/HELP.md`, its canonical,
+  presented-to-users content; `scripts/`/`tests/` for its `-e`/`--online`
+  local server; and `meta/SECURITY.md` alongside `MAINTAINERS.md`,
+  covering that server's scope, network exposure, and bounded lifecycle.
+
+`tests/` and `meta/` are development-only — for maintaining bundled
+scripts and documenting design decisions, not part of using the skills.
+`SKILL.md` may point to them by name, but only to say they're not part of
+carrying out a request — neither is ever read as instructions while a
+`/scrolls-*` command is actually running.
+
+This directory (`skills/scrolls/`) has its own `meta/MAINTAINERS.md` and
+`CHANGELOG.md` too — family-wide maintainer notes (shared conventions
+across all five, versioning, where the installable artifacts live) and a
+family-wide change log for anything that isn't tied to a single skill's
+own version, neither of which belong in any single skill's own docs.

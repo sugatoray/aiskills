@@ -89,5 +89,42 @@ stop_reported_server "$out2a" >/dev/null
 stop_reported_server "$out2b" >/dev/null
 
 echo
+echo "=== Scenario 3: --stop terminates a running server and cleans up its state file ==="
+out3="$(bash "$SCRIPT" 2>&1)"
+url3="$(printf '%s' "$out3" | grep -oE 'https?://127\.0\.0\.1:[0-9]+/' | head -n1)"
+port3="$(printf '%s' "$url3" | sed -E 's#.*:([0-9]+)/#\1#')"
+if [ -n "$port3" ]; then
+  sleep 0.3
+  status3="$(curl -s -o /dev/null -w '%{http_code}' "$url3" 2>/dev/null || echo "000")"
+  assert_eq "$status3" "200" "server is reachable before --stop"
+
+  stop_out3="$(bash "$SCRIPT" --stop "$port3" 2>&1)"
+  assert_match "$stop_out3" "Stopped server on port $port3" "--stop reports it stopped the right port"
+
+  sleep 0.5
+  still_reachable3="no"
+  if curl -s -o /dev/null -m 2 "$url3" 2>/dev/null; then still_reachable3="yes"; fi
+  assert_eq "$still_reachable3" "no" "server no longer answers requests after --stop"
+
+  state_file3="/tmp/scrolls-help-servers/$port3.json"
+  if [ -f "$state_file3" ]; then
+    fail "--stop removes the server's state file"
+  else
+    pass "--stop removes the server's state file"
+  fi
+fi
+
+echo
+echo "=== Scenario 4: server shuts itself down after being idle ==="
+out4="$(SCROLLS_HELP_IDLE_TIMEOUT=1 SCROLLS_HELP_CHECK_INTERVAL=0.5 bash "$SCRIPT" 2>&1)"
+url4="$(printf '%s' "$out4" | grep -oE 'https?://127\.0\.0\.1:[0-9]+/' | head -n1)"
+if [ -n "$url4" ]; then
+  sleep 3
+  still_reachable4="no"
+  if curl -s -o /dev/null -m 2 "$url4" 2>/dev/null; then still_reachable4="yes"; fi
+  assert_eq "$still_reachable4" "no" "idle server shuts itself down without being killed"
+fi
+
+echo
 echo "=== Results: $((TOTAL - FAILURES))/$TOTAL passed ==="
 [ "$FAILURES" -eq 0 ] && exit 0 || exit 1

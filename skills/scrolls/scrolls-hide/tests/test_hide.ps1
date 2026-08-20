@@ -113,7 +113,7 @@ function New-VisibleScrollsFixture {
     New-Item -ItemType Directory -Path $scrollsPath -Force | Out-Null
     Set-Content -Path (Join-Path $scrollsPath "STARTER.md") -Value "# STARTER.md`nRead $RefForm/SPEC.md first."
     $baseOfDocs = Split-Path -Parent (Join-Path $Base $RelDocsDir)
-    Set-Content -Path (Join-Path $baseOfDocs "CLAUDE.md") -Value "# Project instructions`nRead $RefForm/STARTER.md first."
+    Set-Content -Path (Join-Path $baseOfDocs "SCROLLS.md") -Value "# Scrolls — Project Memory`nRead $RefForm/STARTER.md first."
 }
 
 # ============================================================
@@ -129,8 +129,8 @@ Invoke-Scenario "Scenario 1: default (exact-check) hides docs/scrolls at cwd" {
     Assert-True (-not (Test-Path (Join-Path $d1 "docs/scrolls"))) "ps1: docs/scrolls no longer exists"
     $starterContent1 = Get-Content (Join-Path $d1 "docs/.scrolls/STARTER.md") -Raw
     Assert-Match $starterContent1 "docs/\.scrolls/SPEC\.md" "ps1: STARTER.md self-reference rewritten to docs/.scrolls"
-    $claudeContent1 = Get-Content (Join-Path $d1 "CLAUDE.md") -Raw
-    Assert-Match $claudeContent1 "docs/\.scrolls/STARTER\.md" "ps1: CLAUDE.md reference rewritten to docs/.scrolls"
+    $scrollsMdContent1 = Get-Content (Join-Path $d1 "SCROLLS.md") -Raw
+    Assert-Match $scrollsMdContent1 "docs/\.scrolls/STARTER\.md" "ps1: SCROLLS.md reference rewritten to docs/.scrolls"
     Remove-Item -Recurse -Force $d1
 }
 
@@ -152,7 +152,7 @@ Invoke-Scenario "Scenario 2: exact-check finds nothing from a subdirectory; -t f
     Remove-Item -Recurse -Force $d2
 }
 
-Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's CLAUDE.md" {
+Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's SCROLLS.md" {
     $d3 = New-ScratchDir
     New-GitRepo $d3
     New-VisibleScrollsFixture -Base $d3 -RelDocsDir "docs" -RefForm "docs/scrolls"
@@ -162,10 +162,10 @@ Invoke-Scenario "Scenario 3: -r sweep finds a nested package without cross-conta
     Invoke-Ps1 $d3 @("-r") | Out-Null
     Assert-True (Test-Path (Join-Path $d3 "docs/.scrolls")) "ps1 -r: root scrolls folder hidden"
     Assert-True (Test-Path (Join-Path $d3 "packages/api/docs/.scrolls")) "ps1 -r: nested package scrolls folder hidden too"
-    $rootClaude3 = Get-Content (Join-Path $d3 "CLAUDE.md") -Raw
-    $pkgClaude3 = Get-Content (Join-Path $d3 "packages/api/CLAUDE.md") -Raw
-    Assert-Match $rootClaude3 "docs/\.scrolls/STARTER\.md" "ps1 -r: root CLAUDE.md correctly rewritten"
-    Assert-Match $pkgClaude3 "docs/\.scrolls/STARTER\.md" "ps1 -r: package CLAUDE.md correctly rewritten to its OWN short form"
+    $rootScrollsMd3 = Get-Content (Join-Path $d3 "SCROLLS.md") -Raw
+    $pkgScrollsMd3 = Get-Content (Join-Path $d3 "packages/api/SCROLLS.md") -Raw
+    Assert-Match $rootScrollsMd3 "docs/\.scrolls/STARTER\.md" "ps1 -r: root SCROLLS.md correctly rewritten"
+    Assert-Match $pkgScrollsMd3 "docs/\.scrolls/STARTER\.md" "ps1 -r: package SCROLLS.md correctly rewritten to its OWN short form"
     Remove-Item -Recurse -Force $d3
 }
 
@@ -212,9 +212,9 @@ Invoke-Scenario "Scenario 7: round trip with unhide.ps1 returns to byte-identica
     New-GitRepo $d7
     New-Item -ItemType Directory -Path (Join-Path $d7 "docs/.scrolls") -Force | Out-Null
     Set-Content -Path (Join-Path $d7 "docs/.scrolls/STARTER.md") -Value "# STARTER.md`nRead docs/.scrolls/SPEC.md first."
-    Set-Content -Path (Join-Path $d7 "CLAUDE.md") -Value "# Project instructions`nRead docs/.scrolls/STARTER.md first."
+    Set-Content -Path (Join-Path $d7 "SCROLLS.md") -Value "# Scrolls — Project Memory`nRead docs/.scrolls/STARTER.md first."
     $originalStarter = Get-Content (Join-Path $d7 "docs/.scrolls/STARTER.md") -Raw
-    $originalClaude = Get-Content (Join-Path $d7 "CLAUDE.md") -Raw
+    $originalScrollsMd = Get-Content (Join-Path $d7 "SCROLLS.md") -Raw
 
     Push-Location $d7
     & pwsh -NoProfile -File $unhideScript | Out-Null
@@ -222,9 +222,9 @@ Invoke-Scenario "Scenario 7: round trip with unhide.ps1 returns to byte-identica
     Pop-Location
 
     $finalStarter = Get-Content (Join-Path $d7 "docs/.scrolls/STARTER.md") -Raw
-    $finalClaude = Get-Content (Join-Path $d7 "CLAUDE.md") -Raw
+    $finalScrollsMd = Get-Content (Join-Path $d7 "SCROLLS.md") -Raw
     Assert-True ($finalStarter -eq $originalStarter) "ps1 round trip: STARTER.md is byte-identical to before unhide+hide"
-    Assert-True ($finalClaude -eq $originalClaude) "ps1 round trip: CLAUDE.md is byte-identical to before unhide+hide"
+    Assert-True ($finalScrollsMd -eq $originalScrollsMd) "ps1 round trip: SCROLLS.md is byte-identical to before unhide+hide"
     Remove-Item -Recurse -Force $d7
 }
 
@@ -238,8 +238,8 @@ if ($HaveBash) {
         Invoke-Sh $dq @("-r") | Out-Null
         Assert-True (Test-Path (Join-Path $dq "docs/.scrolls")) "sh -r: root scrolls folder hidden"
         Assert-True (Test-Path (Join-Path $dq "packages/api/docs/.scrolls")) "sh -r: nested package scrolls folder hidden too"
-        $pkgClaudeQ = Get-Content (Join-Path $dq "packages/api/CLAUDE.md") -Raw
-        Assert-NotMatch $pkgClaudeQ "(?<!\.)scrolls/STARTER" "sh -r: package CLAUDE.md wasn't wrongly double-processed"
+        $pkgScrollsMdQ = Get-Content (Join-Path $dq "packages/api/SCROLLS.md") -Raw
+        Assert-NotMatch $pkgScrollsMdQ "(?<!\.)scrolls/STARTER" "sh -r: package SCROLLS.md wasn't wrongly double-processed"
         Remove-Item -Recurse -Force $dq
     }
 }

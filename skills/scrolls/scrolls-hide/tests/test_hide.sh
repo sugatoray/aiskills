@@ -62,7 +62,7 @@ new_visible_scrolls_fixture() {
   printf '# STARTER.md\nRead %s/SPEC.md first.\n' "$ref_form" > "$base/$rel_docs_dir/scrolls/STARTER.md"
   local base_of_docs
   base_of_docs="$(dirname "$base/$rel_docs_dir")"
-  printf '# Project instructions\nRead %s/STARTER.md first.\n' "$ref_form" > "$base_of_docs/CLAUDE.md"
+  printf '# Scrolls — Project Memory\nRead %s/STARTER.md first.\n' "$ref_form" > "$base_of_docs/SCROLLS.md"
 }
 
 # ============================================================
@@ -77,7 +77,7 @@ new_visible_scrolls_fixture "$d1" "docs" "docs/scrolls"
 assert "docs/.scrolls exists after hide" test -d "$d1/docs/.scrolls"
 assert "docs/scrolls no longer exists" bash -c "[ ! -d '$d1/docs/scrolls' ]"
 assert_match "$(cat "$d1/docs/.scrolls/STARTER.md")" 'docs/\.scrolls/SPEC\.md' "STARTER.md self-reference rewritten to docs/.scrolls"
-assert_match "$(cat "$d1/CLAUDE.md")" 'docs/\.scrolls/STARTER\.md' "CLAUDE.md reference rewritten to docs/.scrolls"
+assert_match "$(cat "$d1/SCROLLS.md")" 'docs/\.scrolls/STARTER\.md' "SCROLLS.md reference rewritten to docs/.scrolls"
 rm -rf "$d1"
 
 echo
@@ -99,7 +99,7 @@ assert_not_contains_literal "$starter2" "$d2" "STARTER.md does NOT contain the a
 rm -rf "$d2"
 
 echo
-echo "=== Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's CLAUDE.md ==="
+echo "=== Scenario 3: -r sweep finds a nested package without cross-contaminating its sibling's SCROLLS.md ==="
 d3="$(new_scratch_dir)"
 new_git_repo "$d3"
 new_visible_scrolls_fixture "$d3" "docs" "docs/scrolls"
@@ -108,8 +108,8 @@ new_visible_scrolls_fixture "$d3" "packages/api/docs" "docs/scrolls"
 ( cd "$d3" && bash "$SCRIPT" -r >/dev/null 2>&1 )
 assert "root scrolls folder hidden" test -d "$d3/docs/.scrolls"
 assert "nested package scrolls folder hidden too" test -d "$d3/packages/api/docs/.scrolls"
-assert_match "$(cat "$d3/CLAUDE.md")" 'docs/\.scrolls/STARTER\.md' "root CLAUDE.md correctly rewritten"
-assert_match "$(cat "$d3/packages/api/CLAUDE.md")" 'docs/\.scrolls/STARTER\.md' "package CLAUDE.md correctly rewritten to its OWN short form"
+assert_match "$(cat "$d3/SCROLLS.md")" 'docs/\.scrolls/STARTER\.md' "root SCROLLS.md correctly rewritten"
+assert_match "$(cat "$d3/packages/api/SCROLLS.md")" 'docs/\.scrolls/STARTER\.md' "package SCROLLS.md correctly rewritten to its OWN short form"
 rm -rf "$d3"
 
 echo
@@ -152,14 +152,14 @@ if [ -f "$UNHIDE_SCRIPT" ]; then
   new_git_repo "$d7"
   mkdir -p "$d7/docs/.scrolls"
   printf '# STARTER.md\nRead docs/.scrolls/SPEC.md first.\n' > "$d7/docs/.scrolls/STARTER.md"
-  printf '# Project instructions\nRead docs/.scrolls/STARTER.md first.\n' > "$d7/CLAUDE.md"
+  printf '# Scrolls — Project Memory\nRead docs/.scrolls/STARTER.md first.\n' > "$d7/SCROLLS.md"
   original_starter="$(cat "$d7/docs/.scrolls/STARTER.md")"
-  original_claude="$(cat "$d7/CLAUDE.md")"
+  original_scrolls_md="$(cat "$d7/SCROLLS.md")"
   ( cd "$d7" && bash "$UNHIDE_SCRIPT" >/dev/null 2>&1 && bash "$SCRIPT" >/dev/null 2>&1 )
   final_starter="$(cat "$d7/docs/.scrolls/STARTER.md")"
-  final_claude="$(cat "$d7/CLAUDE.md")"
+  final_scrolls_md="$(cat "$d7/SCROLLS.md")"
   assert "round trip: STARTER.md is byte-identical to before unhide+hide" bash -c "[ '$final_starter' = '$original_starter' ]"
-  assert "round trip: CLAUDE.md is byte-identical to before unhide+hide" bash -c "[ '$final_claude' = '$original_claude' ]"
+  assert "round trip: SCROLLS.md is byte-identical to before unhide+hide" bash -c "[ '$final_scrolls_md' = '$original_scrolls_md' ]"
   rm -rf "$d7"
 else
   echo "SKIP: unhide.sh not present"

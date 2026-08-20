@@ -143,5 +143,43 @@ if ($HaveBash) {
     }
 }
 
+Invoke-Scenario "Scenario 3: --stop terminates a running server and cleans up its state file" {
+    $out = (& pwsh -NoProfile -File $Ps1Script 2>&1 | Out-String)
+    $m = [regex]::Match($out, 'https?://127\.0\.0\.1:(\d+)/')
+    $url = if ($m.Success) { $m.Value } else { $null }
+    $port = if ($m.Success) { $m.Groups[1].Value } else { $null }
+    if ($url -and $port) {
+        Start-Sleep -Milliseconds 300
+        $reachableBefore = $true
+        try { Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5 | Out-Null } catch { $reachableBefore = $false }
+        Assert-True $reachableBefore "server is reachable before --stop"
+
+        $stopOut = (& pwsh -NoProfile -File $Ps1Script --stop $port 2>&1 | Out-String)
+        Assert-Match $stopOut "Stopped server on port $port" "--stop reports it stopped the right port"
+
+        Start-Sleep -Milliseconds 500
+        $stillReachable = $true
+        try { Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 2 | Out-Null } catch { $stillReachable = $false }
+        Assert-True (-not $stillReachable) "server no longer answers requests after --stop"
+
+        $stateFile = Join-Path ([System.IO.Path]::GetTempPath()) "scrolls-help-servers/$port.json"
+        Assert-True (-not (Test-Path $stateFile)) "--stop removes the server's state file"
+    }
+}
+
+Invoke-Scenario "Scenario 4: server shuts itself down after being idle" {
+    $env:SCROLLS_HELP_IDLE_TIMEOUT = "1"
+    $env:SCROLLS_HELP_CHECK_INTERVAL = "0.5"
+    $out = (& pwsh -NoProfile -File $Ps1Script 2>&1 | Out-String)
+    Remove-Item Env:\SCROLLS_HELP_IDLE_TIMEOUT, Env:\SCROLLS_HELP_CHECK_INTERVAL -ErrorAction SilentlyContinue
+    $url = if ($out -match '(https?://127\.0\.0\.1:\d+/)') { $Matches[1] } else { $null }
+    if ($url) {
+        Start-Sleep -Seconds 3
+        $stillReachable = $true
+        try { Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 2 | Out-Null } catch { $stillReachable = $false }
+        Assert-True (-not $stillReachable) "idle server shuts itself down without being killed"
+    }
+}
+
 Write-Host "`n=== Results: $($script:Total - $script:Failures)/$($script:Total) passed ===" -ForegroundColor $(if ($script:Failures -eq 0) { "Green" } else { "Red" })
 if ($script:Failures -gt 0) { exit 1 } else { exit 0 }
