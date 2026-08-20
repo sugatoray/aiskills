@@ -3,13 +3,21 @@
 All notable changes to the `scrolls-update` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.3.0] - 2026-08-20
+
+Jumps straight from `1.0.0` to `1.3.0`, skipping `1.1.0`/`1.2.0` — this
+skill's version is now locked in step with the other four `scrolls-*`
+skills (see `../meta/MAINTAINERS.md`'s Versioning entry), and `1.3.0` is
+where that family-wide version currently stands. No functional change
+of this skill's own in this release.
 
 ### Added
 
 - `meta/MAINTAINERS.md`: development notes (layout, running `tests/`,
-  versioning) for this skill. Documentation-only — no version bump, per
-  this skill's own versioning rule.
+  versioning) for this skill. Was documentation-only at the time it
+  landed (no version bump then, per this skill's own versioning rule);
+  folded into this release now that a family-wide bump is happening
+  anyway.
 
 ## [1.0.0] - 2026-08-18
 

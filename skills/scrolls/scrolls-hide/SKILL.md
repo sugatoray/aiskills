@@ -8,7 +8,7 @@ metadata:
   - name: scrolls-hide
     type: skill
     author: sugatoray
-    version: "1.1.0"
+    version: "1.3.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-hide"
 ---
 

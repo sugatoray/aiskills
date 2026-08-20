@@ -13,12 +13,15 @@ updates. For a specific skill's own version history, see its own
 
 ## Current versions
 
+All five skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
+Versioning entry) — one shared number across the family, currently:
+
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 1.2.0 |
-| `scrolls-update` | 1.0.0 |
-| `scrolls-hide` | 1.1.0 |
-| `scrolls-unhide` | 1.1.0 |
+| `scrolls-setup` | 1.3.0 |
+| `scrolls-update` | 1.3.0 |
+| `scrolls-hide` | 1.3.0 |
+| `scrolls-unhide` | 1.3.0 |
 | `scrolls-help` | 1.3.0 |
 
 ## 2026-08-20
@@ -57,6 +60,16 @@ updates. For a specific skill's own version history, see its own
 - Added this file and a `CHANGELOG.md` per skill; `meta/MAINTAINERS.md`
   (both this directory's and each skill's own) now says to update the
   relevant one alongside any `metadata.version` bump.
+- **Versions locked in lockstep.** All five `scrolls-*` skills now share
+  a single version number instead of bumping independently — before
+  this, versions had drifted apart (`scrolls-setup` 1.2.0,
+  `scrolls-update` 1.0.0, `scrolls-hide`/`scrolls-unhide` 1.1.0,
+  `scrolls-help` 1.3.0). Brought every skill up to `1.3.0`, the highest
+  version any of them had reached; `scrolls-setup`, `scrolls-hide`,
+  `scrolls-unhide`, and `scrolls-update` had no functional change of
+  their own in this bump — see each skill's own `CHANGELOG.md` for its
+  "synced to 1.3.0" entry. `meta/MAINTAINERS.md` (this directory's and
+  each skill's own) now states the lockstep rule going forward.
 
 ## 2026-08-18
 

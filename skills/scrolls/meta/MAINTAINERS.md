@@ -32,19 +32,27 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   developed and changed test-first — write or update the failing test
   in that skill's `tests/` before touching the script, confirm it fails
   for the right reason, then make it pass.
-- **Versioning**: each skill bumps its own `metadata.version`
-  independently in its own `SKILL.md` — there's no shared family
-  version number. Bump only for changes visible to an actual
-  `/scrolls-*` invocation (new/changed flag, changed default, changed
-  behavior); leave it alone for documentation-only or test-only
-  changes. Each skill's own `meta/MAINTAINERS.md` states this rule for
-  that skill specifically.
+- **Versioning — locked in lockstep**: all five `scrolls-*` skills
+  share a single version number, kept identical across every skill's
+  `metadata.version` in `SKILL.md` — as of this writing, `1.3.0`
+  everywhere. A version bump is still only warranted by a change
+  visible to an actual `/scrolls-*` invocation (new/changed flag,
+  changed default, changed behavior) somewhere in the family — pure
+  documentation or test-only changes don't trigger one. But once
+  *anything* in the family earns a bump, bump **all five** to that
+  same new number in the same commit, including skills with no
+  functional change of their own. Never let one skill's version number
+  outpace or lag the others — a mismatched set of versions across the
+  family is itself a bug to fix, not a state to leave alone.
 - **Changelogs**: each skill has its own `CHANGELOG.md` at its top
-  level — update it in the same commit as any `metadata.version` bump,
-  under an `## [Unreleased]` heading for doc/test-only changes that
-  don't bump the version. This directory's own `CHANGELOG.md` is for
-  family-wide changes that aren't tied to a single skill's version (a
-  shared-flags table update, a `README.md` reorganization, and so on).
+  level — update it in the same commit as any `metadata.version` bump.
+  A skill bumped only to stay in lockstep (no functional change of its
+  own that release) gets a short "synced to vX.Y.Z — no functional
+  change" entry rather than a substantive one; use an `## [Unreleased]`
+  heading for doc/test-only changes that don't themselves trigger a
+  family-wide bump. This directory's own `CHANGELOG.md` is the place to
+  look for what actually shipped in each shared version, across the
+  whole family.
 - **`../README.md`** (this directory's README) is the user-facing
   overview across all five commands — update it whenever a skill's
   directory layout or shared-flag behavior changes, not just that

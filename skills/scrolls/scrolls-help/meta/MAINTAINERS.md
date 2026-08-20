@@ -42,3 +42,8 @@ Covers: URL/PID reporting, the server actually answering a real request,
 Bump `metadata.version` in `../SKILL.md`'s frontmatter when something visible
 to a `/scrolls-help` invocation changes (new flag, changed default,
 changed behavior) — not for pure documentation or test-only changes.
+
+This skill's version is locked in step with the other four `scrolls-*`
+skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
+here means bumping all five to the same new number in the same commit,
+even the ones with nothing of their own to report that release.
