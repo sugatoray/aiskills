@@ -3,6 +3,20 @@
 All notable changes to the `scrolls-setup` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-08-20
+
+### Changed (breaking)
+
+- Major version bump, family-wide (see `../CHANGELOG.md`): formalizes
+  the `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` restructuring from `1.1.0`/
+  `1.2.0` as a breaking change rather than a minor one. Projects
+  already set up by a pre-`2.0.0` version of this skill keep working as
+  before, but `scrolls-hide`/`scrolls-unhide` `2.0.0` no longer rewrite
+  their `CLAUDE.md` on rename — only `SCROLLS.md` (see those skills'
+  own `CHANGELOG.md`). Re-run `/scrolls-setup` against an old project
+  (safe: it never overwrites existing content) to pick up `SCROLLS.md`
+  and get that rewrite coverage back.
+
 ## [1.3.0] - 2026-08-20
 
 ### Changed

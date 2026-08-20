@@ -3,6 +3,17 @@
 All notable changes to the `scrolls-help` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-08-20
+
+### Changed
+
+- Synced to `2.0.0` to keep this skill's version locked in step with
+  the other four `scrolls-*` skills (see `../meta/MAINTAINERS.md`'s
+  Versioning entry). No functional change of its own in this release —
+  the major bump reflects a breaking change elsewhere in the family
+  (`scrolls-hide`/`scrolls-unhide`'s rewrite-target change), not
+  anything in `scrolls-help` itself. See `../CHANGELOG.md`.
+
 ## [1.3.0] - 2026-08-20
 
 ### Added

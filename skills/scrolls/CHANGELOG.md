@@ -18,13 +18,28 @@ Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 1.3.0 |
-| `scrolls-update` | 1.3.0 |
-| `scrolls-hide` | 1.3.0 |
-| `scrolls-unhide` | 1.3.0 |
-| `scrolls-help` | 1.3.0 |
+| `scrolls-setup` | 2.0.0 |
+| `scrolls-update` | 2.0.0 |
+| `scrolls-hide` | 2.0.0 |
+| `scrolls-unhide` | 2.0.0 |
+| `scrolls-help` | 2.0.0 |
 
-## 2026-08-20
+## 2026-08-20 (2.0.0)
+
+- **Major version bump, all five skills: `1.3.0` → `2.0.0`.** The
+  `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` restructuring below is a
+  breaking change for any project already set up by a pre-`2.0.0`
+  `scrolls-setup`: `scrolls-hide`/`scrolls-unhide` `2.0.0` rewrite
+  `SCROLLS.md` on rename, not `CLAUDE.md` — a project without a
+  `SCROLLS.md` (i.e. set up before this release) won't have its
+  `CLAUDE.md` reference rewritten anymore. Re-running `/scrolls-setup`
+  against such a project is safe (it never overwrites existing
+  content) and adds the missing `SCROLLS.md`, restoring rewrite
+  coverage. `scrolls-update` and `scrolls-help` have no functional
+  change of their own in this release; see each skill's own
+  `CHANGELOG.md` for the version-by-version detail behind this bump.
+
+## 2026-08-20 (1.3.0 and earlier same-day changes)
 
 - **Memory-pointer chain restructured.** `scrolls-setup` now writes
   `SCROLLS.md` (the actual "read `STARTER.md` first" content) with
