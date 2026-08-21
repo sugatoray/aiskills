@@ -19,7 +19,11 @@ deck following the palette, typography, layout, and voice rules defined in
 
 ## Demo
 
-Three sample concepts run through the skill below.
+Three sample concepts run through the skill below. For a rendered, visual
+version of these same three decks (pastel palette, rounded flat-illustration
+doodles, swipeable slides), open
+[`assets/cozy-carousel-deck.html`](assets/cozy-carousel-deck.html) in a
+browser.
 
 ---
 
@@ -149,3 +153,6 @@ symbolizing gradual growth, warm cream background throughout.
   illustration tool or designer to produce final slides.
 - Palette, typography, and voice rules live in [`SKILL.md`](SKILL.md); this
   file only demonstrates the format.
+- [`assets/cozy-carousel-deck.html`](assets/cozy-carousel-deck.html) is a
+  self-contained, static HTML rendering of the three demo carousels above —
+  open it directly in a browser (no build step or server needed).
