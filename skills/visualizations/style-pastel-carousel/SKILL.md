@@ -2,6 +2,8 @@
 name: style-pastel-carousel
 description: "Provides structured guidance for generating educational carousel-style content in a modern pastel flat-illustration aesthetic commonly used on Instagram and LinkedIn. Use when the user requests carousel design, slide content, pastel flat illustration style, productivity-style educational visuals, or mentions 'Instagram carousel', 'LinkedIn carousel', 'pastel aesthetic', or similar."
 license: MIT
+compatibility: "Any Claude Code / LLM agent environment that supports Markdown skill files; pure prompt guidance with no bundled scripts or external dependencies."
+disable-model-invocation: false
 metadata:
   - name: style-pastel-carousel
     type: skill
