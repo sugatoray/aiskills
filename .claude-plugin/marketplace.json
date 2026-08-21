@@ -1,0 +1,24 @@
+{
+  "name": "sugatoray",
+  "owner": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "description": "Sugato Ray's curated agent skills, as installable Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "scrolls-skills",
+      "source": "./",
+      "description": "Scrolls: a git-native markdown system for agentic memory that persists project state across sessions and agents (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-help).",
+      "category": "productivity",
+      "keywords": [
+        "memory",
+        "agentic-memory",
+        "docs",
+        "handoff",
+        "productivity",
+        "scrolls"
+      ]
+    }
+  ]
+}
