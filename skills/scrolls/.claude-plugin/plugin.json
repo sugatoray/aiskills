@@ -18,10 +18,10 @@
     "scrolls"
   ],
   "skills": [
-    "./skills/scrolls/scrolls-setup",
-    "./skills/scrolls/scrolls-update",
-    "./skills/scrolls/scrolls-hide",
-    "./skills/scrolls/scrolls-unhide",
-    "./skills/scrolls/scrolls-help"
+    "./scrolls-setup",
+    "./scrolls-update",
+    "./scrolls-hide",
+    "./scrolls-unhide",
+    "./scrolls-help"
   ]
 }
