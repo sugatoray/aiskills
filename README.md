@@ -38,6 +38,24 @@ use skill: /scrolls-update
 
 > 💡 For more information, refer to the [**Scrolls README.md**](skills/scrolls/README.md).
 
+## 📊 Stata
+
+Skills for writing, reviewing, and reasoning about Stata code — turning a
+plain-language description of what someone's trying to do into correct,
+runnable Stata commands, with attention to the mistakes that run cleanly
+but silently produce a wrong answer.
+
+**Installation**:
+
+Choose the skill by name: `stata-recipes` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+> 💡 For more information, refer to the [**Stata README.md**](skills/stata/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -52,3 +70,7 @@ use skill: /scrolls-update
 | [Scrolls](skills/scrolls/README.md) | `scrolls-help`   | Show help doc for the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-help]](https://www.skills.sh/sugatoray/aiskills/scrolls-help) |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-hide`   | Hide the folder: `docs/scrolls` --> `docs/.scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-hide]](https://www.skills.sh/sugatoray/aiskills/scrolls-hide) |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | Unhide the folder: `docs/.scrolls` --> `docs/scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) |
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ships with ARDL). |
