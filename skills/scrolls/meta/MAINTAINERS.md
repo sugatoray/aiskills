@@ -67,6 +67,56 @@ not a second copy. Never duplicate skill content into `src/`; if the
 pointer's install commands or target-folder note go stale, fix them in
 place rather than growing a parallel source of truth.
 
+## Claude Code plugin manifest (`.claude-plugin/plugin.json`)
+
+**Design choice**: this manifest lives inside `skills/scrolls/`, not at
+the repo root. The repo root only holds `.claude-plugin/marketplace.json`
+(the catalog), with `metadata.pluginRoot: "./skills"` set so each plugin
+entry's `source` can just be `"./<group>"`. Scrolls's entry is
+`"./scrolls"`, resolving to `skills/scrolls/.claude-plugin/plugin.json`.
+The point of this layout: any future skill-group folder that lands next
+to `skills/scrolls/` (e.g. `skills/<newgroup>/`) gets its own
+`.claude-plugin/plugin.json` inside its own directory plus one new
+one-line entry in the root `marketplace.json` — never a second manifest
+competing for the repo root, and no other group's skills ever get pulled
+into an unrelated install.
+
+**Keep it in sync — every time**:
+
+- **Version**: `plugin.json`'s top-level `"version"` must match the
+  family's lockstep `metadata.version` (see "Versioning" above) exactly.
+  Bump it in the same commit as any family-wide version bump — a
+  mismatched plugin version is the same class of bug as a mismatched
+  skill version.
+- **New skill published**: add its `./scrolls-<name>` path to the
+  `"skills"` array in the same commit that adds the skill directory.
+- **Skill deprecated/deactivated**: when a skill's `SKILL.md` is renamed
+  to `SKILL.md.deprecated`, `SKILL.md.deactivated`, or `SKILL.md.inactive`
+  (see below), remove that skill's entry from the `"skills"` array in the
+  same commit. The Claude Code plugin loader already silently drops a
+  skill whose directory has no file literally named `SKILL.md` — verified
+  with `claude --plugin-dir <path> plugin details <name>`, which reported
+  4 skills in the component inventory instead of 5 the moment one
+  `SKILL.md` was renamed away, with no warning from `claude plugin
+  validate` either, `--strict` or not. So a stale entry left in the array
+  costs nothing functionally, but it's still wrong: anyone reading
+  `plugin.json` to see what ships would be misled into thinking a
+  deactivated skill is still installed. Keep the array as the accurate
+  list of what's live, not a superset of it.
+
+**Renaming convention that discards a skill from installing**: the
+loader's discovery rule is an exact match on the filename `SKILL.md`
+inside a skill directory — nothing else. Any rename off that exact name
+is sufficient by itself to drop the skill from both `/plugin` installs
+and the `skills/` auto-discovery convention, independent of whatever
+suffix is chosen. This repo's convention is `SKILL.md.deprecated` /
+`SKILL.md.deactivated` / `SKILL.md.inactive` (pick whichever best states
+why it's off), because it keeps the file sitting right next to its own
+skill directory, keeps its content one `mv` away from being live again,
+and reads clearly in a directory listing — but the mechanism that
+actually makes it inert is simply "the file is no longer named
+`SKILL.md`," not the specific suffix used.
+
 ## Installing for local testing
 
 See `src/scrolls/CLAUDE.md` for the tested `npx skills add

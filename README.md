@@ -10,12 +10,28 @@ Scrolls are a system of git-native markdown files, that together provide your pr
 
 **Installation**:
 
-Choose the skills by the name: `scrolls-*` and install interactively.
+Install with `npx skills` (RECOMMENDED). It works with Claude Code,
+Codex, and other agents, and copies editable skill files into your
+project. Choose skills by name (`scrolls-*`) and install interactively.
 
 ```sh
 npx skills add sugatoray/aiskills               # project-level
 npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
 ```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install scrolls-skills@sugatoray
+```
+
+</details>
 
 **Getting Started**:
 

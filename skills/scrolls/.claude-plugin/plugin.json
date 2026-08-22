@@ -1,0 +1,27 @@
+{
+  "name": "scrolls-skills",
+  "version": "2.1.0",
+  "description": "Scrolls: a git-native markdown system for agentic memory that persists project state across sessions and agents. Five commands manage docs/.scrolls/ — setup, update, hide, unhide, and a help reference.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "agentic-memory",
+    "docs",
+    "handoff",
+    "productivity",
+    "scrolls"
+  ],
+  "skills": [
+    "./scrolls-setup",
+    "./scrolls-update",
+    "./scrolls-hide",
+    "./scrolls-unhide",
+    "./scrolls-help"
+  ]
+}
