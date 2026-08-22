@@ -9,7 +9,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "1.0.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/visualizations/style-pastel-carousel"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/visualizations/styles/style-pastel-carousel"
 ---
 
 # Pastel Carousel Style Skill
