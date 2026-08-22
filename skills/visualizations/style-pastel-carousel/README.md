@@ -156,3 +156,7 @@ symbolizing gradual growth, warm cream background throughout.
 - [`assets/cozy-carousel-deck.html`](assets/cozy-carousel-deck.html) is a
   self-contained, static HTML rendering of the three demo carousels above —
   open it directly in a browser (no build step or server needed).
+- [`assets/design.md`](assets/design.md) is an implementation-ready design
+  reference — color tokens, type scale, slide anatomy, and the reusable flat
+  illustration component library — for anyone building slides by hand, in
+  code, or via an image model.
