@@ -1,0 +1,5 @@
+interface:
+  display_name: "Pastel Carousel Style"
+  short_description: "Generates pastel flat-illustration carousel content in an Instagram/LinkedIn 'swipe post' style."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,796 @@
+<title>Cozy Carousel Deck</title>
+<style>
+  :root{
+    --paper:#F3ECE4;
+    --paper-soft:#EAE0D3;
+    --ink:#2E2E2E;
+    --ink-soft:#6A6A6A;
+    --line: rgba(46,46,46,0.12);
+    --pink:#F4C2C2;
+    --yellow:#F7D96F;
+    --blue:#A7D3F0;
+    --shadow: 0 20px 44px -20px rgba(46,32,26,0.38), 0 2px 8px rgba(46,32,26,0.10);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --paper:#211C18;
+      --paper-soft:#2B241F;
+      --ink:#F3ECE4;
+      --ink-soft:#BBAEA0;
+      --line: rgba(243,236,228,0.14);
+      --shadow: 0 20px 44px -20px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#211C18;
+    --paper-soft:#2B241F;
+    --ink:#F3ECE4;
+    --ink-soft:#BBAEA0;
+    --line: rgba(243,236,228,0.14);
+    --shadow: 0 20px 44px -20px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Nunito", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:"Fredoka","Nunito",ui-sans-serif,system-ui,sans-serif;
+    font-weight:600;
+    margin:0;
+    text-wrap:balance;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding: clamp(2rem,5vw,4.5rem) clamp(1.25rem,4vw,3rem) 5rem;
+  }
+
+  /* ---------- Header ---------- */
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    font-family:"Nunito",sans-serif;
+    font-weight:800;
+    font-size:.75rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .eyebrow::before{
+    content:"";
+    width:1.4rem;
+    height:2px;
+    background:var(--blue);
+    border-radius:2px;
+  }
+  header.hero{
+    display:flex;
+    flex-direction:column;
+    gap:1.1rem;
+    margin-bottom: clamp(2.5rem,5vw,3.5rem);
+  }
+  header.hero h1{
+    font-size:clamp(2.4rem,5vw,3.4rem);
+    line-height:1.05;
+  }
+  header.hero p.lede{
+    max-width:62ch;
+    font-size:1.06rem;
+    line-height:1.65;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .command{
+    display:inline-flex;
+    align-items:center;
+    gap:.55rem;
+    font-family:ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size:.86rem;
+    background:var(--paper-soft);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:.6rem .95rem;
+    border-radius:.85rem;
+    width:fit-content;
+  }
+  .command b{color:var(--blue);font-weight:800;}
+
+  .keyrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1.1rem 1.6rem;
+    margin-top:.4rem;
+  }
+  .swatch{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+  .swatch i{
+    width:1.05rem;height:1.05rem;border-radius:50%;
+    display:inline-block;
+    box-shadow: inset 0 0 0 1px rgba(46,46,46,0.15);
+  }
+
+  /* ---------- Section ---------- */
+  section.deck{
+    margin-top: clamp(3rem,6vw,4.5rem);
+  }
+  .deck-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:1rem;
+    margin-bottom:1.3rem;
+    border-bottom:1px solid var(--line);
+    padding-bottom:1rem;
+  }
+  .deck-head h2{
+    font-size:clamp(1.5rem,3vw,1.9rem);
+  }
+  .deck-head p{
+    margin:.35rem 0 0;
+    color:var(--ink-soft);
+    font-size:.92rem;
+    max-width:52ch;
+  }
+  .swipe-hint{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .swipe-hint svg{width:1.6rem;height:1rem;}
+
+  /* ---------- Carousel track ---------- */
+  .carousel{
+    display:flex;
+    gap:1.1rem;
+    overflow-x:auto;
+    scroll-snap-type:x proximity;
+    padding:.4rem .4rem 1rem;
+    margin:0 -0.4rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) transparent;
+  }
+  .carousel::-webkit-scrollbar{height:8px;}
+  .carousel::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+
+  .slide{
+    scroll-snap-align:center;
+    flex: 0 0 auto;
+    width:min(78vw, 300px);
+    aspect-ratio: 4 / 5;
+    background:#FFF9F5;
+    border-radius:1.6rem;
+    box-shadow:var(--shadow);
+    padding:1.15rem 1.15rem 1.3rem;
+    display:flex;
+    flex-direction:column;
+    color:#2E2E2E;
+    position:relative;
+    overflow:hidden;
+  }
+  .slide.bg-a{background:#FFF9F5;}
+  .slide.bg-b{background:#FDF7F3;}
+  .slide.bg-c{background:#F7EFEA;}
+
+  .slide .pill{
+    align-self:flex-start;
+    font-size:.62rem;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    background:rgba(46,46,46,0.06);
+    color:#6A6A6A;
+    padding:.28rem .6rem;
+    border-radius:99px;
+    margin-bottom:.55rem;
+  }
+  .illus{
+    width:100%;
+    flex:0 0 auto;
+    height:38%;
+    margin-bottom:.7rem;
+  }
+  .illus svg{width:100%;height:100%;display:block;}
+
+  .slide h3{
+    font-size:1.16rem;
+    line-height:1.18;
+    margin-bottom:.5rem;
+    color:#2E2E2E;
+  }
+  .slide ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:.34rem;
+    font-size:.83rem;
+    line-height:1.35;
+    color:#4A4A4A;
+    flex:1 1 auto;
+  }
+  .slide li{
+    display:flex;
+    align-items:flex-start;
+    gap:.45rem;
+  }
+  .slide li::before{
+    content:"";
+    width:.4rem;height:.4rem;
+    border-radius:50%;
+    margin-top:.4rem;
+    flex:0 0 auto;
+    background:#F4C2C2;
+  }
+  .slide li:nth-of-type(2)::before{background:#F7D96F;}
+  .slide li:nth-of-type(3)::before{background:#A7D3F0;}
+
+  .flow{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    margin-top:.7rem;
+    padding-top:.6rem;
+    border-top:1px dashed rgba(46,46,46,0.14);
+  }
+  .flow .chip{
+    font-size:.78rem;
+    background:rgba(255,255,255,0.7);
+    border:1px solid rgba(46,46,46,0.08);
+    padding:.22rem .5rem;
+    border-radius:.6rem;
+  }
+  .flow .arrow{color:#B7ADA3;font-size:.85rem;}
+
+  .dots{
+    display:flex;
+    gap:.4rem;
+    margin-top:1rem;
+  }
+  .dots span{
+    width:.42rem;height:.42rem;border-radius:50%;
+    background:var(--line);
+  }
+  .dots span:nth-child(1){background:var(--pink);}
+  .dots span:nth-child(2){background:var(--yellow);}
+  .dots span:nth-child(3){background:var(--blue);}
+
+  footer{
+    margin-top:4rem;
+    padding-top:1.4rem;
+    border-top:1px solid var(--line);
+    font-size:.82rem;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:.6rem;
+  }
+  footer code{
+    font-family:ui-monospace, monospace;
+    background:var(--paper-soft);
+    padding:.1rem .4rem;
+    border-radius:.4rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .slide{transition:transform .25s ease, box-shadow .25s ease;}
+    .slide:hover{transform:translateY(-4px);}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">style-pastel-carousel · demo</span>
+    <h1>Three carousels, one pastel world</h1>
+    <p class="lede">
+      Every deck below was generated with the same command, swapping only the concept.
+      The skill supplies the palette, the rounded flat-illustration language, and the
+      friendly, action-oriented voice — the concept just fills it in.
+    </p>
+    <div class="command">/visualize <b>{{ concept }}</b> | /style-pastel-carousel</div>
+    <div class="keyrow">
+      <span class="swatch"><i style="background:#FFF9F5"></i>#FFF9F5 bg</span>
+      <span class="swatch"><i style="background:#F4C2C2"></i>#F4C2C2 pink</span>
+      <span class="swatch"><i style="background:#F7D96F"></i>#F7D96F yellow</span>
+      <span class="swatch"><i style="background:#A7D3F0"></i>#A7D3F0 blue</span>
+      <span class="swatch"><i style="background:#2E2E2E"></i>#2E2E2E ink</span>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- CAROUSEL 1 — Automating your inbox                            -->
+  <!-- ============================================================ -->
+  <section class="deck">
+    <div class="deck-head">
+      <div>
+        <h2>Automating your inbox</h2>
+        <p>/visualize Automating your inbox | /style-pastel-carousel</p>
+      </div>
+      <span class="swipe-hint">Swipe
+        <svg viewBox="0 0 40 16" fill="none"><path d="M2 8h34" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round"/><path d="M30 3l6 5-6 5" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+    <div class="carousel">
+
+      <!-- Slide 1 -->
+      <article class="slide bg-a">
+        <span class="pill">Slide 1 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="120" rx="95" ry="18" fill="#A7D3F0" opacity=".35"/>
+            <rect x="45" y="55" width="90" height="58" rx="10" fill="#F7EFEA" stroke="#2E2E2E" stroke-width="2"/>
+            <rect x="55" y="65" width="70" height="38" rx="4" fill="#A7D3F0" opacity=".55"/>
+            <rect x="30" y="112" width="130" height="10" rx="5" fill="#2E2E2E"/>
+            <g>
+              <rect x="150" y="40" width="20" height="15" rx="3" fill="#F4C2C2" transform="rotate(18 160 47)"/>
+              <polygon points="150,40 170,40 160,50" fill="#fff" opacity=".6" transform="rotate(18 160 47)"/>
+              <rect x="165" y="20" width="18" height="13" rx="3" fill="#F7D96F" transform="rotate(-10 174 26)"/>
+            </g>
+            <g fill="#F7D96F">
+              <path d="M35 30l2.4 5.2L43 38l-5.6 2.6L35 46l-2.4-5.4L27 38l5.6-2.8z"/>
+              <path d="M185 65l1.6 3.6L190 70l-3.4 1.6L185 75l-1.7-3.4L180 70l3.3-1.4z"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Your Inbox Is Trying to Tell You Something</h3>
+        <ul>
+          <li>The average inbox eats 2+ hours a day</li>
+          <li>Most of that time is repetitive triage, not real decisions</li>
+          <li>Automation handles the repetitive part so you don't have to</li>
+        </ul>
+        <div class="flow">
+          <span class="chip">📥 Inbox</span><span class="arrow">→</span>
+          <span class="chip">🤖 Automate</span><span class="arrow">→</span>
+          <span class="chip">✅ Done</span>
+        </div>
+      </article>
+
+      <!-- Slide 2 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 2 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="122" rx="95" ry="16" fill="#F4C2C2" opacity=".3"/>
+            <rect x="20" y="80" width="46" height="40" rx="10" fill="#A7D3F0" opacity=".5"/>
+            <rect x="87" y="80" width="46" height="40" rx="10" fill="#F7D96F" opacity=".5"/>
+            <rect x="154" y="80" width="46" height="40" rx="10" fill="#F4C2C2" opacity=".5"/>
+            <rect x="30" y="30" width="22" height="16" rx="3" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(-8 41 38)"/>
+            <rect x="98" y="24" width="22" height="16" rx="3" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(6 109 32)"/>
+            <rect x="165" y="30" width="22" height="16" rx="3" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(-4 176 38)"/>
+            <path d="M40 46 Q42 62 42 78" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="3 4"/>
+            <path d="M109 40 Q109 60 109 78" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="3 4"/>
+            <path d="M176 46 Q178 62 178 78" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="3 4"/>
+          </svg>
+        </div>
+        <h3>What You Can Automate</h3>
+        <ul>
+          <li>Sorting by sender or subject</li>
+          <li>Drafting quick replies</li>
+          <li>Flagging anything time-sensitive</li>
+        </ul>
+      </article>
+
+      <!-- Slide 3 -->
+      <article class="slide bg-c">
+        <span class="pill">Slide 3 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="126" rx="85" ry="14" fill="#F7D96F" opacity=".3"/>
+            <circle cx="95" cy="55" r="20" fill="#F4C2C2" opacity=".7"/>
+            <path d="M75 95 q20 -22 40 0 l-4 30 h-32 z" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <path d="M140 100 a10 10 0 1 0 0.1 0" fill="none" stroke="#2E2E2E" stroke-width="2"/>
+            <rect x="128" y="96" width="18" height="14" rx="3" fill="#A7D3F0"/>
+            <g transform="translate(150 55)">
+              <circle r="16" fill="#fff" stroke="#2E2E2E" stroke-width="1.6"/>
+              <path d="M-5 2c1.5 -4 3.5 -4 5 0 1.5 -4 3.5 -4 5 0 0 4 -5 7 -5 7s-5 -3 -5 -7z" fill="#F4C2C2"/>
+            </g>
+          </svg>
+        </div>
+        <h3>What You Should Keep Doing Yourself</h3>
+        <ul>
+          <li>Anything needing judgment or nuance</li>
+          <li>Sensitive or high-stakes replies</li>
+          <li>Relationship-building messages</li>
+        </ul>
+      </article>
+
+      <!-- Slide 4 -->
+      <article class="slide bg-a">
+        <span class="pill">Slide 4 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="126" rx="90" ry="14" fill="#A7D3F0" opacity=".3"/>
+            <rect x="70" y="90" width="80" height="26" rx="6" fill="#F4C2C2" transform="rotate(-2 110 103)"/>
+            <rect x="76" y="64" width="80" height="26" rx="6" fill="#F7D96F" transform="rotate(1.5 116 77)"/>
+            <rect x="70" y="38" width="80" height="26" rx="6" fill="#A7D3F0" transform="rotate(-1.5 110 51)"/>
+            <path d="M65 26 q10 -14 22 -2" stroke="#2E2E2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M83 21l4 3 -2 5" stroke="#2E2E2E" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>A Simple Starting Setup</h3>
+        <ul>
+          <li>Rule 1: auto-file newsletters</li>
+          <li>Rule 2: draft replies to FAQs</li>
+          <li>Rule 3: star anything from your team</li>
+        </ul>
+        <div class="flow">
+          <span class="chip">✉️</span><span class="arrow">→</span>
+          <span class="chip">🏷️</span><span class="arrow">→</span>
+          <span class="chip">⭐</span>
+        </div>
+      </article>
+
+      <!-- Slide 5 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 5 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <circle cx="180" cy="30" r="16" fill="#F7D96F" opacity=".8"/>
+            <rect x="0" y="118" width="220" height="4" fill="#2E2E2E" opacity=".08"/>
+            <path d="M60 118 q-4 -46 34 -60" stroke="#2E2E2E" stroke-width="2" fill="none"/>
+            <circle cx="94" cy="52" r="12" fill="#F4C2C2"/>
+            <path d="M60 118 c0 -18 14 -22 24 -14 c8 -10 26 -8 26 8 v6 h-50z" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <rect x="40" y="90" width="18" height="28" rx="4" fill="#A7D3F0" transform="rotate(-6 49 104)"/>
+            <ellipse cx="30" cy="120" rx="10" ry="4" fill="#F4C2C2" opacity=".6"/>
+          </svg>
+        </div>
+        <h3>Save the Hours for What Matters</h3>
+        <ul>
+          <li>Less triage, more deep work</li>
+          <li>Automation is a teammate, not a replacement</li>
+          <li>Start with one rule today</li>
+        </ul>
+      </article>
+
+    </div>
+    <div class="dots"><span></span><span></span><span></span><span style="background:var(--line)"></span><span style="background:var(--line)"></span></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- CAROUSEL 2 — Building a morning routine                       -->
+  <!-- ============================================================ -->
+  <section class="deck">
+    <div class="deck-head">
+      <div>
+        <h2>Building a morning routine</h2>
+        <p>/visualize Building a morning routine | /style-pastel-carousel</p>
+      </div>
+      <span class="swipe-hint">Swipe
+        <svg viewBox="0 0 40 16" fill="none"><path d="M2 8h34" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round"/><path d="M30 3l6 5-6 5" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+    <div class="carousel">
+
+      <!-- Slide 1 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 1 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <circle cx="176" cy="30" r="20" fill="#F7D96F" opacity=".85"/>
+            <g stroke="#F7D96F" stroke-width="2" opacity=".85">
+              <line x1="176" y1="4" x2="176" y2="-4"/>
+              <line x1="200" y1="30" x2="210" y2="30"/>
+              <line x1="193" y1="13" x2="200" y2="6"/>
+            </g>
+            <rect x="10" y="60" width="4" height="70" fill="#2E2E2E" opacity=".1"/>
+            <path d="M20 130 q20 -50 55 -34" stroke="#2E2E2E" stroke-width="2" fill="none"/>
+            <circle cx="70" cy="72" r="12" fill="#F4C2C2"/>
+            <path d="M40 130 c0 -20 16 -24 26 -14 c10 -10 30 -6 30 12 v2 h-56z" fill="#FFF9F5" stroke="#2E2E2E" stroke-width="2"/>
+            <g transform="translate(140 100)">
+              <rect x="0" y="6" width="20" height="18" rx="3" fill="#A7D3F0"/>
+              <path d="M20 10c6 0 6 10 0 10" stroke="#2E2E2E" stroke-width="1.6" fill="none"/>
+              <path d="M4 3q3 -4 6 0" stroke="#2E2E2E" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Mornings Set the Tone</h3>
+        <ul>
+          <li>The first hour shapes the rest of your day</li>
+          <li>A little structure beats a lot of willpower</li>
+          <li>Small, repeatable habits compound</li>
+        </ul>
+      </article>
+
+      <!-- Slide 2 -->
+      <article class="slide bg-c">
+        <span class="pill">Slide 2 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="126" rx="95" ry="14" fill="#A7D3F0" opacity=".3"/>
+            <g transform="translate(30 46)">
+              <ellipse cx="20" cy="60" rx="16" ry="6" fill="#2E2E2E" opacity=".08"/>
+              <path d="M4 40 q16 -34 32 0z" fill="#F4C2C2"/>
+              <rect x="0" y="40" width="40" height="8" rx="4" fill="#2E2E2E"/>
+            </g>
+            <g transform="translate(94 40)">
+              <rect x="0" y="0" width="30" height="22" rx="2" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="1.6"/>
+              <line x1="6" y1="7" x2="24" y2="7" stroke="#A7D3F0" stroke-width="2"/>
+              <line x1="6" y1="13" x2="24" y2="13" stroke="#A7D3F0" stroke-width="2"/>
+              <line x1="6" y1="18" x2="18" y2="18" stroke="#A7D3F0" stroke-width="2"/>
+            </g>
+            <g transform="translate(160 44)">
+              <rect x="0" y="6" width="18" height="16" rx="3" fill="#F7D96F"/>
+              <path d="M18 10c5 0 5 8 0 8" stroke="#2E2E2E" stroke-width="1.4" fill="none"/>
+            </g>
+            <path d="M55 55 q12 -6 24 0" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="2.5 4"/>
+            <path d="M132 52 q12 -4 22 0" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="2.5 4"/>
+          </svg>
+        </div>
+        <h3>The 3-Step Framework</h3>
+        <ul>
+          <li>Move: a few minutes of stretching or walking</li>
+          <li>Reflect: jot down today's one priority</li>
+          <li>Fuel: a proper breakfast, not just coffee</li>
+        </ul>
+        <div class="flow">
+          <span class="chip">🏃 Move</span><span class="arrow">→</span>
+          <span class="chip">📝 Reflect</span><span class="arrow">→</span>
+          <span class="chip">☕ Fuel</span>
+        </div>
+      </article>
+
+      <!-- Slide 3 -->
+      <article class="slide bg-a">
+        <span class="pill">Slide 3 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="126" rx="80" ry="14" fill="#F4C2C2" opacity=".28"/>
+            <rect x="80" y="35" width="60" height="90" rx="14" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <circle cx="110" cy="115" r="4" fill="#2E2E2E"/>
+            <g transform="translate(92 55)">
+              <path d="M0 14 q9 -18 18 -12 q4 -8 12 -4" stroke="#2E2E2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <circle cx="15" cy="10" r="9" fill="none" stroke="#2E2E2E" stroke-width="1.8"/>
+              <path d="M21 16l6 6" stroke="#2E2E2E" stroke-width="1.8" stroke-linecap="round"/>
+            </g>
+            <line x1="60" y1="20" x2="80" y2="40" stroke="#F4C2C2" stroke-width="3" stroke-linecap="round"/>
+            <line x1="60" y1="40" x2="80" y2="20" stroke="#F4C2C2" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>What to Skip</h3>
+        <ul>
+          <li>Checking email first thing</li>
+          <li>Scrolling social media in bed</li>
+          <li>Overplanning the whole day at once</li>
+        </ul>
+      </article>
+
+      <!-- Slide 4 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 4 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="126" rx="90" ry="14" fill="#F7D96F" opacity=".28"/>
+            <rect x="55" y="30" width="110" height="86" rx="10" fill="#fff" stroke="#2E2E2E" stroke-width="2"/>
+            <rect x="55" y="30" width="110" height="20" rx="10" fill="#A7D3F0" opacity=".6"/>
+            <g stroke="#2E2E2E" stroke-width="1" opacity=".5">
+              <line x1="70" y1="60" x2="70" y2="106"/><line x1="90" y1="60" x2="90" y2="106"/>
+              <line x1="110" y1="60" x2="110" y2="106"/><line x1="130" y1="60" x2="130" y2="106"/><line x1="150" y1="60" x2="150" y2="106"/>
+              <line x1="60" y1="66" x2="160" y2="66"/><line x1="60" y1="80" x2="160" y2="80"/><line x1="60" y1="94" x2="160" y2="94"/>
+            </g>
+            <path d="M97 84l3.4 6.8 7.6 1-5.5 5.2 1.3 7.5-6.8-3.6-6.8 3.6 1.3-7.5-5.5-5.2 7.6-1z" fill="#F7D96F"/>
+            <path d="M137 70l2.6 5 5.6 0.8-4 3.8 1 5.6-5.2-2.7-5.2 2.7 1-5.6-4-3.8 5.6-0.8z" fill="#F4C2C2"/>
+          </svg>
+        </div>
+        <h3>Make It Stick</h3>
+        <ul>
+          <li>Anchor it to something you already do</li>
+          <li>Keep the routine under 30 minutes</li>
+          <li>Track it for one week, not forever</li>
+        </ul>
+      </article>
+
+      <!-- Slide 5 -->
+      <article class="slide bg-c">
+        <span class="pill">Slide 5 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <circle cx="150" cy="30" r="18" fill="#F7D96F" opacity=".7"/>
+            <ellipse cx="70" cy="35" rx="20" ry="10" fill="#fff"/>
+            <ellipse cx="55" cy="40" rx="14" ry="8" fill="#fff"/>
+            <ellipse cx="85" cy="40" rx="14" ry="8" fill="#fff"/>
+            <rect x="0" y="122" width="220" height="4" fill="#2E2E2E" opacity=".08"/>
+            <path d="M100 122 q-2 -40 30 -50" stroke="#2E2E2E" stroke-width="2" fill="none"/>
+            <circle cx="132" cy="60" r="11" fill="#F4C2C2"/>
+            <path d="M100 122c0 -16 12 -20 22 -12c8 -8 24 -4 24 10v2h-46z" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <path d="M75 100 q-8 8 -4 22 h24 q4 -14 -4 -22z" fill="#A7D3F0" opacity=".8" stroke="#2E2E2E" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <h3>Your Morning, Your Rules</h3>
+        <ul>
+          <li>There's no universal "perfect" routine</li>
+          <li>Adjust until it feels sustainable</li>
+          <li>Consistency beats intensity</li>
+        </ul>
+      </article>
+
+    </div>
+    <div class="dots"><span></span><span></span><span></span><span style="background:var(--line)"></span><span style="background:var(--line)"></span></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- CAROUSEL 3 — Getting started with AI agents                   -->
+  <!-- ============================================================ -->
+  <section class="deck">
+    <div class="deck-head">
+      <div>
+        <h2>Getting started with AI agents</h2>
+        <p>/visualize Getting started with AI agents | /style-pastel-carousel</p>
+      </div>
+      <span class="swipe-hint">Swipe
+        <svg viewBox="0 0 40 16" fill="none"><path d="M2 8h34" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round"/><path d="M30 3l6 5-6 5" stroke="#6A6A6A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+    <div class="carousel">
+
+      <!-- Slide 1 -->
+      <article class="slide bg-a">
+        <span class="pill">Slide 1 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="128" rx="95" ry="14" fill="#F7D96F" opacity=".3"/>
+            <rect x="70" y="40" width="50" height="42" rx="12" fill="#A7D3F0"/>
+            <circle cx="85" cy="58" r="5" fill="#2E2E2E"/><circle cx="105" cy="58" r="5" fill="#2E2E2E"/>
+            <line x1="95" y1="40" x2="95" y2="28" stroke="#2E2E2E" stroke-width="2"/>
+            <circle cx="95" cy="24" r="4" fill="#F4C2C2"/>
+            <rect x="55" y="90" width="80" height="28" rx="4" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <rect x="62" y="97" width="46" height="4" rx="2" fill="#A7D3F0"/>
+            <rect x="62" y="105" width="60" height="4" rx="2" fill="#F4C2C2"/>
+            <rect x="150" y="70" width="26" height="20" rx="3" fill="#F7D96F" transform="rotate(8 163 80)"/>
+          </svg>
+        </div>
+        <h3>What Is an AI Agent, Really?</h3>
+        <ul>
+          <li>Not just a chatbot — it can take actions</li>
+          <li>Reads context, decides, and executes steps</li>
+          <li>Think "assistant with hands," not "search bar"</li>
+        </ul>
+      </article>
+
+      <!-- Slide 2 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 2 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <g fill="none" stroke="#2E2E2E" stroke-width="1.8" stroke-dasharray="3 4">
+              <path d="M75 50 a45 45 0 0 1 70 15"/>
+              <path d="M148 92 a45 45 0 0 1 -55 32"/>
+              <path d="M70 100 a45 45 0 0 1 -5 -50"/>
+            </g>
+            <g>
+              <rect x="45" y="35" width="42" height="30" rx="8" fill="#F4C2C2"/>
+              <rect x="132" y="60" width="42" height="30" rx="8" fill="#A7D3F0"/>
+              <rect x="70" y="100" width="42" height="30" rx="8" fill="#F7D96F"/>
+            </g>
+          </svg>
+        </div>
+        <h3>The Core Loop</h3>
+        <ul>
+          <li>Input: a goal or task you give it</li>
+          <li>Process: it plans and calls tools</li>
+          <li>Output: a result, or a question back to you</li>
+        </ul>
+        <div class="flow">
+          <span class="chip">🎯 Goal</span><span class="arrow">→</span>
+          <span class="chip">⚙️ Tools</span><span class="arrow">→</span>
+          <span class="chip">📤 Result</span>
+        </div>
+      </article>
+
+      <!-- Slide 3 -->
+      <article class="slide bg-c">
+        <span class="pill">Slide 3 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="70" cy="120" rx="55" ry="12" fill="#A7D3F0" opacity=".3"/>
+            <rect x="30" y="50" width="70" height="16" rx="2" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(-4 65 58)"/>
+            <rect x="34" y="66" width="70" height="16" rx="2" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(3 69 74)"/>
+            <rect x="30" y="84" width="70" height="16" rx="2" fill="#fff" stroke="#2E2E2E" stroke-width="1.6" transform="rotate(-2 65 92)"/>
+            <path d="M108 70h34" stroke="#2E2E2E" stroke-width="1.8" fill="none" stroke-dasharray="2 4"/>
+            <path d="M136 65l6 5-6 5" stroke="#2E2E2E" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="155" y="58" width="30" height="22" rx="4" fill="#F7D96F" transform="rotate(-3 170 69)"/>
+            <path d="M195 40l2.4 5.2 5.6 0.8-4 4 1 5.6-5-2.7-5 2.7 1-5.6-4-4 5.6-0.8z" fill="#F4C2C2"/>
+          </svg>
+        </div>
+        <h3>Common Starter Use Cases</h3>
+        <ul>
+          <li>Summarizing long documents</li>
+          <li>Drafting first-pass reports</li>
+          <li>Triaging repetitive requests</li>
+        </ul>
+      </article>
+
+      <!-- Slide 4 -->
+      <article class="slide bg-a">
+        <span class="pill">Slide 4 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <ellipse cx="110" cy="128" rx="95" ry="14" fill="#F4C2C2" opacity=".28"/>
+            <rect x="130" y="55" width="34" height="30" rx="8" fill="#A7D3F0"/>
+            <circle cx="140" cy="68" r="3.4" fill="#2E2E2E"/><circle cx="154" cy="68" r="3.4" fill="#2E2E2E"/>
+            <line x1="147" y1="55" x2="147" y2="46" stroke="#2E2E2E" stroke-width="1.8"/>
+            <circle cx="147" cy="43" r="3" fill="#F7D96F"/>
+            <path d="M60 60 q10 -18 22 -14" stroke="#2E2E2E" stroke-width="2" fill="none"/>
+            <circle cx="70" cy="38" r="10" fill="#F4C2C2"/>
+            <path d="M50 90c0 -14 10 -18 20 -10c8 -8 22 -4 22 8v6h-42z" fill="#FDF7F3" stroke="#2E2E2E" stroke-width="2"/>
+            <path d="M100 62l14 -14" stroke="#2E2E2E" stroke-width="2" stroke-linecap="round"/>
+            <path d="M133 45l16 -16" stroke="#2E2E2E" stroke-width="2" stroke-linecap="round"/>
+            <rect x="60" y="105" width="70" height="20" rx="4" fill="#fff" stroke="#2E2E2E" stroke-width="1.8"/>
+            <path d="M67 115l4 4 8 -8" stroke="#A7D3F0" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="86" y="119" font-family="Nunito, sans-serif" font-size="8" font-weight="800" fill="#2E2E2E">Reviewed</text>
+          </svg>
+        </div>
+        <h3>Keep a Human in the Loop</h3>
+        <ul>
+          <li>Review before anything goes out the door</li>
+          <li>Set clear boundaries on what it can touch</li>
+          <li>Treat mistakes as tuning, not failure</li>
+        </ul>
+      </article>
+
+      <!-- Slide 5 -->
+      <article class="slide bg-b">
+        <span class="pill">Slide 5 / 5</span>
+        <div class="illus">
+          <svg viewBox="0 0 220 150">
+            <rect x="0" y="120" width="220" height="4" fill="#2E2E2E" opacity=".08"/>
+            <g transform="translate(30 96)">
+              <rect x="0" y="18" width="20" height="14" fill="#A7D3F0"/>
+              <ellipse cx="10" cy="14" rx="7" ry="7" fill="#F7D96F"/>
+            </g>
+            <g transform="translate(90 78)">
+              <rect x="0" y="24" width="26" height="20" fill="#F4C2C2"/>
+              <ellipse cx="13" cy="18" rx="11" ry="11" fill="#F7D96F"/>
+              <ellipse cx="4" cy="10" rx="6" ry="6" fill="#F7D96F"/>
+            </g>
+            <g transform="translate(155 58)">
+              <rect x="0" y="30" width="32" height="26" fill="#A7D3F0"/>
+              <ellipse cx="16" cy="22" rx="15" ry="15" fill="#F7D96F"/>
+              <ellipse cx="4" cy="10" rx="8" ry="8" fill="#F7D96F"/>
+              <ellipse cx="26" cy="8" rx="7" ry="7" fill="#F7D96F"/>
+            </g>
+            <path d="M40 96 q60 -50 130 -34" stroke="#2E2E2E" stroke-width="1.6" fill="none" stroke-dasharray="2 5"/>
+          </svg>
+        </div>
+        <h3>Start Small, Then Expand</h3>
+        <ul>
+          <li>Pick one repetitive task this week</li>
+          <li>Automate it, then watch it run</li>
+          <li>Add the next task once it's boring, not before</li>
+        </ul>
+      </article>
+
+    </div>
+    <div class="dots"><span></span><span></span><span></span><span style="background:var(--line)"></span><span style="background:var(--line)"></span></div>
+  </section>
+
+  <footer>
+    <span>Generated with <code>skills/visualizations/styles/style-pastel-carousel</code></span>
+    <span>Text outlines, not final art — pair with a designer or image model for finished slides.</span>
+  </footer>
+
+</div>
