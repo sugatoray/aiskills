@@ -71,6 +71,6 @@ two rules above and the wrong/right examples.
 ## Scope
 
 This file's rules apply only to markdown files inside
-`newsletters/newsletter-ai/`. They are not a repository-wide
+`skills/newsletters/newsletter-ai/`. They are not a repository-wide
 convention — don't apply them to other skills' markdown files as a side
 effect of an unrelated change.

@@ -7,7 +7,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "1.5.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/newsletters/newsletter-ai"
     aliases:
       - nltr-ai
 ---
@@ -85,13 +85,13 @@ reconstruct the brief from memory or summarize it — read the file itself.
        and mention it can be rendered into the interactive report with:
 
        ```
-       python newsletters/newsletter-ai/builder/build_report.py <file>.yaml <output>.html
+       python skills/newsletters/newsletter-ai/builder/build_report.py <file>.yaml <output>.html
        ```
 
      - **`-r`/`--report PATH` given:** run the render yourself:
 
        ```
-       python newsletters/newsletter-ai/builder/build_report.py <file>.yaml -r PATH
+       python skills/newsletters/newsletter-ai/builder/build_report.py <file>.yaml -r PATH
        ```
 
        This writes the rendered HTML and a copy of the YAML side by
