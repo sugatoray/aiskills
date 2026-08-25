@@ -6,10 +6,19 @@ For people developing this skill — not read as part of producing a
 ## Layout
 
 - `../SKILL.md` — the only file read at invocation time. Frontmatter
-  (`name`, `description`, `metadata.version`) plus the steps for using
-  `assets/PROMPT.md` to produce one edition, in markdown or YAML.
+  (`name`, `description`, `metadata.version`, `metadata.aliases`) plus
+  the steps for using `assets/PROMPT.md` to produce one edition, in
+  markdown or YAML.
+- `../README.md` — human-facing usage doc (how to invoke, all flags with
+  examples, screenshots). Not read at invocation time; keep its flag
+  table in sync with `SKILL.md`'s Steps when either changes.
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
+- `assets/images/` — the screenshots `README.md` embeds. Regenerate by
+  rendering `assets/templates/sample-report.yaml` (see the CLI below)
+  and screenshotting the result; keep filenames descriptive
+  (`report-<what>-<light|dark>.png`) since `README.md` references them
+  by exact path.
 - `assets/PROMPT.md` — the editorial brief itself: role, audience,
   research window, sourcing rules, the 15-part structure, editorial
   rules, and writing style. This is the single source of truth for what

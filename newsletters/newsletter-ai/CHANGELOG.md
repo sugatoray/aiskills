@@ -3,6 +3,23 @@
 All notable changes to the `newsletter-ai` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.0] - 2026-08-25
+
+### Added
+
+- `README.md`: human- and agent-facing usage guide — invocation examples
+  for both `/newsletter-ai` and its new `/nltr-ai` shorthand, a full
+  flags table (`-o`/`--output`, `--md`/`--yaml`/`--yml`, `-r`/`--report`)
+  with side-by-side examples, a programmatic/CLI section for agents that
+  want to render already-written YAML without an LLM call, and two
+  screenshots of the rendered report (light-theme overview, dark-theme
+  citation-to-reference navigation).
+- `assets/images/`: the two screenshots `README.md` embeds, rendered
+  from `assets/templates/sample-report.yaml`.
+- `metadata.aliases: [nltr-ai]` in `SKILL.md`'s frontmatter, and the
+  description updated to say both `/newsletter-ai` and `/nltr-ai`
+  trigger the same skill.
+
 ## [1.3.0] - 2026-08-25
 
 ### Added

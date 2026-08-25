@@ -1,13 +1,15 @@
 ---
 name: newsletter-ai
-description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document, and add -r/--report path/to/folder-or-report.html to render it straight into an interactive, light/dark, multi-tab HTML report (with per-tab References accordions, its source YAML fused in for single-file distribution, and a Download-data button) written next to a copy of the YAML. Use when the user runs /newsletter-ai, or asks to draft, write, or update this week's AI newsletter/intelligence brief."
+description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document, and add -r/--report path/to/folder-or-report.html to render it straight into an interactive, light/dark, multi-tab HTML report (with per-tab References accordions, its source YAML fused in for single-file distribution, and a Download-data button) written next to a copy of the YAML. Use when the user runs /newsletter-ai (aliased as the shorthand /nltr-ai — treat both identically), or asks to draft, write, or update this week's AI newsletter/intelligence brief."
 license: MIT
 metadata:
   - name: newsletter-ai
     type: skill
     author: sugatoray
-    version: "1.3.0"
+    version: "1.4.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
+    aliases:
+      - nltr-ai
 ---
 
 # Newsletter: AI Intelligence Brief
