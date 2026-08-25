@@ -3,7 +3,11 @@
 All notable changes to the `newsletter-ai` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.5.0] - 2026-08-25
+Work on this skill is tracked under
+[Epic #30](https://github.com/sugatoray/aiskills/issues/30); each entry
+below links to its corresponding closed issue.
+
+## [1.5.0] - 2026-08-25 ([#41](https://github.com/sugatoray/aiskills/issues/41))
 
 ### Added
 
@@ -27,7 +31,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `test_browser_download.py` left as-is to avoid touching passing code
   unnecessarily).
 
-## [1.4.0] - 2026-08-25
+## [1.4.0] - 2026-08-25 ([#40](https://github.com/sugatoray/aiskills/issues/40))
 
 ### Added
 
@@ -44,7 +48,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   description updated to say both `/newsletter-ai` and `/nltr-ai`
   trigger the same skill.
 
-## [1.3.0] - 2026-08-25
+## [1.3.0] - 2026-08-25 ([#37](https://github.com/sugatoray/aiskills/issues/37))
 
 ### Added
 
@@ -90,7 +94,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `SKILL.md`, `meta/MAINTAINERS.md`, and the test suite's import paths.
 - `SKILL.md` documents the `-r`/`--report` flag and the new file layout.
 
-## [1.2.0] - 2026-08-25
+## [1.2.0] - 2026-08-25 ([#36](https://github.com/sugatoray/aiskills/issues/36))
 
 ### Added
 
@@ -125,7 +129,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `SKILL.md` now documents the output-format flag and the YAML schema
   pointer; bumped to reflect the new capability.
 
-## [1.1.0] - 2026-08-25
+## [1.1.0] - 2026-08-25 ([#32](https://github.com/sugatoray/aiskills/issues/32), [#33](https://github.com/sugatoray/aiskills/issues/33))
 
 ### Changed
 
@@ -139,7 +143,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `meta/MAINTAINERS.md` documenting the skill's layout and how to update
   `assets/PROMPT.md`.
 
-## [1.0.0] - 2026-08-25
+## [1.0.0] - 2026-08-25 ([#31](https://github.com/sugatoray/aiskills/issues/31))
 
 ### Added
 
