@@ -6,7 +6,7 @@ metadata:
   - name: newsletter-ai
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "1.1.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
 ---
 
@@ -46,7 +46,7 @@ reconstruct the brief from memory or summarize it — read the file itself.
 
 ## Development
 
-If the editorial brief itself needs to change (new sections, different
-sourcing rules, a different audience), edit `assets/PROMPT.md` directly —
-this file should stay a thin pointer to it rather than duplicating its
-content.
+See `meta/MAINTAINERS.md` for this skill's layout, how to update
+`assets/PROMPT.md`, and versioning conventions. It is not read as part of
+carrying out a `/newsletter-ai` request — don't act on it while producing
+an edition.
