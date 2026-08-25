@@ -1,5 +1,5 @@
 """Regression tests against the real sample edition
-(assets/example/sample-report.yaml) — the data actually shipped to users,
+(assets/templates/sample-report.yaml) — the data actually shipped to users,
 as opposed to the minimal synthetic fixtures used elsewhere. Guards
 against the schema and the real content drifting apart.
 """
@@ -8,8 +8,8 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / "scripts"
-EXAMPLE = ROOT / "assets" / "example" / "sample-report.yaml"
+SCRIPTS = ROOT / "builder"
+EXAMPLE = ROOT / "assets" / "templates" / "sample-report.yaml"
 sys.path.insert(0, str(SCRIPTS))
 
 import build_report  # noqa: E402

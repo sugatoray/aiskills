@@ -20,7 +20,7 @@ import sys
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / "scripts"
+SCRIPTS = ROOT / "builder"
 FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 sys.path.insert(0, str(SCRIPTS))
 
@@ -143,6 +143,24 @@ def test_light_and_dark_theme_tokens_present(html):
 
 def test_theme_toggle_control_present(html):
     assert 'id="themeBtn"' in html
+
+
+# --------------------------------------------------------------- data fusion
+
+def test_download_data_button_present_in_template(html):
+    assert 'id="downloadDataBtn"' in html
+
+
+def test_fused_source_data_embedded_by_default(ctx):
+    fused_html = build_report.render_html(ctx)
+    import fuse
+    assert fuse.extract_source(fused_html) is not None
+
+
+def test_no_fuse_omits_embedded_source_data(ctx):
+    unfused_html = build_report.render_html(ctx, embed_data=False)
+    import fuse
+    assert fuse.extract_source(unfused_html) is None
 
 
 # ------------------------------------------------------------------ print CSS

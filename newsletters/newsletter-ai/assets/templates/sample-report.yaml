@@ -1,8 +1,8 @@
 # Example newsletter-ai report data, conforming to the schema documented
-# in scripts/report_data.py and meta/MAINTAINERS.md. This is the content
+# in builder/report_data.py and meta/MAINTAINERS.md. This is the content
 # of a real sample edition (Week of Aug 19-25, 2026) and doubles as a
 # fixture other tooling can render with:
-#   python scripts/build_report.py assets/example/sample-report.yaml out.html
+#   python builder/build_report.py assets/templates/sample-report.yaml out.html
 
 meta:
   title: "The AI Intelligence Brief"

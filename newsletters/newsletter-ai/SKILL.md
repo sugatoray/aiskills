@@ -1,12 +1,12 @@
 ---
 name: newsletter-ai
-description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document that assets/templates/report.html renders into an interactive, light/dark, multi-tab HTML report with per-tab References accordions. Use when the user runs /newsletter-ai, or asks to draft, write, or update this week's AI newsletter/intelligence brief."
+description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document, and add -r/--report path/to/folder-or-report.html to render it straight into an interactive, light/dark, multi-tab HTML report (with per-tab References accordions, its source YAML fused in for single-file distribution, and a Download-data button) written next to a copy of the YAML. Use when the user runs /newsletter-ai, or asks to draft, write, or update this week's AI newsletter/intelligence brief."
 license: MIT
 metadata:
   - name: newsletter-ai
     type: skill
     author: sugatoray
-    version: "1.2.0"
+    version: "1.3.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
 ---
 
@@ -25,11 +25,17 @@ reconstruct the brief from memory or summarize it — read the file itself.
 1. Read `assets/PROMPT.md` in full before writing anything. Treat it as
    the complete editorial brief for this edition, not a template to
    paraphrase.
-2. Parse the invocation for an output-format flag: `-o`/`--output` followed
-   by `md`, `yaml`, or `yml`; or the shorthand `--md` / `--yaml` /
-   `--yml`. No flag means `md` (the original behavior). An unrecognized
-   value is an error — ask the user to pick `md` or `yaml` rather than
-   guessing.
+2. Parse the invocation for flags:
+   - **Output format** — `-o`/`--output` followed by `md`, `yaml`, or
+     `yml`; or the shorthand `--md` / `--yaml` / `--yml`. No flag means
+     `md` (the original behavior). An unrecognized value is an error —
+     ask the user to pick `md` or `yaml` rather than guessing.
+   - **Report path** (`yaml`/`yml` output only) — `-r`/`--report`
+     followed by a path: either a folder (gets `report.html` +
+     `report.yaml` inside it) or an explicit `.html`/`.htm` file path
+     (gets a `.yaml` sidecar with the same basename next to it). Given
+     with `md` output, it's a no-op — say so rather than silently
+     ignoring it.
 3. Do the research it calls for: AI developments from the last 7 days,
    pulling in 30-90 days of prior context only where a development needs
    it to make sense. Use current web research and prefer the primary
@@ -57,7 +63,7 @@ reconstruct the brief from memory or summarize it — read the file itself.
      output, structured per `assets/PROMPT.md`, unless the user asks for
      it to be saved to a file. Cite sources as ordinary markdown links.
    - **`yaml`/`yml`:** instead of prose, produce a single YAML document
-     conforming exactly to the schema `scripts/report_data.py` validates
+     conforming exactly to the schema `builder/report_data.py` validates
      (see its module docstring and `validate()` for the authoritative
      field list) — a `meta` block plus an ordered `sections` list (one
      `kind: home` landing section, then one `kind: standard` section per
@@ -65,21 +71,32 @@ reconstruct the brief from memory or summarize it — read the file itself.
      the template's set, and whichever of `body` / `facts` / `table` /
      `stats` / `kv` fits that item's content, plus `sources: [{label,
      url}]` for every claim with a real link). Use
-     `assets/example/sample-report.yaml` as a fully worked template — copy
-     its shape rather than inventing a new one. Do **not** hand-number
-     citations or write a references list yourself: list each item's
-     `sources`, and the render step below dedupes them by URL and builds
-     the numbering and per-tab References accordions automatically, which
-     is what guarantees every citation link actually resolves.
-     After writing the YAML, mention to the user that it can be rendered
-     into the interactive report with:
-     ```
-     python newsletters/newsletter-ai/scripts/build_report.py <file>.yaml <output>.html
-     ```
-     which validates the data, computes references, and renders
-     `assets/templates/report.html` (multi-tab, accordioned, light/dark,
-     with a browser-native "Save as PDF" button) — offer to run it
-     yourself if the user wants the HTML file rather than just the YAML.
+     `assets/templates/sample-report.yaml` as a fully worked example —
+     copy its shape rather than inventing a new one. Do **not**
+     hand-number citations or write a references list yourself: list
+     each item's `sources`, and the render step below dedupes them by
+     URL and builds the numbering and per-tab References accordions
+     automatically, which is what guarantees every citation link
+     actually resolves.
+     - **No `-r`/`--report` given:** write the YAML to a file (or
+       return it as a fenced code block if the user hasn't said where),
+       and mention it can be rendered into the interactive report with:
+       ```
+       python newsletters/newsletter-ai/builder/build_report.py <file>.yaml <output>.html
+       ```
+     - **`-r`/`--report PATH` given:** run the render yourself:
+       ```
+       python newsletters/newsletter-ai/builder/build_report.py <file>.yaml -r PATH
+       ```
+       This writes the rendered HTML and a copy of the YAML side by
+       side (see Report path above for how PATH resolves), and by
+       default fuses the source YAML into the HTML too (a hidden,
+       base64-encoded `<script>` blob) so the single `.html` file
+       remains fully reproducible even without its `.yaml` sidecar — the
+       page's "Download data" button in the top bar lets a viewer pull
+       that YAML back out. Pass `--no-fuse` only if the user explicitly
+       doesn't want the data embedded. Report the paths written back to
+       the user.
 
 ## Development
 

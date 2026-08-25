@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "scripts"
+SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "builder"
 sys.path.insert(0, str(SCRIPTS))
 
 import report_data  # noqa: E402

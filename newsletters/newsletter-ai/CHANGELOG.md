@@ -3,6 +3,52 @@
 All notable changes to the `newsletter-ai` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-08-25
+
+### Added
+
+- `-r`/`--report path/to/folder-or-report.html` for `/newsletter-ai -o
+  yaml`: renders the YAML straight into `report.html` (or
+  `<name>.html`) with a `.yaml` copy written next to it, instead of
+  leaving the render step to the user. `builder/paths.py` resolves the
+  folder-vs-file argument into a concrete path pair (Red/Green tested).
+- **Data fusion**: `builder/fuse.py` embeds the source YAML into the
+  rendered HTML by default (a hidden, base64-encoded `<script>` blob),
+  and `report.html` grows a "Download data" button that extracts it back
+  out client-side — a single `.html` file now stays fully reproducible
+  even without its `.yaml` sidecar. `--no-fuse` opts out.
+  Building this exposed two real bugs, both now covered by regression
+  tests: (1) `fuse.py`'s first version spliced the payload into a
+  *decoy* `</body>` — a mention of that literal text inside an
+  explanatory code comment earlier in the page — instead of the real
+  closing tag, corrupting the document (`tests/test_fuse.py`, fixed by
+  inserting at the *last* `</body>` instead of the first); (2) the
+  download button's `atob()` call returned a binary string rather than
+  decoded Unicode text, mangling every em dash, curly quote, and other
+  multi-byte character in the downloaded file — invisible to Python
+  round-trip tests, caught only by a real-browser test
+  (`tests/test_browser_download.py`, driving headless Chromium via
+  Playwright end to end: build → open → click → diff the downloaded file
+  byte-for-byte against the source).
+- Per-control tactile `:hover`/`:active` feedback across the report UI
+  (nav items, home cards, accordion triggers, top-bar buttons), and a
+  contrast pass on small caption/meta text and the "Sample edition"
+  pill that were below WCAG AA — informed by a design-taste audit
+  (`npx skills add https://github.com/Leonxlnx/taste-skill --skill
+  design-taste-frontend`; its landing-page-specific rules — hero copy
+  limits, eyebrow counts, motion choreography — don't apply to this
+  report UI and were intentionally not applied, but its contrast,
+  shape-consistency, and tactile-feedback checks did).
+
+### Changed
+
+- Renamed `scripts/` → `builder/` (all non-test code for this skill;
+  `tests/` stays test-only) and moved
+  `assets/example/sample-report.yaml` → `assets/templates/sample-report.yaml`,
+  next to the template it renders through. Updated every reference in
+  `SKILL.md`, `meta/MAINTAINERS.md`, and the test suite's import paths.
+- `SKILL.md` documents the `-r`/`--report` flag and the new file layout.
+
 ## [1.2.0] - 2026-08-25
 
 ### Added

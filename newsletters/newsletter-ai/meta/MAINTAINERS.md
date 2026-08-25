@@ -19,40 +19,70 @@ For people developing this skill — not read as part of producing a
   interactive, multi-tab, light/dark HTML report. Renders a validated
   report data dict (see Schema below) into a self-contained HTML file:
   sidebar nav + tab panels per section, accordions per item, an
-  auto-generated References accordion per section, and a print
-  stylesheet with a cover/TOC for the browser's own "Save as PDF".
-- `assets/example/sample-report.yaml` — a complete, valid, real edition
-  (Week of Aug 19-25, 2026) in the YAML schema. Doubles as the reference
-  example for `SKILL.md`'s YAML-output step and as a test fixture
+  auto-generated References accordion per section, a print stylesheet
+  with a cover/TOC for the browser's own "Save as PDF", and a
+  "Download data" button that pulls a fused source-YAML copy back out
+  (see Data fusion below).
+- `assets/templates/sample-report.yaml` — a complete, valid, real
+  edition (Week of Aug 19-25, 2026) in the YAML schema, living next to
+  the template it renders through. Doubles as the reference example for
+  `SKILL.md`'s YAML-output step and as a test fixture
   (`tests/test_example_data.py` renders it and checks link integrity on
   every change).
-- `scripts/report_data.py` — loads and validates report YAML
-  (`load_yaml`, `validate`), and dedupes each standard section's item
-  `sources` by URL into a numbered reference list, annotating each item
-  with the shared reference numbers (`compute_references`,
-  `build_context`). This is what makes citation links unbreakable by
-  construction: the citation number and the References-accordion entry
-  it points at are computed from the same data in the same pass, so they
-  can't drift apart.
-- `scripts/build_report.py` — CLI + library (`render_html`, `build`)
-  that renders validated data through `report.html` via Jinja2.
-  ```
-  python scripts/build_report.py <input>.yaml <output>.html [--template PATH]
-  ```
-- `scripts/requirements.txt` — `pyyaml` and `jinja2`, the only runtime
-  dependencies (`build_report.py`/`report_data.py` are otherwise stdlib).
-  This is a deliberate departure from the `scrolls-*` family's
-  stdlib-only convention: hand-rolling a YAML parser or a Jinja2-grade
-  templating engine would be worse than depending on two extremely
-  stable, common libraries. Install with
-  `pip install -r scripts/requirements.txt`.
-- `tests/` — pytest suite; see Testing below.
+- `builder/` — all non-test code for this skill (Python + the one
+  browser-check helper script). Named `builder/` rather than the
+  `scripts/` convention used by the `skills/scrolls/*` family, at the
+  user's explicit request when this pipeline was built:
+  - `report_data.py` — loads and validates report YAML (`load_yaml`,
+    `validate`), and dedupes each standard section's item `sources` by
+    URL into a numbered reference list, annotating each item with the
+    shared reference numbers (`compute_references`, `build_context`).
+    This is what makes citation links unbreakable by construction: the
+    citation number and the References-accordion entry it points at are
+    computed from the same data in the same pass, so they can't drift
+    apart.
+  - `build_report.py` — CLI + library (`render_html`, `build`) that
+    renders validated data through `report.html` via Jinja2, resolves
+    the `-r`/`--report` output path, and fuses the source YAML into the
+    HTML by default. See CLI below.
+  - `paths.py` — `resolve_report_paths(path, default_basename="report")`:
+    turns a single "folder-or-report.html" argument into a concrete
+    `(html_path, yaml_path)` pair. A directory (existing or not) gets
+    `<default_basename>.html`/`.yaml` inside it; an `.html`/`.htm` path
+    is used as-is with a same-basename `.yaml` sidecar next to it.
+  - `fuse.py` — `embed_source(html, yaml_text)` / `extract_source(html)`:
+    embeds the exact source YAML text into the rendered HTML as a
+    hidden, base64-encoded `<script>` blob (see Data fusion below), and
+    reads it back out.
+  - `requirements.txt` — `pyyaml` and `jinja2`, the only runtime
+    dependencies (everything in `builder/` is otherwise stdlib). This is
+    a deliberate departure from the `scrolls-*` family's stdlib-only
+    convention: hand-rolling a YAML parser or a Jinja2-grade templating
+    engine would be worse than depending on two extremely stable, common
+    libraries. Install with `pip install -r builder/requirements.txt`.
+- `tests/` — pytest suite (plus one Node/Playwright helper it shells
+  out to); see Testing below.
+
+## CLI
+
+```
+python builder/build_report.py INPUT.yaml OUTPUT.html [--template PATH] [--no-fuse]
+python builder/build_report.py INPUT.yaml -r/--report PATH [--template PATH] [--no-fuse]
+```
+
+The first form is the legacy single-file form (writes exactly the given
+HTML path). The second (`-r`/`--report`) is what `SKILL.md` tells the
+`yaml`-output flow to use: PATH is either a folder or an explicit
+`.html`/`.htm` file (see `paths.resolve_report_paths`), and the command
+writes both the rendered HTML *and* an exact copy of the source YAML
+text next to it. Both forms fuse the source YAML into the HTML by
+default; pass `--no-fuse` to skip that.
 
 ## The report YAML schema
 
-Authoritative definition: `scripts/report_data.py`'s `validate()`
+Authoritative definition: `builder/report_data.py`'s `validate()`
 function and module docstring. Authoritative example:
-`assets/example/sample-report.yaml` — copy its shape for a new edition
+`assets/templates/sample-report.yaml` — copy its shape for a new edition
 rather than re-deriving the schema from prose. Summary:
 
 ```yaml
@@ -111,10 +141,58 @@ Icon names come from the `<symbol>` sprite defined at the top of
 `assets/templates/report.html` (`ico-home`, `ico-trend`, `ico-dollar`,
 `ico-flask`, `ico-server`, `ico-globe`, `ico-people`, `ico-cpu`,
 `ico-bolt`, `ico-compass`, `ico-hash`, `ico-pulse`, `ico-calendar`,
-`ico-horizon`, `ico-eye`, `ico-alert`, `ico-building`) — adding a new
-icon means adding a `<g id="ico-...">` there. Badge names come from the
-`.b-*` classes next to them (`red`, `orange`, `green`, `mint`, `teal`,
-`cyan`, `indigo`, `purple`, `gray`).
+`ico-horizon`, `ico-eye`, `ico-alert`, `ico-building`, `ico-download`) —
+adding a new icon means adding a `<g id="ico-...">` there. Badge names
+come from the `.b-*` classes next to them (`red`, `orange`, `green`,
+`mint`, `teal`, `cyan`, `indigo`, `purple`, `gray`).
+
+## Data fusion (single-file distribution)
+
+`fuse.embed_source` inserts the source YAML text into the rendered HTML
+as `<script type="application/x-yaml-base64" id="report-source-yaml"
+data-encoding="base64" data-filename="report.yaml">…</script>`, right
+before the real closing `</body>` tag. Two non-obvious things about it,
+both discovered by shipping this feature and hitting the bug for real —
+keep them in mind before touching `fuse.py` or the download JS in
+`report.html`:
+
+1. **Base64, not escaped raw text.** The payload is base64-encoded
+   specifically so it can never contain a literal `</script` sequence
+   and truncate the tag early. Don't "simplify" this to inline the raw
+   YAML text with HTML-escaping instead — HTML entities are not decoded
+   inside `<script>` content (it's a raw-text element per the HTML
+   spec), so an escaped `&lt;` would come back as the literal four
+   characters `&lt;`, not `<`.
+2. **Insert at the *last* `</body>`, not the first.** A page's own
+   markup, JS, or comments may mention the literal text `</body>` before
+   the real closing tag (this actually happened: an explanatory comment
+   in `report.html` about *where* the fused tag gets inserted contained
+   the string `</body>`, and the first version of `fuse.py` used
+   `str.replace("</body>", ..., 1)` — which matched that comment instead
+   of the real tag and corrupted the page). `fuse.py` uses `str.rfind`
+   for this reason; there's a regression test for exactly this scenario
+   in `tests/test_fuse.py`
+   (`test_embed_inserts_at_the_real_closing_body_tag_not_a_decoy_earlier_in_the_page`).
+
+On the client side, `report.html`'s download-button JS has two matching
+gotchas, both covered by `tests/test_browser_download.py`:
+
+1. **Script execution order.** The fused `<script>` is inserted *after*
+   the app's own `<script>` tag in document order (both live in
+   `<body>`), so a synchronous top-level `getElementById` for it at the
+   top of the app script finds nothing. The wiring is deferred to
+   `DOMContentLoaded` (or run immediately if the document has already
+   finished loading) so it sees the fully-parsed DOM regardless of
+   where the fused tag landed.
+2. **`atob()` returns a binary string, not Unicode text.** For any
+   multi-byte UTF-8 character (em dashes, curly quotes, `·`, `→`, …),
+   `atob()` gives you one JS "character" per raw byte, not the decoded
+   code point — using that string directly produces mojibake
+   (`â` instead of `—`) when it's turned into a Blob. The fix decodes
+   through `Uint8Array` + `TextDecoder('utf-8')`. Pure-Python round-trip
+   tests can't catch this (Python's own encode/decode is correct); only
+   a real-browser test can, which is why `test_browser_download.py`
+   exists — see Testing below.
 
 ## Updating `assets/PROMPT.md`
 
@@ -122,7 +200,8 @@ Edit it directly when the editorial brief needs to change — new or
 reordered parts, different sourcing rules, a different audience, a
 different tone. If a part is added, removed, or reordered, update
 `SKILL.md`'s step numbering and, if you also maintain
-`assets/example/sample-report.yaml`, keep its `sections` order matching.
+`assets/templates/sample-report.yaml`, keep its `sections` order
+matching.
 
 ## Updating `assets/templates/report.html`
 
@@ -130,23 +209,42 @@ It's plain Jinja2 — no build step of its own. One gotcha worth knowing:
 `section.items` in Jinja2 resolves to `dict.items()` (the method), not
 the `items` key, because `section` is a plain dict — always write
 `section['items']` in the template, never `section.items`. After any
-template change, re-render the example (`python scripts/build_report.py
-assets/example/sample-report.yaml /tmp/out.html`) and re-run the test
+template change, re-render the example (`python builder/build_report.py
+assets/templates/sample-report.yaml /tmp/out.html`) and re-run the test
 suite; the link-integrity and theme-token tests catch most regressions
 (a class rename that silently breaks the References-accordion selector,
 a missing `data-theme` block, a broken citation anchor).
 
+The visual design follows Apple's system-settings idiom (sidebar nav,
+grouped accordions, a single restrained accent) — if you're changing
+colors, spacing, or interaction states, keep every interactive control's
+`:hover`/`:active`/`:focus-visible` states present and consistent, and
+re-check contrast (`--ink-faint` and the `--badge-*-ink` tokens exist
+specifically because their first values were below WCAG AA on small
+text) in both themes before shipping.
+
 ## Testing
 
-Red/Green pytest suite, no network access needed:
+Red/Green pytest suite. Everything except `test_browser_download.py`
+needs no network access and no Node; that one shells out to Node +
+Playwright (already available in this environment) to drive a real
+browser and is skipped automatically if they're not on PATH.
 
 ```
-pip install -r scripts/requirements.txt pytest
+pip install -r builder/requirements.txt pytest
 pytest newsletters/newsletter-ai/tests -q
 ```
 
 - `tests/test_report_data.py` — schema validation and reference-dedup
   logic in isolation (synthetic dicts, no template involved).
+- `tests/test_paths.py` — `-r`/`--report` path resolution
+  (folder-vs-`.html` detection, custom basenames, directory creation).
+- `tests/test_fuse.py` — embedding/extracting the source YAML from
+  rendered HTML: round-trips exactly (including a payload that itself
+  contains a literal `</script>`), replaces rather than duplicates on a
+  second fuse pass, and — the regression that matters most — inserts at
+  the real closing `</body>` even when the page's own markup mentions
+  that text earlier.
 - `tests/test_build_report.py` — renders `tests/fixtures/sample.yaml`
   (a small fixture exercising every item content-shape: `body`, `facts`,
   `table`, `stats`, `kv`) through the real template and asserts: one nav
@@ -156,26 +254,40 @@ pytest newsletters/newsletter-ai/tests -q
   own section, References accordions exist exactly where — and only
   where — a section has sourced items, light *and* dark theme tokens are
   present, print CSS forces every tab panel and accordion panel visible
-  (the truncation-bug regression from this skill's first HTML pass), and
-  each content shape renders.
+  (the truncation-bug regression from this skill's first HTML pass),
+  each content shape renders, the download button markup is present,
+  and fusing is on by default / off with `embed_data=False`.
 - `tests/test_example_data.py` — the same link-integrity and structural
   checks, but against the real shipped content
-  (`assets/example/sample-report.yaml`) rather than a synthetic fixture,
-  so a bad edit to the real data fails CI even if the fixture still
-  passes.
+  (`assets/templates/sample-report.yaml`) rather than a synthetic
+  fixture, so a bad edit to the real data fails CI even if the fixture
+  still passes.
+- `tests/test_cli.py` — `build_report.py`'s library API (`build()` with
+  `report_path=` vs. the legacy `output_path=`) and its actual CLI
+  (`subprocess`-invoked: `-r`/`--report`, `--no-fuse`, error handling
+  when neither output form is given).
+- `tests/test_browser_download.py` (+ `tests/browser/check_download.cjs`)
+  — the one test that opens a real headless browser: builds a report,
+  clicks the "Download data" button, and diffs the downloaded file
+  against the source YAML byte-for-byte. This is what caught both
+  client-side gotchas listed under Data fusion above; a pure-Python
+  round-trip test passed while the actual feature was broken in the
+  browser, which is why this test exists as its own layer rather than
+  being considered redundant with `test_fuse.py`.
 
 When adding a new item content-shape (beyond `body`/`facts`/`table`/
 `stats`/`kv`) or a new top-level section field, add it to
 `tests/fixtures/sample.yaml` and a matching assertion in
 `test_build_report.py` first (red), then implement it in
 `report_data.py`/`report.html` (green) — don't skip straight to the
-implementation.
+implementation. The same applies to `builder/` behavior changes: write
+or extend the failing test in `tests/` first.
 
 ## Versioning
 
 Bump `metadata.version` in `../SKILL.md`'s frontmatter when something
 that changes the produced newsletter or its tooling changes: a part
 added, removed, or reordered in `assets/PROMPT.md`; a changed sourcing or
-editorial rule; a changed audience; a schema or template change that
-changes what a rendered report looks like or accepts. Not for pure typo
-fixes or file moves with no content/behavior change.
+editorial rule; a changed audience; a schema, CLI, or template change
+that changes what a rendered report looks like, accepts, or writes. Not
+for pure typo fixes or file moves with no content/behavior change.

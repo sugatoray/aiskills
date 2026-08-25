@@ -8,15 +8,15 @@
 /* ===================== Tokens ===================== */
 :root{
   --bg:#f5f5f7; --surface:#ffffff; --surface-2:#fbfbfd; --surface-3:#eeeef0;
-  --ink:#1d1d1f; --ink-soft:#6e6e73; --ink-faint:#86868b;
+  --ink:#1d1d1f; --ink-soft:#6e6e73; --ink-faint:#6b6b70;
   --line:#d2d2d7; --line-soft:#e5e5ea;
   --accent:#0071e3; --accent-ink:#ffffff; --accent-soft:#e8f1fd;
   --shadow-1:0 1px 2px rgba(0,0,0,.04), 0 1px 1px rgba(0,0,0,.03);
   --shadow-2:0 10px 30px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
-  --radius-l:20px; --radius-m:14px; --radius-s:9px;
+  --radius-m:14px; --radius-s:9px;
   --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI","Liberation Sans",Roboto,Helvetica,Arial,sans-serif;
   --font-mono:ui-monospace,"SF Mono","Cascadia Code","Liberation Mono","Roboto Mono",Menlo,Consolas,monospace;
-  --badge-red:#ff3b30; --badge-orange:#ff9500; --badge-green:#2fa84f; --badge-mint:#00a89d;
+  --badge-red:#ff3b30; --badge-orange:#ff9500; --badge-orange-ink:#9a5b00; --badge-green:#2fa84f; --badge-mint:#00a89d;
   --badge-teal:#2d97a8; --badge-cyan:#0090c7; --badge-indigo:#5856d6; --badge-purple:#af52de; --badge-gray:#6e6e73;
 }
 @media (prefers-color-scheme: dark){
@@ -26,6 +26,7 @@
     --line:#38383a; --line-soft:#2c2c2e;
     --accent:#0a84ff; --accent-ink:#ffffff; --accent-soft:#0a2540;
     --shadow-1:0 1px 2px rgba(0,0,0,.5); --shadow-2:0 12px 30px rgba(0,0,0,.55);
+    --badge-orange-ink:#ffb454;
   }
 }
 :root[data-theme="dark"]{
@@ -34,14 +35,16 @@
   --line:#38383a; --line-soft:#2c2c2e;
   --accent:#0a84ff; --accent-ink:#ffffff; --accent-soft:#0a2540;
   --shadow-1:0 1px 2px rgba(0,0,0,.5); --shadow-2:0 12px 30px rgba(0,0,0,.55);
+  --badge-orange-ink:#ffb454;
 }
 :root[data-theme="light"]{
   --bg:#f5f5f7; --surface:#ffffff; --surface-2:#fbfbfd; --surface-3:#eeeef0;
-  --ink:#1d1d1f; --ink-soft:#6e6e73; --ink-faint:#86868b;
+  --ink:#1d1d1f; --ink-soft:#6e6e73; --ink-faint:#6b6b70;
   --line:#d2d2d7; --line-soft:#e5e5ea;
   --accent:#0071e3; --accent-ink:#ffffff; --accent-soft:#e8f1fd;
   --shadow-1:0 1px 2px rgba(0,0,0,.04), 0 1px 1px rgba(0,0,0,.03);
   --shadow-2:0 10px 30px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+  --badge-orange-ink:#9a5b00;
 }
 
 /* ===================== Reset ===================== */
@@ -59,6 +62,7 @@ table{border-collapse:collapse;width:100%;}
   *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
 }
 .print-only{display:none;}
+[hidden]{display:none !important;}
 
 /* ===================== App shell ===================== */
 .app{display:flex;min-height:100vh;}
@@ -86,14 +90,15 @@ table{border-collapse:collapse;width:100%;}
 .nav-item .n-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .nav-item .n-idx{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);}
 .nav-item:hover{background:var(--surface-3);}
+.nav-item:active{transform:scale(.98);}
 .nav-item.active{background:var(--accent);color:var(--accent-ink);}
 .nav-item.active .n-ico,.nav-item.active .n-idx{color:var(--accent-ink);}
 
 .sidebar-foot{padding:14px 20px 20px;border-top:1px solid var(--line);}
 .sidebar-foot .sf-row{font-size:11px;color:var(--ink-faint);display:flex;justify-content:space-between;margin-bottom:6px;}
 .sample-pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:650;
-  letter-spacing:.04em;text-transform:uppercase;color:var(--badge-orange);
-  background:color-mix(in srgb, var(--badge-orange) 14%, transparent);padding:4px 8px;border-radius:999px;}
+  letter-spacing:.04em;text-transform:uppercase;color:var(--badge-orange-ink);
+  background:color-mix(in srgb, var(--badge-orange) 16%, transparent);padding:4px 8px;border-radius:999px;}
 
 .sidebar-scrim{display:none;}
 
@@ -103,19 +108,23 @@ table{border-collapse:collapse;width:100%;}
   padding:12px 28px;background:var(--bg);
   border-bottom:1px solid var(--line);
 }
-.menu-btn{display:none;width:34px;height:34px;border-radius:9px;align-items:center;justify-content:center;}
+.menu-btn{display:none;width:34px;height:34px;border-radius:9px;align-items:center;justify-content:center;transition:background .15s ease, transform .1s ease;}
 .menu-btn:hover{background:var(--surface-3);}
+.menu-btn:active{transform:scale(.94);}
 .menu-btn svg{width:19px;height:19px;}
 .crumb{font-size:12.5px;color:var(--ink-soft);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .crumb b{color:var(--ink);font-weight:600;}
-.icon-btn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+.icon-btn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:background .15s ease, color .15s ease, transform .1s ease;}
 .icon-btn:hover{background:var(--surface-3);color:var(--ink);}
+.icon-btn:active{transform:scale(.94);}
 .icon-btn svg{width:18px;height:18px;}
 .pdf-btn{
   display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;
   background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:600;
+  transition:opacity .15s ease, transform .1s ease;
 }
 .pdf-btn:hover{opacity:.85;}
+.pdf-btn:active{transform:scale(.96);}
 .pdf-btn svg{width:15px;height:15px;}
 
 .view{flex:1;max-width:900px;width:100%;margin:0 auto;padding:44px 32px 96px;}
@@ -149,6 +158,7 @@ h1.page-title{font-size:34px;line-height:1.12;letter-spacing:-.015em;font-weight
   box-shadow:var(--shadow-1);transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .home-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2);border-color:var(--line-soft);}
+.home-card:active{transform:translateY(0) scale(.99);}
 .hc-top{display:flex;align-items:center;justify-content:space-between;}
 .hc-badge{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;}
 .hc-badge svg{width:18px;height:18px;}
@@ -159,12 +169,16 @@ h1.page-title{font-size:34px;line-height:1.12;letter-spacing:-.015em;font-weight
 /* ===================== Accordion group ===================== */
 .group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .group-head .g-count{font-size:12px;color:var(--ink-faint);}
-.toggle-all{font-size:12px;font-weight:600;color:var(--accent);}
+.toggle-all{font-size:12px;font-weight:600;color:var(--accent);border-radius:6px;}
+.toggle-all:hover{text-decoration:underline;}
 .accordion-group{display:flex;flex-direction:column;gap:10px;}
 
 .accordion{border:1px solid var(--line);border-radius:var(--radius-m);background:var(--surface);
   box-shadow:var(--shadow-1);overflow:hidden;}
-.accordion-trigger{width:100%;display:flex;align-items:center;gap:13px;padding:15px 16px;text-align:left;}
+.accordion-trigger{width:100%;display:flex;align-items:center;gap:13px;padding:15px 16px;text-align:left;
+  transition:background .15s ease;}
+.accordion-trigger:hover{background:var(--surface-3);}
+.accordion-trigger:active{background:var(--surface-3);}
 .a-badge{width:34px;height:34px;flex:0 0 34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;}
 .a-badge svg{width:18px;height:18px;}
 .a-titlewrap{flex:1;min-width:0;}
@@ -317,6 +331,7 @@ dl.kv dd{flex:1;font-size:12.5px;color:var(--ink-soft);margin:0;}
 <g id="ico-moon"><path d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.4 6.4 0 0 0 10.2 10.2Z"/></g>
 <g id="ico-print"><rect x="6" y="9" width="12" height="8" rx="1"/><polyline points="6,9 6,4 18,4 18,9"/><rect x="8" y="13" width="8" height="6"/></g>
 <g id="ico-arrow"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14,6 20,12 14,18"/></g>
+<g id="ico-download"><path d="M12 3v12"/><polyline points="7,10 12,15 17,10"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></g>
 </defs>
 </svg>
 <style>svg[aria-hidden] g{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}</style>
@@ -348,6 +363,7 @@ dl.kv dd{flex:1;font-size:12.5px;color:var(--ink-soft);margin:0;}
     <header class="topbar no-print">
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation"><svg><use href="#ico-menu"/></svg></button>
       <div class="crumb">{{ meta.title }} <span id="crumbSep">·</span> <b id="crumbCurrent">{{ sections[0].nav_label }}</b></div>
+      <button class="icon-btn" id="downloadDataBtn" aria-label="Download source data (.yaml)" title="Download source data (.yaml)" hidden><svg><use href="#ico-download"/></svg></button>
       <button class="icon-btn" id="themeBtn" aria-label="Toggle color theme"><svg id="themeIco"><use href="#ico-moon"/></svg></button>
       <button class="pdf-btn" id="printBtn"><svg><use href="#ico-print"/></svg><span>Save as PDF</span></button>
     </header>
@@ -607,6 +623,44 @@ dl.kv dd{flex:1;font-size:12.5px;color:var(--ink-soft);margin:0;}
   });
 
   byId('printBtn').addEventListener('click', function(){ window.print(); });
+
+  /* ---------- Download embedded source data ----------
+     The fuse.py build step inserts the fused report-source-yaml tag
+     right at the end of the body, i.e. AFTER this script tag in source
+     order — so it does not exist yet during this script's synchronous
+     top-level execution. Defer the lookup to DOMContentLoaded (or run
+     it now if the document has already finished loading) so it sees
+     the fully-parsed DOM regardless of where the data tag landed. */
+  function wireDownloadButton(){
+    var dataScript = document.getElementById('report-source-yaml');
+    var downloadBtn = byId('downloadDataBtn');
+    if(!dataScript || !downloadBtn) return;
+    downloadBtn.hidden = false;
+    downloadBtn.addEventListener('click', function(){
+      try{
+        var binary = atob(dataScript.textContent.trim());
+        var bytes = new Uint8Array(binary.length);
+        for(var bi = 0; bi < binary.length; bi++){ bytes[bi] = binary.charCodeAt(bi); }
+        var yamlText = new TextDecoder('utf-8').decode(bytes);
+        var blob = new Blob([yamlText], {type: 'application/x-yaml'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = dataScript.getAttribute('data-filename') || 'report.yaml';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      }catch(e){
+        console.error('Could not decode embedded source data', e);
+      }
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', wireDownloadButton);
+  } else {
+    wireDownloadButton();
+  }
 })();
 </script>
 </body>

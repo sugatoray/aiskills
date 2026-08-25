@@ -9,7 +9,7 @@ reference numbers, so the template can render both an inline citation and
 a matching entry in that section's References accordion from the same
 data — no hand-numbered cross-references to keep in sync.
 
-See assets/example/sample-report.yaml for a complete, valid document.
+See assets/templates/sample-report.yaml for a complete, valid document.
 """
 from __future__ import annotations
 
