@@ -1,0 +1,109 @@
+meta:
+  title: "Test Brief"
+  eyebrow: "Weekly Executive Brief"
+  window: "Week of Jan 1-7, 2030"
+  generated: "January 7, 2030"
+  coverage_line: "3 parts · 2 ranked developments"
+  sample_edition: true
+  scope_note: "Fixture data for automated tests only."
+
+sections:
+  - id: home
+    kind: home
+    nav_label: "Overview"
+    icon: home
+    title: "Overview"
+    eyebrow: "Weekly Executive Brief"
+    lede: "Fixture overview lede."
+    callout:
+      style: warn
+      icon: alert
+      html: "<b>Test callout.</b> Body text."
+    cards:
+      - target: part1
+        icon: trend
+        badge: cyan
+        title: "01 · Top Developments"
+        desc: "Card description for part1."
+      - target: part2
+        icon: flask
+        badge: purple
+        title: "02 · Model Intelligence"
+        desc: "Card description for part2."
+
+  - id: part1
+    kind: standard
+    nav_label: "Top Developments"
+    icon: trend
+    number: "01"
+    eyebrow: "Part 1"
+    title: "The Top Developments"
+    lede: "Fixture lede for part1."
+    items:
+      - title: "1. First development"
+        icon: dollar
+        badge: green
+        tag: "Capital / M&A"
+        open: true
+        facts:
+          - label: "What happened"
+            text: "Something happened, per <b>Example Source</b>."
+          - label: "Why it matters"
+            text: "It matters because of reasons."
+        sources:
+          - label: "Example News"
+            url: "https://example.com/a"
+          - label: "Example Wire"
+            url: "https://example.org/b"
+      - title: "2. Second development, reuses a source"
+        icon: bolt
+        badge: mint
+        tag: "Trend"
+        facts:
+          - label: "What happened"
+            text: "Something else happened."
+        sources:
+          - label: "Example News (again)"
+            url: "https://example.com/a"
+
+  - id: part2
+    kind: standard
+    nav_label: "Model Intelligence"
+    icon: flask
+    number: "02"
+    eyebrow: "Part 2"
+    title: "Model Intelligence"
+    lede: "Fixture lede for part2."
+    items:
+      - title: "Release timeline"
+        icon: flask
+        badge: purple
+        tag: "Model intelligence"
+        open: true
+        table:
+          headers: ["Model", "Provider"]
+          rows:
+            - ["Test Model A", "Test Co"]
+            - ["Test Model B", "Test Co"]
+      - title: "This week's dashboard"
+        icon: hash
+        badge: gray
+        tag: "Numbers"
+        stats:
+          - value: "$1B"
+            label: "Fixture raise"
+          - value: "42%"
+            label: "Fixture growth"
+      - title: "Three things to watch"
+        icon: compass
+        badge: orange
+        tag: "Forward look"
+        kv:
+          - term: "1. Watch this"
+            desc: "Description of what to watch."
+      - title: "No sources item"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No material development this week."
