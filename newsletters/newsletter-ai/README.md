@@ -165,6 +165,7 @@ Red/Green pytest suite (`pip install -r builder/requirements.txt pytest
 && pytest tests -q`), schema reference, and everything else for
 maintaining this skill lives in [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 — not read as part of producing an edition, only when working on the
-skill itself.
+skill itself. For a complete inventory of what this skill can do, see
+[`meta/FEATURES.md`](meta/FEATURES.md).
 
 License: MIT

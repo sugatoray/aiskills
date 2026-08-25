@@ -12,13 +12,17 @@ For people developing this skill — not read as part of producing a
 - `../README.md` — human-facing usage doc (how to invoke, all flags with
   examples, screenshots). Not read at invocation time; keep its flag
   table in sync with `SKILL.md`'s Steps when either changes.
+- `FEATURES.md` — a catalog of everything this skill does, grouped by
+  area, with pointers into the code/tests that implement each item. Not
+  read at invocation time. Update it alongside any change that adds,
+  removes, or materially changes a feature — it's meant to stay a
+  complete map, not drift into a partial one.
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
-- `assets/images/` — the screenshots `README.md` embeds. Regenerate by
-  rendering `assets/templates/sample-report.yaml` (see the CLI below)
-  and screenshotting the result; keep filenames descriptive
-  (`report-<what>-<light|dark>.png`) since `README.md` references them
-  by exact path.
+- `assets/images/` — the screenshots `README.md` embeds. Regenerate with
+  the screenshot automation (see Screenshot automation below), not by
+  hand; keep filenames descriptive (`report-<what>-<light|dark>.png`)
+  since `README.md` references them by exact path.
 - `assets/PROMPT.md` — the editorial brief itself: role, audience,
   research window, sourcing rules, the 15-part structure, editorial
   rules, and writing style. This is the single source of truth for what
@@ -63,14 +67,19 @@ For people developing this skill — not read as part of producing a
     embeds the exact source YAML text into the rendered HTML as a
     hidden, base64-encoded `<script>` blob (see Data fusion below), and
     reads it back out.
+  - `capture_screenshots.py` / `screenshots.cjs` — screenshot automation
+    for `assets/images/` (see Screenshot automation below).
   - `requirements.txt` — `pyyaml` and `jinja2`, the only runtime
     dependencies (everything in `builder/` is otherwise stdlib). This is
     a deliberate departure from the `scrolls-*` family's stdlib-only
     convention: hand-rolling a YAML parser or a Jinja2-grade templating
     engine would be worse than depending on two extremely stable, common
     libraries. Install with `pip install -r builder/requirements.txt`.
-- `tests/` — pytest suite (plus one Node/Playwright helper it shells
-  out to); see Testing below.
+    (`screenshots.cjs` additionally needs Node + a globally-installed
+    `playwright`, already present in this environment — see Testing.)
+- `tests/` — pytest suite, `tests/conftest.py`'s shared Node/Playwright
+  availability helpers, and one Node helper (`tests/browser/`) a Python
+  test shells out to; see Testing below.
 
 ## CLI
 
@@ -203,6 +212,32 @@ gotchas, both covered by `tests/test_browser_download.py`:
    a real-browser test can, which is why `test_browser_download.py`
    exists — see Testing below.
 
+## Screenshot automation
+
+`assets/images/` is machine-generated, not hand-captured. Regenerate it
+after any visual change to `report.html`:
+
+```
+python builder/capture_screenshots.py assets/templates/sample-report.yaml assets/images
+```
+
+This builds `sample-report.yaml` to a temporary HTML file and shells out
+to `builder/screenshots.cjs` (Playwright), which captures one PNG per
+*scene*. A scene is `{name, hash, theme, action}` — which tab, which
+theme, and an optional small interaction (currently only
+`click-first-citation`, used for the citation-navigation shot) performed
+before the shot. The two shipped scenes,
+`report-overview-light`/`report-citations-dark`, are defined in the
+`SCENES` array at the top of `screenshots.cjs` and mirrored in
+`capture_screenshots.py`'s `SCENE_NAMES` — `test_capture_screenshots.py`
+asserts those two lists agree, so update both together. Pass specific
+scene names on either the Python or the Node CLI to capture a subset
+instead of regenerating everything.
+
+Adding a new scene: add an entry to `SCENES` in `screenshots.cjs`
+(new `action` values go in `runAction`), add its name to `SCENE_NAMES`
+in `capture_screenshots.py`, then re-run the command above.
+
 ## Updating `assets/PROMPT.md`
 
 Edit it directly when the editorial brief needs to change — new or
@@ -234,10 +269,12 @@ text) in both themes before shipping.
 
 ## Testing
 
-Red/Green pytest suite. Everything except `test_browser_download.py`
-needs no network access and no Node; that one shells out to Node +
-Playwright (already available in this environment) to drive a real
-browser and is skipped automatically if they're not on PATH.
+Red/Green pytest suite. Everything except `test_browser_download.py` and
+`test_capture_screenshots.py` needs no network access and no Node; those
+two shell out to Node + Playwright (already available in this
+environment) to drive a real browser, via the shared availability check
+in `tests/conftest.py`, and are skipped automatically if it's not on
+PATH.
 
 ```
 pip install -r builder/requirements.txt pytest
@@ -283,6 +320,15 @@ pytest newsletters/newsletter-ai/tests -q
   round-trip test passed while the actual feature was broken in the
   browser, which is why this test exists as its own layer rather than
   being considered redundant with `test_fuse.py`.
+- `tests/test_capture_screenshots.py` — the screenshot automation
+  itself: `capture_screenshots.SCENE_NAMES` matches `screenshots.cjs`'s
+  `SCENES`, every scene produces a valid PNG of plausible dimensions
+  (parsed straight out of the PNG `IHDR` chunk with `struct`, no image
+  library needed), the light and dark scenes are byte-different from
+  each other (a coarse but dependency-free check that theming actually
+  took effect), capturing a named subset only writes those files, an
+  unknown scene name raises, and the CLI writes the expected files on
+  disk.
 
 When adding a new item content-shape (beyond `body`/`facts`/`table`/
 `stats`/`kv`) or a new top-level section field, add it to

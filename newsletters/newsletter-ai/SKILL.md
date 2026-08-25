@@ -6,7 +6,7 @@ metadata:
   - name: newsletter-ai
     type: skill
     author: sugatoray
-    version: "1.4.0"
+    version: "1.5.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
     aliases:
       - nltr-ai

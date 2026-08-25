@@ -3,6 +3,30 @@
 All notable changes to the `newsletter-ai` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.0] - 2026-08-25
+
+### Added
+
+- `meta/FEATURES.md`: a complete, grouped catalog of everything this
+  skill implements, with pointers into the code and tests behind each
+  item.
+- Screenshot automation: `builder/screenshots.cjs` (Playwright,
+  scene-driven — each scene picks a tab, a theme, and an optional
+  interaction) and `builder/capture_screenshots.py` (build + capture
+  wrapper, CLI and library). `assets/images/` is now machine-generated
+  (`python builder/capture_screenshots.py assets/templates/sample-report.yaml
+  assets/images`) rather than hand-captured; regenerated the two shipped
+  images with it to prove the pipeline. Built Red/Green: `tests/test_capture_screenshots.py`
+  (schema-name agreement between the Python and Node scene lists, valid
+  PNG dimensions parsed straight from the `IHDR` chunk with stdlib
+  `struct`, light/dark scenes verified byte-different, subset capture,
+  unknown-scene rejection, and the CLI) written and confirmed failing
+  before `screenshots.cjs`/`capture_screenshots.py` existed.
+- `tests/conftest.py`: shared Node/Playwright-availability helpers,
+  factored out for the new browser-driven test to reuse (existing
+  `test_browser_download.py` left as-is to avoid touching passing code
+  unnecessarily).
+
 ## [1.4.0] - 2026-08-25
 
 ### Added
