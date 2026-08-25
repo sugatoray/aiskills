@@ -11,7 +11,7 @@ These assert the invariants the user explicitly asked for:
   - print CSS forces every tab panel and accordion panel fully visible
     (the truncation bug class from the first pass of this work)
 
-Run: pytest newsletters/newsletter-ai/tests -q
+Run: pytest skills/newsletters/newsletter-ai/tests -q
 """
 import pathlib
 import re

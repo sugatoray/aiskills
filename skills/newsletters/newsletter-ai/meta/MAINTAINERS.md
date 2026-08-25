@@ -288,7 +288,7 @@ PATH.
 
 ```
 pip install -r builder/requirements.txt pytest
-pytest newsletters/newsletter-ai/tests -q
+pytest skills/newsletters/newsletter-ai/tests -q
 ```
 
 - `tests/test_report_data.py` — schema validation and reference-dedup

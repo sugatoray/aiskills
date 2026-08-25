@@ -1,6 +1,6 @@
 """Red/Green tests for report_data.py — the YAML -> render-context layer.
 
-Run: pytest newsletters/newsletter-ai/tests -q
+Run: pytest skills/newsletters/newsletter-ai/tests -q
 """
 import pathlib
 import sys
