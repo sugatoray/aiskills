@@ -144,6 +144,8 @@ it — not read at invocation time.
 - [`MAINTAINERS.md`](MAINTAINERS.md) — layout, the full YAML schema
   reference, data-fusion implementation gotchas, template-editing notes,
   and the testing breakdown.
+- [`MARKDOWN_FORMATTING.md`](MARKDOWN_FORMATTING.md) — the two markdown
+  spacing rules every `.md` file in this skill follows.
 - [`../CHANGELOG.md`](../CHANGELOG.md) — version-by-version history.
 - This file.
 

@@ -83,13 +83,17 @@ reconstruct the brief from memory or summarize it — read the file itself.
      - **No `-r`/`--report` given:** write the YAML to a file (or
        return it as a fenced code block if the user hasn't said where),
        and mention it can be rendered into the interactive report with:
+
        ```
        python newsletters/newsletter-ai/builder/build_report.py <file>.yaml <output>.html
        ```
+
      - **`-r`/`--report PATH` given:** run the render yourself:
+
        ```
        python newsletters/newsletter-ai/builder/build_report.py <file>.yaml -r PATH
        ```
+
        This writes the rendered HTML and a copy of the YAML side by
        side (see Report path above for how PATH resolves), and by
        default fuses the source YAML into the HTML too (a hidden,

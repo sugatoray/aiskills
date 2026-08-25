@@ -17,6 +17,8 @@ For people developing this skill — not read as part of producing a
   read at invocation time. Update it alongside any change that adds,
   removes, or materially changes a feature — it's meant to stay a
   complete map, not drift into a partial one.
+- `MARKDOWN_FORMATTING.md` — the two markdown spacing rules every `.md`
+  file in this skill follows (see Markdown Linting Rules below).
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
 - `assets/images/` — the screenshots `README.md` embeds. Regenerate with
@@ -80,6 +82,14 @@ For people developing this skill — not read as part of producing a
 - `tests/` — pytest suite, `tests/conftest.py`'s shared Node/Playwright
   availability helpers, and one Node helper (`tests/browser/`) a Python
   test shells out to; see Testing below.
+
+## Markdown Linting Rules
+
+Every markdown file in this skill follows the two spacing rules in
+[`MARKDOWN_FORMATTING.md`](MARKDOWN_FORMATTING.md) (blank line around
+every header, blank line around every fenced code block). Read it before
+editing any `.md` file here, and re-check a diff against it before
+committing — the rules apply to this file too.
 
 ## CLI
 

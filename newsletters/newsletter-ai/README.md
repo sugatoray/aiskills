@@ -53,6 +53,7 @@ Bare invocation, no flags — writes the edition as markdown in the chat:
 ```
 /newsletter-ai
 ```
+
 ```
 /nltr-ai
 ```
@@ -64,6 +65,7 @@ request):
 ```
 /newsletter-ai -o yaml
 ```
+
 > Same content, but as a structured YAML document instead of markdown
 > prose — useful if you want to render it into the interactive report,
 > or feed it into other tooling.
@@ -71,12 +73,14 @@ request):
 ```
 /newsletter-ai --yaml -r reports/2026-08-25/
 ```
+
 > Writes the YAML *and* renders it, in one go: `reports/2026-08-25/report.html`
 > and `reports/2026-08-25/report.yaml`, side by side.
 
 ```
 /newsletter-ai -o yaml -r reports/weekly-brief.html
 ```
+
 > Same, but pins the exact HTML filename — the YAML sidecar lands next
 > to it automatically as `reports/weekly-brief.yaml`.
 
