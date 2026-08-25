@@ -1,12 +1,12 @@
 ---
 name: newsletter-ai
-description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Use when the user runs /newsletter-ai, or asks to draft, write, or update this week's AI newsletter/intelligence brief."
+description: "Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document that assets/templates/report.html renders into an interactive, light/dark, multi-tab HTML report with per-tab References accordions. Use when the user runs /newsletter-ai, or asks to draft, write, or update this week's AI newsletter/intelligence brief."
 license: MIT
 metadata:
   - name: newsletter-ai
     type: skill
     author: sugatoray
-    version: "1.1.0"
+    version: "1.2.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/newsletters/newsletter-ai"
 ---
 
@@ -25,28 +25,66 @@ reconstruct the brief from memory or summarize it — read the file itself.
 1. Read `assets/PROMPT.md` in full before writing anything. Treat it as
    the complete editorial brief for this edition, not a template to
    paraphrase.
-2. Do the research it calls for: AI developments from the last 7 days,
+2. Parse the invocation for an output-format flag: `-o`/`--output` followed
+   by `md`, `yaml`, or `yml`; or the shorthand `--md` / `--yaml` /
+   `--yml`. No flag means `md` (the original behavior). An unrecognized
+   value is an error — ask the user to pick `md` or `yaml` rather than
+   guessing.
+3. Do the research it calls for: AI developments from the last 7 days,
    pulling in 30-90 days of prior context only where a development needs
    it to make sense. Use current web research and prefer the primary
    sources `assets/PROMPT.md` lists (company announcements, papers, model
    cards, technical reports, repos, earnings, regulatory filings) over
    secondary reporting; cross-check important claims across multiple
    sources.
-3. Write the newsletter following `assets/PROMPT.md`'s structure and
+4. Write the newsletter following `assets/PROMPT.md`'s structure and
    rules exactly, in order: the Top 20 Developments, then Parts 2-15
    (Model Intelligence through The Big Picture), applying the Editorial
    Rules and Writing Style sections throughout. Skip a section's content
    honestly ("No material development this week.") rather than
    manufacturing a story to fill it.
-4. Keep confirmed fact, company claim, reported information, and analyst
+5. Keep confirmed fact, company claim, reported information, and analyst
    inference clearly distinguished throughout, as `assets/PROMPT.md`
    requires — don't blur them for narrative flow.
-5. Return the finished edition as markdown chat output unless the user
-   asks for it to be saved to a file.
+6. **Attach a real source to every sourced claim, and never invent one.**
+   Whenever a development traces to an actual URL you found during
+   research, carry that URL forward as a citation (see the YAML `sources`
+   field below, or an inline link in markdown mode). When no verifiable
+   URL exists for a claim, say so in the text instead of fabricating a
+   link — a missing citation is honest; a fake one is not.
+7. Produce the output in the requested format:
+   - **`md` (default):** return the finished edition as markdown chat
+     output, structured per `assets/PROMPT.md`, unless the user asks for
+     it to be saved to a file. Cite sources as ordinary markdown links.
+   - **`yaml`/`yml`:** instead of prose, produce a single YAML document
+     conforming exactly to the schema `scripts/report_data.py` validates
+     (see its module docstring and `validate()` for the authoritative
+     field list) — a `meta` block plus an ordered `sections` list (one
+     `kind: home` landing section, then one `kind: standard` section per
+     Part, each with `items` that carry `title`, an `icon`/`badge` from
+     the template's set, and whichever of `body` / `facts` / `table` /
+     `stats` / `kv` fits that item's content, plus `sources: [{label,
+     url}]` for every claim with a real link). Use
+     `assets/example/sample-report.yaml` as a fully worked template — copy
+     its shape rather than inventing a new one. Do **not** hand-number
+     citations or write a references list yourself: list each item's
+     `sources`, and the render step below dedupes them by URL and builds
+     the numbering and per-tab References accordions automatically, which
+     is what guarantees every citation link actually resolves.
+     After writing the YAML, mention to the user that it can be rendered
+     into the interactive report with:
+     ```
+     python newsletters/newsletter-ai/scripts/build_report.py <file>.yaml <output>.html
+     ```
+     which validates the data, computes references, and renders
+     `assets/templates/report.html` (multi-tab, accordioned, light/dark,
+     with a browser-native "Save as PDF" button) — offer to run it
+     yourself if the user wants the HTML file rather than just the YAML.
 
 ## Development
 
-See `meta/MAINTAINERS.md` for this skill's layout, how to update
-`assets/PROMPT.md`, and versioning conventions. It is not read as part of
+See `meta/MAINTAINERS.md` for this skill's layout, the YAML schema, how to
+update `assets/PROMPT.md` or `assets/templates/report.html`, how to run
+the test suite, and versioning conventions. It is not read as part of
 carrying out a `/newsletter-ai` request — don't act on it while producing
 an edition.

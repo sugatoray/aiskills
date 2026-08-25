@@ -1,0 +1,746 @@
+# Example newsletter-ai report data, conforming to the schema documented
+# in scripts/report_data.py and meta/MAINTAINERS.md. This is the content
+# of a real sample edition (Week of Aug 19-25, 2026) and doubles as a
+# fixture other tooling can render with:
+#   python scripts/build_report.py assets/example/sample-report.yaml out.html
+
+meta:
+  title: "The AI Intelligence Brief"
+  eyebrow: "Weekly Executive Brief"
+  window: "Week of August 19–25, 2026"
+  generated: "August 25, 2026"
+  coverage_line: "15 parts · 10 ranked developments"
+  sample_edition: true
+  scope_note: >-
+    Produced by the <b>newsletter-ai</b> skill as a demonstration pass: a
+    lighter research depth than the full editorial brief in
+    <code>assets/PROMPT.md</code> calls for. Ten ranked developments instead
+    of twenty, and several sections are marked as data gaps rather than
+    filled with unverified claims. See &ldquo;Scope &amp; Limitations&rdquo;
+    in Part 15 for the full caveat.
+
+sections:
+  - id: home
+    kind: home
+    nav_label: "Overview"
+    icon: home
+    eyebrow: "Weekly Executive Brief"
+    title: "Overview"
+    lede: >-
+      <b>The AI Intelligence Brief</b> — a ranked, sourced read on the AI
+      developments that actually moved capability, cost, adoption, compute,
+      and the global competitive balance — for people who don't have time to
+      read everything themselves.
+    callout:
+      style: warn
+      icon: alert
+      html: >-
+        <b>This is a sample / demonstration edition.</b> It was produced by
+        the <code>newsletter-ai</code> skill from seven targeted web
+        searches — a much lighter research pass than the skill's own brief
+        (<code>assets/PROMPT.md</code>) calls for, which expects roughly
+        twenty ranked, cross-checked, primary-sourced developments per week.
+        Several sections below say plainly where the evidence ran out,
+        rather than filling the gap. Full caveat under Part 15 →
+        &ldquo;Scope &amp; Limitations.&rdquo;
+    cards:
+      - target: part1
+        icon: trend
+        badge: cyan
+        title: "01 · Top Developments"
+        desc: "Ten ranked stories — an IPO race, a talent exodus, a rack-scale hardware challenger, and China's memory-chip breakout."
+      - target: part2
+        icon: flask
+        badge: purple
+        title: "02 · Model Intelligence"
+        desc: "Twelve-plus model releases in three weeks, compared in one table — with an honest note on how unverified the specifics are."
+      - target: part3
+        icon: eye
+        badge: indigo
+        title: "03 · Open vs. Closed"
+        desc: "Mixed signal this week — no confident call on whether the capability gap is widening or narrowing."
+      - target: part4
+        icon: people
+        badge: purple
+        title: "04 · Labs & Talent War"
+        desc: "Jeff Dean's cluster exit from Google, and where the Shazeer/Jumper moves fit the bigger pattern."
+      - target: part5
+        icon: dollar
+        badge: green
+        title: "05 · AI Money"
+        desc: "Fireworks AI and Together AI headline the raises; capital keeps rotating toward inference infrastructure."
+      - target: part6
+        icon: building
+        badge: mint
+        title: "06 · AI in Production"
+        desc: "No material development with measurable ROI evidence surfaced this pass — stated plainly rather than manufactured."
+      - target: part7
+        icon: bolt
+        badge: orange
+        title: "07 · Agents & App Layer"
+        desc: "Google's A2A protocol joins MCP under neutral Linux Foundation governance."
+      - target: part8
+        icon: cpu
+        badge: teal
+        title: "08 · Chips & Compute"
+        desc: "AMD's Helios rack-scale system takes direct aim at Nvidia's Vera Rubin NVL72."
+      - target: part9
+        icon: server
+        badge: teal
+        title: "09 · Data Centers & Energy"
+        desc: "An 800VDC power-architecture shift is quietly resetting rack design for next-gen AI facilities."
+      - target: part10
+        icon: globe
+        badge: indigo
+        title: "10 · The Global AI Race"
+        desc: "China accelerates on chip self-sufficiency; U.S. export-control enforcement still isn't executing in practice."
+      - target: part11
+        icon: compass
+        badge: indigo
+        title: "11 · Company Watchlist"
+        desc: "Momentum moved toward Anthropic, AMD, and CXMT this week."
+      - target: part12
+        icon: hash
+        badge: gray
+        title: "12 · Numbers That Matter"
+        desc: "A one-page dashboard of the week's load-bearing figures, with sourcing caveats attached."
+      - target: part13
+        icon: pulse
+        badge: purple
+        title: "13 · Signals Beneath Headlines"
+        desc: "Two small-looking developments worth tracking over the next six to twenty-four months."
+      - target: part14
+        icon: calendar
+        badge: cyan
+        title: "14 · What Changed This Week"
+        desc: "Eight direct answers — who gained ground, who lost it, and what's being underestimated."
+      - target: part15
+        icon: horizon
+        badge: orange
+        title: "15 · The Big Picture"
+        desc: "The five-minute synthesis, three things to watch next week, sources, and the full scope note."
+
+  - id: part1
+    kind: standard
+    nav_label: "Top Developments"
+    icon: trend
+    number: "01"
+    eyebrow: "Part 1"
+    title: "The Top Developments"
+    lede: "Ranked by strategic significance, not headline volume — ten stories, trimmed from the spec's twenty because this pass's research depth couldn't responsibly support twenty cross-checked entries."
+    items:
+      - title: "1. Anthropic accelerates toward a fall IPO; OpenAI drifts to 2027"
+        icon: dollar
+        badge: green
+        tag: "Capital / M&A"
+        open: true
+        facts:
+          - label: "What happened"
+            text: "Anthropic is meeting investors ahead of a potential September/October 2026 listing, off a Series H reported at a ~$965B valuation and a July run-rate near $65B. OpenAI, which filed to list in June, is reportedly pushing its own IPO toward 2027."
+          - label: "Why it matters"
+            text: "A live frontier-lab IPO would be the first real public-market price discovery for foundation-model economics — testing whether Street investors buy the growth story at these multiples."
+          - label: "Who's affected"
+            text: "Both labs, their investors, and every AI stock priced on comparison to them."
+        sources:
+          - label: "Motley Fool"
+            url: "https://www.fool.com/investing/2026/08/22/ipo-fever-heats-up-for-openai-and-anthropic/"
+          - label: "Yahoo Finance"
+            url: "https://finance.yahoo.com/technology/ai/articles/anthropic-openai-said-racing-public-050144673.html"
+      - title: "2. Google's A2A protocol joins the Agentic AI Foundation"
+        icon: bolt
+        badge: mint
+        tag: "Enterprise Adoption"
+        facts:
+          - label: "What happened"
+            text: "Google's Agent2Agent protocol formally moved under Linux Foundation-directed AAIF governance on August 20 — the same neutral home as Anthropic's MCP — with the foundation now citing 250+ members."
+          - label: "Why it matters"
+            text: "Interoperability standards, not any single model, decide whether multi-vendor agent ecosystems actually compose in production."
+          - label: "Who's affected"
+            text: "Every team building cross-vendor agent tooling."
+        sources:
+          - label: "AIToolsRecap — AI News August 2026 (aggregated)"
+            url: "https://aitoolsrecap.com/Blog/AINewsAugust2026.aspx"
+      - title: "3. CXMT's Shanghai debut — the memory-chip leg of China's self-sufficiency push"
+        icon: globe
+        badge: indigo
+        tag: "Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "Chinese memory maker CXMT reportedly surged ~466% on its Shanghai STAR Market debut, raising about $9.8B and briefly becoming China's most valuable listed company."
+          - label: "Why it matters"
+            text: "Memory (HBM-class) capacity is the piece of the AI hardware stack China has struggled hardest to domesticate; a well-funded domestic player changes the self-sufficiency trajectory, not just the logic-chip story."
+          - label: "Who's affected"
+            text: "Chinese AI hardware supply chains, and Nvidia/SK Hynix/Samsung competitively."
+        sources:
+          - label: "Al Jazeera — US chip ban applies to Chinese firms outside China (context)"
+            url: "https://www.aljazeera.com/economy/2026/6/1/us-says-ban-on-ai-chip-shipments-applies-to-chinese-firms-outside-china"
+      - title: "4. Jeff Dean exits Google to co-found an AI-for-science startup"
+        icon: alert
+        badge: red
+        tag: "Watch closely"
+        facts:
+          - label: "What happened"
+            text: "Reported departure of Jeff Dean — with Oriol Vinyals, Quoc Le, and Sanjay Ghemawat — to found “Discovery Loop,” focused on AI for scientific discovery."
+          - label: "Why it matters"
+            text: "A cluster of Google's most senior technical leadership leaving together, following Noam Shazeer's earlier move to OpenAI and John Jumper's to Anthropic, is a materially different signal than routine attrition."
+          - label: "Who's affected"
+            text: "Google DeepMind's research bench strength; the new startup's future investors."
+        sources:
+          - label: "HPCwire / AIwire — Google DeepMind Departures"
+            url: "https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/"
+          - label: "Axios — AI lab / AGI departures"
+            url: "https://www.axios.com/2026/06/23/ai-lab-agi-google-deepmind-departures"
+      - title: "5. H200/MI308 sales to China remain in legal limbo despite Commerce clearance"
+        icon: globe
+        badge: indigo
+        tag: "Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "Commerce reportedly cleared roughly ten Chinese firms — Alibaba, Tencent, and ByteDance among them — to buy Nvidia's H200 at a 75,000-unit-per-customer cap, but no deliveries have shipped."
+          - label: "Why it matters"
+            text: "The policy exists on paper without executing in practice — the real constraint on China's frontier compute access is still unresolved, not loosened."
+          - label: "Who's affected"
+            text: "Nvidia and AMD revenue guidance; Chinese hyperscaler capacity planning."
+        body:
+          - "No independently verifiable primary source for the delivery status was found this pass — treat as aggregated congressional and press reporting, not confirmed fact."
+      - title: "6. AMD ships Helios, a rack-scale system aimed at Nvidia's Vera Rubin NVL72"
+        icon: server
+        badge: teal
+        tag: "Infrastructure"
+        facts:
+          - label: "What happened"
+            text: "AMD's integrated rack combines 6th-gen Epyc CPUs, Instinct MI455X GPUs, Pensando networking, and ROCm as a single-vendor stack, with AMD claiming better tokens-per-dollar."
+          - label: "Why it matters"
+            text: "This is AMD competing at the rack level, not just the chip level — the level hyperscalers actually buy at."
+          - label: "Who's affected"
+            text: "Hyperscaler procurement teams; Nvidia's pricing power."
+        sources:
+          - label: "Data Center Knowledge — Hardware Highlights Aug 2026"
+            url: "https://www.datacenterknowledge.com/data-center-hardware/data-center-hardware-highlights-august-2026"
+      - title: "7. Fireworks AI raises a reported $1.5B — capital keeps rotating to inference"
+        icon: dollar
+        badge: green
+        tag: "Capital / M&A"
+        facts:
+          - label: "What happened"
+            text: "Fireworks AI's raise, alongside Together AI's reported $800M, headline a month where AI funding has reportedly already topped $407B in six months."
+          - label: "Why it matters"
+            text: "Money is visibly shifting from foundation-model training toward the inference layer — where sustained unit economics actually get decided."
+          - label: "Who's affected"
+            text: "Inference-infra competitors (Together, Baseten, Modal); model providers depending on cheap inference to hit pricing targets."
+        sources:
+          - label: "The Business Perspective — August 2026 AI Funding"
+            url: "https://thebusinessperspective.com/ai-startups-that-raised-funding-in-august-2026/"
+      - title: "8. Model release cadence: 12+ new frontier/near-frontier models in three weeks"
+        icon: trend
+        badge: cyan
+        tag: "Trend"
+        facts:
+          - label: "What happened"
+            text: "Reported releases include Alibaba's Qwen3.8 Max (Aug 2), Google's Gemini 3.7 Flash (Aug 13), Z.AI's GLM-5.3 (Aug 14) and GLM-5.2 Turbo (Aug 17), ByteDance's Seed 2.1 Turbo (Aug 10), plus GPT-5.6 Luna and a DeepSeek-V4-Flash update."
+          - label: "Why it matters"
+            text: "At this cadence, model choice is now a live optimization problem, not a one-time decision — see Part 2."
+          - label: "Who's affected"
+            text: "Every team doing model routing and evaluation."
+        body:
+          - "Aggregated tracker reporting — see the sourcing caveat under Part 2."
+      - title: "9. OpenAI cuts GPT-5.6 Luna input pricing ~80% to $0.20/M tokens"
+        icon: trend
+        badge: cyan
+        tag: "Trend"
+        facts:
+          - label: "What happened"
+            text: "Reported price cut alongside ChatGPT crossing a reported ~1B weekly active users."
+          - label: "Why it matters"
+            text: "Aggressive price competition at the frontier compresses margins across the stack and pressures every other provider's pricing."
+          - label: "Who's affected"
+            text: "All API-consuming products; competing model providers."
+        body:
+          - "Aggregated reporting, unconfirmed against OpenAI's own pricing page at research time."
+      - title: "10. Intel details “Crescent Island,” a low-power inference GPU, at Hot Chips 2026"
+        icon: cpu
+        badge: teal
+        tag: "Infrastructure"
+        facts:
+          - label: "What happened"
+            text: "Intel positioned a low-power, high-memory-capacity GPU aimed at longer context windows and more concurrent agents within existing air-cooled data-center footprints."
+          - label: "Why it matters"
+            text: "A three-way Nvidia/AMD/Intel inference-hardware contest is a different competitive dynamic than the training-chip race that dominated 2023–2025."
+          - label: "Who's affected"
+            text: "Data-center power and cooling planning; inference-cost curves."
+        sources:
+          - label: "Intel Newsroom — Hot Chips 2026"
+            url: "https://newsroom.intel.com/client-computing/intel-outlines-architectures-for-agentic-ai-at-hot-chips-2026"
+
+  - id: part2
+    kind: standard
+    nav_label: "Model Intelligence"
+    icon: flask
+    number: "02"
+    eyebrow: "Part 2"
+    title: "Model Intelligence"
+    lede: "Frontier and near-frontier model activity across the major labs, tracked as a release timeline rather than deep benchmark analysis this pass."
+    items:
+      - title: "Release timeline, last three weeks"
+        icon: flask
+        badge: purple
+        tag: "Model intelligence"
+        open: true
+        table:
+          headers: ["Model", "Provider", "Open / Closed", "Notable"]
+          rows:
+            - ["Qwen3.8 Max", "Alibaba", "Closed", "Aug 2 release, flagship tier"]
+            - ["Seed 2.1 Turbo", "ByteDance", "Closed", "Aug 10 release"]
+            - ["Gemini 3.7 Flash", "Google", "Closed", "Aug 13, efficiency tier"]
+            - ["GLM-5.3", "Z.AI", "Open-weight", "Aug 14 release"]
+            - ["GLM-5.2 Turbo", "Z.AI", "Open-weight", "Aug 17, most recent tracked"]
+            - ["GPT-5.6 Luna", "OpenAI", "Closed", "Input price cut ~80%"]
+            - ["DeepSeek-V4-Flash-0731", "DeepSeek", "Open-weight", "Incremental update"]
+        sources:
+          - label: "AIToolsRecap — AI News August 2026"
+            url: "https://aitoolsrecap.com/Blog/AINewsAugust2026.aspx"
+          - label: "LLM Gateway — Model Releases Timeline"
+            url: "https://llmgateway.io/timeline"
+      - title: "Sourcing caveat"
+        icon: alert
+        badge: gray
+        tag: "Read before citing"
+        body:
+          - "This table is pulled from aggregator/tracker sites, not cross-checked against each vendor's own release notes. Treat context-window, pricing, and benchmark specifics as unverified until confirmed at the primary source — the full brief's editorial rules require exactly that cross-check before publication."
+
+  - id: part3
+    kind: standard
+    nav_label: "Open vs. Closed"
+    icon: eye
+    number: "03"
+    eyebrow: "Part 3"
+    title: "Open vs. Closed AI"
+    lede: "Is the gap between open-weight and closed models widening or narrowing this week?"
+    items:
+      - title: "This week's read: mixed, not conclusive"
+        icon: eye
+        badge: indigo
+        tag: "Assessment"
+        open: true
+        body:
+          - "Z.AI (GLM-5.3 / GLM-5.2 Turbo) and DeepSeek continue shipping open-weight releases at a fast clip, and CXMT's raise strengthens China's open-ecosystem hardware base. But the highest-profile move of the week — OpenAI's 80% Luna price cut — is a closed-model provider competing on price rather than ceding ground on capability."
+          - "<b>No confident call this week</b> on whether the gap is widening or narrowing — that would need side-by-side benchmark data this research pass didn't gather."
+
+  - id: part4
+    kind: standard
+    nav_label: "Labs & Talent War"
+    icon: people
+    number: "04"
+    eyebrow: "Part 4"
+    title: "Labs & the Talent War"
+    lede: "Researcher movement, departures, and new labs worth tracking."
+    items:
+      - title: "The departures"
+        icon: people
+        badge: purple
+        tag: "Talent"
+        open: true
+        body:
+          - "The standout move: Jeff Dean, Oriol Vinyals, Quoc Le, and Sanjay Ghemawat leaving Google together to found Discovery Loop, an AI-for-scientific-discovery startup. It follows Noam Shazeer's earlier Google DeepMind → OpenAI move, and John Jumper's Google DeepMind → Anthropic move."
+        sources:
+          - label: "HPCwire / AIwire — Google DeepMind Departures"
+            url: "https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/"
+          - label: "Axios — AI lab / AGI departures"
+            url: "https://www.axios.com/2026/06/23/ai-lab-agi-google-deepmind-departures"
+      - title: "Researcher to watch"
+        icon: eye
+        badge: purple
+        tag: "Talent"
+        body:
+          - "Whoever Discovery Loop recruits next will signal whether it's positioning as a serious new lab or a smaller applied-science shop."
+
+  - id: part5
+    kind: standard
+    nav_label: "AI Money"
+    icon: dollar
+    number: "05"
+    eyebrow: "Part 5"
+    title: "AI Money: Funding & M&A"
+    lede: "Acquisitions, funding rounds, and capital flows across the AI stack."
+    items:
+      - title: "Largest raises this month"
+        icon: dollar
+        badge: green
+        tag: "Funding"
+        open: true
+        body:
+          - "Fireworks AI ($1.5B, reported) → Together AI ($800M, reported) → LeapXpert ($180M, reported) round out the month's largest known raises."
+        sources:
+          - label: "The Business Perspective — August 2026 AI Funding"
+            url: "https://thebusinessperspective.com/ai-startups-that-raised-funding-in-august-2026/"
+      - title: "Market context"
+        icon: hash
+        badge: green
+        tag: "Funding"
+        body:
+          - "Aggregate 2026 AI funding is reported at $407B+ through six months, already exceeding all of 2025's $264B — capital is concentrating into fewer, larger checks."
+      - title: "M&A: none confirmed"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No confirmed major M&A transaction surfaced in this research pass. Per the brief's editorial rules, better to say so than manufacture a story to fill the section."
+
+  - id: part6
+    kind: standard
+    nav_label: "AI in Production"
+    icon: building
+    number: "06"
+    eyebrow: "Part 6"
+    title: "AI in Production"
+    lede: "Real-world deployment evidence, not pilots or demos."
+    items:
+      - title: "No material development this week"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        open: true
+        body:
+          - "No development with measurable production-deployment evidence — revenue impact, cost reduction, ROI figures — surfaced in this research pass."
+
+  - id: part7
+    kind: standard
+    nav_label: "Agents & App Layer"
+    icon: bolt
+    number: "07"
+    eyebrow: "Part 7"
+    title: "Agents & the Application Layer"
+    lede: "Tracking the shift from chatbots to copilots to agents to autonomous workflows."
+    items:
+      - title: "Interoperability"
+        icon: bolt
+        badge: mint
+        tag: "Agents"
+        open: true
+        body:
+          - "A2A joining AAIF under the same governance as MCP (see Part 1, #2) is the clearest agents-infrastructure signal of the week."
+        sources:
+          - label: "AIToolsRecap — AI News August 2026"
+            url: "https://aitoolsrecap.com/Blog/AINewsAugust2026.aspx"
+      - title: "Coding agents"
+        icon: cpu
+        badge: mint
+        tag: "Agents"
+        body:
+          - "Meta's “Muse Code” coding-assistant launch is a second data point on agentic coding tools shipping into products."
+      - title: "Production or still experimental?"
+        icon: eye
+        badge: gray
+        tag: "Open question"
+        body:
+          - "Insufficient evidence gathered this pass to support a confident answer either way."
+
+  - id: part8
+    kind: standard
+    nav_label: "Chips & Compute"
+    icon: cpu
+    number: "08"
+    eyebrow: "Part 8"
+    title: "Chips, Compute & AI Hardware"
+    lede: "GPUs, accelerators, inference chips, and the economics they change."
+    items:
+      - title: "Compute development of the week: AMD Helios"
+        icon: server
+        badge: teal
+        tag: "Infrastructure"
+        open: true
+        body:
+          - "AMD's Helios (Part 1, #6) is the first credible single-vendor, rack-level challenger to Nvidia's Vera Rubin NVL72 — it changes the buying unit hyperscalers negotiate over, not just the chip spec sheet."
+        sources:
+          - label: "Data Center Knowledge — Hardware Highlights Aug 2026"
+            url: "https://www.datacenterknowledge.com/data-center-hardware/data-center-hardware-highlights-august-2026"
+      - title: "Also watching: Intel's inference push"
+        icon: cpu
+        badge: teal
+        tag: "Infrastructure"
+        body:
+          - "Intel's Crescent Island (Part 1, #10) is a distinct bet — optimizing for inference density and agent concurrency rather than raw training throughput."
+        sources:
+          - label: "Intel Newsroom — Hot Chips 2026"
+            url: "https://newsroom.intel.com/client-computing/intel-outlines-architectures-for-agentic-ai-at-hot-chips-2026"
+
+  - id: part9
+    kind: standard
+    nav_label: "Data Centers & Energy"
+    icon: server
+    number: "09"
+    eyebrow: "Part 9"
+    title: "Data Centers, Energy & Infrastructure"
+    lede: "Hyperscale build-out, power, and the physical constraints on AI growth."
+    items:
+      - title: "Power architecture shift: 800VDC"
+        icon: bolt
+        badge: orange
+        tag: "Infrastructure"
+        open: true
+        body:
+          - "A shift toward 800VDC power architectures in next-gen AI data centers is reportedly gathering pace, with direct implications for power-semiconductor demand and rack design as GPU density climbs."
+        sources:
+          - label: "DigiTimes — 800VDC adoption in AI data centers"
+            url: "https://www.digitimes.com/news/a20260821PD204/data-gan-demand-adoption-sic.html"
+      - title: "What's missing"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No GW-scale build-out announcement with a confirmed number surfaced in this research pass."
+
+  - id: part10
+    kind: standard
+    nav_label: "The Global AI Race"
+    icon: globe
+    number: "10"
+    eyebrow: "Part 10"
+    title: "The Global AI Race"
+    lede: "Momentum across the major regions — directional, and honest about where confidence runs out."
+    items:
+      - title: "United States — stable"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        open: true
+        body:
+          - "Capital and model releases keep flowing, but export-control enforcement (H200 sales still undelivered despite clearance) shows real policy friction."
+        sources:
+          - label: "Al Jazeera — US chip ban applies to Chinese firms outside China"
+            url: "https://www.aljazeera.com/economy/2026/6/1/us-says-ban-on-ai-chip-shipments-applies-to-chinese-firms-outside-china"
+      - title: "China — accelerating"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        open: true
+        body:
+          - "CXMT's raise and the open-weight model cadence (GLM, DeepSeek) both point to real domestic-stack momentum."
+      - title: "Other regions"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "Insufficient data gathered this pass to rate the EU, UK, Japan, South Korea, or Gulf states with any confidence."
+
+  - id: part11
+    kind: standard
+    nav_label: "Company Watchlist"
+    icon: compass
+    number: "11"
+    eyebrow: "Part 11"
+    title: "AI Company Watchlist"
+    lede: "Companies whose competitive position materially changed this week."
+    items:
+      - title: "Momentum changes this week"
+        icon: compass
+        badge: indigo
+        tag: "Watchlist"
+        open: true
+        body:
+          - "<b>Anthropic</b> — IPO timeline pulling ahead of OpenAI's. <b>AMD</b> — Helios makes it a credible rack-level Nvidia challenger. <b>CXMT</b> — new entrant, high-momentum IPO."
+      - title: "Scope note"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "The full three-region Leaders / Challengers / Emerging watchlist wasn't built out in this sample pass."
+
+  - id: part12
+    kind: standard
+    nav_label: "Numbers That Matter"
+    icon: hash
+    number: "12"
+    eyebrow: "Part 12"
+    title: "The Numbers That Matter"
+    lede: "A compact dashboard of the week's most load-bearing figures."
+    items:
+      - title: "This week's dashboard"
+        icon: hash
+        badge: gray
+        tag: "Numbers"
+        open: true
+        stats:
+          - value: "$965B"
+            label: "Anthropic Series H valuation (reported)"
+          - value: "$65B"
+            label: "Anthropic July run-rate (reported)"
+          - value: "$1.5B"
+            label: "Fireworks AI raise (reported)"
+          - value: "$407B+"
+            label: "2026 AI funding YTD, 6 mo. (reported), vs. $264B for all of 2025"
+          - value: "$9.8B"
+            label: "CXMT IPO raise"
+          - value: "~466%"
+            label: "CXMT single-day debut gain (reported)"
+          - value: "−80%"
+            label: "GPT-5.6 Luna input-token price cut, to $0.20/M"
+          - value: "75,000"
+            label: "H200 export-clearance cap, units/customer — deliveries: zero, per reporting"
+        sources:
+          - label: "Motley Fool — IPO Fever Heats Up"
+            url: "https://www.fool.com/investing/2026/08/22/ipo-fever-heats-up-for-openai-and-anthropic/"
+          - label: "Yahoo Finance — Anthropic, OpenAI racing to go public"
+            url: "https://finance.yahoo.com/technology/ai/articles/anthropic-openai-said-racing-public-050144673.html"
+          - label: "The Business Perspective — August 2026 AI Funding"
+            url: "https://thebusinessperspective.com/ai-startups-that-raised-funding-in-august-2026/"
+      - title: "Sourcing caveat"
+        icon: alert
+        badge: gray
+        tag: "Read before citing"
+        body:
+          - "All figures above are as reported by secondary sources gathered via web search — not independently cross-checked against primary filings or company statements, per the caveats noted throughout this edition."
+
+  - id: part13
+    kind: standard
+    nav_label: "Signals Beneath Headlines"
+    icon: pulse
+    number: "13"
+    eyebrow: "Part 13"
+    title: "Signals Beneath the Headlines"
+    lede: "Developments that look small today but could become strategically important over the next six to twenty-four months."
+    items:
+      - title: "Signal 1 — Intel is designing for inference, not training"
+        icon: pulse
+        badge: purple
+        tag: "6–24 month watch"
+        open: true
+        facts:
+          - label: "Signal"
+            text: "Intel is explicitly designing an inference-optimized (not training-optimized) GPU for agentic workloads."
+          - label: "Why it could matter"
+            text: "If inference cost — not training compute — becomes the binding constraint on agent deployment, an inference-specialist chip vendor could carve out real share from Nvidia's training-dominant position."
+          - label: "What to watch"
+            text: "Crescent Island design wins at a hyperscaler within 2–3 quarters."
+        sources:
+          - label: "Intel Newsroom — Hot Chips 2026"
+            url: "https://newsroom.intel.com/client-computing/intel-outlines-architectures-for-agentic-ai-at-hot-chips-2026"
+      - title: "Signal 2 — Senior researchers are leaving in clusters, not trickles"
+        icon: pulse
+        badge: purple
+        tag: "6–24 month watch"
+        open: true
+        facts:
+          - label: "Signal"
+            text: "A cluster of Google's most senior researchers left together rather than individually over time."
+          - label: "Why it could matter"
+            text: "Coordinated senior departures can precede a broader talent exodus if internal confidence in a lab's trajectory shifts."
+          - label: "What to watch"
+            text: "Whether additional DeepMind principal-level researchers follow within the next two quarters."
+        sources:
+          - label: "HPCwire / AIwire — Google DeepMind Departures"
+            url: "https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/"
+
+  - id: part14
+    kind: standard
+    nav_label: "What Changed This Week"
+    icon: calendar
+    number: "14"
+    eyebrow: "Part 14"
+    title: "What Changed This Week?"
+    lede: "Eight direct questions, answered succinctly."
+    items:
+      - title: "1. Which company gained the most strategic ground?"
+        icon: calendar
+        badge: cyan
+        open: true
+        body:
+          - "<b>Anthropic</b> — IPO timeline and valuation lead over OpenAI."
+      - title: "2. Which company lost ground?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "<b>Google DeepMind</b> — senior researcher exodus."
+      - title: "3. Which model release mattered most?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Unclear from this pass — no single release stood out over the cluster of twelve-plus."
+      - title: "4. What changed in AI economics?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Frontier pricing compressed further with the GPT-5.6 Luna cut."
+      - title: "5. What changed in enterprise adoption?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Agent interoperability standard (A2A) gained formal governance backing."
+      - title: "6. What changed in AI infrastructure?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "AMD credibly entered rack-scale competition with Nvidia."
+      - title: "7. What changed in the U.S.–China AI race?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Chip policy exists on paper (H200 clearance) without executing in practice; China's domestic memory-chip capacity got a large capital infusion."
+      - title: "8. What development is being underestimated?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "The 800VDC power-architecture shift — reads as a hardware footnote but resets rack design assumptions across the industry."
+
+  - id: part15
+    kind: standard
+    nav_label: "The Big Picture"
+    icon: horizon
+    number: "15"
+    eyebrow: "Part 15"
+    title: "The Big Picture"
+    lede: "The AI landscape in five minutes, three things to watch next week, and the full scope note."
+    items:
+      - title: "The AI landscape in five minutes"
+        icon: horizon
+        badge: orange
+        tag: "Synthesis"
+        open: true
+        body:
+          - "Capital is now chasing inference and IPO exits rather than pure model training — Fireworks and Together's raises and Anthropic's IPO push both point the same direction — while frontier labs compete as much on price ($0.20/M tokens) as on capability. Hardware is fragmenting into a three-way inference contest (Nvidia, AMD, Intel) even as China's chip self-sufficiency push gains a real capital boost (CXMT) without yet resolving the export-control standoff on the compute China actually needs. Underneath the corporate headlines, senior talent is moving in visible clusters rather than individually — a leading indicator worth watching more than any single week's news cycle."
+      - title: "Three things to watch next week"
+        icon: compass
+        badge: orange
+        tag: "Forward look"
+        open: true
+        kv:
+          - term: "1. H200 shipments"
+            desc: "Whether any units actually ship to the cleared Chinese buyers, or the legal limbo persists."
+          - term: "2. Anthropic's IPO"
+            desc: "The next visible process milestone — roadshow scheduling, S-1 amendments."
+          - term: "3. Discovery Loop"
+            desc: "Whether Jeff Dean's new venture announces funding or additional hires, clarifying its ambitions."
+      - title: "All sources, indexed"
+        icon: hash
+        badge: gray
+        tag: "Reference"
+        kv:
+          - term: "Motley Fool"
+            desc: "<a href=\"https://www.fool.com/investing/2026/08/22/ipo-fever-heats-up-for-openai-and-anthropic/\" target=\"_blank\" rel=\"noopener noreferrer\">IPO Fever Heats Up</a>"
+          - term: "Yahoo Finance"
+            desc: "<a href=\"https://finance.yahoo.com/technology/ai/articles/anthropic-openai-said-racing-public-050144673.html\" target=\"_blank\" rel=\"noopener noreferrer\">Anthropic, OpenAI racing to go public</a>"
+          - term: "AIToolsRecap"
+            desc: "<a href=\"https://aitoolsrecap.com/Blog/AINewsAugust2026.aspx\" target=\"_blank\" rel=\"noopener noreferrer\">AI News August 2026</a>"
+          - term: "LLM Gateway"
+            desc: "<a href=\"https://llmgateway.io/timeline\" target=\"_blank\" rel=\"noopener noreferrer\">Model Releases Timeline</a>"
+          - term: "The Business Perspective"
+            desc: "<a href=\"https://thebusinessperspective.com/ai-startups-that-raised-funding-in-august-2026/\" target=\"_blank\" rel=\"noopener noreferrer\">August 2026 AI Funding</a>"
+          - term: "Data Center Knowledge"
+            desc: "<a href=\"https://www.datacenterknowledge.com/data-center-hardware/data-center-hardware-highlights-august-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Hardware Highlights Aug 2026</a>"
+          - term: "DigiTimes"
+            desc: "<a href=\"https://www.digitimes.com/news/a20260821PD204/data-gan-demand-adoption-sic.html\" target=\"_blank\" rel=\"noopener noreferrer\">800VDC adoption in AI data centers</a>"
+          - term: "Al Jazeera"
+            desc: "<a href=\"https://www.aljazeera.com/economy/2026/6/1/us-says-ban-on-ai-chip-shipments-applies-to-chinese-firms-outside-china\" target=\"_blank\" rel=\"noopener noreferrer\">US chip ban applies to Chinese firms outside China</a>"
+          - term: "HPCwire / AIwire"
+            desc: "<a href=\"https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/\" target=\"_blank\" rel=\"noopener noreferrer\">Google DeepMind Departures</a>"
+          - term: "Axios"
+            desc: "<a href=\"https://www.axios.com/2026/06/23/ai-lab-agi-google-deepmind-departures\" target=\"_blank\" rel=\"noopener noreferrer\">AI lab / AGI departures</a>"
+          - term: "Intel Newsroom"
+            desc: "<a href=\"https://newsroom.intel.com/client-computing/intel-outlines-architectures-for-agentic-ai-at-hot-chips-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Hot Chips 2026</a>"
+      - title: "Scope & limitations"
+        icon: alert
+        badge: red
+        tag: "Read this before relying on the brief"
+        body:
+          - "This edition falls short of the full <code>assets/PROMPT.md</code> spec in specific, stated ways: only ten ranked items instead of twenty; several sections marked “insufficient data” rather than filled in; and most figures are single-source and unverified rather than cross-checked against primary filings, as the brief's own sourcing rules require."
+          - "A production run would need deeper research — more searches per section, primary-source lookups for every number — before publishing under the newsletter's own editorial standard."
