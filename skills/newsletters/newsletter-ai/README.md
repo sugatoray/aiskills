@@ -32,10 +32,11 @@ newsletter-ai/
 │   ├── build_report.py            # CLI: yaml -> html (+ optional yaml sidecar)
 │   ├── report_data.py             # schema validation + reference numbering
 │   ├── paths.py                   # -r/--report path resolution
-│   ├── fuse.py                    # embeds source yaml into the html
-│   └── requirements.txt
+│   └── fuse.py                    # embeds source yaml into the html
 ├── tests/                          # pytest suite (Red/Green), see meta/MAINTAINERS.md
 ├── meta/MAINTAINERS.md            # schema reference, dev notes, testing
+├── pyproject.toml                 # uv-managed deps (runtime + dev), see Development below
+├── uv.lock
 ├── CHANGELOG.md
 ├── README.md                      # you are here
 └── SKILL.md                       # runtime instructions Claude reads to produce an edition
@@ -127,17 +128,24 @@ real one.
 **2. Render it**, no LLM call needed for this part — it's a plain CLI:
 
 ```bash
-pip install -r builder/requirements.txt
-python builder/build_report.py path/to/data.yaml -r path/to/output/
+cd skills/newsletters/newsletter-ai
+uv run builder/build_report.py path/to/data.yaml -r path/to/output/
 ```
 
 ```bash
 # or pin the exact HTML filename:
-python builder/build_report.py path/to/data.yaml -r path/to/output/brief.html
+uv run builder/build_report.py path/to/data.yaml -r path/to/output/brief.html
 
 # or the legacy single-file form (no yaml sidecar written):
-python builder/build_report.py path/to/data.yaml path/to/output.html
+uv run builder/build_report.py path/to/data.yaml path/to/output.html
 ```
+
+(From a different cwd, pass `--project skills/newsletters/newsletter-ai`
+and the same full path for the script itself. `uv run` reads
+`pyproject.toml`, creates/updates the virtualenv, and installs `PyYAML` +
+`Jinja2` on its own — no separate install step. See
+[Development](#development) below for the dev setup, e.g. running the
+test suite.)
 
 `build_report.py` validates the data first and exits non-zero with a
 readable error listing *every* problem found (not just the first) if it
@@ -165,11 +173,15 @@ embedded.
 
 ## Development
 
-Red/Green pytest suite (`pip install -r builder/requirements.txt pytest
-&& pytest tests -q`), schema reference, and everything else for
-maintaining this skill lives in [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
-— not read as part of producing an edition, only when working on the
-skill itself. For a complete inventory of what this skill can do, see
+Managed with [`uv`](https://docs.astral.sh/uv/) — `pyproject.toml` +
+`uv.lock` pin both the runtime deps (`PyYAML`, `Jinja2`) and the `dev`
+group (`pytest`). Red/Green pytest suite: `cd skills/newsletters/newsletter-ai
+&& uv run pytest tests -q` (`uv` installs everything into a local `.venv`
+on first run, no separate install step). Schema reference and everything
+else for maintaining this skill lives in
+[`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) — not read as part of
+producing an edition, only when working on the skill itself. For a
+complete inventory of what this skill can do, see
 [`meta/FEATURES.md`](meta/FEATURES.md).
 
 License: MIT

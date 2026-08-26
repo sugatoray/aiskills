@@ -7,6 +7,23 @@ Work on this skill is tracked under
 [Epic #30](https://github.com/sugatoray/aiskills/issues/30); each entry
 below links to its corresponding closed issue.
 
+## [1.5.1] - 2026-08-26
+
+### Changed
+
+- Dev tooling now uses [`uv`](https://docs.astral.sh/uv/) instead of bare
+  `pip install -r builder/requirements.txt`: added `pyproject.toml` +
+  `uv.lock` declaring the runtime deps (`PyYAML`, `Jinja2`) and a `dev`
+  dependency group (`pytest`); removed `builder/requirements.txt`, now
+  superseded. `README.md` and `meta/MAINTAINERS.md` updated to `uv run
+  pytest tests -q` / `uv run builder/build_report.py ...`. Built
+  Red/Green: `tests/test_packaging.py` (pyproject.toml exists, declares
+  `pyyaml`/`jinja2` as runtime deps and `pytest` in the `dev` group,
+  declares `requires-python`, and the old `requirements.txt` hasn't crept
+  back in) written and confirmed failing before `pyproject.toml` existed.
+  No change to the produced newsletter or the CLI's own behavior — dev
+  workflow only.
+
 ## [1.5.0] - 2026-08-25 ([#41](https://github.com/sugatoray/aiskills/issues/41))
 
 ### Added

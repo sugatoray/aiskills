@@ -70,18 +70,23 @@ For people developing this skill — not read as part of producing a
     hidden, base64-encoded `<script>` blob (see Data fusion below), and
     reads it back out.
   - `capture_screenshots.py` / `screenshots.cjs` — screenshot automation
-    for `assets/images/` (see Screenshot automation below).
-  - `requirements.txt` — `pyyaml` and `jinja2`, the only runtime
-    dependencies (everything in `builder/` is otherwise stdlib). This is
-    a deliberate departure from the `scrolls-*` family's stdlib-only
-    convention: hand-rolling a YAML parser or a Jinja2-grade templating
-    engine would be worse than depending on two extremely stable, common
-    libraries. Install with `pip install -r builder/requirements.txt`.
-    (`screenshots.cjs` additionally needs Node + a globally-installed
-    `playwright`, already present in this environment — see Testing.)
-- `tests/` — pytest suite, `tests/conftest.py`'s shared Node/Playwright
-  availability helpers, and one Node helper (`tests/browser/`) a Python
-  test shells out to; see Testing below.
+    for `assets/images/` (Node + a globally-installed `playwright`,
+    already present in this environment — see Screenshot automation
+    below and Testing).
+- `pyproject.toml` / `uv.lock` — this skill's Python dependencies, managed
+  with [`uv`](https://docs.astral.sh/uv/): `pyyaml` and `jinja2` as
+  runtime deps (everything in `builder/` is otherwise stdlib — a
+  deliberate departure from the `scrolls-*` family's stdlib-only
+  convention, since hand-rolling a YAML parser or a Jinja2-grade
+  templating engine would be worse than depending on two extremely
+  stable, common libraries), and `pytest` in the `dev` dependency group.
+  `uv run <script>` (from this directory) installs everything into a
+  local `.venv` on first use — no separate install step. `tests/
+  test_packaging.py` asserts both groups stay declared here.
+- `tests/` — pytest suite (including `test_packaging.py`, guarding the
+  `pyproject.toml` setup above), `tests/conftest.py`'s shared
+  Node/Playwright availability helpers, and one Node helper
+  (`tests/browser/`) a Python test shells out to; see Testing below.
 
 ## Markdown Linting Rules
 
@@ -287,10 +292,21 @@ in `tests/conftest.py`, and are skipped automatically if it's not on
 PATH.
 
 ```
-pip install -r builder/requirements.txt pytest
-pytest skills/newsletters/newsletter-ai/tests -q
+cd skills/newsletters/newsletter-ai
+uv run pytest tests -q
 ```
 
+`uv` reads `pyproject.toml`/`uv.lock`, creates/updates the local `.venv`,
+and installs the runtime deps plus the `dev` group (`pytest`) on first
+run — no separate `pip install` step. Running from a different cwd:
+`uv run --project skills/newsletters/newsletter-ai pytest
+skills/newsletters/newsletter-ai/tests -q`.
+
+- `tests/test_packaging.py` — the `pyproject.toml` setup itself: it
+  exists, declares `pyyaml`/`jinja2` as runtime dependencies and `pytest`
+  in the `dev` group, declares `requires-python`, and that the old
+  `builder/requirements.txt` hasn't crept back in to drift out of sync
+  with it.
 - `tests/test_report_data.py` — schema validation and reference-dedup
   logic in isolation (synthetic dicts, no template involved).
 - `tests/test_paths.py` — `-r`/`--report` path resolution
