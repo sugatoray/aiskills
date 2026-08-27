@@ -10,7 +10,6 @@ metadata:
     author: sugatoray
     version: "2.1.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
-    
 ---
 
 # Scrolls help
