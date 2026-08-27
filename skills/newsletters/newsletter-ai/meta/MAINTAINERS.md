@@ -420,6 +420,19 @@ When adding a new item content-shape (beyond `body`/`facts`/`table`/
 implementation. The same applies to `builder/` behavior changes: write
 or extend the failing test in `tests/` first.
 
+## Frontmatter validation
+
+Run `yamllint --strict` against `../SKILL.md`'s frontmatter every time this
+skill is updated — it catches unquoted URLs, trailing whitespace, and other
+formatting slips before they land. Extract the block between the two `---`
+markers and lint it (`line-length`/`document-start` disabled since prose
+descriptions and bare `SKILL.md` frontmatter both fail those on purpose):
+
+```bash
+awk '/^---$/{c++; if(c==2){exit}} c==1' ../SKILL.md | \
+  yamllint --strict -d "{extends: default, rules: {line-length: disable, document-start: disable}}" -
+```
+
 ## Versioning
 
 Bump `metadata.version` in `../SKILL.md`'s frontmatter when something

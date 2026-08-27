@@ -9,7 +9,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "2.1.0"
-    source_url: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup"
 ---
 
 # Setting up docs/.scrolls/
