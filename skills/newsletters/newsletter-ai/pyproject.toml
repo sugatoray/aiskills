@@ -1,0 +1,18 @@
+[project]
+name = "newsletter-ai-builder"
+version = "0.1.0"
+description = "Builder/test tooling for the newsletter-ai skill: validates report YAML and renders it into the interactive HTML report."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0",
+    "Jinja2>=3.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv]
+package = false

@@ -8,7 +8,8 @@ For people developing this skill — not read as part of producing a
 - `../SKILL.md` — the only file read at invocation time. Frontmatter
   (`name`, `description`, `metadata.version`, `metadata.aliases`) plus
   the steps for using `assets/PROMPT.md` to produce one edition, in
-  markdown or YAML.
+  markdown or YAML. See The `/nltr-ai` alias below for what
+  `metadata.aliases` does and doesn't do on its own.
 - `../README.md` — human-facing usage doc (how to invoke, all flags with
   examples, screenshots). Not read at invocation time; keep its flag
   table in sync with `SKILL.md`'s Steps when either changes.
@@ -70,18 +71,29 @@ For people developing this skill — not read as part of producing a
     hidden, base64-encoded `<script>` blob (see Data fusion below), and
     reads it back out.
   - `capture_screenshots.py` / `screenshots.cjs` — screenshot automation
-    for `assets/images/` (see Screenshot automation below).
-  - `requirements.txt` — `pyyaml` and `jinja2`, the only runtime
-    dependencies (everything in `builder/` is otherwise stdlib). This is
-    a deliberate departure from the `scrolls-*` family's stdlib-only
-    convention: hand-rolling a YAML parser or a Jinja2-grade templating
-    engine would be worse than depending on two extremely stable, common
-    libraries. Install with `pip install -r builder/requirements.txt`.
-    (`screenshots.cjs` additionally needs Node + a globally-installed
-    `playwright`, already present in this environment — see Testing.)
-- `tests/` — pytest suite, `tests/conftest.py`'s shared Node/Playwright
-  availability helpers, and one Node helper (`tests/browser/`) a Python
-  test shells out to; see Testing below.
+    for `assets/images/` (Node + a globally-installed `playwright`,
+    already present in this environment — see Screenshot automation
+    below and Testing).
+  - `requirements.txt` — pip fallback for when `uv` isn't available;
+    `pyyaml` and `jinja2`, kept in sync with `pyproject.toml`'s runtime
+    dependencies below by `tests/test_packaging.py`. `uv` is the
+    RECOMMENDED path — see the next bullet.
+- `pyproject.toml` / `uv.lock` — this skill's Python dependencies, managed
+  with [`uv`](https://docs.astral.sh/uv/) (**RECOMMENDED**): `pyyaml` and
+  `jinja2` as runtime deps (everything in `builder/` is otherwise stdlib —
+  a deliberate departure from the `scrolls-*` family's stdlib-only
+  convention, since hand-rolling a YAML parser or a Jinja2-grade
+  templating engine would be worse than depending on two extremely
+  stable, common libraries), and `pytest` in the `dev` dependency group.
+  `uv run <script>` (from this directory) installs everything into a
+  local `.venv` on first use — no separate install step. `tests/
+  test_packaging.py` asserts both dependency groups stay declared here
+  and that `builder/requirements.txt` (the pip fallback above) doesn't
+  drift out of sync with the runtime deps listed here.
+- `tests/` — pytest suite (including `test_packaging.py`, guarding the
+  `pyproject.toml` setup above), `tests/conftest.py`'s shared
+  Node/Playwright availability helpers, and one Node helper
+  (`tests/browser/`) a Python test shells out to; see Testing below.
 
 ## Markdown Linting Rules
 
@@ -263,7 +275,7 @@ It's plain Jinja2 — no build step of its own. One gotcha worth knowing:
 `section.items` in Jinja2 resolves to `dict.items()` (the method), not
 the `items` key, because `section` is a plain dict — always write
 `section['items']` in the template, never `section.items`. After any
-template change, re-render the example (`python builder/build_report.py
+template change, re-render the example (`uv run builder/build_report.py
 assets/templates/sample-report.yaml /tmp/out.html`) and re-run the test
 suite; the link-integrity and theme-token tests catch most regressions
 (a class rename that silently breaks the References-accordion selector,
@@ -277,6 +289,41 @@ re-check contrast (`--ink-faint` and the `--badge-*-ink` tokens exist
 specifically because their first values were below WCAG AA on small
 text) in both themes before shipping.
 
+## The `/nltr-ai` alias
+
+Two independent layers make `/nltr-ai` behave like `/newsletter-ai`, and
+it's worth knowing which is doing the work when touching either:
+
+1. **Model-driven (works everywhere this skill is installed).**
+   `SKILL.md`'s `description` explicitly says "Use when the user runs
+   /newsletter-ai (aliased as the shorthand /nltr-ai — treat both
+   identically)". The Agent Skills spec has no `aliases` frontmatter
+   field — only `name` mechanically becomes the real slash command
+   (`/newsletter-ai`), and unrecognized keys inside `metadata` (our
+   `metadata.aliases: [nltr-ai]`) are inert data any spec-compliant
+   runtime just ignores. So `/nltr-ai` only resolves because Claude reads
+   that sentence in the description and follows it — there's no
+   mechanical second command being registered anywhere the skill gets
+   installed (e.g. via `npx skills add`, which copies only this skill's
+   own folder).
+2. **Hard-registered, repo-root only.** [`/.claude/commands/nltr-ai.md`](../../../../.claude/commands/nltr-ai.md)
+   (note: at the repo root, *outside* this skill's own folder) is a thin
+   Claude Code custom command whose body forwards `$ARGUMENTS` straight
+   to the `newsletter-ai` skill. It exists so `/nltr-ai` shows up in
+   command autocomplete too, not just when typed and sent — but only for
+   someone working directly in this repo (cloned it, or opened it as
+   their Claude Code project). It is **not** copied by `npx skills add`
+   (which only installs `skills/newsletters/newsletter-ai/`) and is not
+   part of the `scrolls-skills` plugin bundle either, so it doesn't reach
+   most people who install just this skill — for them, layer 1 above is
+   what makes `/nltr-ai` work. If you want that same hard alias in your
+   own project, copy the same kind of file into your own
+   `.claude/commands/`.
+
+Keep both in sync if the alias ever changes: `SKILL.md`'s `description`
+and `metadata.aliases`, `README.md`'s intro line, `FEATURES.md`, and
+`.claude/commands/nltr-ai.md`'s forwarding text.
+
 ## Testing
 
 Red/Green pytest suite. Everything except `test_browser_download.py` and
@@ -286,11 +333,36 @@ environment) to drive a real browser, via the shared availability check
 in `tests/conftest.py`, and are skipped automatically if it's not on
 PATH.
 
+`uv` is the RECOMMENDED path:
+
 ```
-pip install -r builder/requirements.txt pytest
-pytest skills/newsletters/newsletter-ai/tests -q
+cd skills/newsletters/newsletter-ai
+uv run pytest tests -q
 ```
 
+`uv` reads `pyproject.toml`/`uv.lock`, creates/updates the local `.venv`,
+and installs the runtime deps plus the `dev` group (`pytest`) on first
+run — no separate `pip install` step. Running from a different cwd:
+`uv run --project skills/newsletters/newsletter-ai pytest
+skills/newsletters/newsletter-ai/tests -q`.
+
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```
+cd skills/newsletters/newsletter-ai
+pip install -r builder/requirements.txt pytest
+pytest tests -q
+```
+
+</details>
+
+- `tests/test_packaging.py` — the `pyproject.toml` setup itself: it
+  exists, declares `pyyaml`/`jinja2` as runtime dependencies and `pytest`
+  in the `dev` group, and declares `requires-python`; and that
+  `builder/requirements.txt` (the pip fallback above) still exists and
+  declares exactly the same runtime packages as `pyproject.toml`, so the
+  two installation paths can't silently drift apart.
 - `tests/test_report_data.py` — schema validation and reference-dedup
   logic in isolation (synthetic dicts, no template involved).
 - `tests/test_paths.py` — `-r`/`--report` path resolution

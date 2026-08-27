@@ -7,7 +7,21 @@ markdown chat output; ask for `yaml` and it renders into the interactive
 report shown below.
 
 Run it with `/newsletter-ai` or the shorthand `/nltr-ai` — both trigger
-the same skill.
+the same skill. `/newsletter-ai` is the skill's real name (`SKILL.md`'s
+`name:` field is what any Agent Skills-compatible tool turns into a slash
+command); `/nltr-ai` works because `SKILL.md`'s `description` explicitly
+tells Claude to treat it identically — there's no `aliases` field in the
+Agent Skills spec, so this is Claude reading and following that sentence,
+not a second command mechanically registered by the installer. This repo
+also ships a literal `/nltr-ai` command
+([`.claude/commands/nltr-ai.md`](../../../.claude/commands/nltr-ai.md))
+that forwards to the skill, so autocomplete finds it too — but that file
+lives at the repo root, not inside this skill folder, so it only applies
+when working directly in this repo (e.g. cloned, or opened as a Claude
+Code project) and isn't copied along by `npx skills add` (which installs
+only this skill's own folder). Add the same kind of file to your own
+project's `.claude/commands/` if you want a hard `/nltr-ai` alias there
+too.
 
 <p>
   <img src="assets/images/report-overview-light.png" width="49%" alt="Report overview tab, light theme, showing the sidebar nav and the 15 section cards" />
@@ -33,9 +47,11 @@ newsletter-ai/
 │   ├── report_data.py             # schema validation + reference numbering
 │   ├── paths.py                   # -r/--report path resolution
 │   ├── fuse.py                    # embeds source yaml into the html
-│   └── requirements.txt
+│   └── requirements.txt           # pip fallback — uv (pyproject.toml) is RECOMMENDED
 ├── tests/                          # pytest suite (Red/Green), see meta/MAINTAINERS.md
 ├── meta/MAINTAINERS.md            # schema reference, dev notes, testing
+├── pyproject.toml                 # uv-managed deps (runtime + dev), see Development below
+├── uv.lock
 ├── CHANGELOG.md
 ├── README.md                      # you are here
 └── SKILL.md                       # runtime instructions Claude reads to produce an edition
@@ -127,6 +143,29 @@ real one.
 **2. Render it**, no LLM call needed for this part — it's a plain CLI:
 
 ```bash
+cd skills/newsletters/newsletter-ai
+uv run builder/build_report.py path/to/data.yaml -r path/to/output/
+```
+
+```bash
+# or pin the exact HTML filename:
+uv run builder/build_report.py path/to/data.yaml -r path/to/output/brief.html
+
+# or the legacy single-file form (no yaml sidecar written):
+uv run builder/build_report.py path/to/data.yaml path/to/output.html
+```
+
+(From a different cwd, pass `--project skills/newsletters/newsletter-ai`
+and the same full path for the script itself. `uv run` reads
+`pyproject.toml`, creates/updates the virtualenv, and installs `PyYAML` +
+`Jinja2` on its own — no separate install step. See
+[Development](#development) below for the dev setup, e.g. running the
+test suite.)
+
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```bash
 pip install -r builder/requirements.txt
 python builder/build_report.py path/to/data.yaml -r path/to/output/
 ```
@@ -138,6 +177,8 @@ python builder/build_report.py path/to/data.yaml -r path/to/output/brief.html
 # or the legacy single-file form (no yaml sidecar written):
 python builder/build_report.py path/to/data.yaml path/to/output.html
 ```
+
+</details>
 
 `build_report.py` validates the data first and exits non-zero with a
 readable error listing *every* problem found (not just the first) if it
@@ -165,11 +206,32 @@ embedded.
 
 ## Development
 
-Red/Green pytest suite (`pip install -r builder/requirements.txt pytest
-&& pytest tests -q`), schema reference, and everything else for
-maintaining this skill lives in [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
-— not read as part of producing an edition, only when working on the
-skill itself. For a complete inventory of what this skill can do, see
+Managed with [`uv`](https://docs.astral.sh/uv/) (**RECOMMENDED**) —
+`pyproject.toml` + `uv.lock` pin both the runtime deps (`PyYAML`,
+`Jinja2`) and the `dev` group (`pytest`). Red/Green pytest suite: `cd
+skills/newsletters/newsletter-ai && uv run pytest tests -q` (`uv`
+installs everything into a local `.venv` on first run, no separate
+install step).
+
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```bash
+cd skills/newsletters/newsletter-ai
+pip install -r builder/requirements.txt pytest
+pytest tests -q
+```
+
+`builder/requirements.txt` is kept in sync with `pyproject.toml`'s
+runtime dependencies (`tests/test_packaging.py` enforces it) specifically
+so this fallback stays usable — but prefer `uv` when it's available.
+
+</details>
+
+Schema reference and everything else for maintaining this skill lives in
+[`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) — not read as part of
+producing an edition, only when working on the skill itself. For a
+complete inventory of what this skill can do, see
 [`meta/FEATURES.md`](meta/FEATURES.md).
 
 License: MIT

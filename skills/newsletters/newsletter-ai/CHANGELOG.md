@@ -7,6 +7,51 @@ Work on this skill is tracked under
 [Epic #30](https://github.com/sugatoray/aiskills/issues/30); each entry
 below links to its corresponding closed issue.
 
+## [1.5.2] - 2026-08-26 ([#47](https://github.com/sugatoray/aiskills/issues/47))
+
+### Added
+
+- `/.claude/commands/nltr-ai.md` (repo root, outside this skill's own
+  folder): a thin Claude Code custom command that forwards its arguments
+  straight to the `newsletter-ai` skill, giving `/nltr-ai` a real,
+  autocomplete-visible command entry for anyone working directly in this
+  repo — on top of the existing model-driven alias (`SKILL.md`'s
+  `description` already told Claude to treat `/nltr-ai` identically to
+  `/newsletter-ai`, since the Agent Skills spec has no `aliases`
+  frontmatter field of its own). Documented the two-layer mechanism, and
+  this file's install-time limitation (`npx skills add` copies only
+  `skills/newsletters/newsletter-ai/`, so this repo-root file doesn't
+  travel with the skill), in `README.md` and a new "The `/nltr-ai` alias"
+  section in `meta/MAINTAINERS.md`.
+
+### Changed
+
+- `meta/MAINTAINERS.md`: fixed a leftover `python builder/build_report.py`
+  command (from before the `uv` migration in [1.5.1]) to `uv run
+  builder/build_report.py`.
+
+## [1.5.1] - 2026-08-26 ([#46](https://github.com/sugatoray/aiskills/issues/46))
+
+### Changed
+
+- Dev tooling now uses [`uv`](https://docs.astral.sh/uv/) as the
+  **RECOMMENDED** way to install and run this skill's Python tooling,
+  instead of bare `pip install -r builder/requirements.txt`: added
+  `pyproject.toml` + `uv.lock` declaring the runtime deps (`PyYAML`,
+  `Jinja2`) and a `dev` dependency group (`pytest`). `README.md` and
+  `meta/MAINTAINERS.md` lead with `uv run pytest tests -q` / `uv run
+  builder/build_report.py ...`, each with a plain-`pip` fallback (for
+  when `uv` isn't available) tucked into a collapsible `<details>` block
+  right below it. `builder/requirements.txt` is kept, not removed, so
+  that fallback stays usable — `tests/test_packaging.py` asserts it
+  declares exactly the same runtime packages as `pyproject.toml`, so the
+  two installation paths can't silently drift apart. Built Red/Green:
+  `tests/test_packaging.py` written first and confirmed failing (no
+  `pyproject.toml`; `builder/requirements.txt` missing/out of sync)
+  before `pyproject.toml` existed and before `requirements.txt` was
+  restored. No change to the produced newsletter or the CLI's own
+  behavior — dev workflow only.
+
 ## [1.5.0] - 2026-08-25 ([#41](https://github.com/sugatoray/aiskills/issues/41))
 
 ### Added
