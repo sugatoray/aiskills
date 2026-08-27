@@ -8,7 +8,8 @@ For people developing this skill — not read as part of producing a
 - `../SKILL.md` — the only file read at invocation time. Frontmatter
   (`name`, `description`, `metadata.version`, `metadata.aliases`) plus
   the steps for using `assets/PROMPT.md` to produce one edition, in
-  markdown or YAML.
+  markdown or YAML. See The `/nltr-ai` alias below for what
+  `metadata.aliases` does and doesn't do on its own.
 - `../README.md` — human-facing usage doc (how to invoke, all flags with
   examples, screenshots). Not read at invocation time; keep its flag
   table in sync with `SKILL.md`'s Steps when either changes.
@@ -274,7 +275,7 @@ It's plain Jinja2 — no build step of its own. One gotcha worth knowing:
 `section.items` in Jinja2 resolves to `dict.items()` (the method), not
 the `items` key, because `section` is a plain dict — always write
 `section['items']` in the template, never `section.items`. After any
-template change, re-render the example (`python builder/build_report.py
+template change, re-render the example (`uv run builder/build_report.py
 assets/templates/sample-report.yaml /tmp/out.html`) and re-run the test
 suite; the link-integrity and theme-token tests catch most regressions
 (a class rename that silently breaks the References-accordion selector,
@@ -287,6 +288,41 @@ colors, spacing, or interaction states, keep every interactive control's
 re-check contrast (`--ink-faint` and the `--badge-*-ink` tokens exist
 specifically because their first values were below WCAG AA on small
 text) in both themes before shipping.
+
+## The `/nltr-ai` alias
+
+Two independent layers make `/nltr-ai` behave like `/newsletter-ai`, and
+it's worth knowing which is doing the work when touching either:
+
+1. **Model-driven (works everywhere this skill is installed).**
+   `SKILL.md`'s `description` explicitly says "Use when the user runs
+   /newsletter-ai (aliased as the shorthand /nltr-ai — treat both
+   identically)". The Agent Skills spec has no `aliases` frontmatter
+   field — only `name` mechanically becomes the real slash command
+   (`/newsletter-ai`), and unrecognized keys inside `metadata` (our
+   `metadata.aliases: [nltr-ai]`) are inert data any spec-compliant
+   runtime just ignores. So `/nltr-ai` only resolves because Claude reads
+   that sentence in the description and follows it — there's no
+   mechanical second command being registered anywhere the skill gets
+   installed (e.g. via `npx skills add`, which copies only this skill's
+   own folder).
+2. **Hard-registered, repo-root only.** [`/.claude/commands/nltr-ai.md`](../../../../.claude/commands/nltr-ai.md)
+   (note: at the repo root, *outside* this skill's own folder) is a thin
+   Claude Code custom command whose body forwards `$ARGUMENTS` straight
+   to the `newsletter-ai` skill. It exists so `/nltr-ai` shows up in
+   command autocomplete too, not just when typed and sent — but only for
+   someone working directly in this repo (cloned it, or opened it as
+   their Claude Code project). It is **not** copied by `npx skills add`
+   (which only installs `skills/newsletters/newsletter-ai/`) and is not
+   part of the `scrolls-skills` plugin bundle either, so it doesn't reach
+   most people who install just this skill — for them, layer 1 above is
+   what makes `/nltr-ai` work. If you want that same hard alias in your
+   own project, copy the same kind of file into your own
+   `.claude/commands/`.
+
+Keep both in sync if the alias ever changes: `SKILL.md`'s `description`
+and `metadata.aliases`, `README.md`'s intro line, `FEATURES.md`, and
+`.claude/commands/nltr-ai.md`'s forwarding text.
 
 ## Testing
 

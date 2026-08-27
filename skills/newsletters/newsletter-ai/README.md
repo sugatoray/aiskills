@@ -7,7 +7,21 @@ markdown chat output; ask for `yaml` and it renders into the interactive
 report shown below.
 
 Run it with `/newsletter-ai` or the shorthand `/nltr-ai` — both trigger
-the same skill.
+the same skill. `/newsletter-ai` is the skill's real name (`SKILL.md`'s
+`name:` field is what any Agent Skills-compatible tool turns into a slash
+command); `/nltr-ai` works because `SKILL.md`'s `description` explicitly
+tells Claude to treat it identically — there's no `aliases` field in the
+Agent Skills spec, so this is Claude reading and following that sentence,
+not a second command mechanically registered by the installer. This repo
+also ships a literal `/nltr-ai` command
+([`.claude/commands/nltr-ai.md`](../../../.claude/commands/nltr-ai.md))
+that forwards to the skill, so autocomplete finds it too — but that file
+lives at the repo root, not inside this skill folder, so it only applies
+when working directly in this repo (e.g. cloned, or opened as a Claude
+Code project) and isn't copied along by `npx skills add` (which installs
+only this skill's own folder). Add the same kind of file to your own
+project's `.claude/commands/` if you want a hard `/nltr-ai` alias there
+too.
 
 <p>
   <img src="assets/images/report-overview-light.png" width="49%" alt="Report overview tab, light theme, showing the sidebar nav and the 15 section cards" />

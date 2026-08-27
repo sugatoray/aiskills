@@ -7,6 +7,29 @@ Work on this skill is tracked under
 [Epic #30](https://github.com/sugatoray/aiskills/issues/30); each entry
 below links to its corresponding closed issue.
 
+## [1.5.2] - 2026-08-26
+
+### Added
+
+- `/.claude/commands/nltr-ai.md` (repo root, outside this skill's own
+  folder): a thin Claude Code custom command that forwards its arguments
+  straight to the `newsletter-ai` skill, giving `/nltr-ai` a real,
+  autocomplete-visible command entry for anyone working directly in this
+  repo — on top of the existing model-driven alias (`SKILL.md`'s
+  `description` already told Claude to treat `/nltr-ai` identically to
+  `/newsletter-ai`, since the Agent Skills spec has no `aliases`
+  frontmatter field of its own). Documented the two-layer mechanism, and
+  this file's install-time limitation (`npx skills add` copies only
+  `skills/newsletters/newsletter-ai/`, so this repo-root file doesn't
+  travel with the skill), in `README.md` and a new "The `/nltr-ai` alias"
+  section in `meta/MAINTAINERS.md`.
+
+### Changed
+
+- `meta/MAINTAINERS.md`: fixed a leftover `python builder/build_report.py`
+  command (from before the `uv` migration in [1.5.1]) to `uv run
+  builder/build_report.py`.
+
 ## [1.5.1] - 2026-08-26
 
 ### Changed
