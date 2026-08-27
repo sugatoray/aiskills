@@ -11,18 +11,23 @@ below links to its corresponding closed issue.
 
 ### Changed
 
-- Dev tooling now uses [`uv`](https://docs.astral.sh/uv/) instead of bare
-  `pip install -r builder/requirements.txt`: added `pyproject.toml` +
-  `uv.lock` declaring the runtime deps (`PyYAML`, `Jinja2`) and a `dev`
-  dependency group (`pytest`); removed `builder/requirements.txt`, now
-  superseded. `README.md` and `meta/MAINTAINERS.md` updated to `uv run
-  pytest tests -q` / `uv run builder/build_report.py ...`. Built
-  Red/Green: `tests/test_packaging.py` (pyproject.toml exists, declares
-  `pyyaml`/`jinja2` as runtime deps and `pytest` in the `dev` group,
-  declares `requires-python`, and the old `requirements.txt` hasn't crept
-  back in) written and confirmed failing before `pyproject.toml` existed.
-  No change to the produced newsletter or the CLI's own behavior — dev
-  workflow only.
+- Dev tooling now uses [`uv`](https://docs.astral.sh/uv/) as the
+  **RECOMMENDED** way to install and run this skill's Python tooling,
+  instead of bare `pip install -r builder/requirements.txt`: added
+  `pyproject.toml` + `uv.lock` declaring the runtime deps (`PyYAML`,
+  `Jinja2`) and a `dev` dependency group (`pytest`). `README.md` and
+  `meta/MAINTAINERS.md` lead with `uv run pytest tests -q` / `uv run
+  builder/build_report.py ...`, each with a plain-`pip` fallback (for
+  when `uv` isn't available) tucked into a collapsible `<details>` block
+  right below it. `builder/requirements.txt` is kept, not removed, so
+  that fallback stays usable — `tests/test_packaging.py` asserts it
+  declares exactly the same runtime packages as `pyproject.toml`, so the
+  two installation paths can't silently drift apart. Built Red/Green:
+  `tests/test_packaging.py` written first and confirmed failing (no
+  `pyproject.toml`; `builder/requirements.txt` missing/out of sync)
+  before `pyproject.toml` existed and before `requirements.txt` was
+  restored. No change to the produced newsletter or the CLI's own
+  behavior — dev workflow only.
 
 ## [1.5.0] - 2026-08-25 ([#41](https://github.com/sugatoray/aiskills/issues/41))
 

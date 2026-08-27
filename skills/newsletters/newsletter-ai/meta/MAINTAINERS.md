@@ -73,16 +73,22 @@ For people developing this skill — not read as part of producing a
     for `assets/images/` (Node + a globally-installed `playwright`,
     already present in this environment — see Screenshot automation
     below and Testing).
+  - `requirements.txt` — pip fallback for when `uv` isn't available;
+    `pyyaml` and `jinja2`, kept in sync with `pyproject.toml`'s runtime
+    dependencies below by `tests/test_packaging.py`. `uv` is the
+    RECOMMENDED path — see the next bullet.
 - `pyproject.toml` / `uv.lock` — this skill's Python dependencies, managed
-  with [`uv`](https://docs.astral.sh/uv/): `pyyaml` and `jinja2` as
-  runtime deps (everything in `builder/` is otherwise stdlib — a
-  deliberate departure from the `scrolls-*` family's stdlib-only
+  with [`uv`](https://docs.astral.sh/uv/) (**RECOMMENDED**): `pyyaml` and
+  `jinja2` as runtime deps (everything in `builder/` is otherwise stdlib —
+  a deliberate departure from the `scrolls-*` family's stdlib-only
   convention, since hand-rolling a YAML parser or a Jinja2-grade
   templating engine would be worse than depending on two extremely
   stable, common libraries), and `pytest` in the `dev` dependency group.
   `uv run <script>` (from this directory) installs everything into a
   local `.venv` on first use — no separate install step. `tests/
-  test_packaging.py` asserts both groups stay declared here.
+  test_packaging.py` asserts both dependency groups stay declared here
+  and that `builder/requirements.txt` (the pip fallback above) doesn't
+  drift out of sync with the runtime deps listed here.
 - `tests/` — pytest suite (including `test_packaging.py`, guarding the
   `pyproject.toml` setup above), `tests/conftest.py`'s shared
   Node/Playwright availability helpers, and one Node helper
@@ -291,6 +297,8 @@ environment) to drive a real browser, via the shared availability check
 in `tests/conftest.py`, and are skipped automatically if it's not on
 PATH.
 
+`uv` is the RECOMMENDED path:
+
 ```
 cd skills/newsletters/newsletter-ai
 uv run pytest tests -q
@@ -302,11 +310,23 @@ run — no separate `pip install` step. Running from a different cwd:
 `uv run --project skills/newsletters/newsletter-ai pytest
 skills/newsletters/newsletter-ai/tests -q`.
 
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```
+cd skills/newsletters/newsletter-ai
+pip install -r builder/requirements.txt pytest
+pytest tests -q
+```
+
+</details>
+
 - `tests/test_packaging.py` — the `pyproject.toml` setup itself: it
   exists, declares `pyyaml`/`jinja2` as runtime dependencies and `pytest`
-  in the `dev` group, declares `requires-python`, and that the old
-  `builder/requirements.txt` hasn't crept back in to drift out of sync
-  with it.
+  in the `dev` group, and declares `requires-python`; and that
+  `builder/requirements.txt` (the pip fallback above) still exists and
+  declares exactly the same runtime packages as `pyproject.toml`, so the
+  two installation paths can't silently drift apart.
 - `tests/test_report_data.py` — schema validation and reference-dedup
   logic in isolation (synthetic dicts, no template involved).
 - `tests/test_paths.py` — `-r`/`--report` path resolution

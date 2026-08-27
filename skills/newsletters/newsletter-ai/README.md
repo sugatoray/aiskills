@@ -32,7 +32,8 @@ newsletter-ai/
 │   ├── build_report.py            # CLI: yaml -> html (+ optional yaml sidecar)
 │   ├── report_data.py             # schema validation + reference numbering
 │   ├── paths.py                   # -r/--report path resolution
-│   └── fuse.py                    # embeds source yaml into the html
+│   ├── fuse.py                    # embeds source yaml into the html
+│   └── requirements.txt           # pip fallback — uv (pyproject.toml) is RECOMMENDED
 ├── tests/                          # pytest suite (Red/Green), see meta/MAINTAINERS.md
 ├── meta/MAINTAINERS.md            # schema reference, dev notes, testing
 ├── pyproject.toml                 # uv-managed deps (runtime + dev), see Development below
@@ -147,6 +148,24 @@ and the same full path for the script itself. `uv run` reads
 [Development](#development) below for the dev setup, e.g. running the
 test suite.)
 
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```bash
+pip install -r builder/requirements.txt
+python builder/build_report.py path/to/data.yaml -r path/to/output/
+```
+
+```bash
+# or pin the exact HTML filename:
+python builder/build_report.py path/to/data.yaml -r path/to/output/brief.html
+
+# or the legacy single-file form (no yaml sidecar written):
+python builder/build_report.py path/to/data.yaml path/to/output.html
+```
+
+</details>
+
 `build_report.py` validates the data first and exits non-zero with a
 readable error listing *every* problem found (not just the first) if it
 doesn't conform — safe to call from a script or a CI step without an LLM
@@ -173,12 +192,29 @@ embedded.
 
 ## Development
 
-Managed with [`uv`](https://docs.astral.sh/uv/) — `pyproject.toml` +
-`uv.lock` pin both the runtime deps (`PyYAML`, `Jinja2`) and the `dev`
-group (`pytest`). Red/Green pytest suite: `cd skills/newsletters/newsletter-ai
-&& uv run pytest tests -q` (`uv` installs everything into a local `.venv`
-on first run, no separate install step). Schema reference and everything
-else for maintaining this skill lives in
+Managed with [`uv`](https://docs.astral.sh/uv/) (**RECOMMENDED**) —
+`pyproject.toml` + `uv.lock` pin both the runtime deps (`PyYAML`,
+`Jinja2`) and the `dev` group (`pytest`). Red/Green pytest suite: `cd
+skills/newsletters/newsletter-ai && uv run pytest tests -q` (`uv`
+installs everything into a local `.venv` on first run, no separate
+install step).
+
+<details>
+<summary>No <code>uv</code>? Plain <code>pip</code> fallback</summary>
+
+```bash
+cd skills/newsletters/newsletter-ai
+pip install -r builder/requirements.txt pytest
+pytest tests -q
+```
+
+`builder/requirements.txt` is kept in sync with `pyproject.toml`'s
+runtime dependencies (`tests/test_packaging.py` enforces it) specifically
+so this fallback stays usable — but prefer `uv` when it's available.
+
+</details>
+
+Schema reference and everything else for maintaining this skill lives in
 [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) — not read as part of
 producing an edition, only when working on the skill itself. For a
 complete inventory of what this skill can do, see
