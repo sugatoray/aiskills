@@ -40,7 +40,7 @@ formatting slips before they land. Extract the block between the two `---`
 markers and lint it (`line-length`/`document-start` disabled since prose
 descriptions and bare `SKILL.md` frontmatter both fail those on purpose):
 
-```
+```bash
 awk '/^---$/{c++; if(c==2){exit}} c==1' ../SKILL.md | \
   yamllint --strict -d "{extends: default, rules: {line-length: disable, document-start: disable}}" -
 ```
