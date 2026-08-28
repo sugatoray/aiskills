@@ -7,7 +7,7 @@ metadata:
   - name: stata-recipes
     type: skill
     author: sugatoray
-    version: "1.0.0"
+    version: "1.1.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
 ---
 
@@ -84,6 +84,11 @@ Load these on demand rather than holding all of it in context at once:
 | [`references/python-interop.md`](references/python-interop.md) | The task involves Python and Stata together, in either direction. |
 | [`references/recipes/README.md`](references/recipes/README.md) | Writing a *new* recipe, or checking what a recipe file is expected to contain. |
 | [`references/recipes/ardl.md`](references/recipes/ardl.md) | The task is ARDL / bounds-testing / long-run-short-run time-series modeling, or is close enough to it to use as a structural template. |
+| [`references/recipes/timeseries-regression.md`](references/recipes/timeseries-regression.md) | A plain regression on a single time series — lag structure, Newey-West/HAC standard errors, autocorrelation diagnostics, avoiding spurious regression. |
+| [`references/recipes/panel-regression.md`](references/recipes/panel-regression.md) | Fixed-effects vs. random-effects panel regression, the Hausman test, clustered standard errors. |
+| [`references/recipes/dickey-fuller-test.md`](references/recipes/dickey-fuller-test.md) | The mechanics of `dfuller` specifically — trend/drift specification, lag-length choice, testing level vs. first difference. |
+| [`references/recipes/unit-root-test.md`](references/recipes/unit-root-test.md) | Deciding *which* unit-root test(s) to run (ADF/PP/DF-GLS vs. KPSS) and how to read them together, before committing to one test's mechanics. |
+| [`references/recipes/im-pesaran-shin-test.md`](references/recipes/im-pesaran-shin-test.md) | The panel counterpart to a unit-root test — `xtunitroot ips`, its heterogeneous alternative vs. Levin-Lin-Chu's homogeneous one, and cross-sectional-dependence caveats. |
 
 ## Recipe library
 
@@ -97,6 +102,11 @@ there over time without touching this file.
 | Recipe | Covers |
 | --- | --- |
 | [`ardl`](references/recipes/ardl.md) | Autoregressive Distributed Lag modeling: lag-order selection, the `ec` error-correction form, the Pesaran/Shin/Smith bounds test for a long-run relationship, and the postestimation gotcha where `ardl`'s own results don't carry the full `regress` postestimation menu. |
+| [`timeseries-regression`](references/recipes/timeseries-regression.md) | Single-equation regression on one time series: lag structure, Newey-West/HAC standard errors, autocorrelation/heteroskedasticity diagnostics, and avoiding spurious regression between non-stationary series. |
+| [`panel-regression`](references/recipes/panel-regression.md) | Fixed-effects vs. random-effects panel regression, the Hausman test to choose between them, and clustering standard errors by panel. |
+| [`dickey-fuller-test`](references/recipes/dickey-fuller-test.md) | Running `dfuller` correctly: trend/drift specification, lag-length choice, and testing the level vs. the first difference to determine order of integration. |
+| [`unit-root-test`](references/recipes/unit-root-test.md) | Choosing among ADF/Phillips-Perron/DF-GLS/KPSS and reading them together — the decision layer above any single test's mechanics. |
+| [`im-pesaran-shin-test`](references/recipes/im-pesaran-shin-test.md) | Panel unit-root testing with `xtunitroot ips`: its heterogeneous alternative vs. Levin-Lin-Chu, and cross-sectional-dependence caveats. |
 
 If the user's task doesn't match an existing recipe, write the code
 directly from Stata/econometric first principles and the guidance above —

@@ -89,4 +89,4 @@ npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
 
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
-| [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ships with ARDL). |
+| [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ARDL, time-series and panel regression, Dickey-Fuller/unit-root/Im-Pesaran-Shin tests). |

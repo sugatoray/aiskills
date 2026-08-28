@@ -3,6 +3,27 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-08-28
+
+### Added
+
+- Five new recipes in `references/recipes/`:
+  `timeseries-regression.md` (single-equation regression on one time
+  series: lag structure, Newey-West/HAC standard errors, autocorrelation
+  diagnostics, avoiding spurious regression), `panel-regression.md`
+  (fixed-effects vs. random-effects, the Hausman test, clustered
+  standard errors), `dickey-fuller-test.md` (`dfuller` mechanics:
+  trend/drift specification, lag-length choice, level vs. first
+  difference), `unit-root-test.md` (the decision layer above any single
+  test — choosing among ADF/Phillips-Perron/DF-GLS/KPSS and reading
+  conflicting results), and `im-pesaran-shin-test.md` (panel unit-root
+  testing via `xtunitroot ips`, its heterogeneous alternative vs.
+  Levin-Lin-Chu, cross-sectional-dependence caveats). Each cross-
+  references the others and the existing `ardl.md`/good-bad-examples
+  content where the workflows chain together (e.g. unit-root testing
+  before a time-series or panel regression).
+- New recipes added to the table in `SKILL.md` and to `README.md`.
+
 ## [1.0.0] - 2026-08-21
 
 ### Added

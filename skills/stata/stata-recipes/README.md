@@ -24,11 +24,22 @@ file is a human-facing pointer, not read at invocation time.
   from Python, and driving Stata from a Python script (`pystata`/
   `stata_setup` for in-process work, batch mode for pipelines/CI).
 - [`references/recipes/`](references/recipes/) — named, reusable
-  workflows for specific model classes. Ships with
-  [`ardl.md`](references/recipes/ardl.md) (Autoregressive Distributed Lag
-  modeling: lag selection, bounds test, long-run/short-run form,
-  diagnostics). [`recipes/README.md`](references/recipes/README.md) is
-  the template for adding more.
+  workflows for specific model classes:
+  [`ardl.md`](references/recipes/ardl.md) (lag selection, bounds test,
+  long-run/short-run form, diagnostics),
+  [`timeseries-regression.md`](references/recipes/timeseries-regression.md)
+  (single-series regression, Newey-West SEs, spurious-regression
+  avoidance),
+  [`panel-regression.md`](references/recipes/panel-regression.md)
+  (fixed vs. random effects, Hausman test, clustered SEs),
+  [`dickey-fuller-test.md`](references/recipes/dickey-fuller-test.md)
+  (`dfuller` mechanics: specification and lag choice),
+  [`unit-root-test.md`](references/recipes/unit-root-test.md) (choosing
+  among ADF/PP/DF-GLS/KPSS and reading them together), and
+  [`im-pesaran-shin-test.md`](references/recipes/im-pesaran-shin-test.md)
+  (panel unit-root testing via `xtunitroot ips`).
+  [`recipes/README.md`](references/recipes/README.md) is the template
+  for adding more.
 
 ## Adding a recipe
 

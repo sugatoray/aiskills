@@ -9,7 +9,7 @@ but silently produce a wrong answer.
 
 | Skill | Purpose |
 | --- | --- |
-| [`stata-recipes`](stata-recipes/) | Turns a plain-language requirement into a runnable `.do` file or command sequence. Covers good-vs-bad Stata patterns, all three directions of Stata↔Python interop, and a growing library of named recipes for specific model classes (ships with ARDL). |
+| [`stata-recipes`](stata-recipes/) | Turns a plain-language requirement into a runnable `.do` file or command sequence. Covers good-vs-bad Stata patterns, all three directions of Stata↔Python interop, and a growing library of named recipes for specific model classes (ARDL, time-series and panel regression, Dickey-Fuller/unit-root/Im-Pesaran-Shin tests). |
 
 More skills will be added under this folder over time (e.g. panel-data
 workflows, data cleaning/wrangling patterns, output/reporting) following
