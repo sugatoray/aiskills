@@ -3,6 +3,17 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.1] - 2026-08-28
+
+### Added
+
+- `meta/MAINTAINERS.md`: development notes (layout, versioning, where
+  to add a new recipe) for this skill, matching the pattern the
+  `scrolls-*` skills use. Pointed to from a new "Development" section
+  in `SKILL.md` (explicitly not read while answering a live request)
+  and from `README.md`; `../README.md` (the `skills/stata/` group
+  README) layout list updated to mention it too.
+
 ## [1.2.0] - 2026-08-28
 
 ### Changed

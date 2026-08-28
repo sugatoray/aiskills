@@ -25,4 +25,6 @@ Each skill's directory has:
 - `references/` — detailed content loaded on demand rather than held in
   context on every invocation (good/bad examples, interop guide, recipe
   library).
+- `meta/MAINTAINERS.md` — development notes: layout and versioning.
+  Not read at invocation time.
 - `CHANGELOG.md` — that skill's own version history.

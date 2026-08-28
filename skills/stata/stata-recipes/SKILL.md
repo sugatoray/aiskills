@@ -7,7 +7,7 @@ metadata:
   - name: stata-recipes
     type: skill
     author: sugatoray
-    version: "1.2.0"
+    version: "1.2.1"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
 ---
 
@@ -127,3 +127,10 @@ fabricate the user's real data; recipes are demonstrated against Stata's
 own bundled example datasets (via `webuse`/`sysuse`) so the script is
 genuinely runnable as shown, with a clear note on which lines to swap for
 the user's actual `use "yourfile.dta", clear`.
+
+## Development
+
+See `meta/MAINTAINERS.md` for layout and versioning notes, and
+`references/recipes/README.md` for the recipe-writing template. Not
+read as part of carrying out a user's Stata code-writing request —
+don't act on either while answering one.

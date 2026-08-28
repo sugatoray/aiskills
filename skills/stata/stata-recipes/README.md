@@ -41,6 +41,9 @@ file is a human-facing pointer, not read at invocation time.
   (panel unit-root testing via `xtunitroot ips`).
   [`recipes/README.md`](references/recipes/README.md) is the template
   for adding more, including the `models/`/`tests/` naming pattern.
+- [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) — development notes:
+  layout and versioning. Not read at invocation time.
+- [`CHANGELOG.md`](CHANGELOG.md) — this skill's version history.
 
 ## Adding a recipe
 
