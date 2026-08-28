@@ -56,14 +56,26 @@ plugin manifest. Load it locally with:
 claude --plugin-dir skills/stata/stata-recipes
 ```
 
-`agents/claude-code.yaml` carries per-agent-harness interface metadata
-for the `npx skills add --agent <name>` install path (same shape as the
-`scrolls-*` skills' `agents/openai.yaml`) — it's unrelated to and
-doesn't conflict with the plugin's own `agents/` directory convention;
-see `meta/MAINTAINERS.md` for why. There's no marketplace listing yet,
-so `/plugin install` from a remote marketplace isn't available — only
-local `--plugin-dir` loading (above) and the `npx skills add` install
-path documented in the [group README](../README.md).
+`agents/claude-code.yaml` and `agents/openai.yaml` carry per-agent-
+harness interface metadata for the `npx skills add --agent <name>`
+install path (same shape as the `scrolls-*` skills' own
+`agents/openai.yaml` files) — unrelated to, and not in conflict with, the
+plugin's own `agents/` directory convention; see `meta/MAINTAINERS.md`
+for why.
+
+This skill is also installable via the repo's marketplace, as part of
+the `stata-skills` plugin (every `stata-*` skill, currently just this
+one):
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install stata-skills@sugatoray
+```
+
+See [`../meta/MAINTAINERS.md`](../meta/MAINTAINERS.md) for how that
+family-level manifest (`skills/stata/.claude-plugin/plugin.json`) relates
+to this skill's own `.claude-plugin/plugin.json` above, and the
+[group README](../README.md) for the `npx skills add` install path.
 
 ## Adding a recipe
 

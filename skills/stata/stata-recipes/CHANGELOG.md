@@ -3,6 +3,28 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.1] - 2026-08-28
+
+### Added
+
+- `agents/openai.yaml`: per-agent-harness interface metadata matching
+  the `scrolls-*` skills' own `agents/openai.yaml` files, alongside the
+  existing `agents/claude-code.yaml`.
+- This skill is now also part of the `stata-skills` family plugin
+  (`skills/stata/.claude-plugin/plugin.json`), installable via
+  `/plugin install stata-skills@sugatoray` after `/plugin marketplace
+  add sugatoray/aiskills`, in addition to this skill's own standalone
+  plugin manifest. See `skills/stata/meta/MAINTAINERS.md` (new) for the
+  family-level manifest and `meta/MAINTAINERS.md`'s updated "Claude Code
+  plugin packaging" section for how the two relate.
+
+### Fixed
+
+- `.claude-plugin/plugin.json`'s `author.name` corrected from
+  `sugatoray` to `Sugato Ray`, matching the convention
+  `skills/scrolls/.claude-plugin/plugin.json` and the root
+  `marketplace.json` both use.
+
 ## [1.3.0] - 2026-08-28
 
 ### Added

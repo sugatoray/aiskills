@@ -22,6 +22,21 @@
         "productivity",
         "scrolls"
       ]
+    },
+    {
+      "name": "stata-skills",
+      "source": "./stata",
+      "description": "Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-bad command guidance, Python↔Stata interop, and a growing recipe library (ARDL, time-series and panel regression, unit-root tests).",
+      "category": "data-science",
+      "keywords": [
+        "stata",
+        "econometrics",
+        "statistics",
+        "time-series",
+        "panel-data",
+        "regression",
+        "python"
+      ]
     }
   ]
 }

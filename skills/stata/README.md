@@ -15,6 +15,17 @@ More skills will be added under this folder over time (e.g. panel-data
 workflows, data cleaning/wrangling patterns, output/reporting) following
 the same layout as `stata-recipes/`.
 
+## This folder
+
+- `.claude-plugin/plugin.json` — the family-level Claude Code plugin
+  manifest, grouping every skill in this folder into one `stata-skills`
+  plugin listed in the repo-root `.claude-plugin/marketplace.json`. See
+  [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) for its design and
+  keep-in-sync rules — the same layout `skills/scrolls/` uses for its own
+  group manifest.
+- `meta/MAINTAINERS.md` — family-wide maintainer notes. Not read at
+  invocation time.
+
 ## Layout
 
 Each skill's directory has:
