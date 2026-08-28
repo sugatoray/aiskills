@@ -1,4 +1,4 @@
-# Repo actions
+# Repo-related skills
 
 Skills that act on a repository's own hosted state — issues, pull
 requests, releases, and similar — rather than on its code. Currently:

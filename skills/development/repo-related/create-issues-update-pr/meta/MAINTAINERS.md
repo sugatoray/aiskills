@@ -22,14 +22,18 @@ for what that packaging looks like if this skill grows to need it.
 
 ## Why this path
 
-`skills/development/repo-actions/create-issues-update-pr/` is one level
+`skills/development/repo-related/create-issues-update-pr/` is one level
 deeper than the flat `skills/<group>/<skill-name>/` layout
 `skills/scrolls/` and `skills/stata/` use. `skills/development/` is
 meant to hold developer-workflow skills broadly (not just GitHub ones),
-with `repo-actions/` as a subgroup for anything that acts on a
+with `repo-related/` as a subgroup for anything that acts on a
 repository's own hosted state (issues, PRs, releases, and the like —
 not just issues and PRs specifically, which is why the folder isn't
-named `issues-pull-requests/`) — a second skill in that subgroup (say, a
+named `issues-pull-requests/`). It also isn't named `repo-actions/` (an
+earlier choice) — "actions" already means something specific and
+different in a GitHub context (GitHub Actions, the CI/CD product), and a
+subgroup meant to be generic shouldn't borrow a name that reads as
+"workflow automation" instead. A second skill in this subgroup (say, a
 PR-review, release-notes, or issue-triage skill) slots in as a sibling
 directory here without needing a new top-level group. Don't flatten this
 back to `skills/development/create-issues-update-pr/` to match the other
@@ -47,7 +51,7 @@ bump.
 
 This is currently the only skill under `skills/development/`, so its
 version moves independently — no family-wide lockstep. If
-`repo-actions/` or `skills/development/` grows a second skill,
+`repo-related/` or `skills/development/` grows a second skill,
 decide then whether shared versioning or a family-level
 `meta/MAINTAINERS.md` (see `skills/stata/meta/MAINTAINERS.md` for what
 that looks like at the group level) makes sense — don't assume it does
