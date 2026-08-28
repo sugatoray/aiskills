@@ -54,6 +54,23 @@ use skill: /scrolls-update
 
 > 💡 For more information, refer to the [**Scrolls README.md**](skills/scrolls/README.md).
 
+## 🛠️ Development
+
+Skills for software-development workflows that aren't specific to any
+one language or project — currently: filing GitHub issues for a PR's
+work and keeping the PR's title/description in sync with them.
+
+**Installation**:
+
+Choose the skill by name: `create-issues-update-pr` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+> 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -68,3 +85,7 @@ use skill: /scrolls-update
 | [Scrolls](skills/scrolls/README.md) | `scrolls-help`   | Show help doc for the scrolls system. | [![badge-scrolls][#skills-sh-badge-scrolls-help]](https://www.skills.sh/sugatoray/aiskills/scrolls-help) |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-hide`   | Hide the folder: `docs/scrolls` --> `docs/.scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-hide]](https://www.skills.sh/sugatoray/aiskills/scrolls-hide) |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | Unhide the folder: `docs/.scrolls` --> `docs/scrolls`. | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) |
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Development](skills/development/README.md) | `create-issues-update-pr` | Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list. |
