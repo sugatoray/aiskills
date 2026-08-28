@@ -1,0 +1,5 @@
+interface:
+  display_name: "Stata-Recipes"
+  short_description: "Turns a plain-language Stata task into runnable .do code, with recipes and Python interop guidance."
+policy:
+  allow_implicit_invocation: true

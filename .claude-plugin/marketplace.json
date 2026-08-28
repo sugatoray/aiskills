@@ -24,6 +24,21 @@
       ]
     },
     {
+      "name": "stata-skills",
+      "source": "./stata",
+      "description": "Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-bad command guidance, Python↔Stata interop, and a growing recipe library (ARDL, time-series and panel regression, unit-root tests).",
+      "category": "data-science",
+      "keywords": [
+        "stata",
+        "econometrics",
+        "statistics",
+        "time-series",
+        "panel-data",
+        "regression",
+        "python"
+      ]
+    },
+    {
       "name": "repo-related-skills",
       "source": "./development/repo-related",
       "description": "Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and similar). Files GitHub issue(s) for a PR's work and keeps the PR's title/description in sync with them.",
