@@ -4,15 +4,15 @@
 
 The user has panel data (multiple units observed over time) and wants to
 test whether a variable has a unit root *across the panel* — the panel
-counterpart to `dickey-fuller-test.md`/`unit-root-test.md`, and a natural
-step before `panel-regression.md` when the variables involved might be
+counterpart to `test-dickey-fuller.md`/`test-unit-root.md`, and a natural
+step before `../models/regression-panel.md` when the variables involved might be
 non-stationary. Typical asks: "panel unit root test", "Im-Pesaran-Shin
 test in Stata", "is this panel variable stationary", "test for unit
 roots before my panel regression".
 
 **Not this when:**
 - There's only one series, no panel dimension — use
-  `dickey-fuller-test.md`/`unit-root-test.md` instead; those are what IPS
+  `test-dickey-fuller.md`/`test-unit-root.md` instead; those are what IPS
   is generalizing.
 - The economic assumption is that *every* panel unit shares the same
   autoregressive root under the alternative (a strong homogeneity
@@ -40,7 +40,7 @@ it's not the right tool for a panel with only 2-3 periods per unit.
 
 ## Worked script
 
-Uses `webuse nlswork` — the same dataset as `panel-regression.md`, so the
+Uses `webuse nlswork` — the same dataset as `../models/regression-panel.md`, so the
 two recipes chain naturally (test for a unit root first, then decide
 whether the panel regression on that variable needs differencing or an
 error-correction-style specification).

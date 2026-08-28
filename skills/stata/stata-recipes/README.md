@@ -24,26 +24,28 @@ file is a human-facing pointer, not read at invocation time.
   from Python, and driving Stata from a Python script (`pystata`/
   `stata_setup` for in-process work, batch mode for pipelines/CI).
 - [`references/recipes/`](references/recipes/) — named, reusable
-  workflows for specific model classes:
-  [`ardl.md`](references/recipes/ardl.md) (lag selection, bounds test,
-  long-run/short-run form, diagnostics),
-  [`timeseries-regression.md`](references/recipes/timeseries-regression.md)
+  workflows, split into `models/` (a model class to estimate) and
+  `tests/` (a diagnostic/statistical test):
+  [`models/ardl.md`](references/recipes/models/ardl.md) (lag selection,
+  bounds test, long-run/short-run form, diagnostics),
+  [`models/regression-timeseries.md`](references/recipes/models/regression-timeseries.md)
   (single-series regression, Newey-West SEs, spurious-regression
   avoidance),
-  [`panel-regression.md`](references/recipes/panel-regression.md)
+  [`models/regression-panel.md`](references/recipes/models/regression-panel.md)
   (fixed vs. random effects, Hausman test, clustered SEs),
-  [`dickey-fuller-test.md`](references/recipes/dickey-fuller-test.md)
+  [`tests/test-dickey-fuller.md`](references/recipes/tests/test-dickey-fuller.md)
   (`dfuller` mechanics: specification and lag choice),
-  [`unit-root-test.md`](references/recipes/unit-root-test.md) (choosing
-  among ADF/PP/DF-GLS/KPSS and reading them together), and
-  [`im-pesaran-shin-test.md`](references/recipes/im-pesaran-shin-test.md)
+  [`tests/test-unit-root.md`](references/recipes/tests/test-unit-root.md)
+  (choosing among ADF/PP/DF-GLS/KPSS and reading them together), and
+  [`tests/test-im-pesaran-shin.md`](references/recipes/tests/test-im-pesaran-shin.md)
   (panel unit-root testing via `xtunitroot ips`).
   [`recipes/README.md`](references/recipes/README.md) is the template
-  for adding more.
+  for adding more, including the `models/`/`tests/` naming pattern.
 
 ## Adding a recipe
 
 New recipes are meant to be dropped in over time without editing
-`SKILL.md`'s workflow section — just a new file in `references/recipes/`
-following the template in `references/recipes/README.md`, plus one row
-added to the recipe table in `SKILL.md`.
+`SKILL.md`'s workflow section — just a new file in
+`references/recipes/models/` or `references/recipes/tests/` (see
+`references/recipes/README.md` for which one and the naming pattern),
+plus one row added to the recipe table in `SKILL.md`.

@@ -3,9 +3,32 @@
 A recipe is a self-contained file for one named, recurring workflow (a
 model class, a data-prep pattern, a whole class of analysis) — detailed
 enough that following it produces a genuinely runnable script, not just a
-description of what the commands roughly do. `ardl.md` is the first one
-and follows this structure; use it as the concrete example alongside the
-outline below when writing a new one.
+description of what the commands roughly do. `models/ardl.md` is the
+first one and follows this structure; use it as the concrete example
+alongside the outline below when writing a new one.
+
+## Where a recipe file goes
+
+Recipes live in one of two subfolders, chosen by what the recipe
+actually is:
+
+- **`models/`** — a model class you estimate: a specific regression
+  method, `webuse`-based example, and interpretation of its output.
+  Filename pattern: `<topic>.md` for a named method with no natural
+  cross-sectional-vs-time-series axis (`ardl.md`), or
+  `regression-<data-shape>.md` when the same underlying idea (a
+  regression) needs a different recipe per data shape
+  (`regression-timeseries.md`, `regression-panel.md`).
+- **`tests/`** — a diagnostic or statistical test that answers a
+  yes/no or which-of-these-tests question rather than fitting a model
+  people build things on top of (a unit-root test, a specification
+  test). Filename pattern: `test-<name>.md` (`test-dickey-fuller.md`,
+  `test-unit-root.md`, `test-im-pesaran-shin.md`).
+
+If a new recipe doesn't obviously fit either bucket, use your judgment
+and say so in the recipe's own opening paragraph rather than forcing a
+folder — the split exists to make browsing easier, not to be a rigid
+taxonomy.
 
 ## Sections every recipe should have
 
@@ -30,7 +53,7 @@ outline below when writing a new one.
 4. **Diagnostics specific to this method** — not a generic "check your
    residuals" but the actual postestimation commands that apply *after
    this specific estimator*, including any gotcha about what does and
-   doesn't work directly (see `ardl.md`'s `regstore()`/`estimates
+   doesn't work directly (see `models/ardl.md`'s `regstore()`/`estimates
    restore` note for the kind of thing worth flagging).
 
 5. **Common mistakes** — the recipe-specific version of
@@ -51,3 +74,7 @@ outline below when writing a new one.
 - Add the new file to the recipe table in `../../SKILL.md` (one row) —
   that's the only place outside `references/recipes/` that needs
   touching; nothing else in the skill references recipes by name.
+- Cross-reference sibling recipes by filename only within the same
+  subfolder (e.g. `regression-panel.md` from another file inside
+  `models/`), and with a `../models/`/`../tests/` prefix when pointing
+  across the two subfolders — see the existing recipes for the pattern.

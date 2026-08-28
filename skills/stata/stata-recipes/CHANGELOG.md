@@ -3,6 +3,23 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-08-28
+
+### Changed
+
+- Restructured `references/recipes/` into `models/` (a model class to
+  estimate) and `tests/` (a diagnostic/statistical test) subfolders, and
+  renamed files to match: `ardl.md` → `models/ardl.md`,
+  `timeseries-regression.md` → `models/regression-timeseries.md`,
+  `panel-regression.md` → `models/regression-panel.md`,
+  `dickey-fuller-test.md` → `tests/test-dickey-fuller.md`,
+  `unit-root-test.md` → `tests/test-unit-root.md`, and (to match the new
+  `test-` naming pattern) `im-pesaran-shin-test.md` →
+  `tests/test-im-pesaran-shin.md`. `references/recipes/README.md` now
+  documents the `models/`/`tests/` split and naming convention; all
+  cross-recipe references, `SKILL.md`'s two recipe tables, and this
+  skill's `README.md` updated to match.
+
 ## [1.1.0] - 2026-08-28
 
 ### Added

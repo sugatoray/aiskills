@@ -10,12 +10,12 @@ unit root test".
 
 **Not this when:**
 - The question is really "which unit root test should I even use" —
-  that's `unit-root-test.md`, the decision layer above this one (ADF vs.
+  that's `test-unit-root.md`, the decision layer above this one (ADF vs.
   Phillips-Perron vs. DF-GLS vs. KPSS, and what to do about conflicting
   results). This recipe assumes ADF/`dfuller` has already been chosen and
   focuses on using it correctly.
 - The variable is a panel variable (multiple units, not one series) —
-  that's `im-pesaran-shin-test.md`. `dfuller` tests one series at a time;
+  that's `test-im-pesaran-shin.md`. `dfuller` tests one series at a time;
   running it separately on every panel unit and eyeballing the results is
   a common but weaker substitute for a proper panel unit-root test.
 
@@ -24,7 +24,7 @@ unit root test".
 One time series, `tsset`. `dfuller` needs a genuine time ordering to
 compute the differenced/lagged terms its test regression is built from —
 same requirement as any other `l.`/`d.` usage (see
-`../good-bad-examples.md` #2).
+`../../good-bad-examples.md` #2).
 
 ## Worked script
 
@@ -77,7 +77,7 @@ dfuller d_invest, trend lags(4) regress
 * reject, the series is I(1). If even the first difference fails to
 * reject, stop and reconsider — a series requiring a second difference
 * to become stationary is I(2), which breaks the assumptions behind
-* ardl.md's bounds test and most standard cointegration approaches.
+* models/ardl.md's bounds test and most standard cointegration approaches.
 ```
 
 **To point this at real data instead of the demo dataset:** replace
@@ -103,7 +103,7 @@ the actual series looks like, not on this recipe's example.
   root at the level" doesn't distinguish I(1) from I(2) — you don't know
   which until you also test the difference (step 4). Stopping early
   here is exactly the kind of assumption that quietly breaks an ARDL
-  model downstream (see `ardl.md`'s "Not this when" note on I(2)).
+  model downstream (see `../models/ardl.md`'s "Not this when" note on I(2)).
 - **Reading `dfuller`'s reported statistic against ordinary t-distribution
   critical values instead of the Dickey-Fuller critical values it
   prints.** The whole reason this is a dedicated test rather than "check

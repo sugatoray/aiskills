@@ -34,7 +34,7 @@ already in place — ARDL as covered here is not the panel-ARDL variant.
 Before touching `ardl` itself:
 
 1. The data must be `tsset` on a proper time variable (see
-   `../good-bad-examples.md` #2 for why this matters generally — for ARDL
+   `../../good-bad-examples.md` #2 for why this matters generally — for ARDL
    specifically, `ardl` will refuse to run at all without it).
 2. Check the order of integration of every variable going in
    (`dfuller`, ideally with a trend/lag specification matched to the

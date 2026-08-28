@@ -11,10 +11,10 @@ them together, not the detailed mechanics of any single one.
 
 **Not this when:**
 - The test to run has already been decided as the (Augmented) Dickey-
-  Fuller test specifically — go straight to `dickey-fuller-test.md` for
+  Fuller test specifically — go straight to `test-dickey-fuller.md` for
   the lag-selection and specification details.
 - The variable is a panel variable (multiple units) rather than one
-  series — go to `im-pesaran-shin-test.md` instead; the tests below are
+  series — go to `test-im-pesaran-shin.md` instead; the tests below are
   all single-series tests.
 
 ## The core idea: tests disagree about which hypothesis is the null
@@ -58,7 +58,7 @@ tsset time
 tsline invest
 * invest visibly trends, so every test below is specified with a trend.
 
-* --- ADF: see dickey-fuller-test.md for full detail on this step ---
+* --- ADF: see test-dickey-fuller.md for full detail on this step ---
 dfuller invest, trend lags(4) regress
 
 * --- Phillips-Perron: same null as ADF, non-parametric correction for ---

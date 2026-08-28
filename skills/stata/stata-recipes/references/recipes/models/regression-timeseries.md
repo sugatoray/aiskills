@@ -14,9 +14,10 @@ look autocorrelated, how do I fix the standard errors".
   equilibrium relationship between series that may differ in order of
   integration — that's `ardl.md`, not a plain regression.
 - There are multiple panel units (firms, countries, individuals) observed
-  over time, not one series — that's `panel-regression.md`.
+  over time, not one series — that's `regression-panel.md`.
 - Any series involved might be non-stationary and you haven't checked —
-  read `unit-root-test.md` / `dickey-fuller-test.md` *first*. Regressing
+  read `../tests/test-unit-root.md` / `../tests/test-dickey-fuller.md`
+  *first*. Regressing
   one I(1) series on another unrelated I(1) series produces the classic
   "spurious regression" result: a high R² and significant coefficient
   with no real relationship behind it (Granger & Newbold, 1974). This is
@@ -81,7 +82,7 @@ estat archlm, lags(1/4)
 **To point this at real data instead of the demo dataset:** replace the
 `webuse investment2, clear` line with `use "yourfile.dta", clear`, swap
 `invest`/`gnp` for the real variable names, and re-run step 1's
-stationarity check (via `dickey-fuller-test.md`/`unit-root-test.md`) on
+stationarity check (via `../tests/test-dickey-fuller.md`/`../tests/test-unit-root.md`) on
 the real series — this recipe assumes that check already happened, it
 doesn't perform it.
 
@@ -108,5 +109,5 @@ doesn't perform it.
   add `i.quarter`/`i.month` (built from the time variable) rather than
   leaving seasonality in the residuals.
 - **Forgetting `tsset` before any `l.`/`f.`/`d.` operator** — see
-  `../good-bad-examples.md` #2 for what silently goes wrong instead of
+  `../../good-bad-examples.md` #2 for what silently goes wrong instead of
   erroring.

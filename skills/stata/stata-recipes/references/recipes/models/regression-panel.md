@@ -11,9 +11,9 @@ firm/country effects", "should I use fixed or random effects".
 
 **Not this when:**
 - There's only one unit observed over time (no panel dimension at all) —
-  that's `timeseries-regression.md`.
+  that's `regression-timeseries.md`.
 - The question is specifically about whether a panel *variable* has a
-  unit root — that's `im-pesaran-shin-test.md`, a diagnostic check that
+  unit root — that's `../tests/test-im-pesaran-shin.md`, a diagnostic check that
   might precede a panel regression on non-stationary series, not a
   substitute for one.
 - The panels are so short (T = 2 or 3) that within-unit dynamics aren't
