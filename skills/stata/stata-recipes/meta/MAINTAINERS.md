@@ -25,15 +25,52 @@ Stata code-writing request (that's `../SKILL.md`).
     sections) and the naming convention for which subfolder a new
     recipe goes in. Read this, not this file, before writing a new
     recipe.
+- `../.claude-plugin/plugin.json` — the Claude Code plugin manifest
+  (name, version, description, author, license, keywords). Not read
+  during a normal skill invocation; only Claude Code's plugin loader
+  reads it, when this directory is loaded as a plugin (see "Claude Code
+  plugin packaging" below).
+- `../agents/claude-code.yaml` — per-agent-harness interface metadata
+  (`display_name`, `short_description`, `allow_implicit_invocation`),
+  same shape and purpose as the `scrolls-*` skills' `agents/openai.yaml`
+  files, for the multi-agent `npx skills add --agent <name>` packaging.
+  Claude Code's own plugin loader only reads `.md` files from `agents/`
+  as custom-agent definitions, so this `.yaml` file is silently ignored
+  by it — no conflict between the two uses of this directory name. Add
+  `agents/openai.yaml` alongside it later if this skill needs the same
+  OpenAI-target customization the `scrolls-*` skills have; nothing here
+  depends on that happening.
 
 Unlike the `scrolls-*` skills, this one has no bundled `.sh`/`.ps1`
-script, no `agents/openai.yaml`, and no `tests/` directory — it's pure
-markdown guidance and code-generation instructions with nothing
-executable of its own to regression-test. Recipes are demonstrated
-against Stata's own `webuse`/`sysuse` datasets so they're genuinely
-runnable *as Stata code*, but nothing in this skill's own toolchain
-executes them — see `../SKILL.md`'s "What this skill doesn't do"
-section for that caveat as it applies to a live request.
+script and no `tests/` directory — it's pure markdown guidance and
+code-generation instructions with nothing executable of its own to
+regression-test. Recipes are demonstrated against Stata's own
+`webuse`/`sysuse` datasets so they're genuinely runnable *as Stata
+code*, but nothing in this skill's own toolchain executes them — see
+`../SKILL.md`'s "What this skill doesn't do" section for that caveat as
+it applies to a live request.
+
+## Claude Code plugin packaging
+
+`../SKILL.md` already sits directly at this skill's root with no
+`skills/` subfolder — that's Claude Code's "single-skill plugin" layout
+already, so adding `../.claude-plugin/plugin.json` was enough to make
+this directory a self-contained, loadable Claude Code plugin with no
+restructuring. Test it locally with:
+
+```
+claude --plugin-dir skills/stata/stata-recipes
+```
+
+**What this does *not* yet include**: a `.claude-plugin/marketplace.json`
+that would let someone `/plugin install stata-recipes@<marketplace>` it
+without a local checkout. A marketplace is a repo-level (not per-skill)
+concept, and `skills/stata/` isn't the only skill family in this
+repository (see `skills/scrolls/`) — deciding whether `aiskills` becomes
+a marketplace, and what that means for the skills already distributed
+via `npx skills add`, is a bigger call than this one skill's packaging
+and hasn't been made. If that's wanted, raise it as its own task rather
+than assuming this plugin manifest implies it.
 
 ## Versioning
 
@@ -43,6 +80,16 @@ Stata-code-writing request would actually see changes: a new or
 reworded workflow step, a new/changed footgun in
 `good-bad-examples.md`, a new/changed interop pattern, or a new/edited
 recipe. Pure typo fixes or formatting-only edits don't need a bump.
+Structural additions to the skill itself (a new reference file, this
+`meta/MAINTAINERS.md`, the plugin manifest) have also gotten their own
+bump in practice, even though they're not something a live request
+would see — treat that as the actual working norm here, not just the
+letter of the rule above.
+
+Keep `../.claude-plugin/plugin.json`'s `version` field equal to
+`SKILL.md`'s `metadata.version` — bump both in the same commit. They're
+two manifests for the same release, and a mismatch is exactly the kind
+of inconsistency worth catching before it ships.
 
 This is currently the only skill under `skills/stata/`, so its version
 moves independently — there's no family-wide lockstep the way the five

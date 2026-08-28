@@ -1,0 +1,24 @@
+{
+  "name": "stata-recipes",
+  "displayName": "Stata Recipes",
+  "version": "1.3.0",
+  "description": "Turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-bad command guidance, Python↔Stata interop, and a growing recipe library (ARDL, time-series and panel regression, unit-root tests).",
+  "author": {
+    "name": "sugatoray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "stata",
+    "econometrics",
+    "statistics",
+    "time-series",
+    "panel-data",
+    "regression",
+    "ardl",
+    "unit-root",
+    "python"
+  ]
+}

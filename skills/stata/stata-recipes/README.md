@@ -45,6 +45,26 @@ file is a human-facing pointer, not read at invocation time.
   layout and versioning. Not read at invocation time.
 - [`CHANGELOG.md`](CHANGELOG.md) — this skill's version history.
 
+## Installing as a Claude Code plugin
+
+This directory is a self-contained Claude Code plugin: `SKILL.md` sits
+at the plugin root with no `skills/` subfolder needed, and
+[`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) carries the
+plugin manifest. Load it locally with:
+
+```
+claude --plugin-dir skills/stata/stata-recipes
+```
+
+`agents/claude-code.yaml` carries per-agent-harness interface metadata
+for the `npx skills add --agent <name>` install path (same shape as the
+`scrolls-*` skills' `agents/openai.yaml`) — it's unrelated to and
+doesn't conflict with the plugin's own `agents/` directory convention;
+see `meta/MAINTAINERS.md` for why. There's no marketplace listing yet,
+so `/plugin install` from a remote marketplace isn't available — only
+local `--plugin-dir` loading (above) and the `npx skills add` install
+path documented in the [group README](../README.md).
+
 ## Adding a recipe
 
 New recipes are meant to be dropped in over time without editing

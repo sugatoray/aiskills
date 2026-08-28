@@ -3,6 +3,27 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-08-28
+
+### Added
+
+- `.claude-plugin/plugin.json`: a Claude Code plugin manifest, making
+  this directory a self-contained, loadable plugin (`claude
+  --plugin-dir skills/stata/stata-recipes`) with no restructuring —
+  `SKILL.md` already sat at the plugin root with no `skills/`
+  subfolder, which is Claude Code's single-skill plugin layout.
+- `agents/claude-code.yaml`: per-agent-harness interface metadata
+  (`display_name`, `short_description`, `allow_implicit_invocation`)
+  for the `npx skills add --agent <name>` install path, matching the
+  `scrolls-*` skills' `agents/openai.yaml` pattern. Confirmed against
+  Claude Code's plugin docs that non-`.md` files in `agents/` are
+  silently ignored by the plugin loader, so this doesn't collide with
+  Claude Code's own custom-agent-definition use of that directory name.
+- No `.claude-plugin/marketplace.json` — that's a repo-level concept
+  (this repo also hosts the unrelated `scrolls-*` skill family) and a
+  bigger call than this one skill's packaging; not made here. See
+  `meta/MAINTAINERS.md`'s "Claude Code plugin packaging" section.
+
 ## [1.2.1] - 2026-08-28
 
 ### Added
