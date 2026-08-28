@@ -1,9 +1,9 @@
-# Issues & pull requests
+# Repo actions
 
-Skills for working with GitHub issues and pull requests — filing issues
-for work that's happened on a branch, keeping a PR's title and
-description in sync with what it actually tracks, and related
-developer-workflow tasks.
+Skills that act on a repository's own hosted state — issues, pull
+requests, releases, and similar — rather than on its code. Currently:
+filing issues for work that's happened on a branch, and keeping a PR's
+title and description in sync with what it actually tracks.
 
 ## Skills
 

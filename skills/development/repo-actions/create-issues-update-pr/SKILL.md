@@ -8,7 +8,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "1.0.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/issues-pull-requests/create-issues-update-pr"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-actions/create-issues-update-pr"
 ---
 
 # Create GitHub issues from a PR's work, and update the PR
