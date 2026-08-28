@@ -1,0 +1,22 @@
+{
+  "name": "repo-related-skills",
+  "version": "1.1.0",
+  "description": "Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and similar). Files GitHub issue(s) for a PR's work and keeps the PR's title/description in sync with them.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "issues",
+    "pull-requests",
+    "developer-workflow",
+    "repo-related"
+  ],
+  "skills": [
+    "./create-issues-update-pr"
+  ]
+}

@@ -22,6 +22,19 @@
         "productivity",
         "scrolls"
       ]
+    },
+    {
+      "name": "repo-related-skills",
+      "source": "./development/repo-related",
+      "description": "Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and similar). Files GitHub issue(s) for a PR's work and keeps the PR's title/description in sync with them.",
+      "category": "productivity",
+      "keywords": [
+        "github",
+        "issues",
+        "pull-requests",
+        "developer-workflow",
+        "repo-related"
+      ]
     }
   ]
 }

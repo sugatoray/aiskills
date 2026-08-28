@@ -69,6 +69,20 @@ npx skills add sugatoray/aiskills               # project-level
 npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
 ```
 
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install repo-related-skills@sugatoray
+```
+
+</details>
+
 > 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
 
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green

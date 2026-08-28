@@ -21,6 +21,37 @@ file is a human-facing pointer, not read at invocation time.
   layout and versioning. Not read at invocation time.
 - [`CHANGELOG.md`](CHANGELOG.md) — this skill's version history.
 
+## Installing as a Claude Code plugin
+
+This directory is a self-contained Claude Code plugin: `SKILL.md` sits
+at the plugin root with no `skills/` subfolder needed, and
+[`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) carries the
+plugin manifest. Load it locally with:
+
+```
+claude --plugin-dir skills/development/repo-related/create-issues-update-pr
+```
+
+`agents/claude-code.yaml` and `agents/openai.yaml` carry per-agent-
+harness interface metadata for the `npx skills add --agent <name>`
+install path (same shape as the `scrolls-*` skills' own
+`agents/openai.yaml` files) — unrelated to, and not in conflict with, the
+plugin's own `agents/` directory convention; see `meta/MAINTAINERS.md`
+for why.
+
+This skill is also installable via the repo's marketplace, as part of
+the `repo-related-skills` plugin (every skill under
+`skills/development/repo-related/`, currently just this one):
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install repo-related-skills@sugatoray
+```
+
+See [`../meta/MAINTAINERS.md`](../meta/MAINTAINERS.md) for how that
+family-level manifest relates to this skill's own
+`.claude-plugin/plugin.json` above.
+
 ## Example
 
 Given a PR with six commits building one feature, this skill produced:

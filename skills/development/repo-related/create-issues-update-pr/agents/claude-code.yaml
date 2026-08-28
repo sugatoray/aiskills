@@ -1,0 +1,5 @@
+interface:
+  display_name: "Create-Issues-Update-PR"
+  short_description: "Files GitHub issue(s) for a PR's work and rewrites the PR's title and description to list them, nested by parent-child relationship."
+policy:
+  allow_implicit_invocation: true

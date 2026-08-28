@@ -1,0 +1,20 @@
+{
+  "name": "create-issues-update-pr",
+  "displayName": "Create Issues & Update PR",
+  "version": "1.1.0",
+  "description": "Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "issues",
+    "pull-requests",
+    "developer-workflow",
+    "repo-related"
+  ]
+}
