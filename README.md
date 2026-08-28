@@ -86,6 +86,37 @@ with every skill twice — pick one.
 
 > 💡 For more information, refer to the [**Stata README.md**](skills/stata/README.md).
 
+## 🛠️ Development
+
+Skills for software-development workflows that aren't specific to any
+one language or project — currently: filing GitHub issues for a PR's
+work and keeping the PR's title/description in sync with them.
+
+**Installation**:
+
+Choose the skill by name: `create-issues-update-pr` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install repo-related-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -104,3 +135,7 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ARDL, time-series and panel regression, Dickey-Fuller/unit-root/Im-Pesaran-Shin tests). |
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Development](skills/development/README.md) | `create-issues-update-pr` | Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list. |
