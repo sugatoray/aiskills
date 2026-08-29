@@ -117,6 +117,55 @@ and reads clearly in a directory listing — but the mechanism that
 actually makes it inert is simply "the file is no longer named
 `SKILL.md`," not the specific suffix used.
 
+## Codex plugin manifest (`.codex-plugin/plugin.json`)
+
+**Design choice**: mirrors the Claude Code plugin above — the manifest
+lives inside `skills/scrolls/`, not at the repo root, so this family
+never competes for a repo-root manifest with any future
+`skills/<newgroup>/` that adds its own `.codex-plugin/plugin.json` later.
+
+Codex's plugin schema (verified against `openai/codex`'s own
+`plugin-json-spec.md` and its bundled `validate_plugin.py`, both under
+`codex-rs/skills/src/assets/samples/plugin-creator/`) requires a
+`"skills"` field, when present, to resolve to exactly `skills` — a
+directory literally named `skills/` directly under the plugin root, not
+an arbitrary path. Since the five `scrolls-*` skill directories live as
+siblings of `.codex-plugin/` (matching the Claude Code layout, and never
+duplicated per "Where the installable artifacts live" below),
+`skills/scrolls/skills/` holds one symlink per skill
+(`scrolls-setup -> ../scrolls-setup`, etc.) rather than a real copy —
+zero content duplication, and each symlink resolves straight to that
+skill's real `SKILL.md`, scripts, and tests. Note for Windows
+maintainers: a `git clone` there needs `core.symlinks=true` (and
+Developer Mode/admin) for these five entries to check out as real
+symlinks rather than plain text files containing the link target — every
+other cross-platform concern in this family (the bundled scripts
+themselves) is unaffected, since only this `skills/` indirection uses
+symlinks at all.
+
+**Known caveat — `disable-model-invocation`**: `validate_plugin.py`
+rejects any skill whose frontmatter sets `disable-model-invocation` to
+anything other than `false`/absent. All five `scrolls-*` skills set it
+to `true` on purpose — explicit-`/scrolls-*`-command-only, matching each
+skill's own `agents/openai.yaml` (`policy.allow_implicit_invocation:
+false`) — so as of this writing this plugin will fail that validator,
+and possibly Codex's real plugin installer if it enforces the same rule
+(unconfirmed — `validate_plugin.py` is a bundled sample validator, not
+something run against this repo). This is a deliberate tradeoff, not an
+oversight: flipping the flag would let Codex (and Claude) trigger these
+skills without an explicit command, a real behavior change to the whole
+family, not something to change silently for one packaging format. Leave
+it as `true` unless a maintainer deliberately decides the family should
+allow implicit invocation everywhere — if that ever happens, update both
+this note and `../README.md`.
+
+**Keep it in sync — every time**, same as the Claude Code plugin's own
+rules above: version lockstep with `metadata.version`, add/remove a
+symlink in `skills/scrolls/skills/` in the same commit a skill is
+added/deprecated (mirroring the `"skills"` array update on the Claude
+side), and never let this manifest's `"version"` drift from the other
+one's.
+
 ## Installing for local testing
 
 See `src/scrolls/CLAUDE.md` for the tested `npx skills add
