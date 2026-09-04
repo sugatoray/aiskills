@@ -1,13 +1,13 @@
 ---
 name: create-issues-update-pr
-description: "Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine hierarchy — using GitHub's native parent/child issue relationship, not just labels — and then updates that pull request's title (kept short) and description so the description lists every issue in the exact format '- #{{issue-number}} -- {{issue-title}}', indented to match parent-child nesting. Use this whenever the user asks to file issue(s) for a PR, 'add gh issues for this', 'track this as issues', link a PR to tracking issues, or update a PR's title/description to list the issues covering its changes — including when they invoke /create-issues-update-pr directly. Also trigger when a PR description is stale or generic relative to its actual current commits and the user wants it brought up to date alongside issue creation."
+description: "Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine hierarchy — using GitHub's native parent/child issue relationship, not just labels — and then updates that pull request's title (kept short) and description so the description lists every issue in the exact format '- Closes #{{issue-number}} -- {{issue-title}}', indented to match parent-child nesting. Use this whenever the user asks to file issue(s) for a PR, 'add gh issues for this', 'track this as issues', link a PR to tracking issues, or update a PR's title/description to list the issues covering its changes — including when they invoke /create-issues-update-pr directly. Also trigger when a PR description is stale or generic relative to its actual current commits and the user wants it brought up to date alongside issue creation."
 license: MIT
 compatibility: "GitHub MCP server tools with write access to the target repository: issue_write, sub_issue_write, list_issue_types, search_issues/list_issues, pull_request_read, update_pull_request. Works against any GitHub repository the current session has push/write access to, not just this one."
 metadata:
   - name: create-issues-update-pr
     type: skill
     author: sugatoray
-    version: "1.1.0"
+    version: "1.2.0"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr"
 ---
 
@@ -97,8 +97,14 @@ useful if the PR actually points back at them.
      issue created, one per line, in exactly this format:
 
      ```
-     - #{{issue-number}} -- {{issue-title}}
+     - Closes #{{issue-number}} -- {{issue-title}}
      ```
+
+     The `Closes` keyword is deliberate, on every line including a
+     parent epic's — GitHub auto-closes any issue referenced this way
+     when the PR merges into the repo's default branch, so the list
+     doubles as the mechanism that closes the issues, not just a
+     description of them.
 
      Indent each level of child under its parent by two spaces — GitHub
      renders two-space-indented bullets as a nested list. A flat set of
@@ -130,10 +136,10 @@ With a parent epic:
 ```
 ## Issues
 
-- #50 -- Add Stata skill (stata-recipes)
-  - #51 -- Create the initial stata-recipes skill
-  - #52 -- Expand stata-recipes: time-series/panel regression, unit-root tests
-  - #53 -- Restructure stata-recipes recipes into models/ and tests/ subfolders
+- Closes #50 -- Add Stata skill (stata-recipes)
+  - Closes #51 -- Create the initial stata-recipes skill
+  - Closes #52 -- Expand stata-recipes: time-series/panel regression, unit-root tests
+  - Closes #53 -- Restructure stata-recipes recipes into models/ and tests/ subfolders
 ```
 
 Flat, no parent:
@@ -141,7 +147,7 @@ Flat, no parent:
 ```
 ## Issues
 
-- #61 -- Fix broken link in README
+- Closes #61 -- Fix broken link in README
 ```
 
 Two levels of nesting (a parent whose children each have their own
@@ -150,10 +156,10 @@ children) follows the same two-spaces-per-level rule:
 ```
 ## Issues
 
-- #70 -- Rewrite the onboarding flow
-  - #71 -- New signup form
-    - #72 -- Add email verification step
-  - #73 -- New welcome email
+- Closes #70 -- Rewrite the onboarding flow
+  - Closes #71 -- New signup form
+    - Closes #72 -- Add email verification step
+  - Closes #73 -- New welcome email
 ```
 
 ## What this doesn't do
