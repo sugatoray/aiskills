@@ -62,7 +62,10 @@ it — not read at invocation time.
 ## Interactive HTML report
 
 *Implementation: [`../assets/templates/report.html`](../assets/templates/report.html)
-(Jinja2) + [`../builder/build_report.py`](../builder/build_report.py) (renderer).*
+(Jinja2, `{% include %}`-ing the icon sprite from
+[`../assets/templates/icons.svg`](../assets/templates/icons.svg) so the
+rendered output stays a single self-contained file) +
+[`../builder/build_report.py`](../builder/build_report.py) (renderer).*
 
 - Sidebar navigation (one entry per section) + tab panels, macOS
   System-Settings-style.
@@ -180,8 +183,9 @@ afterward.
   request).
 - `tests/` — all tests, plus the one Node helper (`tests/browser/`) a
   Python test shells out to.
-- `assets/templates/` — the Jinja2 template and the real example/schema
-  YAML, next to each other.
+- `assets/templates/` — the Jinja2 template, its `{% include %}`-d icon
+  sprite (`icons.svg`), and the real example/schema YAML, next to each
+  other.
 - `assets/images/` — screenshots `README.md` embeds, machine-generated
   (see Screenshot automation above) rather than hand-captured and
   committed as one-offs.
