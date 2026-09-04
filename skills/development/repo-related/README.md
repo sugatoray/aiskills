@@ -7,8 +7,11 @@ requests, releases, and similar — rather than on its code. The first one,
 parent epic via GitHub's native parent/child relationship when the work
 genuinely splits into distinct pieces, then rewrites that pull request's
 title (kept short) and description so the description lists every issue
-in the exact format `- #{{issue-number}} -- {{issue-title}}`, indented to
-match parent-child nesting.
+in the exact format `- Closes #{{issue-number}} -- {{issue-title}}`,
+indented to match parent-child nesting. The `Closes` keyword is
+deliberate on every line, including a parent epic's — GitHub auto-closes
+any issue referenced this way when the PR merges into the repo's default
+branch.
 
 ## Skills
 
