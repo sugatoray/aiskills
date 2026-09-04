@@ -41,6 +41,7 @@ newsletter-ai/
 │   ├── PROMPT.md                  # the editorial brief (source of truth for content)
 │   └── templates/
 │       ├── report.html            # Jinja2 template for the HTML report
+│       ├── icons.svg              # icon sprite, {% include %}-d into report.html
 │       └── sample-report.yaml     # a complete real edition, also the schema example
 ├── builder/                        # all non-test code (Python)
 │   ├── build_report.py            # CLI: yaml -> html (+ optional yaml sidecar)

@@ -39,6 +39,13 @@ For people developing this skill — not read as part of producing a
   with a cover/TOC for the browser's own "Save as PDF", and a
   "Download data" button that pulls a fused source-YAML copy back out
   (see Data fusion below).
+- `assets/templates/icons.svg` — the icon sprite (`<g id="ico-...">`
+  per icon, official [Lucide](https://lucide.dev) path data, MIT),
+  pulled into `report.html` via Jinja2 `{% include "icons.svg" %}` at
+  render time. Kept in its own file for editing (a real, syntax-checked
+  SVG rather than markup buried in the template), but the include
+  inlines it into the rendered output, so the generated `report.html`
+  stays a single self-contained file with no external references.
 - `assets/templates/sample-report.yaml` — a complete, valid, real
   edition (Week of Aug 19-25, 2026) in the YAML schema, living next to
   the template it renders through. Doubles as the reference example for
@@ -177,12 +184,15 @@ accordion — see `report_data.compute_references`. Sections with no
 sourced items get no References accordion; don't add an empty one by
 hand.
 
-Icon names come from the `<symbol>` sprite defined at the top of
-`assets/templates/report.html` (`ico-home`, `ico-trend`, `ico-dollar`,
-`ico-flask`, `ico-server`, `ico-globe`, `ico-people`, `ico-cpu`,
-`ico-bolt`, `ico-compass`, `ico-hash`, `ico-pulse`, `ico-calendar`,
-`ico-horizon`, `ico-eye`, `ico-alert`, `ico-building`, `ico-download`) —
-adding a new icon means adding a `<g id="ico-...">` there. Badge names
+Icon names come from the sprite in `assets/templates/icons.svg` (pulled
+into `report.html` via `{% include %}`, see above): `ico-home`,
+`ico-trend`, `ico-alert`, `ico-flask`, `ico-building`, `ico-dollar`,
+`ico-server`, `ico-globe`, `ico-people`, `ico-cpu`, `ico-bolt`,
+`ico-compass`, `ico-hash`, `ico-pulse`, `ico-calendar`, `ico-horizon`,
+`ico-eye`, `ico-chevron`, `ico-menu`, `ico-sun`, `ico-moon`, `ico-print`,
+`ico-arrow`, `ico-download` — adding a new icon means adding a
+`<g id="ico-...">` there (grab real path data from
+[lucide.dev](https://lucide.dev) rather than hand-drawing one). Badge names
 come from the `.b-*` classes next to them (`red`, `orange`, `green`,
 `mint`, `teal`, `cyan`, `indigo`, `purple`, `gray`).
 
