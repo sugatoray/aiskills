@@ -4,6 +4,18 @@ All notable changes to the `create-issues-update-pr` skill are
 documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-09-02
+
+### Changed
+
+- The `## Issues` list format changed from `- #{{issue-number}} --
+  {{issue-title}}` to `- Closes #{{issue-number}} -- {{issue-title}}`,
+  on every line including a parent epic's — GitHub auto-closes any
+  issue referenced this way when the PR merges into the default branch,
+  so the list now also does the closing rather than just describing it.
+  Updated the workflow step, both format-reference examples, and the
+  frontmatter `description`.
+
 ## [1.1.0] - 2026-08-28
 
 ### Added
