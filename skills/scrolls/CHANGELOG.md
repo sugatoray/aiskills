@@ -24,6 +24,21 @@ Versioning entry) — one shared number across the family, currently:
 | `scrolls-unhide` | 2.1.0 |
 | `scrolls-help` | 2.1.0 |
 
+## 2026-08-29 (docs, no version bump)
+
+- **Codex plugin manifest added.** `skills/scrolls/.codex-plugin/plugin.json`,
+  alongside the existing Claude Code `.claude-plugin/plugin.json`, so the
+  same five skills are discoverable as a Codex plugin. `skills/scrolls/skills/`
+  holds one symlink per skill pointing back at its real, un-duplicated
+  directory — Codex's plugin schema requires `"skills"` to resolve to a
+  directory literally named `skills/` under the plugin root. See
+  `meta/MAINTAINERS.md`'s new "Codex plugin manifest" section for the full
+  design rationale and a known caveat: all five skills set
+  `disable-model-invocation: true` on purpose (explicit-command-only),
+  which fails OpenAI's own bundled plugin validator (`validate_plugin.py`)
+  — left as-is deliberately rather than changing invocation behavior for
+  the sake of one packaging format.
+
 ## 2026-08-20 (docs, no version bump)
 
 - **Per-skill `README.md` added to all five `scrolls-*` skills.** Each

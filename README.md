@@ -33,6 +33,27 @@ with every skill twice — pick one.
 
 </details>
 
+<details>
+<summary><strong>Alternate: Codex plugin</strong></summary>
+
+`skills/scrolls/.codex-plugin/plugin.json` packages the same five skills
+as a local Codex plugin. Self-serve publishing to the official Codex
+Plugin Directory isn't available yet, so install it from a clone:
+
+```sh
+git clone https://github.com/sugatoray/aiskills
+codex plugins install aiskills/skills/scrolls --dev
+```
+
+Installing both this and `npx skills` leaves you with every skill
+twice — pick one. Note: all five skills are explicit-command-only
+(`disable-model-invocation: true`), which fails Codex's own bundled
+plugin validator as of this writing — see
+[`skills/scrolls/meta/MAINTAINERS.md`](skills/scrolls/meta/MAINTAINERS.md)
+for the full caveat.
+
+</details>
+
 **Getting Started**:
 
 1. Initialize **Scorlls** persistent agentic memory.
