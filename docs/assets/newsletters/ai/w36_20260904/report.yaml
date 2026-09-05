@@ -1,0 +1,1223 @@
+meta:
+  title: "The AI Intelligence Brief"
+  eyebrow: "Weekly Executive Brief"
+  window: "Week of August 29 – September 4, 2026"
+  generated: "September 4, 2026"
+  coverage_line: "15 parts · 20 ranked developments"
+  scope_note: >-
+    Researched via targeted web search across roughly 30 queries covering
+    model releases, capital flows, chips, infrastructure, talent, agents,
+    and the global AI race. Every sourced claim below carries a real URL
+    found during that research; where reporting was single-sourced or
+    aggregator-derived rather than primary-confirmed, the item says so
+    explicitly. See "Scope &amp; Limitations" in Part 15.
+
+sections:
+  - id: home
+    kind: home
+    nav_label: "Overview"
+    icon: home
+    eyebrow: "Weekly Executive Brief"
+    title: "Overview"
+    lede: >-
+      <b>The AI Intelligence Brief</b> — a ranked, sourced read on the AI
+      developments that actually moved capability, cost, adoption, compute,
+      and the global competitive balance this week.
+    callout:
+      style: info
+      icon: alert
+      html: >-
+        Twenty ranked developments this edition, cross-referenced across
+        independent outlets where possible. A handful of items (marked
+        inline) rest on single-source or aggregator reporting rather than
+        primary confirmation — flagged rather than smoothed over, per this
+        newsletter's editorial rules.
+    cards:
+      - target: part1
+        icon: trend
+        badge: cyan
+        title: "01 · Top Developments"
+        desc: "Nvidia buys Hugging Face, GPT-6 Astra crosses the critical-cyber threshold, and Anthropic piles up $60B+ in compute commitments ahead of its IPO."
+      - target: part2
+        icon: flask
+        badge: purple
+        title: "02 · Model Intelligence"
+        desc: "GPT-6 Astra, Gemini 3.8 Flash Cyber, and Claude Fable/Mythos 5.1 land within 72 hours of each other."
+      - target: part3
+        icon: eye
+        badge: indigo
+        title: "03 · Open vs. Closed"
+        desc: "Open-weight cadence keeps closing the capability gap — but frontier labs are pulling ahead on a new axis: gated, safety-tiered access."
+      - target: part4
+        icon: people
+        badge: purple
+        title: "04 · Labs & Talent War"
+        desc: "The Google DeepMind exodus (Dean, Vinyals, Le, Ghemawat) keeps reshaping where senior research talent concentrates."
+      - target: part5
+        icon: dollar
+        badge: green
+        title: "05 · AI Money"
+        desc: "A $13B acquisition, a $45B compute deal, and a $50B data-center lease — capital keeps flowing toward infrastructure, not just models."
+      - target: part6
+        icon: building
+        badge: mint
+        title: "06 · AI in Production"
+        desc: "Cisco puts a governed AI agent in front of all 90,000 employees — a real production deployment, not a pilot."
+      - target: part7
+        icon: bolt
+        badge: orange
+        title: "07 · Agents & App Layer"
+        desc: "MCP hits 97M monthly downloads and 78% enterprise production penetration; A2A reaches v1.0 governance under the Linux Foundation."
+      - target: part8
+        icon: cpu
+        badge: teal
+        title: "08 · Chips & Compute"
+        desc: "AMD locks in 2GW of Anthropic demand for its Helios racks; H200 exports to China stay legally stuck despite clearance."
+      - target: part9
+        icon: server
+        badge: teal
+        title: "09 · Data Centers & Energy"
+        desc: "A $50B Nvidia-backed Texas lease, two more multi-gigawatt Anthropic compute deals, and Gulf sovereign buildouts all advance in parallel."
+      - target: part10
+        icon: globe
+        badge: indigo
+        title: "10 · The Global AI Race"
+        desc: "China's chip self-sufficiency crosses 41%; U.S. export-policy enforcement still isn't matching the paperwork."
+      - target: part11
+        icon: compass
+        badge: indigo
+        title: "11 · Company Watchlist"
+        desc: "Momentum moved toward Nvidia, Anthropic, AMD, and Hut 8 this week."
+      - target: part12
+        icon: hash
+        badge: gray
+        title: "12 · Numbers That Matter"
+        desc: "A one-page dashboard of the week's load-bearing figures, sourced and caveated."
+      - target: part13
+        icon: pulse
+        badge: purple
+        title: "13 · Signals Beneath Headlines"
+        desc: "Five developments that look small today but could matter a great deal in six to twenty-four months."
+      - target: part14
+        icon: calendar
+        badge: cyan
+        title: "14 · What Changed This Week"
+        desc: "Eight direct answers — who gained ground, who lost it, and what's being underestimated."
+      - target: part15
+        icon: horizon
+        badge: orange
+        title: "15 · The Big Picture"
+        desc: "The five-minute synthesis, three things to watch next week, and the full source index."
+
+  - id: part1
+    kind: standard
+    nav_label: "Top Developments"
+    icon: trend
+    number: "01"
+    eyebrow: "Part 1"
+    title: "The Top 20 AI Developments"
+    lede: "Ranked by technological significance, business impact, competitive implications, capital/infrastructure weight, and geopolitical importance — not by headline volume."
+    items:
+      - title: "1. GPT-6 Astra becomes the first model to cross OpenAI's 'Critical' cyber-capability threshold"
+        icon: alert
+        badge: red
+        tag: "🚨 Major Shift"
+        open: true
+        facts:
+          - label: "What happened"
+            text: "OpenAI released GPT-6 Astra on September 3, confirming it is the first model to meet the Critical cybersecurity threshold under its Preparedness Framework — able, with tooling, to find and exploit unknown vulnerabilities across hardened systems without step-by-step human guidance. OpenAI says it delayed parts of the release to strengthen cyber-misuse safeguards."
+          - label: "Why it matters"
+            text: "This is the first time a frontier lab has publicly confirmed a model crossed its own highest-severity capability line before shipping. It forces every lab racing toward similar capability to decide, in public, what gating and access controls look like at that threshold."
+          - label: "Who's affected"
+            text: "OpenAI's enterprise and API customers now under stricter usage gating; cybersecurity vendors and CISOs re-assessing offense/defense balance; rival labs (Anthropic, Google) whose next flagship releases will be judged against this precedent."
+          - label: "Key numbers"
+            text: "98% on FrontierMath Tier 4; 99.9% on ARC-AGI-3; 100% on ExploitBench; 42.4% success on ExploitGym vs. 30.3% for OpenAI's prior model, Sol."
+        sources:
+          - label: "OpenAI — Path to Astra"
+            url: "https://openai.com/index/path-to-astra/"
+          - label: "CSO Online — GPT-6 Astra crosses critical cybersecurity threshold"
+            url: "https://www.csoonline.com/article/4218679/openai-launches-gpt-6-astra-its-first-model-to-cross-a-critical-cybersecurity-threshold.html"
+          - label: "Unite.AI — OpenAI Releases GPT-6 Astra"
+            url: "https://www.unite.ai/openai-releases-gpt-6-astra-its-first-model-rated-critical-for-cyber/"
+
+      - title: "2. Nvidia agrees to buy Hugging Face for nearly $13 billion"
+        icon: dollar
+        badge: green
+        tag: "💰 Capital / M&A"
+        open: true
+        facts:
+          - label: "What happened"
+            text: "Nvidia will acquire Hugging Face — the platform hosting over 3 million models and used by 18 million developers and 200,000+ companies — for roughly $11.9B to shareholders plus up to $1B in employee retention equity. The deal is expected to close in H1 2027, and Nvidia says Hugging Face will remain an open platform for the whole ecosystem."
+          - label: "Why it matters"
+            text: "The largest neutral hub for open-weight models and datasets is being absorbed by the dominant AI hardware vendor. Nvidia was already the platform's biggest contributor of open models and data; owning the distribution layer too changes the competitive calculus for every rival chipmaker and cloud provider that depends on Hugging Face's neutrality."
+          - label: "Who's affected"
+            text: "AMD, Google TPU, and other accelerator vendors; every lab distributing open weights (Meta, DeepSeek, Alibaba, Moonshot, Z.AI); enterprise buyers of open models via Hugging Face's hub and inference endpoints."
+          - label: "Key numbers"
+            text: "~$13B total deal value; Nvidia's second-largest acquisition on record after its ~$20B Groq asset purchase; 18M+ developers, 3M+ models, 200,000+ companies on the platform."
+        sources:
+          - label: "Bloomberg — Nvidia agrees to $13 billion deal for Hugging Face"
+            url: "https://www.bloomberg.com/news/articles/2026-09-03/nvidia-agrees-to-13-billion-deal-for-ai-platform-hugging-face"
+          - label: "CNBC — Nvidia agrees to buy Hugging Face"
+            url: "https://www.cnbc.com/2026/09/03/nvidia-agrees-to-buy-hugging-face-for-almost-13-billion-ai-expansion.html"
+          - label: "Fortune — Hugging Face's path to $13B acquisition"
+            url: "https://fortune.com/2026/09/03/hugging-face-goes-from-a-scrappy-startup-named-after-an-emoji-to-13-billion-nvidia-acquisition/"
+
+      - title: "3. Anthropic locks in $45B (Nscale) and $10B (Volta) compute deals ahead of its IPO"
+        icon: server
+        badge: teal
+        tag: "🖥️ Infrastructure"
+        open: true
+        facts:
+          - label: "What happened"
+            text: "Anthropic signed a six-year, ~$45B deal with UK infrastructure firm Nscale for 460 megawatts of Nvidia Vera Rubin compute (averaging $7.5B/year, starting 2027, sited in West Virginia per Forbes' reporting), on top of an earlier $10B, six-year deal with cloud startup Volta for capacity from a Norwegian data center, and a July agreement for up to $5B in AMD investment tied to 2GW of AMD Instinct MI450-series GPUs."
+          - label: "Why it matters"
+            text: "Anthropic has now committed on the order of $60B+ in multi-year compute spend across three separate suppliers in under two months — a scale of forward-buying that only makes sense against an expectation of both continued revenue growth and an imminent IPO capital raise."
+          - label: "Who's affected"
+            text: "Nscale, Volta, and AMD as suppliers; Nvidia (Vera Rubin volume) and AMD (MI450/Helios) competing for the same customer's gigawatts; OpenAI and Google, whose own compute deals will be benchmarked against these terms."
+          - label: "Key numbers"
+            text: "$45B/6yr Nscale (460MW); $10B/6yr Volta; up to $5B AMD investment tied to 2GW of MI450 GPUs, first 1GW online H1 2027."
+        sources:
+          - label: "TechCrunch — Anthropic's $45B deal with Nscale"
+            url: "https://techcrunch.com/2026/08/26/anthropic-continues-compute-gobbling-streak-in-45-billion-deal-with-nscale/"
+          - label: "Forbes — Anthropic's $45B Nscale deal buys 460MW of Vera Rubin"
+            url: "https://www.forbes.com/sites/jonmarkman/2026/08/28/anthropics-45-billion-nscale-deal-buys-460-megawatts-of-vera-rubin/"
+          - label: "CNBC — AMD to invest up to $5B in Anthropic"
+            url: "https://www.cnbc.com/2026/07/22/amd-anthropic-ai-chip-investment.html"
+
+      - title: "4. Anthropic pulls ahead of OpenAI in the IPO race"
+        icon: dollar
+        badge: green
+        tag: "💰 Capital / M&A"
+        facts:
+          - label: "What happened"
+            text: "Anthropic is reportedly targeting a Nasdaq listing around October 2026 — roadshow through September, S-1 publication imminent, Goldman Sachs/JPMorgan/Morgan Stanley leading, aiming to raise over $60B. OpenAI, which confidentially filed in June, is reportedly now leaning toward a 2027 listing instead."
+          - label: "Why it matters"
+            text: "A live frontier-lab IPO would be the first real public-market price discovery for foundation-model economics, testing whether public investors underwrite these valuations the way private markets have. Anthropic getting there first reshapes the narrative of who is the more mature, IPO-ready lab."
+          - label: "Who's affected"
+            text: "Both labs and their investor bases; every AI-adjacent public stock priced by comparison; the underwriting banks; regulators evaluating the first foundation-model public offering."
+          - label: "Key numbers"
+            text: "Anthropic targeting >$60B raised; OpenAI's June 2026 confidential filing was pegged near a ~$1T valuation ambition."
+        sources:
+          - label: "Dealroom — OpenAI reboots as Anthropic pulls ahead with IPO planned for September"
+            url: "https://dealroom.co/news/147131-openai-reboots-as-anthropic-pulls-ahead-with-ipo-planned-for-september/"
+          - label: "Forge — Anthropic IPO Timeline and Financing Details"
+            url: "https://forgeglobal.com/anthropic_ipo/"
+
+      - title: "5. Sony Music Publishing and Warner Chappell sue Anthropic — and name its founders personally"
+        icon: alert
+        badge: red
+        tag: "⚠️ Watch Closely"
+        facts:
+          - label: "What happened"
+            text: "Sony Music Publishing and Warner Chappell filed a federal copyright suit against Anthropic, alleging it trained Claude on 'tens of thousands' of copyrighted compositions obtained via pirate sources (Library Genesis, Pirate Library Mirror) and scraped licensed lyric sites. Co-founders Dario Amodei and Benjamin Mann are named as defendants alongside the company."
+          - label: "Why it matters"
+            text: "Naming individual founders personally is a more aggressive litigation posture than the author class-action Anthropic settled for $1.5B in September 2025 — a case where the court found training on copyrighted works wasn't itself unlawful, but obtaining them via piracy was."
+          - label: "Who's affected"
+            text: "Anthropic and its leadership directly; every AI lab that trained on similarly sourced music/lyric data; rights holders across other media weighing whether to replicate the personal-defendant tactic."
+          - label: "Key numbers"
+            text: "Statutory damages sought: up to $150,000 per infringed work, plus $25,000 per instance of removed copyright-management information; prior related settlement: $1.5B (Sept. 2025, authors' class action)."
+        sources:
+          - label: "TechCrunch — Sony Music, Warner sue Anthropic"
+            url: "https://techcrunch.com/2026/08/29/sony-music-warner-sue-anthropic-alleging-a-brazen-campaign-of-intellectual-property-theft/"
+          - label: "Fortune — Sony and Warner sue Anthropic over alleged theft of songs"
+            url: "https://fortune.com/2026/09/01/anthropic-warner-sony-music-songs-lawsuit/"
+          - label: "Axios — Sony, Warner sue Anthropic"
+            url: "https://www.axios.com/2026/08/29/anthropic-sony-warner-music-copyright"
+
+      - title: "6. Nvidia-backed $50B Texas data-center lease at Hut 8's Beacon Point campus"
+        icon: server
+        badge: teal
+        tag: "🖥️ Infrastructure"
+        facts:
+          - label: "What happened"
+            text: "Nvidia is reportedly the tenant behind Hut 8's Beacon Point campus in Nueces County, Texas — a 1GW site now fully commercialized via two 352MW, 15-year leases (base value $19.6B, rising to as much as $50.2B with renewal options). Initial energization is targeted for Q1 2027."
+          - label: "Why it matters"
+            text: "A GPU designer becoming a long-term data-center tenant in its own right — rather than just selling chips into someone else's facility — is a structurally different move, and it converts a former bitcoin miner into a hyperscale AI landlord."
+          - label: "Who's affected"
+            text: "Hut 8 shareholders; the Texas grid (704MW of contracted IT capacity); Nvidia's balance sheet, now carrying long-duration lease obligations alongside chip sales."
+          - label: "Key numbers"
+            text: "1GW campus; 704MW contracted IT capacity across two phases; up to $50.2B in total lease value over 15 years."
+        sources:
+          - label: "Data Centre Magazine — Hut 8 Commercialises $9.8bn Texas AI Data Centre Lease"
+            url: "https://datacentremagazine.com/news/hut-8-signs-9-8bn-texas-ai-data-centre-lease"
+          - label: "Yahoo Finance — Nvidia reportedly signs up to $50 billion Texas data-center lease"
+            url: "https://finance.yahoo.com/technology/ai/articles/nvidia-reportedly-signs-50-billion-192803623.html"
+
+      - title: "7. Google ships Gemini 3.8 Flash Cyber, a defender-only cybersecurity model"
+        icon: bolt
+        badge: mint
+        tag: "🔬 Research Breakthrough"
+        facts:
+          - label: "What happened"
+            text: "Alongside a general Gemini 3.8 Flash release, Google DeepMind shipped Gemini 3.8 Flash Cyber, gated to vetted defenders via its Fairwind Program. It scores 86.2% on the CyberGym vulnerability-discovery benchmark and Google's Chrome Security team reports 2.6x more correct vulnerability patches than the best commercial models tested; Google's Cloud Vulnerability Research team says it found a critical vulnerability in under 2 hours using the model."
+          - label: "Why it matters"
+            text: "Paired with GPT-6 Astra's critical-cyber classification (#1), this is the second major lab this week to treat cybersecurity as a distinct, access-gated model category rather than a general capability — an emerging pattern for how frontier labs handle dual-use risk."
+          - label: "Who's affected"
+            text: "Enterprise security teams gaining defender-only access; the broader vulnerability research and bug-bounty ecosystem; rival labs now expected to show equivalent gated-access cyber offerings."
+          - label: "Key numbers"
+            text: "86.2% on CyberGym; 70%+ success across an internal 20-language benchmark; 2.6x more correct Chrome patches vs. leading commercial models."
+        sources:
+          - label: "Google Blog — Introducing Gemini 3.8 Flash and 3.8 Flash Cyber"
+            url: "https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/"
+          - label: "Help Net Security — Google's Gemini 3.8 Flash"
+            url: "https://www.helpnetsecurity.com/2026/09/03/google-gemini-3-8-flash/"
+
+      - title: "8. China's AI chip self-sufficiency crosses 41%, up from ~20% in 2023"
+        icon: globe
+        badge: indigo
+        tag: "🌍 Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "Morgan Stanley data cited this week puts China's domestic AI-GPU self-sufficiency above 41%, with Huawei targeting 1.6 million Ascend-series dies produced in 2026 (about 600,000 Ascend 910C units) and SMIC doubling planned 7nm capacity while piloting 5nm runs for Huawei and Alibaba."
+          - label: "Why it matters"
+            text: "This is a structural, multi-year trend rather than a single-week event, but the pace matters: Morgan Stanley projects self-sufficiency could reach ~85% by 2030. The bottleneck China hasn't solved is memory — CXMT still can't produce enough HBM-class memory to pair with SMIC's logic dies."
+          - label: "Who's affected"
+            text: "Nvidia and AMD's addressable China revenue; U.S. export-control policy design; Chinese hyperscalers (Alibaba, Tencent, ByteDance) planning around domestic supply."
+          - label: "Key numbers"
+            text: "41%+ current self-sufficiency (vs. ~20% in 2023); 1.6M Ascend dies targeted for 2026; ~85% self-sufficiency projected by 2030 (Morgan Stanley)."
+        sources:
+          - label: "officechai — China's chip self-sufficiency data (Morgan Stanley)"
+            url: "https://officechai.com/ai/chinas-self-sufficiency-in-ai-chips-has-risen-from-20-in-2023-to-over-40-in-2026-morgan-stanley-data/"
+          - label: "enkiai — SMIC AI Chip Strategy 2026"
+            url: "https://enkiai.com/ai-market-intelligence/smic-ai-chip-strategy-2026-inside-chinas-5nm-power-play/"
+
+      - title: "9. H200/MI325X exports to China remain undelivered despite Commerce clearance"
+        icon: globe
+        badge: indigo
+        tag: "🌍 Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "BIS moved Nvidia H200 and AMD MI325X export licensing to China from presumptive denial to case-by-case review, subject to a 25% tariff, volume caps, and KYC/inspection requirements. Reporting indicates roughly ten Chinese firms — including Alibaba, Tencent, and ByteDance — have clearance to buy H200s at a cap, but as of this week no units have actually shipped."
+          - label: "Why it matters"
+            text: "The policy exists on paper without executing in practice. That gap — not the headline policy change — is the real constraint on Chinese frontier compute access, and it leaves both Nvidia's China revenue guidance and Chinese capacity planning in limbo."
+          - label: "Who's affected"
+            text: "Nvidia and AMD's China-exposed revenue; Chinese hyperscaler capacity planning; U.S.-China trade negotiators."
+          - label: "Key numbers"
+            text: "25% tariff; ~50% volume cap; roughly ten cleared Chinese buyers; zero confirmed deliveries as of this research pass."
+        sources:
+          - label: "Introl — BIS Export Policy Shift on H200/MI325X"
+            url: "https://introl.com/blog/bis-export-policy-h200-mi325x-china-case-by-case-2026"
+          - label: "whatledto.com — US Export Controls on Nvidia AI Chips to China Timeline"
+            url: "https://whatledto.com/events/nvidia-china-export-controls"
+
+      - title: "10. Anthropic ships Claude Fable 5.1 and Mythos 5.1, cutting cache-read pricing 75%"
+        icon: flask
+        badge: purple
+        tag: "📈 Important Trend"
+        facts:
+          - label: "What happened"
+            text: "Anthropic released Claude Fable 5.1 (general availability) and Claude Mythos 5.1 (trusted-access only, for cybersecurity and life-sciences work) on September 1. List price holds at $10/$50 per million input/output tokens, but cached-input pricing drops from $1.00 to $0.25 per million tokens — a 75% cut. Anthropic reports 52.6% on Terminal-Bench-Science."
+          - label: "Why it matters"
+            text: "The two models share weights but differ in safeguards — Anthropic's own version of the gated-access pattern also seen in GPT-6 Astra and Gemini 3.8 Flash Cyber this week. The cache-pricing cut specifically targets agentic workloads, where repeated context reuse dominates cost."
+          - label: "Who's affected"
+            text: "High-volume agentic API customers (largest beneficiaries of cache savings); competing model providers now under pressure to match cache economics."
+          - label: "Key numbers"
+            text: "Cache-read price: $1.00 → $0.25/M tokens (-75%); list price unchanged at $10/$50 per M tokens; up to ~45% effective cost reduction for cache-heavy agent workloads."
+        sources:
+          - label: "VentureBeat — Claude Fable 5.1 and Mythos 5.1 arrive with 75% cache-cost reduction"
+            url: "https://venturebeat.com/technology/anthropics-claude-fable-5-1-and-mythos-5-1-arrive-with-a-75-cost-reduction-for-fable-cache-reads"
+          - label: "MarkTechPost — Claude Fable 5.1 and Mythos 5.1 benchmarks"
+            url: "https://www.marktechpost.com/2026/09/01/anthropic-releases-claude-fable-5-1-and-claude-mythos-5-1-52-6-on-terminal-bench-science-and-75-cheaper-cache-reads/"
+
+      - title: "11. Cisco puts a governed AI agent in front of all 90,000 employees"
+        icon: building
+        badge: mint
+        tag: "🏢 Enterprise Adoption"
+        facts:
+          - label: "What happened"
+            text: "Cisco's MyAgent, built on its internal multi-model platform Circuit, is rolling out company-wide to all 90,000 employees. The system routes tasks by complexity — a policy question goes to a lightweight model, complex financial analysis to a more capable one — runs mostly on-premises, and performs supervised autonomous workflows across Outlook, Webex, Jira, and SharePoint."
+          - label: "Why it matters"
+            text: "This is a full-workforce production deployment with real architectural choices (on-prem-heavy, model-routed by task) rather than a single-model chatbot pilot — a template other large enterprises are likely to copy."
+          - label: "Who's affected"
+            text: "Cisco's workforce and internal tooling vendors; enterprise AI platform competitors (Microsoft Copilot, Salesforce Agentforce, Google Workspace); IT/security teams evaluating on-prem agent architectures."
+          - label: "Key numbers"
+            text: "90,000 employees; rollout beginning August 2026; task-based routing across at least two model tiers."
+        sources:
+          - label: "PYMNTS — Cisco Deploys Custom AI Agent to Entire 90,000-Person Workforce"
+            url: "https://www.pymnts.com/news/artificial-intelligence/2026/cisco-deploys-custom-ai-agent-to-entire-90000-person-workforce"
+          - label: "Cisco Blogs — MyAgent and the Rise of Ambient Intelligence"
+            url: "https://blogs.cisco.com/news/my-agent-and-the-rise-of-ambient-intelligence-ciscos-next-step-in-enterprise-ai"
+
+      - title: "12. MCP crosses 97 million monthly downloads; A2A reaches v1.0 under Linux Foundation governance"
+        icon: bolt
+        badge: orange
+        tag: "📈 Important Trend"
+        facts:
+          - label: "What happened"
+            text: "Model Context Protocol SDK downloads reportedly grew from 100,000 to 97 million monthly in 16 months (970x), with the public server registry growing from ~1,200 (Q1 2025) to over 9,400 (April 2026); 78% of enterprise AI teams report at least one MCP-backed agent in production. Google's Agent2Agent (A2A) protocol reached v1.0 with signed Agent Cards and reports 150+ production organizations, governed alongside MCP under the Linux Foundation's Agentic AI Foundation."
+          - label: "Why it matters"
+            text: "Interoperability standards — not any single model — determine whether multi-vendor agent ecosystems actually compose in production. Neutral governance under one foundation reduces the risk of a forked, incompatible protocol landscape."
+          - label: "Who's affected"
+            text: "Every team building cross-vendor agent tooling; IDE and platform vendors (Cursor, Windsurf, JetBrains, Vercel) that ship MCP support; enterprises standardizing agent-to-tool and agent-to-agent integration."
+          - label: "Key numbers"
+            text: "97M monthly MCP SDK downloads (970x growth in 16 months); 9,400+ registered MCP servers; 78% enterprise production penetration; A2A: 150+ production orgs, SDKs in 5 languages."
+        sources:
+          - label: "Medium — AI Agent Protocols 2026: MCP, A2A, AG-UI"
+            url: "https://medium.com/@wasowski.jarek/13-agent-protocols-in-four-layers-what-to-deploy-today-ed0015815b69"
+          - label: "digitalapplied — AI Agent Protocol Ecosystem Map 2026"
+            url: "https://www.digitalapplied.com/blog/ai-agent-protocol-ecosystem-map-2026-mcp-a2a-acp-ucp"
+
+      - title: "13. Claude Code's developer adoption more than doubles in five months"
+        icon: cpu
+        badge: mint
+        tag: "🏢 Enterprise Adoption"
+        facts:
+          - label: "What happened"
+            text: "Claude Code usage among professional developers reportedly rose from 18% (January 2026) to 39% globally and 47% in the U.S. (May–July 2026). OpenAI's Codex grew faster in relative terms — from 3% to 16% over the same window, roughly 5x — while an OpenAI-built Codex plugin now runs inside Claude Code itself, with early teams running multiple agentic coding tools together rather than consolidating on one."
+          - label: "Why it matters"
+            text: "Coding agents are the application-layer category with the clearest, most measurable enterprise adoption curve in AI right now, and the market is composing rather than consolidating — a different dynamic than the 'one tool wins' pattern seen in prior software cycles."
+          - label: "Who's affected"
+            text: "Anthropic, OpenAI, Cursor, and GitHub Copilot as competing/complementary coding-agent vendors; every engineering organization now making a multi-tool agentic-coding stack decision rather than a single-vendor one."
+          - label: "Key numbers"
+            text: "Claude Code: 18%→39% global adoption (Jan→May-Jul 2026), 47% in the U.S.; Codex: 3%→16% (~5x growth) over the same period."
+        sources:
+          - label: "The New Stack — Cursor, Claude Code, and Codex are merging into one AI coding stack"
+            url: "https://thenewstack.io/ai-coding-tool-stack/"
+          - label: "Turing College — Best AI Coding Agents in 2026"
+            url: "https://www.turingcollege.com/blog/best-ai-coding-agents-2026-claude-code-codex-cursor"
+
+      - title: "14. Big Tech's combined 2026 AI capex tracks toward ~$725B, up ~77% year over year"
+        icon: hash
+        badge: gray
+        tag: "💰 Capital / M&A"
+        facts:
+          - label: "What happened"
+            text: "Microsoft (~$190B), Amazon (~$200B), Alphabet ($175–185B), and Meta ($115–135B, up more than $10B from prior guidance to $136.7B) are together tracking toward roughly $725B in 2026 capital expenditure, almost entirely AI data centers and compute — up from ~$410B in 2025. Microsoft's fiscal Q3 alone included $30.9B in a single quarter with Azure growth of 40%."
+          - label: "Why it matters"
+            text: "This is the capital base the entire AI infrastructure buildout — Anthropic's compute deals, Hut 8's leases, Gulf sovereign projects — ultimately draws demand from and competes against. It's also the number bears cite against the ~$100B of realized enterprise AI revenue when arguing valuations have outrun monetization."
+          - label: "Who's affected"
+            text: "Nvidia, AMD, and other hardware suppliers; hyperscaler shareholders weighing capex against near-term margin; every AI infrastructure vendor selling into this spend."
+          - label: "Key numbers"
+            text: "~$725B combined 2026 capex (Microsoft, Amazon, Google, Meta) vs. ~$410B in 2025 (+77%); Meta capex raised to $136.7B; Microsoft Azure grew 40% in fiscal Q3."
+        sources:
+          - label: "globaldatacenterhub — Microsoft Q3 FY2026: The $190B Capex Plan"
+            url: "https://www.globaldatacenterhub.com/p/microsoft-q3-fy2026-the-190b-capex"
+          - label: "valueaddvc — Microsoft, Meta Earnings and AI Capex Reckoning"
+            url: "https://valueaddvc.com/pulse/microsoft-meta-earnings-ai-capex-reckoning-2026"
+
+      - title: "15. AI valuation-bubble debate sharpens as September's historical volatility arrives"
+        icon: alert
+        badge: gray
+        tag: "⚠️ Watch Closely"
+        facts:
+          - label: "What happened"
+            text: "Analysts are increasingly flagging circular financing structures — Nvidia investing in cloud providers who commit spend back to hyperscalers who buy Nvidia chips — and a gap between roughly $400B of AI infrastructure spending and an estimated $100B of realized enterprise AI revenue. Nvidia itself trades near 44-47x trailing earnings, well below the ~472x Cisco hit at the 2000 peak, and posted $215.94B in FY2026 revenue (+65% YoY)."
+          - label: "Why it matters"
+            text: "The disagreement is substantive, not just sentiment: bulls point to real free cash flow generation that dot-com-era companies never had; bears point to the growing share of AI 'revenue' that is actually inter-company capital circulating between a small number of players."
+          - label: "Who's affected"
+            text: "Every publicly traded AI infrastructure name; the pending Anthropic IPO (test case for how public markets price frontier-lab economics); pension and index funds now heavily AI-stock-weighted."
+          - label: "Key numbers"
+            text: "~$400B AI infra spend vs. ~$100B realized enterprise AI revenue (cited gap); Nvidia FY2026 revenue $215.94B (+65% YoY); Nvidia trading ~44-47x trailing / ~24-26x forward earnings."
+        body:
+          - "Figures on the infrastructure-spend-vs-revenue gap are aggregated analyst estimates, not a single confirmed primary source — treat as directional, not precise."
+        sources:
+          - label: "Motley Fool — Wall Street's Scariest Seasonal Pattern Returns in September"
+            url: "https://www.fool.com/investing/2026/09/02/wall-street-scary-seasonal-pattern-ai-stock/"
+          - label: "intellectia.ai — AI Investment Bubble 2026"
+            url: "https://intellectia.ai/blog/ai-investment-bubble-2026"
+
+      - title: "16. Mistral forms a European compute-sovereignty coalition, opens to third-party open models"
+        icon: globe
+        badge: indigo
+        tag: "🌍 Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "Mistral AI is forming a coalition aimed at securing up to 1GW of long-term European AI compute capacity by 2030, alongside launching regional endpoints and priority tiers, and adding support for third-party open models starting with Z.AI's GLM-5.2 — a shift from a pure in-house-model strategy toward becoming a broader European AI platform."
+          - label: "Why it matters"
+            text: "This is Europe's clearest attempt this year to build sovereign compute capacity outside the U.S. hyperscaler/Nvidia axis and China's domestic stack, positioning Mistral as platform infrastructure rather than just a model vendor."
+          - label: "Who's affected"
+            text: "European enterprises and governments seeking data-sovereign AI options; Nscale and other European infrastructure providers; Z.AI, as the first third-party model added to Mistral's platform."
+          - label: "Key numbers"
+            text: "Target: up to 1GW of European compute by 2030; prior raises: €1.7B Series C (Sept. 2025, €11.7B valuation), €722M and $830M in infrastructure debt financing (2026)."
+        sources:
+          - label: "EU-Startups — Mistral AI extends outsized expansion with €722 million"
+            url: "https://www.eu-startups.com/2026/03/mistral-ai-extends-a-year-of-outsized-expansion-with-e722-million-to-deepen-europes-ai-infrastructure/"
+        body:
+          - "Coalition and third-party-model details are aggregated from release-tracker reporting rather than a single primary Mistral announcement located during this pass."
+
+      - title: "17. Saudi Arabia and the UAE keep scaling sovereign AI buildouts"
+        icon: globe
+        badge: indigo
+        tag: "🌍 Geopolitical"
+        facts:
+          - label: "What happened"
+            text: "Saudi Arabia's PIF-backed national champion HUMAIN has committed roughly $100B across 11 data centers totaling 2.2GW with hundreds of thousands of Nvidia GPUs. The UAE's Stargate UAE project (G42, with OpenAI, Oracle, Nvidia, Cisco, and SoftBank) targets 1GW total capacity, with the first 200MW coming online in 2026."
+          - label: "Why it matters"
+            text: "Both Gulf states are converting energy-cost advantages (roughly $0.05-0.06/kWh, well below the U.S. average) directly into compute capacity, positioning themselves as sovereign AI hubs rather than just capital sources for U.S. labs."
+          - label: "Who's affected"
+            text: "Nvidia and other hardware vendors selling into these buildouts; U.S. and Chinese labs seeking compute access via Gulf partnerships; regional enterprises gaining access to sovereign AI infrastructure."
+          - label: "Key numbers"
+            text: "HUMAIN: ~$100B, 11 data centers, 2.2GW total. Stargate UAE: 1GW target, 200MW online in 2026. Saudi Arabia targets AI contributing 12% of GDP by 2030; UAE targets 40% by 2031."
+        sources:
+          - label: "Gulf Business — Why Saudi, UAE are becoming the world's next AI heavyweights"
+            url: "https://gulfbusiness.com/en/2026/artificial-intelligence/why-saudi-uae-are-becoming-the-worlds-next-ai/"
+          - label: "Presenc.ai — Sovereign AI Infrastructure Tracker 2026"
+            url: "https://presenc.ai/research/sovereign-ai-infrastructure-tracker-2026"
+
+      - title: "18. Enterprise agent ROI evidence keeps accumulating — Klarna, JPMorgan, Salesforce"
+        icon: building
+        badge: mint
+        tag: "🏢 Enterprise Adoption"
+        facts:
+          - label: "What happened"
+            text: "Surveys report AI agent deployments averaging 171% ROI (192% for U.S. enterprises), with 74% of adopters reporting payback within a year. Concrete cases cited include Klarna's agent handling a reported workload-equivalent of 853 employees and $60M in savings, JPMorgan running 450+ AI use cases in production daily, and Salesforce cutting roughly $5M in legal costs via its own Agentforce contract-automation tooling."
+          - label: "Why it matters"
+            text: "Combined with Cisco's full-workforce rollout (#11) and the MCP production-penetration data (#12), this is the clearest evidence yet that agents are moving from pilot to measurable production deployment at scale, not staying purely experimental — see Part 7 for the fuller case."
+          - label: "Who's affected"
+            text: "Every enterprise now benchmarking its own agent pilots against these figures; agent-platform vendors (Salesforce, Microsoft, ServiceNow) competing on demonstrated ROI rather than feature claims."
+          - label: "Key numbers"
+            text: "171% average ROI, 192% for U.S. enterprises; 74% payback within 12 months; Klarna: ~$60M saved; JPMorgan: 450+ production use cases; Salesforce: ~$5M in legal-cost cuts."
+        body:
+          - "ROI percentages are drawn from vendor/analyst survey aggregation rather than independently audited figures — treat as directional evidence of a trend, not precise financial disclosure."
+        sources:
+          - label: "AI Monk — 12 Agentic AI Examples With Measurable ROI"
+            url: "https://aimonk.com/agentic-ai-examples-enterprise-roi-case-studies/"
+
+      - title: "19. Google DeepMind's senior-researcher exodus continues to reverberate"
+        icon: people
+        badge: purple
+        tag: "⚠️ Watch Closely"
+        facts:
+          - label: "What happened"
+            text: "Jeff Dean's departure from Google to co-found 'Discovery Loop,' an AI-for-scientific-discovery startup, alongside fellow senior researchers Oriol Vinyals, Quoc Le, and Sanjay Ghemawat, continues to be read as part of a pattern that includes Noam Shazeer's earlier move to OpenAI and Nobel laureate John Jumper's move to Anthropic."
+          - label: "Why it matters"
+            text: "A cluster of an organization's most senior technical leadership leaving together is a materially different signal than routine individual attrition — and it's happening against a labor market where open AI roles reportedly outnumber qualified candidates roughly 3.2 to 1."
+          - label: "Who's affected"
+            text: "Google DeepMind's research bench strength and roadmap; Discovery Loop's future investors and recruits; competing labs positioned to absorb further departures."
+          - label: "Key numbers"
+            text: "4 senior researchers in the cluster (Dean, Vinyals, Le, Ghemawat); global AI talent ratio ~3.2 open roles per qualified candidate; ~4.7 month average time-to-hire for AI roles."
+        sources:
+          - label: "HPCwire/AIwire — What Google DeepMind's Departures Say About the AI Talent War"
+            url: "https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/"
+          - label: "Axios — Google takes the hit in AI's talent war"
+            url: "https://www.axios.com/2026/06/23/ai-lab-agi-google-deepmind-departures"
+
+      - title: "20. Robotics foundation models show early evidence of LLM-style scaling laws"
+        icon: cpu
+        badge: teal
+        tag: "🔬 Research Breakthrough"
+        facts:
+          - label: "What happened"
+            text: "The EgoScale paper (February 2026) provided empirical evidence that robotics foundation models follow data-driven scaling laws similar to LLMs — policy performance improves predictably with pretraining data size. Google DeepMind's Gemini Robotics 2 introduces whole-body control, and Physical Intelligence's pi-0.7 (April 2026) demonstrated generalization to tasks like operating an air fryer seen only twice in training."
+          - label: "Why it matters"
+            text: "If robotics foundation models genuinely scale the way language models did, the capital and compute playbook that built today's LLMs becomes directly transferable to physical-world AI — a much larger long-term market than software alone."
+          - label: "Who's affected"
+            text: "NVIDIA (GR00T), Google DeepMind, Physical Intelligence, Figure, and Skild as leading foundation-model developers; industrial and logistics companies evaluating early deployment."
+          - label: "Key numbers"
+            text: "2026 assessed industry-wide as 'a validation year, not proof of mainstream adoption' — real deployment remains concentrated in narrow, vendor-supported industrial/logistics tasks."
+        sources:
+          - label: "humanoid.guide — Humanoid World Models: The 2026 Report"
+            url: "https://humanoid.guide/the-humanoid-foundation-model-report/"
+          - label: "KraneShares — Humanoid Robotics In 2026: The Race From Pilot To Platform"
+            url: "https://kraneshares.com/humanoid-robotics-in-2026-the-race-from-pilot-to-platform/"
+
+  - id: part2
+    kind: standard
+    nav_label: "Model Intelligence"
+    icon: flask
+    number: "02"
+    eyebrow: "Part 2"
+    title: "Model Intelligence"
+    lede: "Three flagship releases landed within 72 hours of each other this week, alongside a fast-moving open-weight release cadence from the last 30 days providing context."
+    items:
+      - title: "This week's flagship releases, compared"
+        icon: flask
+        badge: purple
+        tag: "Model intelligence"
+        open: true
+        table:
+          headers: ["Model", "Provider", "Open/Closed", "Key Strength", "Price", "Notable Benchmark"]
+          rows:
+            - ["GPT-6 Astra", "OpenAI", "Closed", "Agentic reasoning, cyber capability (gated)", "Not disclosed", "98% FrontierMath Tier 4 · 100% ExploitBench"]
+            - ["Gemini 3.8 Flash", "Google DeepMind", "Closed", "Cost-efficient general use", "Same intro price as 3.7 Flash", "Not detailed this pass"]
+            - ["Gemini 3.8 Flash Cyber", "Google DeepMind", "Closed, gated (Fairwind)", "Vulnerability discovery/patching", "Gated access only", "86.2% CyberGym"]
+            - ["Claude Fable 5.1", "Anthropic", "Closed", "Agentic workloads, cache economics", "$10/$50 per M tokens; cache $0.25/M", "52.6% Terminal-Bench-Science"]
+            - ["Claude Mythos 5.1", "Anthropic", "Closed, trusted-access only", "Cybersecurity / life-sciences work", "Trusted-access program only", "Shares Fable 5.1 benchmarks"]
+        sources:
+          - label: "OpenAI — Path to Astra"
+            url: "https://openai.com/index/path-to-astra/"
+          - label: "Google Blog — Gemini 3.8 Flash and 3.8 Flash Cyber"
+            url: "https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/"
+          - label: "VentureBeat — Claude Fable 5.1 and Mythos 5.1"
+            url: "https://venturebeat.com/technology/anthropics-claude-fable-5-1-and-mythos-5-1-arrive-with-a-75-cost-reduction-for-fable-cache-reads"
+      - title: "Open-weight context from the prior 30 days"
+        icon: eye
+        badge: indigo
+        tag: "Context"
+        body:
+          - "The frontier releases above landed on top of a fast open-weight cadence: Moonshot's Kimi K3 (July 17, 2.8T parameters, 1M context, billed as the largest open-source model released to date), Alibaba's Qwen3.8 (Aug 12, 2.4T parameters, plus a more permissively Apache-licensed 27B distilled variant), Z.AI's GLM-5.3 (Aug 14), and DeepSeek's V4 Pro moving to a permanent MIT license with a price cut. See Part 3 for what this cadence means for the open/closed balance."
+        sources:
+          - label: "wavect.io — Best Open-Weight LLMs 2026 comparison"
+            url: "https://wavect.io/blog/open-weight-llm-comparison-2026/"
+      - title: "Sourcing caveat"
+        icon: alert
+        badge: gray
+        tag: "Read before citing"
+        body:
+          - "Context-window and pricing specifics for Gemini 3.8 Flash (non-Cyber) were not independently confirmed against Google's own pricing page this pass; treat as directionally accurate pending primary confirmation."
+
+  - id: part3
+    kind: standard
+    nav_label: "Open vs. Closed"
+    icon: eye
+    number: "03"
+    eyebrow: "Part 3"
+    title: "Open vs. Closed AI"
+    lede: "Is the gap between open-weight and closed models widening or narrowing this week?"
+    items:
+      - title: "This week's read: narrowing on capability and cost, widening on gated-safety tiers"
+        icon: eye
+        badge: indigo
+        tag: "Assessment"
+        open: true
+        body:
+          - "On raw capability and cost, the gap keeps narrowing: Kimi K3 (2.8T params, MIT-adjacent terms), Qwen3.8 (2.4T, with a permissive Apache-licensed distilled variant), GLM-5.3, and a now fully MIT-licensed DeepSeek V4 Pro give enterprises credible, cheap, self-hostable alternatives to frontier closed models for most workloads."
+          - "But this week's three flagship closed releases — GPT-6 Astra, Gemini 3.8 Flash Cyber, and Claude Mythos 5.1 — all point to a <b>new axis of separation</b>: gated, safety-tiered access to categories (cybersecurity, life sciences) that closed labs can restrict via API controls and vetting programs, and open-weight releases structurally cannot. A model you can download and run anywhere cannot be access-gated after the fact."
+          - "<b>Net read:</b> the general-capability gap is narrowing, but a governance gap is opening in specific dual-use categories — meaning 'open vs. closed' is becoming less a single spectrum and more two separate competitions."
+          - "On licensing: 'open weight' still isn't synonymous with 'open source' here — Kimi K3 ships under commercial-use conditions for large-scale MaaS deployments, not an unrestricted license, and Mistral's newly announced coalition (Part 1, #16) is explicitly about compute sovereignty, not licensing liberalization."
+        sources:
+          - label: "wavect.io — Best Open-Weight LLMs 2026 comparison"
+            url: "https://wavect.io/blog/open-weight-llm-comparison-2026/"
+
+  - id: part4
+    kind: standard
+    nav_label: "Labs & Talent War"
+    icon: people
+    number: "04"
+    eyebrow: "Part 4"
+    title: "Labs & the Talent War"
+    lede: "Researcher movement, departures, and the labor market underneath the leaderboard."
+    items:
+      - title: "The DeepMind exodus keeps compounding"
+        icon: people
+        badge: purple
+        tag: "Talent"
+        open: true
+        body:
+          - "Jeff Dean, Oriol Vinyals, Quoc Le, and Sanjay Ghemawat leaving Google together to found Discovery Loop remains the standout move of the past month, following Noam Shazeer's Google DeepMind → OpenAI move and John Jumper's Google DeepMind → Anthropic move. See Part 1, #19 for the full item."
+        sources:
+          - label: "HPCwire/AIwire — What Google DeepMind's Departures Say About the AI Talent War"
+            url: "https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/"
+      - title: "The market underneath: acute scarcity, fast movement"
+        icon: hash
+        badge: purple
+        tag: "Talent"
+        body:
+          - "Globally, open AI roles reportedly outnumber qualified candidates roughly 3.2 to 1 (about 1.6 million positions against 518,000 people who can fill them), with average time-to-hire around 4.7 months. Anthropic reportedly retains 80% of its two-year hires while paying below OpenAI at the median, and pulls engineers from OpenAI and DeepMind at ratios of 8:1 and 11:1 respectively — a data point worth weighing against Google's visible losses this month."
+        sources:
+          - label: "herohunt.ai — How to Win the AI Talent War: 2026 Recruiter Guide"
+            url: "https://www.herohunt.ai/blog/how-to-win-the-ai-talent-war-2026/"
+      - title: "Team to watch"
+        icon: eye
+        badge: purple
+        tag: "Talent"
+        body:
+          - "Discovery Loop's next hires will signal whether it's positioning as a serious new AI-for-science lab or a smaller applied-research shop — worth tracking given the caliber of its founding team."
+
+  - id: part5
+    kind: standard
+    nav_label: "AI Money"
+    icon: dollar
+    number: "05"
+    eyebrow: "Part 5"
+    title: "AI Money: Funding, M&A & Investment"
+    lede: "Capital keeps flowing toward infrastructure and compute commitments more than fresh equity rounds this week."
+    items:
+      - title: "Confirmed transaction: Nvidia → Hugging Face → ~$13B → open-ecosystem consolidation"
+        icon: dollar
+        badge: green
+        tag: "M&A"
+        open: true
+        body:
+          - "<b>Buyer:</b> Nvidia. <b>Target:</b> Hugging Face. <b>Deal value:</b> ~$13B (~$11.9B to shareholders + up to $1B retention equity). <b>Strategic rationale:</b> secure the dominant distribution layer for open-weight models and datasets, reinforcing Nvidia's software/ecosystem moat beyond silicon. <b>Competitive impact:</b> AMD, Google TPU, and cloud rivals now depend on a platform owned by their chief hardware competitor. Expected to close H1 2027, pending regulatory approval — a confirmed agreement, not yet a completed transaction."
+        sources:
+          - label: "Bloomberg — Nvidia agrees to $13 billion deal for Hugging Face"
+            url: "https://www.bloomberg.com/news/articles/2026-09-03/nvidia-agrees-to-13-billion-deal-for-ai-platform-hugging-face"
+      - title: "Compute commitments, not equity: Anthropic's $60B+ multi-supplier buildout"
+        icon: server
+        badge: teal
+        tag: "Capital deployment"
+        body:
+          - "$45B/6yr with Nscale, $10B/6yr with Volta, and up to $5B AMD investment tied to a 2GW GPU commitment — see Part 1, #3 for full detail. These are long-term compute purchase and infrastructure commitments, not primary funding rounds, but they represent capital allocation at a scale comparable to major M&A."
+      - title: "Background context: OpenAI's record $122B round"
+        icon: dollar
+        badge: green
+        tag: "Context (confirmed, prior quarter)"
+        body:
+          - "For scale comparison: OpenAI closed the largest private funding round in history — $122B — on March 31, 2026, at an $852B post-money valuation, led by Amazon ($50B, $35B contingent on IPO/AGI milestones), SoftBank ($30B) and Nvidia ($30B). This is background context from earlier in 2026, not a development from this research window."
+        sources:
+          - label: "OpenAI — Accelerating the next phase of AI"
+            url: "https://openai.com/index/accelerating-the-next-phase-ai/"
+      - title: "No new mega-round confirmed this week"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No new startup mega-funding-round (Series C+) was confirmed in this research pass for the August 29–September 4 window specifically; capital activity this week concentrated in M&A and infrastructure/compute deals instead."
+
+  - id: part6
+    kind: standard
+    nav_label: "AI in Production"
+    icon: building
+    number: "06"
+    eyebrow: "Part 6"
+    title: "AI in Production"
+    lede: "Real-world deployment evidence, not pilots or demos."
+    items:
+      - title: "Production AI Deployment of the Week: Cisco's MyAgent, all 90,000 employees"
+        icon: building
+        badge: mint
+        tag: "Production deployment"
+        open: true
+        body:
+          - "Cisco deployed its governed, multi-model MyAgent platform to its entire 90,000-person global workforce, built on its internal Circuit platform. The system routes tasks to different model tiers by complexity, runs mostly on-premises for cost and data control, and performs supervised autonomous workflows across Outlook, Webex, Jira, and SharePoint. This is a genuine full-workforce production rollout — not a departmental pilot — though Cisco has not yet published independently audited productivity or cost figures for the deployment."
+        sources:
+          - label: "PYMNTS — Cisco Deploys Custom AI Agent to Entire 90,000-Person Workforce"
+            url: "https://www.pymnts.com/news/artificial-intelligence/2026/cisco-deploys-custom-ai-agent-to-entire-90000-person-workforce"
+      - title: "Supporting production evidence"
+        icon: hash
+        badge: mint
+        tag: "Production deployment"
+        body:
+          - "JPMorgan reportedly runs 450+ AI use cases in production daily. Salesforce used its own Agentforce platform to cut roughly $5M in legal costs through contract automation. Klarna's agent handled a reported workload-equivalent of 853 employees with about $60M in savings. These figures come from vendor and analyst reporting rather than independently audited disclosures — see Part 1, #18."
+        sources:
+          - label: "AI Monk — 12 Agentic AI Examples With Measurable ROI"
+            url: "https://aimonk.com/agentic-ai-examples-enterprise-roi-case-studies/"
+
+  - id: part7
+    kind: standard
+    nav_label: "Agents & App Layer"
+    icon: bolt
+    number: "07"
+    eyebrow: "Part 7"
+    title: "Agents & the Application Layer"
+    lede: "Tracking the shift from chatbots to copilots to agents to autonomous workflows."
+    items:
+      - title: "Are agents entering production, or still mostly experimental?"
+        icon: bolt
+        badge: mint
+        tag: "Agents"
+        open: true
+        body:
+          - "<b>Entering production, with measurable evidence.</b> Three independent data points converge this week: (1) 78% of enterprise AI teams report at least one MCP-backed agent in production, with the protocol at 97M monthly downloads and 9,400+ registered servers; (2) Cisco's full-workforce MyAgent rollout is a concrete, non-pilot deployment at 90,000 employees; (3) coding agents specifically show a real adoption curve — Claude Code up from 18% to 39% of professional developers globally in five months, Codex up 5x over the same period. Interoperability standards (MCP, A2A now at v1.0 under Linux Foundation governance) are maturing in parallel, which is the precondition for multi-vendor agent ecosystems to compose reliably rather than being single-vendor science projects."
+        sources:
+          - label: "digitalapplied — AI Agent Protocol Ecosystem Map 2026"
+            url: "https://www.digitalapplied.com/blog/ai-agent-protocol-ecosystem-map-2026-mcp-a2a-acp-ucp"
+          - label: "The New Stack — Cursor, Claude Code, and Codex are merging into one AI coding stack"
+            url: "https://thenewstack.io/ai-coding-tool-stack/"
+      - title: "Coding agents: composing, not consolidating"
+        icon: cpu
+        badge: mint
+        tag: "Agents"
+        body:
+          - "Rather than one tool winning outright, enterprises are running Copilot as a broad autocomplete baseline, Claude Code for senior-engineer agentic refactoring, and Codex for OpenAI-centered async workflows — often together. An OpenAI-built plugin now runs inside Anthropic's own Claude Code, a notable interoperability signal from direct competitors."
+        sources:
+          - label: "Turing College — Best AI Coding Agents in 2026"
+            url: "https://www.turingcollege.com/blog/best-ai-coding-agents-2026-claude-code-codex-cursor"
+
+  - id: part8
+    kind: standard
+    nav_label: "Chips & Compute"
+    icon: cpu
+    number: "08"
+    eyebrow: "Part 8"
+    title: "Chips, Compute & AI Hardware"
+    lede: "GPUs, accelerators, and the economics and geopolitics they change."
+    items:
+      - title: "Compute Development of the Week: AMD locks in 2GW of Anthropic demand for Helios"
+        icon: server
+        badge: teal
+        tag: "Infrastructure"
+        open: true
+        body:
+          - "AMD's up-to-$5B investment in Anthropic, tied to Anthropic deploying up to 2GW of AMD Instinct MI450-series GPUs (MI455X) in AMD's integrated Helios rack-scale systems — combined with EPYC 'Venice' CPUs, Pensando networking, and ROCm — changes the economics question from 'can AMD compete on a chip spec sheet' to 'can AMD win at the rack level, where hyperscalers actually buy.' First gigawatt is slated online in H1 2027. Anthropic has committed to purchasing tens of billions of dollars in AMD server chips over the deal's term."
+        sources:
+          - label: "CNBC — AMD to invest up to $5B in Anthropic"
+            url: "https://www.cnbc.com/2026/07/22/amd-anthropic-ai-chip-investment.html"
+          - label: "Yahoo Finance — AMD Commits Up to $5 Billion as Anthropic Targets 2 Gigawatts"
+            url: "https://finance.yahoo.com/technology/ai/articles/amd-commits-5-billion-anthropic-195336439.html"
+      - title: "The export-control gap: policy cleared, chips not shipped"
+        icon: globe
+        badge: indigo
+        tag: "Geopolitical / Infrastructure"
+        body:
+          - "See Part 1, #9: Commerce's case-by-case review framework for H200/MI325X exports to China exists on paper, but zero units have shipped to the roughly ten cleared Chinese buyers as of this research pass — the real constraint on Chinese frontier compute access remains unresolved rather than loosened."
+        sources:
+          - label: "Introl — BIS Export Policy Shift on H200/MI325X"
+            url: "https://introl.com/blog/bis-export-policy-h200-mi325x-china-case-by-case-2026"
+      - title: "China's domestic stack keeps climbing"
+        icon: cpu
+        badge: teal
+        tag: "Geopolitical"
+        body:
+          - "Huawei/SMIC's progress toward 41%+ self-sufficiency (Part 1, #8) is the other half of this story — improving faster on logic dies than on the memory bottleneck (CXMT still can't produce enough HBM-class memory to match SMIC's output)."
+        sources:
+          - label: "officechai — China's chip self-sufficiency data (Morgan Stanley)"
+            url: "https://officechai.com/ai/chinas-self-sufficiency-in-ai-chips-has-risen-from-20-in-2023-to-over-40-in-2026-morgan-stanley-data/"
+
+  - id: part9
+    kind: standard
+    nav_label: "Data Centers & Energy"
+    icon: server
+    number: "09"
+    eyebrow: "Part 9"
+    title: "Data Centers, Energy & AI Infrastructure"
+    lede: "Hyperscale build-out, power, and the physical constraints on AI growth — all advancing on multiple continents at once."
+    items:
+      - title: "North America: Nvidia becomes a data-center tenant in its own right"
+        icon: server
+        badge: teal
+        tag: "Infrastructure"
+        open: true
+        body:
+          - "Nvidia is reportedly the tenant behind Hut 8's 1GW Beacon Point campus in Nueces County, Texas — 704MW of contracted IT capacity, base lease value $19.6B rising to $50.2B with renewals, targeting Q1 2027 energization. Separately, Anthropic's $45B Nscale deal secures 460MW (reportedly sited in West Virginia), and Energy Vault signed a 1.25GW integrated power-infrastructure deal for a Texas hyperscaler AI data center, expecting $500-600M in revenue through 2027."
+        sources:
+          - label: "Data Centre Magazine — Hut 8 Commercialises $9.8bn Texas AI Data Centre Lease"
+            url: "https://datacentremagazine.com/news/hut-8-signs-9-8bn-texas-ai-data-centre-lease"
+          - label: "Energy Storage News — Energy Vault signs 1.25GW AI data centre power infrastructure agreement"
+            url: "https://www.energy-storage.news/energy-vault-signs-1-25gw-ai-data-centre-power-infrastructure-agreement-in-texas/"
+      - title: "Europe: Norway compute and a sovereignty coalition"
+        icon: globe
+        badge: teal
+        tag: "Infrastructure"
+        body:
+          - "Anthropic's separate $10B/6yr Volta deal draws capacity from a Norwegian data center, while Mistral's new coalition targets up to 1GW of European sovereign compute by 2030 (Part 1, #16) — two different approaches (a U.S. lab buying Nordic capacity vs. a European lab building its own) to the same underlying scarcity."
+      - title: "Gulf states: converting cheap energy into sovereign compute"
+        icon: globe
+        badge: indigo
+        tag: "Infrastructure"
+        body:
+          - "Saudi Arabia's HUMAIN (~$100B, 2.2GW across 11 data centers) and the UAE's Stargate UAE (1GW target, 200MW online in 2026) continue to scale — see Part 1, #17."
+
+  - id: part10
+    kind: standard
+    nav_label: "The Global AI Race"
+    icon: globe
+    number: "10"
+    eyebrow: "Part 10"
+    title: "The Global AI Race"
+    lede: "Momentum across the major regions — directional, and honest about where confidence runs out this week."
+    items:
+      - title: "🇺🇸 United States — ↑ Accelerating, with real friction"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        open: true
+        body:
+          - "Capital (Nvidia-Hugging Face, $725B combined big-tech capex), a live IPO push (Anthropic), and back-to-back frontier releases (GPT-6 Astra) all point up — but H200/MI325X export-policy enforcement still isn't executing in practice, and a copyright suit now names Anthropic's founders personally. Momentum is real; so is accumulating regulatory and legal friction."
+      - title: "🇨🇳 China — ↑ Accelerating"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "Chip self-sufficiency crossing 41% and an aggressive open-weight release cadence (Kimi K3, Qwen3.8, GLM-5.3, DeepSeek V4) both point to sustained domestic-stack momentum, though the unresolved memory (HBM) bottleneck caps how far that goes without a CXMT breakthrough."
+      - title: "🇪🇺 European Union / 🇫🇷 France — → Stable"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "Mistral's compute-sovereignty coalition (Part 1, #16) is real forward motion, but the EU AI Act's high-risk compliance deadline remains politically contested (a proposed delay to December 2027 is unresolved), leaving the region's regulatory trajectory uncertain even as its infrastructure ambitions advance."
+      - title: "🇬🇧 United Kingdom — → Stable"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "The UK's AI Regulation and Safety Bill is expected to receive Royal Assent October 15, 2026; Nscale (UK-based) is a supplier on Anthropic's $45B compute deal, giving the UK an infrastructure foothold independent of the regulatory track."
+      - title: "🇩🇪 Germany — No material development this week"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No Germany-specific AI development surfaced independently in this research pass."
+      - title: "🇮🇳 India — → Stable"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "India's Parliament is scheduled to begin reviewing Digital India Act generative-AI liability clauses on September 21, 2026 — a regulatory process starting, not yet a policy outcome."
+      - title: "🇯🇵 Japan — → Stable"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "METI is set to release updated AI Guidelines for Business on September 10, introducing watermarking recommendations for media companies, continuing Japan's light-touch, no-monetary-penalty regulatory approach."
+      - title: "🇰🇷 South Korea — No material development this week"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "No South Korea-specific AI development surfaced independently in this research pass."
+      - title: "🇸🇦 Saudi Arabia / 🇦🇪 UAE — ↑ Accelerating"
+        icon: globe
+        badge: indigo
+        tag: "Global power map"
+        body:
+          - "HUMAIN's ~$100B, 2.2GW buildout and Stargate UAE's 1GW target both continue advancing on schedule, backed by among the cheapest energy costs of any region building AI infrastructure today."
+
+  - id: part11
+    kind: standard
+    nav_label: "Company Watchlist"
+    icon: compass
+    number: "11"
+    eyebrow: "Part 11"
+    title: "AI Company Watchlist"
+    lede: "Companies whose competitive position materially changed this week, by region."
+    items:
+      - title: "United States"
+        icon: compass
+        badge: indigo
+        tag: "Watchlist"
+        open: true
+        kv:
+          - term: "Leaders"
+            desc: "OpenAI, Anthropic, Google DeepMind, Nvidia, Microsoft, Meta"
+          - term: "Challengers"
+            desc: "AMD (now a 2GW-scale Anthropic supplier), Cisco (full-workforce agent deployment)"
+          - term: "Emerging"
+            desc: "Nscale, Volta, Hut 8, Energy Vault — the infrastructure-supplier layer capturing compute-buildout capital"
+          - term: "Momentum changes this week"
+            desc: "<b>Nvidia</b> — Hugging Face acquisition extends reach into open-model distribution and data-center tenancy. <b>Anthropic</b> — IPO lead over OpenAI, but new personal-liability legal exposure. <b>AMD</b> — credible rack-scale challenger via the Anthropic Helios commitment. <b>Hut 8</b> — completed transition from bitcoin miner to AI-infrastructure landlord."
+      - title: "Europe"
+        icon: compass
+        badge: indigo
+        tag: "Watchlist"
+        kv:
+          - term: "Leaders"
+            desc: "Mistral AI"
+          - term: "Challengers"
+            desc: "Nscale (UK compute infrastructure, now an Anthropic supplier)"
+          - term: "Emerging"
+            desc: "Not confidently identified this pass"
+          - term: "Momentum changes this week"
+            desc: "<b>Mistral</b> — shift from single-model vendor to platform strategy (third-party open-model support, compute-sovereignty coalition)."
+      - title: "China"
+        icon: compass
+        badge: indigo
+        tag: "Watchlist"
+        kv:
+          - term: "Leaders"
+            desc: "Huawei, Alibaba/Qwen, DeepSeek"
+          - term: "Challengers"
+            desc: "Moonshot AI (Kimi), Z.AI (GLM), SMIC"
+          - term: "Emerging"
+            desc: "CXMT (memory), watched for whether it can close the HBM gap"
+          - term: "Momentum changes this week"
+            desc: "<b>Huawei/SMIC</b> — self-sufficiency crossing 41% strengthens the domestic-stack narrative, though CXMT's memory bottleneck remains the visible constraint."
+      - title: "Scope note"
+        icon: alert
+        badge: gray
+        tag: "Gap, stated honestly"
+        body:
+          - "The Europe 'Emerging' category and a full India/Japan/Korea/Gulf company-level watchlist weren't confidently built out from this pass's sourcing — flagged rather than filled with unverified names."
+
+  - id: part12
+    kind: standard
+    nav_label: "Numbers That Matter"
+    icon: hash
+    number: "12"
+    eyebrow: "Part 12"
+    title: "The Numbers That Matter"
+    lede: "A compact dashboard of the week's most load-bearing figures."
+    items:
+      - title: "This week's dashboard"
+        icon: hash
+        badge: gray
+        tag: "Numbers"
+        open: true
+        stats:
+          - value: "~$13B"
+            label: "Nvidia's agreed acquisition of Hugging Face"
+          - value: "$45B"
+            label: "Anthropic's 6-year Nscale compute deal (460MW)"
+          - value: "$10B"
+            label: "Anthropic's 6-year Volta compute deal (Norway)"
+          - value: "up to $50.2B"
+            label: "Nvidia-backed Hut 8 Texas data-center lease, 15-year value"
+          - value: "up to $5B / 2GW"
+            label: "AMD investment in Anthropic, tied to MI450 GPU deployment"
+          - value: "$150,000/song"
+            label: "Statutory damages sought in Sony/Warner Chappell v. Anthropic"
+          - value: "~$725B"
+            label: "Combined 2026 AI capex, Microsoft+Amazon+Google+Meta (+77% YoY)"
+          - value: "41%+"
+            label: "China's AI chip self-sufficiency (up from ~20% in 2023)"
+          - value: "97M/mo"
+            label: "MCP SDK downloads, up from 100K in 16 months (970x)"
+          - value: "39% / 47%"
+            label: "Claude Code adoption among developers, global / U.S. (up from 18%)"
+        sources:
+          - label: "Bloomberg — Nvidia agrees to $13 billion deal for Hugging Face"
+            url: "https://www.bloomberg.com/news/articles/2026-09-03/nvidia-agrees-to-13-billion-deal-for-ai-platform-hugging-face"
+          - label: "Forbes — Anthropic's $45B Nscale deal"
+            url: "https://www.forbes.com/sites/jonmarkman/2026/08/28/anthropics-45-billion-nscale-deal-buys-460-megawatts-of-vera-rubin/"
+          - label: "Yahoo Finance — Nvidia reportedly signs up to $50 billion Texas data-center lease"
+            url: "https://finance.yahoo.com/technology/ai/articles/nvidia-reportedly-signs-50-billion-192803623.html"
+          - label: "Fortune — Sony and Warner sue Anthropic"
+            url: "https://fortune.com/2026/09/01/anthropic-warner-sony-music-songs-lawsuit/"
+          - label: "officechai — China's chip self-sufficiency data"
+            url: "https://officechai.com/ai/chinas-self-sufficiency-in-ai-chips-has-risen-from-20-in-2023-to-over-40-in-2026-morgan-stanley-data/"
+          - label: "The New Stack — Coding agent stack adoption data"
+            url: "https://thenewstack.io/ai-coding-tool-stack/"
+      - title: "Sourcing caveat"
+        icon: alert
+        badge: gray
+        tag: "Read before citing"
+        body:
+          - "Figures above come from company disclosures where noted and from press/analyst reporting otherwise; several (capex totals, self-sufficiency percentage, protocol download counts) are aggregated estimates rather than single confirmed primary-source numbers. Cross-check before using in external materials."
+
+  - id: part13
+    kind: standard
+    nav_label: "Signals Beneath Headlines"
+    icon: pulse
+    number: "13"
+    eyebrow: "Part 13"
+    title: "Signals Beneath the Headlines"
+    lede: "Five developments that look small today but could become strategically important over the next six to twenty-four months."
+    items:
+      - title: "Signal 1 — The neutral hub for open models now has an owner"
+        icon: pulse
+        badge: purple
+        tag: "6-24 month watch"
+        open: true
+        facts:
+          - label: "Signal"
+            text: "Nvidia's acquisition of Hugging Face puts the dominant distribution layer for open-weight models under the ownership of the dominant hardware vendor."
+          - label: "Why it could matter"
+            text: "If rival labs or chipmakers start to distrust Hugging Face's neutrality — even without any actual policy change — a fragmented, multi-hub open-model ecosystem could emerge, undercutting exactly the network effects that made Hugging Face valuable in the first place."
+          - label: "What to watch"
+            text: "Whether AMD, Google, or major open-weight labs (DeepSeek, Alibaba, Moonshot) announce or expand alternative distribution channels within two to three quarters."
+        sources:
+          - label: "Fortune — Hugging Face's path to $13B acquisition"
+            url: "https://fortune.com/2026/09/03/hugging-face-goes-from-a-scrappy-startup-named-after-an-emoji-to-13-billion-nvidia-acquisition/"
+      - title: "Signal 2 — Gated, tiered-access models are becoming the default pattern for dual-use capability"
+        icon: pulse
+        badge: purple
+        tag: "6-24 month watch"
+        open: true
+        facts:
+          - label: "Signal"
+            text: "Three labs (OpenAI, Google, Anthropic) each shipped a cybersecurity-relevant model this week with some form of restricted or vetted access rather than open API availability."
+          - label: "Why it could matter"
+            text: "If this becomes standard practice, frontier capability access starts to look less like a product tier and more like a licensing/vetting regime — with real implications for who gets to build on top of the most capable models, and potential regulatory codification of what 'vetted access' means."
+          - label: "What to watch"
+            text: "Whether any government moves to formalize vetted-access requirements for cyber-capable models within the next year, rather than leaving it to individual labs' self-imposed frameworks."
+        sources:
+          - label: "OpenAI — Path to Astra"
+            url: "https://openai.com/index/path-to-astra/"
+      - title: "Signal 3 — Cisco's model-routing architecture, not its scale, is the real story"
+        icon: pulse
+        badge: purple
+        tag: "6-24 month watch"
+        body:
+          - "Cisco explicitly routes tasks to the cheapest adequate model rather than defaulting every query to a frontier model. If 'right-sized model routing' becomes the enterprise-standard architecture, it caps the growth of pure per-token frontier-model revenue even as agent usage volume keeps rising — a very different outcome for model providers than a world where every task defaults to the biggest available model."
+        sources:
+          - label: "Cisco Blogs — MyAgent and the Rise of Ambient Intelligence"
+            url: "https://blogs.cisco.com/news/my-agent-and-the-rise-of-ambient-intelligence-ciscos-next-step-in-enterprise-ai"
+      - title: "Signal 4 — A single customer is now underwriting 2 gigawatts of non-Nvidia silicon"
+        icon: pulse
+        badge: purple
+        tag: "6-24 month watch"
+        body:
+          - "Anthropic's AMD commitment isn't a pilot order — it's tens of billions of dollars in chip purchases tied to 2GW of deployment. If AMD's Helios racks hit their promised tokens-per-dollar on schedule in H1 2027, it becomes the clearest existence proof yet that a major AI lab can run production workloads on a non-Nvidia stack at meaningful scale, which every other hyperscaler's procurement team will study closely."
+        sources:
+          - label: "Yahoo Finance — AMD Commits Up to $5 Billion as Anthropic Targets 2 Gigawatts"
+            url: "https://finance.yahoo.com/technology/ai/articles/amd-commits-5-billion-anthropic-195336439.html"
+      - title: "Signal 5 — Naming individual founders as defendants is a new litigation lever"
+        icon: pulse
+        badge: purple
+        tag: "6-24 month watch"
+        facts:
+          - label: "Signal"
+            text: "Sony Music Publishing and Warner Chappell named Anthropic's co-founders personally in their copyright suit, a step beyond the corporate-only author class action Anthropic settled for $1.5B a year earlier."
+          - label: "Why it could matter"
+            text: "Personal-liability exposure changes the incentive calculus for founders and executives across the industry — not just Anthropic's — around data-sourcing decisions made years before a lawsuit is filed."
+          - label: "What to watch"
+            text: "Whether other rights holders (visual media, publishing, software) file suits naming individual lab leadership at OpenAI, Google, or Meta within the next several quarters."
+        sources:
+          - label: "TechCrunch — Sony Music, Warner sue Anthropic"
+            url: "https://techcrunch.com/2026/08/29/sony-music-warner-sue-anthropic-alleging-a-brazen-campaign-of-intellectual-property-theft/"
+
+  - id: part14
+    kind: standard
+    nav_label: "What Changed This Week"
+    icon: calendar
+    number: "14"
+    eyebrow: "Part 14"
+    title: "What Changed This Week?"
+    lede: "Eight direct questions, answered succinctly."
+    items:
+      - title: "1. Which company gained the most strategic ground?"
+        icon: calendar
+        badge: cyan
+        open: true
+        body:
+          - "<b>Nvidia</b> — the Hugging Face acquisition extends its reach from silicon into open-model distribution, while it simultaneously becomes a hyperscale data-center tenant via the Hut 8 lease."
+      - title: "2. Which company lost ground?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "<b>Anthropic</b> on the legal front — being named personally, alongside its company, in a major copyright suit is a new category of exposure even as its IPO and compute position strengthen elsewhere."
+      - title: "3. Which model release mattered most?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "<b>GPT-6 Astra</b> — the first model publicly confirmed to cross a lab's highest-severity capability threshold changes the conversation for every subsequent frontier release."
+      - title: "4. What changed in AI economics?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Anthropic's 75% cache-pricing cut targets the specific cost driver of agentic workloads, while combined big-tech capex tracking toward ~$725B sharpens the debate over whether infrastructure spend has outrun realized enterprise revenue."
+      - title: "5. What changed in enterprise adoption?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Cisco's full-workforce, on-prem-heavy, task-routed agent deployment is a concrete architectural template other large enterprises are likely to study and copy."
+      - title: "6. What changed in AI infrastructure?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "AMD secured a 2GW, tens-of-billions-of-dollars commitment from Anthropic — its clearest rack-scale foothold yet against Nvidia — while Nvidia itself became a long-term data-center tenant in Texas."
+      - title: "7. What changed in the U.S.-China AI race?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "China's chip self-sufficiency crossed 41%, while U.S. export-control policy for H200/MI325X remains cleared on paper but undelivered in practice — the compute-access standoff continues rather than resolving."
+      - title: "8. What development is being underestimated?"
+        icon: calendar
+        badge: cyan
+        body:
+          - "Cisco's model-routing architecture (Part 13, Signal 3) — it reads as an internal IT story, but if it becomes the enterprise default, it caps frontier-model per-token revenue growth even as agent adoption keeps climbing."
+
+  - id: part15
+    kind: standard
+    nav_label: "The Big Picture"
+    icon: horizon
+    number: "15"
+    eyebrow: "Part 15"
+    title: "The Big Picture"
+    lede: "The AI landscape in five minutes, three things to watch next week, and the full scope note."
+    items:
+      - title: "The AI landscape in five minutes"
+        icon: horizon
+        badge: orange
+        tag: "Synthesis"
+        open: true
+        body:
+          - "The dominant thread this week is <b>vertical consolidation around Nvidia</b>: a $13B acquisition of the open-model ecosystem's central hub, plus a role as long-term tenant in a $50B Texas data-center lease, extend Nvidia's reach well beyond chips into distribution and physical infrastructure. Layered on top, three frontier labs each shipped a cybersecurity-capable model this week under some form of gated access — OpenAI's GPT-6 Astra crossing a 'Critical' capability threshold, Google's Gemini 3.8 Flash Cyber, and Anthropic's trusted-access Mythos 5.1 — suggesting the industry is converging on tiered, vetted access as the default answer to dual-use risk, rather than waiting for regulation to force the issue."
+          - "Capital continues flowing toward physical buildout over pure model training: Anthropic alone committed on the order of $60B across three compute suppliers in under two months, ahead of an IPO push that has it pulling clearly ahead of OpenAI's now-2027-leaning timeline. That spending sits against a combined ~$725B big-tech capex figure for 2026 and a live, substantive debate about whether infrastructure investment has outrun the roughly $100B of realized enterprise AI revenue supporting it — a question the market will start pricing in earnest once Anthropic's IPO provides the first real public benchmark for foundation-model economics."
+          - "Geopolitically, the pattern from prior weeks holds: policy exists faster than execution. China's chip self-sufficiency keeps climbing (41%+) even as its memory bottleneck persists, while U.S. export clearances for H200/MI325X remain undelivered on the ground months after approval. Meanwhile a new legal front opened against Anthropic — its founders named personally in a copyright suit — adding a category of executive risk that could reshape how every lab's leadership thinks about historical data-sourcing decisions."
+      - title: "Three things to watch next week"
+        icon: compass
+        badge: orange
+        tag: "Forward look"
+        open: true
+        kv:
+          - term: "1. Anthropic's S-1"
+            desc: "Whether Anthropic publishes its S-1 and confirms the October Nasdaq listing target, giving the market its first real look at frontier-lab financials."
+          - term: "2. H200 shipments"
+            desc: "Whether any cleared Chinese buyer actually receives H200 units, or the export-policy limbo continues into a second month."
+          - term: "3. Regulatory reaction to gated cyber models"
+            desc: "Whether any government or standards body responds formally to this week's cluster of Critical/gated cybersecurity model releases (GPT-6 Astra, Gemini 3.8 Flash Cyber, Claude Mythos 5.1)."
+      - title: "All sources, indexed"
+        icon: hash
+        badge: gray
+        tag: "Reference"
+        kv:
+          - term: "OpenAI"
+            desc: "<a href=\"https://openai.com/index/path-to-astra/\" target=\"_blank\" rel=\"noopener noreferrer\">Path to Astra</a>"
+          - term: "CSO Online"
+            desc: "<a href=\"https://www.csoonline.com/article/4218679/openai-launches-gpt-6-astra-its-first-model-to-cross-a-critical-cybersecurity-threshold.html\" target=\"_blank\" rel=\"noopener noreferrer\">GPT-6 Astra crosses critical cybersecurity threshold</a>"
+          - term: "Bloomberg"
+            desc: "<a href=\"https://www.bloomberg.com/news/articles/2026-09-03/nvidia-agrees-to-13-billion-deal-for-ai-platform-hugging-face\" target=\"_blank\" rel=\"noopener noreferrer\">Nvidia agrees to $13B deal for Hugging Face</a>"
+          - term: "CNBC"
+            desc: "<a href=\"https://www.cnbc.com/2026/09/03/nvidia-agrees-to-buy-hugging-face-for-almost-13-billion-ai-expansion.html\" target=\"_blank\" rel=\"noopener noreferrer\">Nvidia agrees to buy Hugging Face</a>"
+          - term: "Fortune"
+            desc: "<a href=\"https://fortune.com/2026/09/03/hugging-face-goes-from-a-scrappy-startup-named-after-an-emoji-to-13-billion-nvidia-acquisition/\" target=\"_blank\" rel=\"noopener noreferrer\">Hugging Face's path to $13B acquisition</a>"
+          - term: "TechCrunch (Nscale)"
+            desc: "<a href=\"https://techcrunch.com/2026/08/26/anthropic-continues-compute-gobbling-streak-in-45-billion-deal-with-nscale/\" target=\"_blank\" rel=\"noopener noreferrer\">Anthropic's $45B deal with Nscale</a>"
+          - term: "Forbes"
+            desc: "<a href=\"https://www.forbes.com/sites/jonmarkman/2026/08/28/anthropics-45-billion-nscale-deal-buys-460-megawatts-of-vera-rubin/\" target=\"_blank\" rel=\"noopener noreferrer\">Anthropic's $45B Nscale deal buys 460MW</a>"
+          - term: "CNBC (AMD)"
+            desc: "<a href=\"https://www.cnbc.com/2026/07/22/amd-anthropic-ai-chip-investment.html\" target=\"_blank\" rel=\"noopener noreferrer\">AMD to invest up to $5B in Anthropic</a>"
+          - term: "Dealroom"
+            desc: "<a href=\"https://dealroom.co/news/147131-openai-reboots-as-anthropic-pulls-ahead-with-ipo-planned-for-september/\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI reboots as Anthropic pulls ahead with IPO</a>"
+          - term: "Forge"
+            desc: "<a href=\"https://forgeglobal.com/anthropic_ipo/\" target=\"_blank\" rel=\"noopener noreferrer\">Anthropic IPO Timeline and Financing Details</a>"
+          - term: "TechCrunch (lawsuit)"
+            desc: "<a href=\"https://techcrunch.com/2026/08/29/sony-music-warner-sue-anthropic-alleging-a-brazen-campaign-of-intellectual-property-theft/\" target=\"_blank\" rel=\"noopener noreferrer\">Sony Music, Warner sue Anthropic</a>"
+          - term: "Fortune (lawsuit)"
+            desc: "<a href=\"https://fortune.com/2026/09/01/anthropic-warner-sony-music-songs-lawsuit/\" target=\"_blank\" rel=\"noopener noreferrer\">Sony and Warner sue Anthropic over songs</a>"
+          - term: "Axios (lawsuit)"
+            desc: "<a href=\"https://www.axios.com/2026/08/29/anthropic-sony-warner-music-copyright\" target=\"_blank\" rel=\"noopener noreferrer\">Sony, Warner sue Anthropic</a>"
+          - term: "Data Centre Magazine"
+            desc: "<a href=\"https://datacentremagazine.com/news/hut-8-signs-9-8bn-texas-ai-data-centre-lease\" target=\"_blank\" rel=\"noopener noreferrer\">Hut 8 Commercialises $9.8bn Texas AI Data Centre Lease</a>"
+          - term: "Yahoo Finance (Hut 8)"
+            desc: "<a href=\"https://finance.yahoo.com/technology/ai/articles/nvidia-reportedly-signs-50-billion-192803623.html\" target=\"_blank\" rel=\"noopener noreferrer\">Nvidia reportedly signs up to $50B Texas lease</a>"
+          - term: "Google Blog"
+            desc: "<a href=\"https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/\" target=\"_blank\" rel=\"noopener noreferrer\">Introducing Gemini 3.8 Flash and 3.8 Flash Cyber</a>"
+          - term: "Help Net Security"
+            desc: "<a href=\"https://www.helpnetsecurity.com/2026/09/03/google-gemini-3-8-flash/\" target=\"_blank\" rel=\"noopener noreferrer\">Google's Gemini 3.8 Flash</a>"
+          - term: "officechai"
+            desc: "<a href=\"https://officechai.com/ai/chinas-self-sufficiency-in-ai-chips-has-risen-from-20-in-2023-to-over-40-in-2026-morgan-stanley-data/\" target=\"_blank\" rel=\"noopener noreferrer\">China's chip self-sufficiency (Morgan Stanley)</a>"
+          - term: "enkiai"
+            desc: "<a href=\"https://enkiai.com/ai-market-intelligence/smic-ai-chip-strategy-2026-inside-chinas-5nm-power-play/\" target=\"_blank\" rel=\"noopener noreferrer\">SMIC AI Chip Strategy 2026</a>"
+          - term: "Introl"
+            desc: "<a href=\"https://introl.com/blog/bis-export-policy-h200-mi325x-china-case-by-case-2026\" target=\"_blank\" rel=\"noopener noreferrer\">BIS Export Policy Shift on H200/MI325X</a>"
+          - term: "whatledto.com"
+            desc: "<a href=\"https://whatledto.com/events/nvidia-china-export-controls\" target=\"_blank\" rel=\"noopener noreferrer\">US Export Controls on Nvidia AI Chips to China Timeline</a>"
+          - term: "VentureBeat"
+            desc: "<a href=\"https://venturebeat.com/technology/anthropics-claude-fable-5-1-and-mythos-5-1-arrive-with-a-75-cost-reduction-for-fable-cache-reads\" target=\"_blank\" rel=\"noopener noreferrer\">Claude Fable 5.1 and Mythos 5.1</a>"
+          - term: "MarkTechPost"
+            desc: "<a href=\"https://www.marktechpost.com/2026/09/01/anthropic-releases-claude-fable-5-1-and-claude-mythos-5-1-52-6-on-terminal-bench-science-and-75-cheaper-cache-reads/\" target=\"_blank\" rel=\"noopener noreferrer\">Claude Fable/Mythos 5.1 benchmarks</a>"
+          - term: "PYMNTS"
+            desc: "<a href=\"https://www.pymnts.com/news/artificial-intelligence/2026/cisco-deploys-custom-ai-agent-to-entire-90000-person-workforce\" target=\"_blank\" rel=\"noopener noreferrer\">Cisco Deploys MyAgent to 90,000 Employees</a>"
+          - term: "Cisco Blogs"
+            desc: "<a href=\"https://blogs.cisco.com/news/my-agent-and-the-rise-of-ambient-intelligence-ciscos-next-step-in-enterprise-ai\" target=\"_blank\" rel=\"noopener noreferrer\">MyAgent and the Rise of Ambient Intelligence</a>"
+          - term: "Medium (Agent Protocols)"
+            desc: "<a href=\"https://medium.com/@wasowski.jarek/13-agent-protocols-in-four-layers-what-to-deploy-today-ed0015815b69\" target=\"_blank\" rel=\"noopener noreferrer\">AI Agent Protocols 2026: MCP, A2A, AG-UI</a>"
+          - term: "digitalapplied"
+            desc: "<a href=\"https://www.digitalapplied.com/blog/ai-agent-protocol-ecosystem-map-2026-mcp-a2a-acp-ucp\" target=\"_blank\" rel=\"noopener noreferrer\">AI Agent Protocol Ecosystem Map 2026</a>"
+          - term: "The New Stack"
+            desc: "<a href=\"https://thenewstack.io/ai-coding-tool-stack/\" target=\"_blank\" rel=\"noopener noreferrer\">Cursor, Claude Code, and Codex merging into one stack</a>"
+          - term: "Turing College"
+            desc: "<a href=\"https://www.turingcollege.com/blog/best-ai-coding-agents-2026-claude-code-codex-cursor\" target=\"_blank\" rel=\"noopener noreferrer\">Best AI Coding Agents in 2026</a>"
+          - term: "globaldatacenterhub"
+            desc: "<a href=\"https://www.globaldatacenterhub.com/p/microsoft-q3-fy2026-the-190b-capex\" target=\"_blank\" rel=\"noopener noreferrer\">Microsoft Q3 FY2026: The $190B Capex Plan</a>"
+          - term: "valueaddvc"
+            desc: "<a href=\"https://valueaddvc.com/pulse/microsoft-meta-earnings-ai-capex-reckoning-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Microsoft, Meta Earnings and AI Capex Reckoning</a>"
+          - term: "Motley Fool"
+            desc: "<a href=\"https://www.fool.com/investing/2026/09/02/wall-street-scary-seasonal-pattern-ai-stock/\" target=\"_blank\" rel=\"noopener noreferrer\">Wall Street's Scariest Seasonal Pattern Returns in September</a>"
+          - term: "intellectia.ai"
+            desc: "<a href=\"https://intellectia.ai/blog/ai-investment-bubble-2026\" target=\"_blank\" rel=\"noopener noreferrer\">AI Investment Bubble 2026</a>"
+          - term: "EU-Startups"
+            desc: "<a href=\"https://www.eu-startups.com/2026/03/mistral-ai-extends-a-year-of-outsized-expansion-with-e722-million-to-deepen-europes-ai-infrastructure/\" target=\"_blank\" rel=\"noopener noreferrer\">Mistral AI extends expansion with €722 million</a>"
+          - term: "Gulf Business"
+            desc: "<a href=\"https://gulfbusiness.com/en/2026/artificial-intelligence/why-saudi-uae-are-becoming-the-worlds-next-ai/\" target=\"_blank\" rel=\"noopener noreferrer\">Why Saudi, UAE are becoming the world's next AI heavyweights</a>"
+          - term: "Presenc.ai"
+            desc: "<a href=\"https://presenc.ai/research/sovereign-ai-infrastructure-tracker-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Sovereign AI Infrastructure Tracker 2026</a>"
+          - term: "AI Monk"
+            desc: "<a href=\"https://aimonk.com/agentic-ai-examples-enterprise-roi-case-studies/\" target=\"_blank\" rel=\"noopener noreferrer\">12 Agentic AI Examples With Measurable ROI</a>"
+          - term: "HPCwire / AIwire"
+            desc: "<a href=\"https://www.hpcwire.com/aiwire/2026/08/12/what-google-deepminds-departures-say-about-the-ai-talent-war/\" target=\"_blank\" rel=\"noopener noreferrer\">Google DeepMind Departures</a>"
+          - term: "Axios (talent)"
+            desc: "<a href=\"https://www.axios.com/2026/06/23/ai-lab-agi-google-deepmind-departures\" target=\"_blank\" rel=\"noopener noreferrer\">Google takes the hit in AI's talent war</a>"
+          - term: "herohunt.ai"
+            desc: "<a href=\"https://www.herohunt.ai/blog/how-to-win-the-ai-talent-war-2026/\" target=\"_blank\" rel=\"noopener noreferrer\">How to Win the AI Talent War: 2026 Recruiter Guide</a>"
+          - term: "humanoid.guide"
+            desc: "<a href=\"https://humanoid.guide/the-humanoid-foundation-model-report/\" target=\"_blank\" rel=\"noopener noreferrer\">Humanoid World Models: The 2026 Report</a>"
+          - term: "KraneShares"
+            desc: "<a href=\"https://kraneshares.com/humanoid-robotics-in-2026-the-race-from-pilot-to-platform/\" target=\"_blank\" rel=\"noopener noreferrer\">Humanoid Robotics In 2026</a>"
+          - term: "wavect.io"
+            desc: "<a href=\"https://wavect.io/blog/open-weight-llm-comparison-2026/\" target=\"_blank\" rel=\"noopener noreferrer\">Best Open-Weight LLMs 2026 comparison</a>"
+          - term: "OpenAI ($122B round)"
+            desc: "<a href=\"https://openai.com/index/accelerating-the-next-phase-ai/\" target=\"_blank\" rel=\"noopener noreferrer\">Accelerating the next phase of AI</a>"
+          - term: "Energy Storage News"
+            desc: "<a href=\"https://www.energy-storage.news/energy-vault-signs-1-25gw-ai-data-centre-power-infrastructure-agreement-in-texas/\" target=\"_blank\" rel=\"noopener noreferrer\">Energy Vault signs 1.25GW AI data centre deal</a>"
+      - title: "Scope & limitations"
+        icon: alert
+        badge: red
+        tag: "Read this before relying on the brief"
+        body:
+          - "This edition was produced from roughly 30 targeted web searches rather than the full multi-source, primary-document research program (company filings, model cards, direct earnings transcripts) that a production newsletter desk would run. Where a figure or claim rests on aggregator or single-outlet reporting rather than a confirmed primary source, the relevant item says so inline (e.g., Mistral's coalition details, ROI survey percentages, AI capex breakdowns)."
+          - "Some sections (Europe/India/Japan/Korea company watchlists, Germany and South Korea in the global power map) are marked as data gaps rather than filled with unverified content, per this newsletter's editorial rules against manufacturing stories to complete a section."
+          - "Figures involving 'reported' deal terms (Hut 8/Nvidia lease value, Mistral coalition scope) should be treated as the best available reporting at publication time, not confirmed by the counterparties in all cases — cross-check against primary filings before citing externally."
