@@ -1,0 +1,5 @@
+interface:
+  display_name: "Landing-Page-Builder"
+  short_description: "Researches a named person and builds a tasteful, sourced personal landing page from a reviewable YAML data file."
+policy:
+  allow_implicit_invocation: true

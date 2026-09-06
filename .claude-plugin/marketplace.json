@@ -50,6 +50,20 @@
         "developer-workflow",
         "repo-related"
       ]
+    },
+    {
+      "name": "personal-branding-skills",
+      "source": "./personal-branding",
+      "description": "Personal-branding skills: researches a named person from public sources and builds a tasteful, sourced, self-contained personal landing page from a reviewable YAML data file.",
+      "category": "design",
+      "keywords": [
+        "personal-branding",
+        "landing-page",
+        "personal-website",
+        "portfolio",
+        "yaml",
+        "web-design"
+      ]
     }
   ]
 }

@@ -117,6 +117,39 @@ with every skill twice — pick one.
 
 > 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
 
+## 🪪 Personal branding
+
+Skills for building a person's own public-facing presence from
+researched, sourced data — currently: researching a named individual
+from public sources and building them a tasteful, professional personal
+landing page (a sourced YAML data file first, then a self-contained
+HTML page rendered from it).
+
+**Installation**:
+
+Choose the skill by name: `landing-page-builder` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install personal-branding-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Personal branding README.md**](skills/personal-branding/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -139,3 +172,7 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Development](skills/development/README.md) | `create-issues-update-pr` | Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list. |
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Personal branding](skills/personal-branding/README.md) | `landing-page-builder` | Researches a named person from public sources, structures the findings into a sourced YAML data file, and builds a tasteful, self-contained personal landing page from it — no generic AI-slop patterns. |

@@ -1,0 +1,22 @@
+{
+  "name": "landing-page-builder",
+  "displayName": "Landing Page Builder",
+  "version": "1.0.0",
+  "description": "Researches a named person from public sources, structures the findings into a sourced YAML data file, and builds a tasteful, self-contained personal landing page from it — no generic AI-slop patterns.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/personal-branding/landing-page-builder",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "landing-page",
+    "personal-website",
+    "portfolio",
+    "personal-branding",
+    "yaml",
+    "web-design",
+    "html"
+  ]
+}

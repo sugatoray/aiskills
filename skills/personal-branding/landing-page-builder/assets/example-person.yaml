@@ -1,0 +1,107 @@
+# Example only — a fictional person, used to illustrate the schema in
+# references/data-schema.md. Never reuse these facts, quotes, or the
+# testimonial below for a real page; they are not sourced from anyone.
+
+person:
+  full_name: "Ava Okonkwo-Reyes"
+  preferred_name: "Ava"
+  pronouns: "she/her"
+  tagline: "Marine biologist studying coral resilience"
+  location: "Honolulu, Hawaii"
+  headshot_url: null   # omitted deliberately — see data-schema.md's "Images" note
+  summary: |
+    Ava studies how staghorn coral adapts to warming oceans, splitting
+    her time between reef-side fieldwork in the Pacific and lab work
+    modeling thermal-tolerance thresholds. She leads the Reef Resilience
+    Atlas, an open dataset now used by three regional research stations.
+
+socials:
+  website: "https://example.org"
+  linkedin: "https://linkedin.com/in/example"
+  github: "https://github.com/example"
+  twitter_x: null
+  scholar: "https://scholar.google.com/citations?user=example"
+  email: "ava@example.org"
+
+career:
+  current:
+    title: "Senior Research Scientist"
+    organization: "Pacific Reef Institute"
+    start_date: "2023-03"
+    location: "Honolulu, HI"
+    highlights:
+      - "Leads a 6-person team studying thermal-tolerance in staghorn coral"
+      - "Built the Reef Resilience Atlas, adopted by 3 regional research stations"
+  history:
+    - title: "Postdoctoral Fellow"
+      organization: "University of Hawaii"
+      start_date: "2019-08"
+      end_date: "2023-02"
+      location: "Honolulu, HI"
+      highlights:
+        - "Published 4 peer-reviewed papers on coral bleaching thresholds"
+
+education:
+  - institution: "Scripps Institution of Oceanography"
+    degree: "Ph.D."
+    field: "Marine Biology"
+    start_date: "2014"
+    end_date: "2019"
+  - institution: "University of Cape Town"
+    degree: "B.Sc."
+    field: "Marine and Coastal Science"
+    start_date: "2010"
+    end_date: "2013"
+
+skills:
+  categories:
+    - name: "Research"
+      items: ["Coral reef ecology", "Field sampling", "R", "QGIS"]
+    - name: "Languages"
+      items: ["English", "Portuguese"]
+
+projects:
+  - name: "Reef Resilience Atlas"
+    description: "Open dataset mapping thermal tolerance across 40 Pacific reef sites."
+    url: "https://example.org/atlas"
+    role: "Principal investigator"
+    date: "2022–present"
+    tags: ["open-data", "coral", "GIS"]
+
+achievements:
+  - title: "NSF CAREER Award"
+    description: "For research on coral thermal adaptation mechanisms."
+    date: "2024"
+    url: "https://nsf.gov/example"
+
+publications_or_talks:
+  - title: "Thermal tolerance thresholds in Acropora cervicornis"
+    venue: "Nature Climate Change"
+    date: "2023"
+    url: "https://doi.org/example"
+    kind: "publication"
+  - title: "Keynote: Reef Restoration at Scale"
+    venue: "International Coral Reef Symposium"
+    date: "2025"
+    url: null
+    kind: "talk"
+
+testimonials:
+  - quote: "Ava's field protocol is now standard across three research stations."
+    author: "Dr. Marcus Lin"
+    role: "Director, Pacific Reef Institute"
+    source_url: "https://example.org/press/example-quote"
+
+sources:
+  - url: "https://example.org/about"
+    note: "Personal site, About page — bio, current role"
+  - url: "https://linkedin.com/in/example"
+    note: "Career history, education dates"
+  - url: "https://example.org/press/example-quote"
+    note: "Source for the testimonial above"
+
+research_meta:
+  researched_at: "2026-09-06"
+  confidence: "high"
+  open_questions:
+    - "No public headshot found; page uses a monogram treatment instead"

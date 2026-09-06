@@ -1,0 +1,23 @@
+{
+  "name": "personal-branding-skills",
+  "version": "1.0.0",
+  "description": "Personal-branding skills: researches a named person from public sources and builds a tasteful, sourced, self-contained personal landing page from a reviewable YAML data file.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "personal-branding",
+    "landing-page",
+    "personal-website",
+    "portfolio",
+    "yaml",
+    "web-design"
+  ],
+  "skills": [
+    "./landing-page-builder"
+  ]
+}
