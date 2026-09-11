@@ -14,6 +14,11 @@ scene, navigation is immediate, and the browser is the presentation surface.
 The visual target is the referenced Ethical Institute keynote:
 `https://ethical.institute/keynote/#D3`
 
+The author’s original public announcement is the LinkedIn post
+`https://www.linkedin.com/posts/axsaucedo_gpt-6-astra-is-insane-so-instead-of-slides-ugcPost-7504056183541129216-R7Di`.
+Treat both links as inspiration and attribution, not as source code or content
+to reproduce.
+
 Use it as a design reference for pacing, cinematic scale, restrained chrome,
 deep visual scenes, keyboard navigation, and an index/help layer. Recreate the
 interaction vocabulary and visual principles; do not copy its source code,
