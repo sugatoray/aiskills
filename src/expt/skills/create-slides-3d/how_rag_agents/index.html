@@ -3,139 +3,121 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A synthetic D3.js keynote about how a trustworthy RAG agent thinks, acts, and proves what happened.">
+  <meta name="description" content="How a Trustworthy RAG Agent Thinks, Acts, and Proves What Happened. A synthetic keynote experience.">
   <title>How a Trustworthy RAG Agent Thinks, Acts, and Proves What Happened</title>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
   <style>
-    :root { color-scheme: dark; --bg:#071015; --panel:#0d1c24; --ink:#eef8f6; --muted:#9bb5b6; --line:#24414a; --cyan:#78e4e0; --amber:#ffd166; --pink:#ff7f8b; --green:#8af0b0; }
-    * { box-sizing: border-box; }
-    html, body { margin:0; min-height:100%; background:radial-gradient(circle at 50% 20%, #12313a 0, var(--bg) 52%); color:var(--ink); font:16px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; }
-    body { overflow-x:hidden; }
-    button { color:inherit; font:inherit; }
-    #app { min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; width:min(1500px,100%); margin:auto; padding:22px clamp(18px,4vw,64px) 18px; }
-    header, footer { display:flex; align-items:center; justify-content:space-between; gap:18px; color:var(--muted); text-transform:uppercase; letter-spacing:.13em; font-size:11px; }
-    header strong { color:var(--cyan); font-weight:700; }
-    header a { color:var(--muted); text-decoration:none; }
-    #stage-wrap { display:grid; place-items:center; min-height:0; padding:20px 0; }
-    #stage { width:min(100%, 1240px); aspect-ratio:16/9; min-height:410px; border:1px solid #23434b; background:linear-gradient(145deg,#0c2028cc,#071115f2); box-shadow:0 24px 90px #0008, inset 0 0 80px #4ce0d20a; overflow:hidden; position:relative; }
-    svg { width:100%; height:100%; display:block; }
-    .geometry polygon, .geometry path, .geometry circle, .geometry line { vector-effect:non-scaling-stroke; }
-    .geometry polygon { stroke:#d8ffff22; stroke-width:1; }
-    .labels text { paint-order:stroke; stroke:#071015; stroke-width:5px; stroke-linejoin:round; }
-    .eyebrow { fill:var(--cyan); font-size:13px; letter-spacing:.18em; text-transform:uppercase; }
-    .title { fill:var(--ink); font-size:36px; font-weight:750; letter-spacing:-.03em; }
-    .caption { fill:var(--muted); font-size:16px; }
-    .small { fill:var(--muted); font-size:13px; }
-    .mono { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
-    .metric { fill:var(--ink); font-size:29px; font-weight:750; }
-    .accent { fill:var(--cyan); }
-    .warning { fill:var(--pink); }
-    .good { fill:var(--green); }
-    .amber { fill:var(--amber); }
-    .control { border:1px solid var(--line); background:#0e232b; padding:8px 12px; cursor:pointer; }
-    .control:hover, .control:focus-visible { border-color:var(--cyan); outline:2px solid var(--cyan); outline-offset:2px; }
-    .control:disabled { opacity:.35; cursor:not-allowed; }
-    #rail { display:flex; align-items:center; gap:7px; flex:1; }
-    #rail button { width:34px; height:5px; padding:0; border:0; background:#34515a; cursor:pointer; }
-    #rail button[aria-current="step"] { background:var(--cyan); height:7px; }
-    #slide-label { min-width:105px; }
-    #status { position:absolute; left:16px; bottom:12px; color:#6f8b8c; font-size:10px; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; } }
-    @media (max-width:700px) { #app { padding:14px 12px; } header { font-size:9px; } header .source { display:none; } #stage { min-height:330px; } .title { font-size:27px; } .caption { font-size:14px; } .eyebrow { font-size:10px; } .small { font-size:11px; } footer { flex-wrap:wrap; } #rail { order:3; flex-basis:100%; } }
+    :root { color-scheme:dark; --bg:#0d1011; --ink:#eeeae3; --muted:#a4aaa8; --line:#303638; --accent:#93dcb6; --red:#f17b70; --amber:#d9b482; }
+    * { box-sizing:border-box; } html { background:#080a0b; scrollbar-width:none; } html::-webkit-scrollbar { display:none; }
+    body { margin:0; color:var(--ink); background:#080a0b; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    button,a { -webkit-tap-highlight-color:transparent; } button { color:inherit; border:0; background:none; cursor:pointer; font:inherit; }
+    button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:7px; } a { color:inherit; text-decoration:none; } a:hover,button:hover { color:var(--accent); }
+    #viewport { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    #stage { width:1920px; height:1080px; flex-shrink:0; position:relative; overflow:hidden; transform:scale(var(--scale,1)); transform-origin:center; background:var(--bg); }
+    #graphics { position:absolute; inset:0; pointer-events:none; } #graphics canvas { width:100%; height:100%; display:block; }
+    #scene-art { position:absolute; inset:0; width:100%; height:100%; opacity:.82; }
+    #slides { position:absolute; inset:0; z-index:2; } .slide { position:absolute; inset:0; padding:155px 96px 118px; visibility:hidden; opacity:0; pointer-events:none; }
+    .slide.active { visibility:visible; opacity:1; pointer-events:auto; } .slide .content { position:relative; height:100%; max-width:1660px; text-shadow:0 1px 3px #08172455; }
+    .slide .content::after { content:""; position:absolute; inset:-70px -96px; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 40% 48%,#0d1011aa 0,transparent 58%); }
+    #chrome { position:absolute; z-index:5; left:96px; right:96px; top:46px; display:flex; align-items:center; justify-content:space-between; color:#acb2ae; font:18px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.08em; }
+    #chrome .brand { display:flex; gap:14px; align-items:center; } #chrome .brand strong { color:var(--ink); font-weight:500; } #chrome .separator { color:#67716c; }
+    #chrome .right { display:flex; align-items:center; gap:18px; font-size:16px; } #chrome a { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:5px; }
+    #act-label { position:absolute; left:50%; transform:translateX(-50%); text-transform:uppercase; font-size:13px; letter-spacing:.13em; white-space:nowrap; }
+    .tag,.mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; } .tag { color:var(--muted); font-size:18px; letter-spacing:.075em; text-transform:uppercase; }
+    .tag::before { content:""; display:inline-block; width:7px; height:7px; margin:0 15px 3px 0; background:var(--accent); }
+    h1,h2,h3,p { margin:0; } h1 { max-width:1550px; font-size:145px; line-height:.98; font-weight:470; letter-spacing:-.07em; }
+    h2 { max-width:1500px; font-size:84px; line-height:1.03; font-weight:490; letter-spacing:-.06em; } h2 em { font-family:Georgia,serif; font-size:1.02em; font-weight:400; }
+    .lead { max-width:1000px; margin-top:38px; color:var(--muted); font-size:36px; line-height:1.34; letter-spacing:-.025em; }
+    .subtitle { margin-top:34px; color:#dad8d3; font-size:41px; letter-spacing:-.03em; } .byline { margin-top:56px; color:#b9bab7; font-size:28px; }
+    .display { position:absolute; top:80px; left:0; } .display .tag { margin-bottom:43px; } .display .small-note { position:absolute; top:665px; left:0; color:#b9b6ad; font:17px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .divider { padding-top:120px; } .divider h2 { max-width:1260px; font-size:116px; } .divider .lead { color:#c4c3bf; max-width:980px; }
+    .scene-copy { padding-top:15px; } .scene-copy h2 { margin-top:32px; } .scene-copy .lead { max-width:850px; }
+    .scene-meta { position:absolute; right:0; bottom:15px; display:grid; grid-template-columns:repeat(3,1fr); gap:60px; width:680px; border-top:1px solid var(--line); padding-top:18px; }
+    .scene-meta strong { display:block; margin-bottom:8px; color:var(--ink); font-size:34px; font-weight:480; letter-spacing:-.05em; } .scene-meta span { color:var(--muted); font:15px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .quote { display:flex; flex-direction:column; justify-content:center; max-width:1560px; margin:auto; padding-top:40px; } .quote h2 { font-size:80px; } .quote .lead { font-size:38px; }
+    .failure h2 { max-width:1100px; } .failure .lead { color:#d8aaa1; } .trust h2 { max-width:1300px; } .trust .lead { color:var(--ink); }
+    #footer { position:absolute; z-index:5; bottom:34px; left:96px; right:96px; display:flex; align-items:center; gap:32px; height:30px; }
+    #slide-label { width:175px; flex:none; color:#adb4af; font:16px ui-monospace,SFMono-Regular,Menlo,monospace; } #rail { display:flex; align-items:center; flex:1; height:30px; gap:5px; }
+    #rail button { position:relative; flex:1; height:30px; padding:0; } #rail button::after { content:""; display:block; height:2px; background:#3a403e; }
+    #rail button.passed::after { background:#79857e; } #rail button.active::after { height:4px; background:var(--accent); }
+    .footer-controls { display:flex; align-items:center; gap:21px; } .footer-controls button { padding:0 3px; font-size:24px; } #help-button { margin-left:10px; font:18px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    #graphics-status { position:absolute; z-index:4; top:93px; right:96px; color:#c6ab89; font:13px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    dialog { width:min(700px,calc(100vw - 30px)); border:1px solid var(--line); border-radius:2px; padding:32px; color:var(--ink); background:#121719; box-shadow:0 25px 100px #000b; }
+    dialog::backdrop { background:#0009; } dialog h2 { font-size:40px; margin-bottom:24px; } dialog p { margin:12px 0; color:var(--muted); font:17px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .dialog-close { border:1px solid var(--line); padding:9px 14px; margin-top:18px; }
+    .index-row { color:var(--muted); letter-spacing:.08em; font:15px ui-monospace,SFMono-Regular,Menlo,monospace; } .index-row:hover { color:var(--accent); }
+    @media (max-width:900px) {
+      #stage { width:100vw; height:56.25vw; max-height:100vh; } #chrome { left:5vw; right:5vw; top:4vw; font-size:11px; } #chrome .right { font-size:10px; gap:8px; } #chrome .source { display:none; }
+      .slide { padding:14vw 5vw 10vw; } h1 { font-size:clamp(38px,7.5vw,145px); } h2 { font-size:clamp(30px,5vw,84px); }
+      .tag { font-size:clamp(9px,1.2vw,18px); } .tag::before { width:4px; height:4px; margin-right:7px; } .lead { margin-top:3vw; font-size:clamp(12px,2.2vw,36px); max-width:70vw; }
+      .subtitle { font-size:clamp(14px,2.5vw,41px); margin-top:2vw; } .byline { font-size:clamp(12px,1.7vw,28px); margin-top:4vw; } .display { top:8vw; }
+      .display .tag { margin-bottom:3vw; } .display .small-note { top:32vw; font-size:clamp(8px,1vw,17px); } .scene-meta { right:5vw; bottom:1vw; width:40vw; gap:3vw; padding-top:1vw; }
+      .scene-meta strong { font-size:clamp(13px,2vw,34px); } .scene-meta span { font-size:clamp(7px,1vw,15px); } #footer { left:5vw; right:5vw; bottom:2vw; gap:2vw; height:3vw; }
+      #slide-label { width:13vw; font-size:clamp(8px,1.2vw,16px); } .footer-controls { gap:1vw; } .footer-controls button { font-size:clamp(14px,2vw,24px); }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
   </style>
 </head>
 <body>
-<main id="app">
-  <header>
-    <span><strong>CREATE-SLIDES-3D</strong> / SYNTHETIC DEMO</span>
-    <a class="source" href="https://ethical.institute/keynote/#D3" target="_blank" rel="noreferrer">VISUAL REFERENCE ↗</a>
-  </header>
-  <section id="stage-wrap" aria-live="polite">
-    <div id="stage" role="region" aria-label="Keynote stage"></div>
-  </section>
-  <footer>
-    <span id="slide-label" class="mono"></span>
-    <nav id="rail" aria-label="Scenes"></nav>
-    <span>
-      <button class="control" id="previous" aria-label="Previous scene">←</button>
-      <button class="control" id="next" aria-label="Next scene">→</button>
-      <button class="control" id="help" aria-label="Show keyboard help">?</button>
-    </span>
-  </footer>
-</main>
-<dialog id="help-dialog">
-  <h2>Controls</h2>
-  <p>Arrow keys / Page Up / Page Down: move between scenes.</p>
-  <p>Home / End: jump to the beginning or end. Escape: close this panel.</p>
-  <button class="control" id="close-help">Close</button>
-</dialog>
-<script>
-(() => {
-  "use strict";
-  // This page is a single-file adaptation of the reusable primitives in
-  // skills/experimental/create-slides-3d/assets/d3-slide-engine:
-  // project(), depth(), cubeFaces(), hash navigation, keyed SVG joins, and
-  // reduced-motion-aware transitions.
-  const W = 1200, H = 675, reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const stage = d3.select("#stage");
-  const svg = stage.append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img");
-  const geometry = svg.append("g").attr("class", "geometry").attr("aria-hidden", "true");
-  const labels = svg.append("g").attr("class", "labels");
-  const duration = reduced ? 0 : 720;
-  const colors = { cyan:"#78e4e0", amber:"#ffd166", pink:"#ff7f8b", green:"#8af0b0", purple:"#b9a1ff", blue:"#7db7ff", panel:"#17333c" };
-
-  const scenes = [
-    { id:"ingress", eyebrow:"01 / QUESTION INGRESS", title:"A question enters the system", caption:"Trust begins before retrieval: preserve intent, identity, and a traceable request boundary.", accent:colors.cyan, draw:drawIngress },
-    { id:"retrieval", eyebrow:"02 / RETRIEVAL", title:"The agent searches a bounded world", caption:"Synthetic documents compete for relevance; the selected context remains visible and inspectable.", accent:colors.blue, draw:drawRetrieval },
-    { id:"context", eyebrow:"03 / CONTEXT ASSEMBLY", title:"Evidence becomes working memory", caption:"Chunks are assembled with source IDs, scores, and a finite context budget.", accent:colors.purple, draw:drawContext },
-    { id:"tools", eyebrow:"04 / TOOL SELECTION", title:"Thinking branches into action", caption:"The policy chooses an answer, a search, or an external action—and records why.", accent:colors.amber, draw:drawTools },
-    { id:"trace", eyebrow:"05 / EXECUTION TRACE", title:"A task outlives a single span", caption:"One synthetic run crosses queue, tool, and verification boundaries while its state stays connected.", accent:colors.green, draw:drawTrace },
-    { id:"evidence", eyebrow:"06 / EVIDENCE PROVENANCE", title:"Claims point back to sources", caption:"A trustworthy answer is not only fluent; each claim has a visible path to evidence.", accent:colors.cyan, draw:drawEvidence },
-    { id:"failure", eyebrow:"07 / ONE FAILED ACTION", title:"The action fails—and says so", caption:"A timeout is useful when it is explicit, bounded, and impossible to confuse with success.", accent:colors.pink, draw:drawFailure },
-    { id:"trust", eyebrow:"08 / FINAL TRUST SUMMARY", title:"Prove what happened", caption:"The final record carries outcome, evidence, timing, and unresolved uncertainty together.", accent:colors.green, draw:drawTrust }
-  ];
-  let index = 0;
-
-  function project({x=0,y=0,z=0}, camera={}) {
-    const { ox=600, oy=350, sx=1, sy=.55, sz=.8, yaw=.72 } = camera;
-    const c=Math.cos(yaw), s=Math.sin(yaw), rx=x*c-y*s, ry=x*s+y*c;
-    return { x:ox+(rx-ry)*sx, y:oy+(rx+ry)*sy-z*sz };
-  }
-  function depth(p, camera={}) { const yaw=camera.yaw??.72; return (p.x+p.y)*Math.cos(yaw)+(p.y-p.x)*Math.sin(yaw)+p.z; }
-  function cubeFaces(box, camera={}) {
-    const { id="cube", x=0,y=0,z=0,width=100,depth:len=100,height=100 }=box;
-    const q={a:{x,y,z},b:{x:x+width,y,z},c:{x:x+width,y:y+len,z},d:{x,y:y+len,z},e:{x,y,z:z+height},f:{x:x+width,y,z:z+height},g:{x:x+width,y:y+len,z:z+height},h:{x,y:y+len,z:z+height}};
-    return [
-      {id:"top", points:[q.e,q.f,q.g,q.h], fill:box.top||colors.cyan},
-      {id:"front", points:[q.a,q.b,q.f,q.e], fill:box.front||"#1e6470"},
-      {id:"side", points:[q.b,q.c,q.g,q.f], fill:box.side||"#12424e"}
-    ].map(f=>({...f,key:`${id}:${f.id}`,projected:f.points.map(p=>project(p,camera)),z:f.points.reduce((n,p)=>n+depth(p,camera),0)/4})).sort((a,b)=>a.z-b.z);
-  }
-  function pts(p){ return p.map(q=>`${q.x},${q.y}`).join(" "); }
-  function linePath(p){ return p.length ? p.map((q,i)=>`${i?"L":"M"}${q.x},${q.y}`).join(" ") : ""; }
-  function clear() { geometry.interrupt().selectAll("*").remove(); labels.interrupt().selectAll("*").remove(); }
-  function text(x,y,value,cls="small") { return labels.append("text").attr("x",x).attr("y",y).attr("class",cls).text(value); }
-  function line(points,stroke=colors.cyan,width=2,dash=null) { return geometry.append("path").attr("d",linePath(points)).attr("fill","none").attr("stroke",stroke).attr("stroke-width",width).attr("stroke-dasharray",dash||null).attr("opacity",0).transition().duration(duration).attr("opacity",1); }
-  function cube(box,camera={}) { const faces=cubeFaces(box,camera); geometry.selectAll(`polygon[data-object="${box.id}"]`).data(faces,d=>d.key).join("polygon").attr("data-object",box.id).attr("points",d=>pts(d.projected)).attr("fill",d=>d.fill).attr("opacity",0).transition().duration(duration).attr("opacity",1); }
-  function base(scene) { clear(); svg.attr("aria-label",`${scene.title}. ${scene.caption}`); text(48,58,scene.eyebrow,"eyebrow"); text(48,111,scene.title,"title"); text(48,143,scene.caption,"caption"); }
-  function node(x,y,label,color=colors.cyan,r=20) { geometry.append("circle").attr("cx",x).attr("cy",y).attr("r",r).attr("fill",color).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(x,y+5,label,"small").attr("text-anchor","middle"); }
-  function chip(x,y,label,color) { geometry.append("rect").attr("x",x).attr("y",y).attr("width",label.length*8+28).attr("height",28).attr("rx",14).attr("fill",color+"22").attr("stroke",color); text(x+14,y+19,label,"small").attr("fill",color); }
-  function drawIngress(s){ base(s); cube({id:"request",x:-250,y:0,z:0,width:160,depth:120,height:115,top:colors.cyan,front:"#1d6471",side:"#123e4c"},{ox:345,oy:405,yaw:.7}); text(242,530,"REQUEST", "small"); node(600,360,"intent",colors.cyan,34); node(865,275,"trace",colors.green,28); line([{x:430,y:390},{x:565,y:365}],colors.cyan,4); line([{x:635,y:350},{x:835,y:288}],colors.green,4); chip(500,500,"req_0142",colors.cyan); chip(720,500,"synthetic",colors.green); }
-  function drawRetrieval(s){ base(s); const docs=[{x:120,y:220,w:220,h:120,id:"D-01",v:.94,c:colors.blue},{x:460,y:250,w:220,h:120,id:"D-02",v:.81,c:colors.cyan},{x:800,y:190,w:220,h:120,id:"D-03",v:.63,c:colors.purple}]; docs.forEach(d=>{ geometry.append("rect").attr("x",d.x).attr("y",d.y).attr("width",d.w).attr("height",d.h).attr("rx",4).attr("fill",colors.panel).attr("stroke",d.c).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(d.x+18,d.y+35,d.id,"accent"); text(d.x+18,d.y+70,`${Math.round(d.v*100)}% relevance`,"metric"); text(d.x+18,d.y+100,"synthetic source","small"); }); line([{x:600,y:190},{x:230,y:220}],colors.blue,2,"5 7"); line([{x:600,y:190},{x:570,y:250}],colors.cyan,2,"5 7"); line([{x:600,y:190},{x:900,y:190}],colors.purple,2,"5 7"); node(600,190,"query",colors.amber,26); text(490,570,"bounded retrieval / top-k = 3","mono small"); }
-  function drawContext(s){ base(s); const camera={ox:610,oy:450,sx:1.05,sy:.58,sz:.82,yaw:.72}; [{id:"chunk-a",x:-220,y:30,z:0,width:180,depth:130,height:70,top:colors.purple},{id:"chunk-b",x:-70,y:-20,z:70,width:180,depth:130,height:82,top:colors.blue},{id:"chunk-c",x:80,y:-70,z:152,width:180,depth:130,height:94,top:colors.cyan}].forEach(b=>cube(b,camera)); text(430,590,"CONTEXT WINDOW / 3 CHUNKS / 768 TOKENS","mono small"); ["source:D-01","source:D-02","source:D-03"].forEach((v,i)=>chip(760,280+i*38,v,[colors.purple,colors.blue,colors.cyan][i])); }
-  function drawTools(s){ base(s); const center={x:600,y:340}; const opts=[{x:285,y:470,l:"ANSWER",c:colors.green},{x:600,y:190,l:"SEARCH",c:colors.blue},{x:915,y:470,l:"ACTION",c:colors.amber}]; opts.forEach(o=>{line([{x:center.x,y:center.y},{x:o.x,y:o.y}],o.c,3); node(o.x,o.y,o.l,o.c,40);}); node(center.x,center.y,"policy",colors.cyan,48); text(505,590,"decision: SEARCH → VERIFY → ANSWER","mono small"); }
-  function drawTrace(s){ base(s); const events=[{l:"ingress",x:150,c:colors.cyan},{l:"retrieve",x:315,c:colors.blue},{l:"assemble",x:480,c:colors.purple},{l:"tool",x:645,c:colors.amber},{l:"verify",x:810,c:colors.green},{l:"answer",x:975,c:colors.cyan}]; line(events.map(e=>({x:e.x,y:365})),"#8fd7d455",10); events.forEach((e,i)=>{node(e.x,365,String(i+1).padStart(2,"0"),e.c,25); text(e.x-36,425,e.l,"small"); text(e.x-28,330,`${(i+1)*180}ms`,"mono small");}); chip(470,510,"trace_id: tr_9af2",colors.green); }
-  function drawEvidence(s){ base(s); const claims=[{x:270,y:300,l:"C1",c:colors.cyan},{x:270,y:430,l:"C2",c:colors.cyan},{x:270,y:560,l:"C3",c:colors.cyan}]; const sources=[{x:880,y:280,l:"D-01",c:colors.blue},{x:880,y:430,l:"D-02",c:colors.purple},{x:880,y:580,l:"D-03",c:colors.amber}]; claims.forEach((a,i)=>{const b=sources[[0,1,0][i]]; line([{x:a.x+34,y:a.y},{x:b.x-34,y:b.y}],i===2?colors.amber:colors.cyan,3); node(a.x,a.y,a.l,a.c,29); node(b.x,b.y,b.l,b.c,29);}); text(485,290,"claim → evidence","accent"); text(485,320,"every edge is inspectable","small"); }
-  function drawFailure(s){ base(s); cube({id:"action",x:-120,y:20,z:0,width:260,depth:180,height:100,top:colors.pink,front:"#7c3347",side:"#4a2536"},{ox:600,oy:420,yaw:.7}); text(486,545,"POST /synthetic-action", "mono small"); geometry.append("line").attr("x1",760).attr("y1",260).attr("x2",970).attr("y2",500).attr("stroke",colors.pink).attr("stroke-width",8).attr("opacity",0).transition().duration(duration).attr("opacity",1); geometry.append("line").attr("x1",970).attr("y1",260).attr("x2",760).attr("y2",500).attr("stroke",colors.pink).attr("stroke-width",8).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(785,555,"TIMEOUT / 2.0s BOUND", "warning"); chip(820,190,"not success",colors.pink); }
-  function drawTrust(s){ base(s); const cards=[{x:110,l:"OUTCOME",v:"ANSWERED",c:colors.green},{x:390,l:"EVIDENCE",v:"3 SOURCES",c:colors.cyan},{x:670,l:"LATENCY",v:"1.42 s",c:colors.amber},{x:950,l:"UNCERTAINTY",v:"1 FLAG",c:colors.pink}]; cards.forEach(k=>{geometry.append("rect").attr("x",k.x).attr("y",245).attr("width",190).attr("height",150).attr("rx",6).attr("fill",colors.panel).attr("stroke",k.c).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(k.x+20,282,k.l,"small"); text(k.x+20,335,k.v,"metric");}); text(410,510,"A trustworthy agent leaves a trail, not just a sentence.","accent"); chip(450,555,"synthetic run complete",colors.green); }
-  function goTo(target,instant=false){ const next=typeof target==="number"?target:scenes.findIndex(s=>s.id===target); index=Math.max(0,Math.min(scenes.length-1,next<0?0:next)); const scene=scenes[index]; scene.draw(scene); document.querySelector("#slide-label").textContent=`${String(index+1).padStart(2,"0")} / ${scenes.length} · ${scene.id}`; document.querySelector("#previous").disabled=index===0; document.querySelector("#next").disabled=index===scenes.length-1; d3.select("#rail").selectAll("button").attr("aria-current",(d,i)=>i===index?"step":null); if(location.hash!==`#${scene.id}`) history.replaceState(null,"",`#${scene.id}`); }
-  function hashIndex(){ const id=decodeURIComponent(location.hash.slice(1)); const found=scenes.findIndex(s=>s.id===id); return found<0?0:found; }
-  scenes.forEach((s,i)=>d3.select("#rail").append("button").attr("aria-label",`Go to ${s.title}`).attr("title",s.title).on("click",()=>goTo(i)));
-  document.querySelector("#previous").onclick=()=>goTo(index-1); document.querySelector("#next").onclick=()=>goTo(index+1); window.addEventListener("hashchange",()=>goTo(hashIndex(),true));
-  document.addEventListener("keydown",e=>{if(e.metaKey||e.ctrlKey||["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return; if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();goTo(index+1);} else if(["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();goTo(index-1);} else if(e.key==="Home"){e.preventDefault();goTo(0);} else if(e.key==="End"){e.preventDefault();goTo(scenes.length-1);} else if(e.key==="Escape"){document.querySelector("#help-dialog").close();}});
-  document.querySelector("#help").onclick=()=>document.querySelector("#help-dialog").showModal(); document.querySelector("#close-help").onclick=()=>document.querySelector("#help-dialog").close();
-  goTo(hashIndex(),true);
-})();
-</script>
+  <div id="viewport"><main id="stage" aria-label="How a Trustworthy RAG Agent Thinks, Acts, and Proves What Happened"><div id="graphics" aria-hidden="true"><svg id="scene-art" viewBox="0 0 1920 1080"></svg></div><div id="graphics-status" hidden>3D GRAPHICS UNAVAILABLE</div><div id="slides"><section class="slide active" aria-label="Question ingress"><div class="content display"><div class="tag">01 / QUESTION INGRESS</div><h1>How a Trustworthy<br>RAG Agent <em>Thinks</em>,<br>Acts, and Proves.</h1><p class="subtitle">A synthetic keynote about the trail behind an answer.</p><p class="byline">CREATE-SLIDES-3D · ORIGINAL DEMONSTRATION</p><p class="small-note">← → to travel · ? for controls</p></div></section></div></main></div>
+  <header id="chrome"><div class="brand"><strong>TRUST / RAG</strong><span class="separator">|</span><a href="https://ethical.institute/keynote/#D3" target="_blank" rel="noreferrer">VISUAL REFERENCE ↗</a></div><span id="act-label">SYNTHETIC SYSTEM / OBSERVABLE BY DESIGN</span><div class="right"><span class="source">CREATE-SLIDES-3D</span><button id="index-button" aria-label="Open scene index">INDEX ↗</button></div></header>
+  <footer id="footer"><span id="slide-label"></span><nav id="rail" aria-label="Scenes"></nav><div class="footer-controls"><button id="previous" aria-label="Previous scene">←</button><button id="next" aria-label="Next scene">→</button><button id="help-button" aria-label="Presentation help">?</button></div></footer>
+  <dialog id="help-dialog"><h2>Presentation controls</h2><p>← → / Page Up / Page Down — previous or next scene</p><p>Home / End — first or final scene</p><p>Scroll — move through the journey</p><p>Escape — close this panel</p><button class="dialog-close" id="close-help">Close</button></dialog>
+  <dialog id="index-dialog"><h2>Scene index</h2><div id="index-list"></div><button class="dialog-close" id="close-index">Close</button></dialog>
+  <script>
+  (() => {
+    "use strict";
+    const W=1920,H=1080,motion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const C={mint:0x93dcb6,blue:0x9ac8ed,amber:0xd9b482,pink:0xf17b70,purple:0xb8a4e8};
+    const scenes=[
+      {id:"ingress",tag:"01 / QUESTION INGRESS",title:"A question enters the system.",lead:"Trust begins before retrieval: preserve intent, identity, and a traceable boundary.",tone:C.mint,type:"ingress",meta:[["req_0142","request id"],["BOUND","identity"],["OPEN","trace"]]},
+      {id:"retrieval",tag:"02 / RETRIEVAL",title:"The agent searches a bounded world.",lead:"Synthetic documents compete for relevance; the selected context remains visible and inspectable.",tone:C.blue,type:"retrieval",meta:[["TOP-3","retrieval"],["0.94","best score"],["D-01…03","sources"]]},
+      {id:"context",tag:"03 / CONTEXT ASSEMBLY",title:"Evidence becomes working memory.",lead:"Chunks are assembled with source IDs, scores, and a finite context budget.",tone:C.purple,type:"context",meta:[["768","tokens"],["03","chunks"],["0.81","mean score"]]},
+      {id:"tools",tag:"04 / TOOL SELECTION",title:"Thinking branches into action.",lead:"The policy chooses an answer, a search, or an external action—and records why.",tone:C.amber,type:"tools",meta:[["SEARCH","selected"],["3","branches"],["POLICY","decision"]]},
+      {id:"trace",tag:"05 / EXECUTION TRACE",title:"A task outlives a single span.",lead:"One synthetic run crosses queue, tool, and verification boundaries while its state stays connected.",tone:C.mint,type:"trace",meta:[["tr_9af2","trace id"],["1.42s","duration"],["06","events"]]},
+      {id:"evidence",tag:"06 / EVIDENCE PROVENANCE",title:"Claims point back to sources.",lead:"A trustworthy answer is not only fluent; each claim has a visible path to evidence.",tone:C.blue,type:"evidence",meta:[["03/03","claims"],["02","direct"],["01","inferred"]]},
+      {id:"failure",tag:"07 / ONE FAILED ACTION",title:"The action fails—and says so.",lead:"A timeout is useful when it is explicit, bounded, and impossible to confuse with success.",tone:C.pink,type:"failure",meta:[["TIMEOUT","outcome"],["2.0s","bound"],["0","side effects"]]},
+      {id:"trust",tag:"08 / FINAL TRUST SUMMARY",title:"Prove what happened.",lead:"The final record carries outcome, evidence, timing, and unresolved uncertainty together.",tone:C.mint,type:"trust",meta:[["ANSWERED","outcome"],["03","sources"],["01 FLAG","uncertainty"]]}
+    ];
+    const stage=document.querySelector("#stage"),slidesRoot=document.querySelector("#slides"),rail=document.querySelector("#rail"),indexList=document.querySelector("#index-list"),label=document.querySelector("#slide-label"),prev=document.querySelector("#previous"),next=document.querySelector("#next"); let index=0,progress=0,world=null;
+    const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    function buildSlides(){
+      slidesRoot.innerHTML=scenes.map((s,i)=>{
+        const classes=["scene-copy"];
+        if(s.type==="failure")classes.push("failure");
+        if(s.type==="trust")classes.push("trust");
+        if(s.type==="tools")classes.push("quote");
+        return `<section class="slide ${i===0?"active":""}" data-id="${s.id}" aria-label="${escapeHTML(s.tag)}"><div class="content ${classes.join(" ")}"><div class="tag">${escapeHTML(s.tag)}</div><h2>${escapeHTML(s.title)}</h2><p class="lead">${escapeHTML(s.lead)}</p><div class="scene-meta">${s.meta.map(m=>`<div><strong>${escapeHTML(m[0])}</strong><span>${escapeHTML(m[1])}</span></div>`).join("")}</div></div></section>`;
+      }).join("");
+      if(window.d3){
+        d3.select(rail).selectAll("button").data(scenes).join("button").attr("aria-label",s=>`Go to ${s.tag}`).attr("title",s=>s.tag).on("click",(_,s)=>goTo(s.id));
+        d3.select(indexList).selectAll("button").data(scenes).join("button").attr("class","index-row").style("display","block").style("width","100%").style("text-align","left").style("padding","12px 0").text(s=>s.tag).on("click",(_,s)=>{goTo(s.id);document.querySelector("#index-dialog").close();});
+      }else scenes.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s.tag;b.onclick=()=>goTo(i);rail.append(b);});
+    }
+    function goTo(target,instant=false){const n=typeof target==="number"?target:scenes.findIndex(s=>s.id===target);index=Math.max(0,Math.min(scenes.length-1,n<0?0:n));progress=index;render(index,instant);if(location.hash!==`#${scenes[index].id}`)history.replaceState(null,"",`#${scenes[index].id}`);}
+    function render(i,instant=false){const s=scenes[i];label.textContent=`${String(i+1).padStart(2,"0")} / ${scenes.length} · ${s.id}`;prev.disabled=i===0;next.disabled=i===scenes.length-1;document.querySelectorAll(".slide").forEach((el,n)=>{el.classList.toggle("active",n===i);el.setAttribute("aria-hidden",String(n!==i));});document.querySelectorAll("#rail button").forEach((b,n)=>{b.classList.toggle("active",n===i);b.classList.toggle("passed",n<i);b.setAttribute("aria-current",n===i?"step":"false");});renderArt(i,s.tone);updateWorld(progress,instant);}
+    function resize(){const scale=Math.min(innerWidth/W,innerHeight/H);stage.style.setProperty("--scale",scale);if(world){world.camera.aspect=innerWidth/innerHeight;world.camera.updateProjectionMatrix();world.renderer.setSize(W*scale,H*scale,false);}}
+    function initFallback(){document.querySelector("#graphics-status").hidden=false;}
+    function initWorld(){try{if(!window.THREE)throw new Error("Three.js unavailable");const canvas=document.createElement("canvas"),renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x000000,0);document.querySelector("#graphics").prepend(canvas);const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(34,16/9,.1,2000);camera.position.set(0,14,48);const root=new THREE.Group();scene.add(root);scene.add(new THREE.AmbientLight(0xdceee8,1.2));const light=new THREE.DirectionalLight(0x9fe9d0,2.5);light.position.set(-18,28,35);scene.add(light);const nodes=[];for(let i=0;i<34;i++){const a=i/34*Math.PI*2,r=8+(i%5)*1.2,n=new THREE.Mesh(new THREE.IcosahedronGeometry(i%5===0?.42:.18,1),new THREE.MeshStandardMaterial({color:C.mint,emissive:C.mint,emissiveIntensity:.22,roughness:.7}));n.position.set(Math.cos(a)*r,(i%4-1.5)*2.3,Math.sin(a)*r-4);root.add(n);nodes.push(n);}for(let i=0;i<nodes.length;i+=2){const a=nodes[i].position,b=nodes[(i+5)%nodes.length].position;const geo=new THREE.BufferGeometry().setFromPoints([a,b]);root.add(new THREE.Line(geo,new THREE.LineBasicMaterial({color:C.mint,transparent:true,opacity:.22})));}for(let i=0;i<7;i++){const geo=new THREE.BoxGeometry(3.5+i*.32,3.5+i*.32,3.5+i*.32),mat=new THREE.MeshStandardMaterial({color:[C.mint,C.blue,C.purple,C.amber][i%4],transparent:true,opacity:.16,roughness:.8});const mesh=new THREE.Mesh(geo,mat);mesh.position.set((i-3)*4,Math.sin(i)*2,(i%2)*4-4);mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:mat.color,transparent:true,opacity:.7})));root.add(mesh);}world={renderer,scene,camera,root,nodes};resize();if(motion){renderer.render(scene,camera);}else{(function frame(t){if(!world)return;world.root.rotation.y=t*.000025;world.root.rotation.x=Math.sin(t*.00012)*.04;world.renderer.render(world.scene,world.camera);requestAnimationFrame(frame);})(0);}}catch(e){initFallback();}}
+    function updateWorld(value,instant=false){if(!world)return;world.root.position.x=-(value-index)*2;world.root.position.y=Math.sin(value*.8)*.7;world.root.scale.setScalar(1+Math.sin(value*.4)*.04);world.nodes?.forEach((n,i)=>{const p=(i/34+value*.025)%1;n.material.opacity=.16+.5*Math.max(0,Math.sin(p*Math.PI));});}
+    function renderArt(i,tone){if(!window.d3)return;const svg=d3.select("#scene-art");svg.selectAll("*").remove();const g=svg.append("g").attr("transform","translate(1040 240)");const col=`#${tone.toString(16).padStart(6,"0")}`;const project=(x,y,z)=>({x:(x-y)*1.25,y:(x+y)*.58-z*.9});const addLine=(points,stroke=col,width=2)=>g.append("path").attr("d",points.map((p,n)=>{const q=project(...p);return `${n?"L":"M"}${q.x},${q.y}`;}).join(" ")).attr("fill","none").attr("stroke",stroke).attr("stroke-width",width).attr("opacity",.8);const addCube=(x,y,z,w,d,h)=>{const q=[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z],[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]].map(p=>project(...p));[[0,1,5,4],[1,2,6,5],[4,5,6,7]].forEach((face,n)=>g.append("polygon").attr("points",face.map(k=>`${q[k].x},${q[k].y}`).join(" ")).attr("fill",n===2?col+"3d":col+"1c").attr("stroke",col).attr("stroke-opacity",.72));};const addNode=(x,y,label,c=col)=>{g.append("circle").attr("cx",x).attr("cy",y).attr("r",7).attr("fill",c);g.append("text").attr("x",x+16).attr("y",y+5).attr("fill",c).attr("font-family","ui-monospace,monospace").attr("font-size",15).text(label);};
+      if(i===0){addCube(-80,0,0,130,100,115);addLine([[70,50,60],[250,50,30]],col,3);addNode(270,75,"trace");}
+      if(i===1){[[0,0,0],[180,20,30],[360,-10,10]].forEach((p,n)=>{addCube(...p,120,90,70+n*18);addLine([[60+n*180,50+n*8,40+n*22],[230+n*80,100,80]],col,2);});addNode(230,100,"query",`#${C.amber.toString(16)}`);}
+      if(i===2){addCube(0,0,0,150,110,55);addCube(55,-28,55,150,110,70);addCube(110,-56,125,150,110,82);addLine([[185,-5,210],[360,65,120]],col,2);addNode(390,120,"budget");}
+      if(i===3){const center=[230,120,110];[[20,240,0],[230,-40,0],[440,240,0]].forEach((p,n)=>{const q=project(...p);addLine([center,p],[`#${[C.mint,C.blue,C.amber][n].toString(16)}`],3);addNode(q.x,q.y,["ANSWER","SEARCH","ACTION"][n],[`#${C.mint.toString(16)}`,`#${C.blue.toString(16)}`,`#${C.amber.toString(16)}`][n]);});const c=project(...center);addNode(c.x,c.y,"policy");}
+      if(i===4){const points=[];for(let n=0;n<6;n++)points.push([n*100,0,n*18]);addLine(points, col,5);points.forEach((p,n)=>{const q=project(...p);addNode(q.x,q.y,String(n+1).padStart(2,"0"));});}
+      if(i===5){const left=[0,80,80],right=[440,80,80];[[80,20,20],[190,110,90],[300,40,30]].forEach((p,n)=>{addLine([left,p,right],n===2?`#${C.amber.toString(16)}`:col,2);});addNode(project(...left).x,project(...left).y,"C");addNode(project(...right).x,project(...right).y,"D");}
+      if(i===6){addCube(80,30,0,240,160,90);addLine([[320,80,45],[500,80,45]],`#${C.pink.toString(16)}`,5);addLine([[480,0,0],[620,180,120]],`#${C.pink.toString(16)}`,5);addLine([[620,0,120],[480,180,0]],`#${C.pink.toString(16)}`,5);addNode(540,100,"TIMEOUT",`#${C.pink.toString(16)}`);}
+      if(i===7){[0,1,2,3].forEach((n)=>addCube(n*105,0,0,72,72,120+n*35));addLine([[20,140,140],[430,140,140]],`#${C.mint.toString(16)}`,3);addNode(460,150,"verified");}
+    }
+    function hashIndex(){const id=decodeURIComponent(location.hash.slice(1));const n=scenes.findIndex(s=>s.id===id);return n<0?0:n;}
+    buildSlides();goTo(hashIndex(),true);renderArt(index,scenes[index].tone);initWorld();addEventListener("resize",resize);addEventListener("hashchange",()=>goTo(hashIndex(),true));
+    const runway=document.createElement("div");runway.setAttribute("aria-hidden","true");runway.style.height=`${scenes.length*100}vh`;document.body.append(runway);
+    document.querySelector("#previous").onclick=()=>goTo(index-1);document.querySelector("#next").onclick=()=>goTo(index+1);document.querySelector("#help-button").onclick=()=>document.querySelector("#help-dialog").showModal();document.querySelector("#close-help").onclick=()=>document.querySelector("#help-dialog").close();document.querySelector("#index-button").onclick=()=>document.querySelector("#index-dialog").showModal();document.querySelector("#close-index").onclick=()=>document.querySelector("#index-dialog").close();
+    addEventListener("scroll",()=>{const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),p=scrollY/max*(scenes.length-1),n=Math.round(p);if(n!==index)goTo(n);});
+    addEventListener("keydown",e=>{if(e.metaKey||e.ctrlKey||["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();goTo(index+1);}else if(["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();goTo(index-1);}else if(e.key==="Home"){e.preventDefault();goTo(0);}else if(e.key==="End"){e.preventDefault();goTo(scenes.length-1);}else if(e.key==="?"){document.querySelector("#help-dialog").showModal();}else if(e.key==="Escape"){document.querySelectorAll("dialog[open]").forEach(d=>d.close());}});
+  })();
+  </script>
 </body>
 </html>
