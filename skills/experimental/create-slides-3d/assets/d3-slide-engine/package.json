@@ -1,0 +1,12 @@
+{
+  "name": "@sugatoray/d3-slide-engine",
+  "private": true,
+  "type": "module",
+  "description": "Reusable D3.js primitives for cinematic 2.5D slide experiences.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "d3": "^7.9.0"
+  }
+}
