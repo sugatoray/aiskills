@@ -55,4 +55,7 @@ npm test
 
 The tests cover projection invariants, cube geometry, depth ordering, hash
 state, bounds clamping, and keyboard intent. Add browser-level tests with
-Playwright when changing `engine.js` or the generated page contract.
+Playwright when changing `engine.js` or the generated page contract. The
+included browser smoke suite checks real SVG output, readable labels,
+navigation, URL hash state, desktop/mobile layout, screenshots, and reduced
+motion in Chromium.
