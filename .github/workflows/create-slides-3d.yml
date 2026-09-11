@@ -2,6 +2,7 @@ name: create-slides-3d
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
     paths:
       - "skills/experimental/create-slides-3d/**"
       - ".github/workflows/create-slides-3d.yml"
@@ -11,11 +12,19 @@ on:
       - "skills/experimental/create-slides-3d/**"
       - ".github/workflows/create-slides-3d.yml"
 
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why this CI run is being requested"
+        required: false
+        default: "Manual validation"
+
 permissions:
   contents: read
 
 jobs:
   test:
+    if: github.event_name != 'pull_request' || github.event.action != 'labeled' || github.event.label.name == 'run-ci'
     runs-on: ubuntu-latest
     defaults:
       run:
