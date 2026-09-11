@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A synthetic D3.js keynote about how a trustworthy RAG agent thinks, acts, and proves what happened.">
+  <title>How a Trustworthy RAG Agent Thinks, Acts, and Proves What Happened</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#071015; --panel:#0d1c24; --ink:#eef8f6; --muted:#9bb5b6; --line:#24414a; --cyan:#78e4e0; --amber:#ffd166; --pink:#ff7f8b; --green:#8af0b0; }
+    * { box-sizing: border-box; }
+    html, body { margin:0; min-height:100%; background:radial-gradient(circle at 50% 20%, #12313a 0, var(--bg) 52%); color:var(--ink); font:16px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; }
+    body { overflow-x:hidden; }
+    button { color:inherit; font:inherit; }
+    #app { min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; width:min(1500px,100%); margin:auto; padding:22px clamp(18px,4vw,64px) 18px; }
+    header, footer { display:flex; align-items:center; justify-content:space-between; gap:18px; color:var(--muted); text-transform:uppercase; letter-spacing:.13em; font-size:11px; }
+    header strong { color:var(--cyan); font-weight:700; }
+    header a { color:var(--muted); text-decoration:none; }
+    #stage-wrap { display:grid; place-items:center; min-height:0; padding:20px 0; }
+    #stage { width:min(100%, 1240px); aspect-ratio:16/9; min-height:410px; border:1px solid #23434b; background:linear-gradient(145deg,#0c2028cc,#071115f2); box-shadow:0 24px 90px #0008, inset 0 0 80px #4ce0d20a; overflow:hidden; position:relative; }
+    svg { width:100%; height:100%; display:block; }
+    .geometry polygon, .geometry path, .geometry circle, .geometry line { vector-effect:non-scaling-stroke; }
+    .geometry polygon { stroke:#d8ffff22; stroke-width:1; }
+    .labels text { paint-order:stroke; stroke:#071015; stroke-width:5px; stroke-linejoin:round; }
+    .eyebrow { fill:var(--cyan); font-size:13px; letter-spacing:.18em; text-transform:uppercase; }
+    .title { fill:var(--ink); font-size:36px; font-weight:750; letter-spacing:-.03em; }
+    .caption { fill:var(--muted); font-size:16px; }
+    .small { fill:var(--muted); font-size:13px; }
+    .mono { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .metric { fill:var(--ink); font-size:29px; font-weight:750; }
+    .accent { fill:var(--cyan); }
+    .warning { fill:var(--pink); }
+    .good { fill:var(--green); }
+    .amber { fill:var(--amber); }
+    .control { border:1px solid var(--line); background:#0e232b; padding:8px 12px; cursor:pointer; }
+    .control:hover, .control:focus-visible { border-color:var(--cyan); outline:2px solid var(--cyan); outline-offset:2px; }
+    .control:disabled { opacity:.35; cursor:not-allowed; }
+    #rail { display:flex; align-items:center; gap:7px; flex:1; }
+    #rail button { width:34px; height:5px; padding:0; border:0; background:#34515a; cursor:pointer; }
+    #rail button[aria-current="step"] { background:var(--cyan); height:7px; }
+    #slide-label { min-width:105px; }
+    #status { position:absolute; left:16px; bottom:12px; color:#6f8b8c; font-size:10px; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; } }
+    @media (max-width:700px) { #app { padding:14px 12px; } header { font-size:9px; } header .source { display:none; } #stage { min-height:330px; } .title { font-size:27px; } .caption { font-size:14px; } .eyebrow { font-size:10px; } .small { font-size:11px; } footer { flex-wrap:wrap; } #rail { order:3; flex-basis:100%; } }
+  </style>
+</head>
+<body>
+<main id="app">
+  <header>
+    <span><strong>CREATE-SLIDES-3D</strong> / SYNTHETIC DEMO</span>
+    <a class="source" href="https://ethical.institute/keynote/#D3" target="_blank" rel="noreferrer">VISUAL REFERENCE ↗</a>
+  </header>
+  <section id="stage-wrap" aria-live="polite">
+    <div id="stage" role="region" aria-label="Keynote stage"></div>
+  </section>
+  <footer>
+    <span id="slide-label" class="mono"></span>
+    <nav id="rail" aria-label="Scenes"></nav>
+    <span>
+      <button class="control" id="previous" aria-label="Previous scene">←</button>
+      <button class="control" id="next" aria-label="Next scene">→</button>
+      <button class="control" id="help" aria-label="Show keyboard help">?</button>
+    </span>
+  </footer>
+</main>
+<dialog id="help-dialog">
+  <h2>Controls</h2>
+  <p>Arrow keys / Page Up / Page Down: move between scenes.</p>
+  <p>Home / End: jump to the beginning or end. Escape: close this panel.</p>
+  <button class="control" id="close-help">Close</button>
+</dialog>
+<script>
+(() => {
+  "use strict";
+  // This page is a single-file adaptation of the reusable primitives in
+  // skills/experimental/create-slides-3d/assets/d3-slide-engine:
+  // project(), depth(), cubeFaces(), hash navigation, keyed SVG joins, and
+  // reduced-motion-aware transitions.
+  const W = 1200, H = 675, reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const stage = d3.select("#stage");
+  const svg = stage.append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img");
+  const geometry = svg.append("g").attr("class", "geometry").attr("aria-hidden", "true");
+  const labels = svg.append("g").attr("class", "labels");
+  const duration = reduced ? 0 : 720;
+  const colors = { cyan:"#78e4e0", amber:"#ffd166", pink:"#ff7f8b", green:"#8af0b0", purple:"#b9a1ff", blue:"#7db7ff", panel:"#17333c" };
+
+  const scenes = [
+    { id:"ingress", eyebrow:"01 / QUESTION INGRESS", title:"A question enters the system", caption:"Trust begins before retrieval: preserve intent, identity, and a traceable request boundary.", accent:colors.cyan, draw:drawIngress },
+    { id:"retrieval", eyebrow:"02 / RETRIEVAL", title:"The agent searches a bounded world", caption:"Synthetic documents compete for relevance; the selected context remains visible and inspectable.", accent:colors.blue, draw:drawRetrieval },
+    { id:"context", eyebrow:"03 / CONTEXT ASSEMBLY", title:"Evidence becomes working memory", caption:"Chunks are assembled with source IDs, scores, and a finite context budget.", accent:colors.purple, draw:drawContext },
+    { id:"tools", eyebrow:"04 / TOOL SELECTION", title:"Thinking branches into action", caption:"The policy chooses an answer, a search, or an external action—and records why.", accent:colors.amber, draw:drawTools },
+    { id:"trace", eyebrow:"05 / EXECUTION TRACE", title:"A task outlives a single span", caption:"One synthetic run crosses queue, tool, and verification boundaries while its state stays connected.", accent:colors.green, draw:drawTrace },
+    { id:"evidence", eyebrow:"06 / EVIDENCE PROVENANCE", title:"Claims point back to sources", caption:"A trustworthy answer is not only fluent; each claim has a visible path to evidence.", accent:colors.cyan, draw:drawEvidence },
+    { id:"failure", eyebrow:"07 / ONE FAILED ACTION", title:"The action fails—and says so", caption:"A timeout is useful when it is explicit, bounded, and impossible to confuse with success.", accent:colors.pink, draw:drawFailure },
+    { id:"trust", eyebrow:"08 / FINAL TRUST SUMMARY", title:"Prove what happened", caption:"The final record carries outcome, evidence, timing, and unresolved uncertainty together.", accent:colors.green, draw:drawTrust }
+  ];
+  let index = 0;
+
+  function project({x=0,y=0,z=0}, camera={}) {
+    const { ox=600, oy=350, sx=1, sy=.55, sz=.8, yaw=.72 } = camera;
+    const c=Math.cos(yaw), s=Math.sin(yaw), rx=x*c-y*s, ry=x*s+y*c;
+    return { x:ox+(rx-ry)*sx, y:oy+(rx+ry)*sy-z*sz };
+  }
+  function depth(p, camera={}) { const yaw=camera.yaw??.72; return (p.x+p.y)*Math.cos(yaw)+(p.y-p.x)*Math.sin(yaw)+p.z; }
+  function cubeFaces(box, camera={}) {
+    const { id="cube", x=0,y=0,z=0,width=100,depth:len=100,height=100 }=box;
+    const q={a:{x,y,z},b:{x:x+width,y,z},c:{x:x+width,y:y+len,z},d:{x,y:y+len,z},e:{x,y,z:z+height},f:{x:x+width,y,z:z+height},g:{x:x+width,y:y+len,z:z+height},h:{x,y:y+len,z:z+height}};
+    return [
+      {id:"top", points:[q.e,q.f,q.g,q.h], fill:box.top||colors.cyan},
+      {id:"front", points:[q.a,q.b,q.f,q.e], fill:box.front||"#1e6470"},
+      {id:"side", points:[q.b,q.c,q.g,q.f], fill:box.side||"#12424e"}
+    ].map(f=>({...f,key:`${id}:${f.id}`,projected:f.points.map(p=>project(p,camera)),z:f.points.reduce((n,p)=>n+depth(p,camera),0)/4})).sort((a,b)=>a.z-b.z);
+  }
+  function pts(p){ return p.map(q=>`${q.x},${q.y}`).join(" "); }
+  function linePath(p){ return p.length ? p.map((q,i)=>`${i?"L":"M"}${q.x},${q.y}`).join(" ") : ""; }
+  function clear() { geometry.interrupt().selectAll("*").remove(); labels.interrupt().selectAll("*").remove(); }
+  function text(x,y,value,cls="small") { return labels.append("text").attr("x",x).attr("y",y).attr("class",cls).text(value); }
+  function line(points,stroke=colors.cyan,width=2,dash=null) { return geometry.append("path").attr("d",linePath(points)).attr("fill","none").attr("stroke",stroke).attr("stroke-width",width).attr("stroke-dasharray",dash||null).attr("opacity",0).transition().duration(duration).attr("opacity",1); }
+  function cube(box,camera={}) { const faces=cubeFaces(box,camera); geometry.selectAll(`polygon[data-object="${box.id}"]`).data(faces,d=>d.key).join("polygon").attr("data-object",box.id).attr("points",d=>pts(d.projected)).attr("fill",d=>d.fill).attr("opacity",0).transition().duration(duration).attr("opacity",1); }
+  function base(scene) { clear(); svg.attr("aria-label",`${scene.title}. ${scene.caption}`); text(48,58,scene.eyebrow,"eyebrow"); text(48,111,scene.title,"title"); text(48,143,scene.caption,"caption"); }
+  function node(x,y,label,color=colors.cyan,r=20) { geometry.append("circle").attr("cx",x).attr("cy",y).attr("r",r).attr("fill",color).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(x,y+5,label,"small").attr("text-anchor","middle"); }
+  function chip(x,y,label,color) { geometry.append("rect").attr("x",x).attr("y",y).attr("width",label.length*8+28).attr("height",28).attr("rx",14).attr("fill",color+"22").attr("stroke",color); text(x+14,y+19,label,"small").attr("fill",color); }
+  function drawIngress(s){ base(s); cube({id:"request",x:-250,y:0,z:0,width:160,depth:120,height:115,top:colors.cyan,front:"#1d6471",side:"#123e4c"},{ox:345,oy:405,yaw:.7}); text(242,530,"REQUEST", "small"); node(600,360,"intent",colors.cyan,34); node(865,275,"trace",colors.green,28); line([{x:430,y:390},{x:565,y:365}],colors.cyan,4); line([{x:635,y:350},{x:835,y:288}],colors.green,4); chip(500,500,"req_0142",colors.cyan); chip(720,500,"synthetic",colors.green); }
+  function drawRetrieval(s){ base(s); const docs=[{x:120,y:220,w:220,h:120,id:"D-01",v:.94,c:colors.blue},{x:460,y:250,w:220,h:120,id:"D-02",v:.81,c:colors.cyan},{x:800,y:190,w:220,h:120,id:"D-03",v:.63,c:colors.purple}]; docs.forEach(d=>{ geometry.append("rect").attr("x",d.x).attr("y",d.y).attr("width",d.w).attr("height",d.h).attr("rx",4).attr("fill",colors.panel).attr("stroke",d.c).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(d.x+18,d.y+35,d.id,"accent"); text(d.x+18,d.y+70,`${Math.round(d.v*100)}% relevance`,"metric"); text(d.x+18,d.y+100,"synthetic source","small"); }); line([{x:600,y:190},{x:230,y:220}],colors.blue,2,"5 7"); line([{x:600,y:190},{x:570,y:250}],colors.cyan,2,"5 7"); line([{x:600,y:190},{x:900,y:190}],colors.purple,2,"5 7"); node(600,190,"query",colors.amber,26); text(490,570,"bounded retrieval / top-k = 3","mono small"); }
+  function drawContext(s){ base(s); const camera={ox:610,oy:450,sx:1.05,sy:.58,sz:.82,yaw:.72}; [{id:"chunk-a",x:-220,y:30,z:0,width:180,depth:130,height:70,top:colors.purple},{id:"chunk-b",x:-70,y:-20,z:70,width:180,depth:130,height:82,top:colors.blue},{id:"chunk-c",x:80,y:-70,z:152,width:180,depth:130,height:94,top:colors.cyan}].forEach(b=>cube(b,camera)); text(430,590,"CONTEXT WINDOW / 3 CHUNKS / 768 TOKENS","mono small"); ["source:D-01","source:D-02","source:D-03"].forEach((v,i)=>chip(760,280+i*38,v,[colors.purple,colors.blue,colors.cyan][i])); }
+  function drawTools(s){ base(s); const center={x:600,y:340}; const opts=[{x:285,y:470,l:"ANSWER",c:colors.green},{x:600,y:190,l:"SEARCH",c:colors.blue},{x:915,y:470,l:"ACTION",c:colors.amber}]; opts.forEach(o=>{line([{x:center.x,y:center.y},{x:o.x,y:o.y}],o.c,3); node(o.x,o.y,o.l,o.c,40);}); node(center.x,center.y,"policy",colors.cyan,48); text(505,590,"decision: SEARCH → VERIFY → ANSWER","mono small"); }
+  function drawTrace(s){ base(s); const events=[{l:"ingress",x:150,c:colors.cyan},{l:"retrieve",x:315,c:colors.blue},{l:"assemble",x:480,c:colors.purple},{l:"tool",x:645,c:colors.amber},{l:"verify",x:810,c:colors.green},{l:"answer",x:975,c:colors.cyan}]; line(events.map(e=>({x:e.x,y:365})),"#8fd7d455",10); events.forEach((e,i)=>{node(e.x,365,String(i+1).padStart(2,"0"),e.c,25); text(e.x-36,425,e.l,"small"); text(e.x-28,330,`${(i+1)*180}ms`,"mono small");}); chip(470,510,"trace_id: tr_9af2",colors.green); }
+  function drawEvidence(s){ base(s); const claims=[{x:270,y:300,l:"C1",c:colors.cyan},{x:270,y:430,l:"C2",c:colors.cyan},{x:270,y:560,l:"C3",c:colors.cyan}]; const sources=[{x:880,y:280,l:"D-01",c:colors.blue},{x:880,y:430,l:"D-02",c:colors.purple},{x:880,y:580,l:"D-03",c:colors.amber}]; claims.forEach((a,i)=>{const b=sources[[0,1,0][i]]; line([{x:a.x+34,y:a.y},{x:b.x-34,y:b.y}],i===2?colors.amber:colors.cyan,3); node(a.x,a.y,a.l,a.c,29); node(b.x,b.y,b.l,b.c,29);}); text(485,290,"claim → evidence","accent"); text(485,320,"every edge is inspectable","small"); }
+  function drawFailure(s){ base(s); cube({id:"action",x:-120,y:20,z:0,width:260,depth:180,height:100,top:colors.pink,front:"#7c3347",side:"#4a2536"},{ox:600,oy:420,yaw:.7}); text(486,545,"POST /synthetic-action", "mono small"); geometry.append("line").attr("x1",760).attr("y1",260).attr("x2",970).attr("y2",500).attr("stroke",colors.pink).attr("stroke-width",8).attr("opacity",0).transition().duration(duration).attr("opacity",1); geometry.append("line").attr("x1",970).attr("y1",260).attr("x2",760).attr("y2",500).attr("stroke",colors.pink).attr("stroke-width",8).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(785,555,"TIMEOUT / 2.0s BOUND", "warning"); chip(820,190,"not success",colors.pink); }
+  function drawTrust(s){ base(s); const cards=[{x:110,l:"OUTCOME",v:"ANSWERED",c:colors.green},{x:390,l:"EVIDENCE",v:"3 SOURCES",c:colors.cyan},{x:670,l:"LATENCY",v:"1.42 s",c:colors.amber},{x:950,l:"UNCERTAINTY",v:"1 FLAG",c:colors.pink}]; cards.forEach(k=>{geometry.append("rect").attr("x",k.x).attr("y",245).attr("width",190).attr("height",150).attr("rx",6).attr("fill",colors.panel).attr("stroke",k.c).attr("opacity",0).transition().duration(duration).attr("opacity",1); text(k.x+20,282,k.l,"small"); text(k.x+20,335,k.v,"metric");}); text(410,510,"A trustworthy agent leaves a trail, not just a sentence.","accent"); chip(450,555,"synthetic run complete",colors.green); }
+  function goTo(target,instant=false){ const next=typeof target==="number"?target:scenes.findIndex(s=>s.id===target); index=Math.max(0,Math.min(scenes.length-1,next<0?0:next)); const scene=scenes[index]; scene.draw(scene); document.querySelector("#slide-label").textContent=`${String(index+1).padStart(2,"0")} / ${scenes.length} · ${scene.id}`; document.querySelector("#previous").disabled=index===0; document.querySelector("#next").disabled=index===scenes.length-1; d3.select("#rail").selectAll("button").attr("aria-current",(d,i)=>i===index?"step":null); if(location.hash!==`#${scene.id}`) history.replaceState(null,"",`#${scene.id}`); }
+  function hashIndex(){ const id=decodeURIComponent(location.hash.slice(1)); const found=scenes.findIndex(s=>s.id===id); return found<0?0:found; }
+  scenes.forEach((s,i)=>d3.select("#rail").append("button").attr("aria-label",`Go to ${s.title}`).attr("title",s.title).on("click",()=>goTo(i)));
+  document.querySelector("#previous").onclick=()=>goTo(index-1); document.querySelector("#next").onclick=()=>goTo(index+1); window.addEventListener("hashchange",()=>goTo(hashIndex(),true));
+  document.addEventListener("keydown",e=>{if(e.metaKey||e.ctrlKey||["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return; if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();goTo(index+1);} else if(["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();goTo(index-1);} else if(e.key==="Home"){e.preventDefault();goTo(0);} else if(e.key==="End"){e.preventDefault();goTo(scenes.length-1);} else if(e.key==="Escape"){document.querySelector("#help-dialog").close();}});
+  document.querySelector("#help").onclick=()=>document.querySelector("#help-dialog").showModal(); document.querySelector("#close-help").onclick=()=>document.querySelector("#help-dialog").close();
+  goTo(hashIndex(),true);
+})();
+</script>
+</body>
+</html>
