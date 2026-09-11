@@ -70,6 +70,10 @@ text, branding, or artwork.
    is available, use it; otherwise use the browser’s own inspection tools and
    document the limitation.
 
+The reusable starter components live in `assets/d3-slide-engine/`. Copy or
+adapt them into generated pages; keep content and art direction in the page
+itself. Read its README and tests before extending the primitives.
+
 ## Visual and interaction quality bar
 
 - Establish a clear focal point, depth hierarchy, and contrast before adding
