@@ -1,0 +1,3 @@
+interface:
+  display_name: "Create Slides 3D"
+  short_description: "Build D3.js 3D-style HTML slides from a concept."
