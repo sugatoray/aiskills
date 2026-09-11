@@ -11,7 +11,8 @@ d3-slide-engine/
 │   ├── engine.js       # D3/SVG lifecycle and slide rendering
 │   ├── geometry.js     # reusable projected shapes
 │   ├── navigation.js   # pure slide/hash/keyboard state
-│   └── projection.js   # camera and 2.5D projection math
+│   ├── projection.js   # camera and 2.5D projection math
+│   └── three-primitives.js # optional WebGL enhancement layer
 └── tests/
     ├── geometry.test.js
     ├── navigation.test.js
@@ -28,6 +29,12 @@ d3-slide-engine/
   stable keyed joins, transitions, resize handling, and accessibility labels.
 - A slide is data, not a hard-coded branch. The engine accepts an array of
   `{ id, title, caption, accent, objects }` records.
+- `three-primitives.js` is optional. Use it for atmospheric depth, wire cubes,
+  and node fields when Three.js/WebGL is available; always retain a D3/SVG or
+  CSS fallback.
+
+For the editorial composition and visual-quality rules, read
+`../../references/design-system.md` before creating a polished keynote page.
 
 ## Use in a single HTML page
 
