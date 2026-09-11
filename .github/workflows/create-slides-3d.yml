@@ -1,0 +1,32 @@
+name: create-slides-3d
+
+on:
+  pull_request:
+    paths:
+      - "skills/experimental/create-slides-3d/**"
+      - ".github/workflows/create-slides-3d.yml"
+  push:
+    branches: [master]
+    paths:
+      - "skills/experimental/create-slides-3d/**"
+      - ".github/workflows/create-slides-3d.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skills/experimental/create-slides-3d/assets/d3-slide-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - run: python3 -m http.server 4173 >/tmp/create-slides-3d-server.log 2>&1 &
+      - run: npm run test:browser
