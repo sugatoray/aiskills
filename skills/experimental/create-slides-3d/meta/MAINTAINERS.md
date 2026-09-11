@@ -10,6 +10,8 @@ For people developing this skill — not read as part of answering a
 - `../references/implementation-patterns.md` — detailed projection,
   scene-model, navigation, responsive, accessibility, and browser-verification
   guidance; keep it linked from `SKILL.md`.
+- `../assets/d3-slide-engine/` — reusable D3/SVG engine starter, pure
+  projection/geometry/navigation modules, and Node tests.
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
 - `../meta/MAINTAINERS.md` — this maintenance guide; it is not loaded during
   ordinary skill use.
