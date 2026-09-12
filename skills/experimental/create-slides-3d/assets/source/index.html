@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Offline visual reference snapshot of the D3 scene from the Ethical Institute keynote.">
+  <title>Offline source snapshot — Ethical Institute keynote / D3</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0d1011;--ink:#eeeae3;--muted:#a4aaa8;--line:#303638;--accent:#a7cebf}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#080a0b;color:var(--ink)}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+    button,a{color:inherit;font:inherit}a{text-decoration:none}a:hover{color:var(--accent)}
+    #viewport{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+    #stage{position:relative;width:1920px;height:1080px;max-width:100vw;max-height:100vh;overflow:hidden;background:var(--bg);transform:scale(min(calc(100vw / 1920),calc(100vh / 1080)));transform-origin:center}
+    #chrome,#footer{position:absolute;z-index:3;left:96px;right:96px;display:flex;align-items:center;justify-content:space-between;color:#acb2ae;font:16px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+    #chrome{top:46px}#footer{bottom:34px;gap:32px}#chrome strong{color:var(--ink);font-weight:500}#chrome .sep{color:#67716c;margin:0 14px}#chrome .center{position:absolute;left:50%;transform:translateX(-50%);font-size:13px;letter-spacing:.13em;white-space:nowrap}
+    #chrome .right{display:flex;gap:18px;font-size:14px}.tag{color:var(--muted);font:18px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.075em}.tag:before{content:"";display:inline-block;width:7px;height:7px;margin:0 15px 3px 0;background:var(--accent)}
+    .copy{position:absolute;left:96px;top:230px;max-width:1030px}.copy h1{margin:42px 0 0;font-size:145px;line-height:.96;font-weight:470;letter-spacing:-.075em}.copy h1 em{font-family:Georgia,serif;font-weight:400}.copy p{margin:42px 0 0;color:#d8d7d1;font-size:38px;letter-spacing:-.03em}.copy .byline{margin-top:58px;color:#a4aaa8;font:18px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+    #art{position:absolute;inset:0;opacity:.88}#art svg{width:100%;height:100%;display:block}.wire{fill:none;stroke:#a7cebf;stroke-width:2;opacity:.72}.wire.faint{stroke:#eeeae344;stroke-width:1}.cube{fill:#a7cebf12;stroke:#a7cebf;stroke-width:2}.node{fill:#a7cebf}.node-label{fill:#a7cebf;font:15px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em}.caption{fill:#a4aaa8;font:14px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+    #status{position:absolute;right:96px;top:93px;color:#c6ab89;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
+    #label{width:175px;flex:none;color:#adb4af}.rail{display:flex;align-items:center;flex:1;gap:5px}.rail i{height:2px;flex:1;background:#3a403e}.rail i.active{height:4px;background:var(--accent)}.controls{display:flex;gap:18px;font-size:22px}
+    @media(max-width:900px){#stage{width:100vw;height:56.25vw;max-height:100vh}.copy{left:5vw;top:18vw;max-width:58vw}.copy h1{font-size:clamp(38px,7.5vw,145px)}.copy p{margin-top:3vw;font-size:clamp(14px,2.5vw,38px)}.copy .byline{margin-top:4vw;font-size:clamp(9px,1.2vw,18px)}.tag{font-size:clamp(9px,1.2vw,18px)}.tag:before{width:4px;height:4px;margin-right:7px}#chrome,#footer{left:5vw;right:5vw}#chrome{top:4vw;font-size:clamp(8px,1vw,16px)}#chrome .center,#chrome .source{display:none}#footer{bottom:2vw;gap:2vw;font-size:clamp(8px,1.1vw,16px)}#status{right:5vw;top:9vw;font-size:clamp(7px,1vw,13px)}#label{width:13vw}.controls{gap:1.5vw;font-size:clamp(14px,2vw,22px)}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div id="viewport">
+    <main id="stage" aria-label="Offline visual reference snapshot of the D3 keynote scene">
+      <div id="art" aria-hidden="true"><svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(1390 610)">
+          <path class="wire faint" d="M-300 130L50-120 370 80M-300 130L-50 330 370 80M50-120L-50 330"/>
+          <path class="wire" d="M-250 170L50-80 310 70M-250 170L-40 300 310 70M50-80L-40 300"/>
+          <path class="wire faint" d="M-30-310L270-60M-30-310L-280-80M270-60L310 70M-280-80L-250 170"/>
+          <polygon class="cube" points="-210,95 80,-145 340,5 50,245"/>
+          <circle class="node" cx="-250" cy="170" r="8"/><circle class="node" cx="50" cy="-80" r="8"/><circle class="node" cx="310" cy="70" r="8"/>
+          <text class="node-label" x="-225" y="176">OBSERVABILITY</text><text class="node-label" x="74" y="-74">MLOPS</text><text class="node-label" x="334" y="76">D3</text>
+          <text class="caption" x="-130" y="380">3D GRAPHICS / STATIC REFERENCE</text>
+        </g>
+      </svg></div>
+      <header id="chrome"><span><strong>SIGNALS 2026</strong><span class="sep">|</span>ETHICAL.INSTITUTE</span><span class="center">THE NEW FAILURE MODES</span><span class="right"><a href="https://ethical.institute/keynote/#D3">LIVE SOURCE ↗</a><span>INDEX ↗</span></span></header>
+      <section class="copy"><div class="tag">D3 / 3 · A DECADE OF MLOPS ALREADY TOLD US</div><h1>A decade of<br><em>MLOps</em> already<br>told us.</h1><p>Offline visual reference snapshot.</p><p class="byline">SOURCE: ETHICAL.INSTITUTE/KEYNOTE/#D3</p></section>
+      <span id="status">3D GRAPHICS UNAVAILABLE</span>
+      <footer id="footer"><span id="label">33 / 41 · D3</span><nav class="rail" aria-label="Reference progress"><i></i><i></i><i></i><i></i><i class="active"></i><i></i><i></i><i></i></nav><span class="controls" aria-hidden="true">←　→　?</span></footer>
+    </main>
+  </div>
+</body>
+</html>
