@@ -19,6 +19,11 @@ Create a single self-contained HTML page with a cinematic isometric visual story
 
 The output is intentionally a browser-native HTML page, not a `.pptx` file.
 
+The self-contained offline visual reference is available at
+`assets/source/index.html`. It captures the composition and visual language of
+the referenced `#D3` scene for local inspection without network access; it is
+not a redistribution of the live keynote's production bundle.
+
 ## Inspiration and attribution
 
 This skill is based on the idea that the keynote page itself can be both the
