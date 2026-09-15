@@ -13,7 +13,7 @@ For people developing this skill — not read as part of handling a live subskil
 
 ## Claude Code plugin packaging
 
-This directory is a self-contained Claude Code plugin: `SKILL.md` sits at the plugin root with no nested `skills/` folder, and The family-level manifest lives at `skills/development/building-blocks/.claude-plugin/plugin.json` and lists `./subskill-dispatcher`.
+The family-level manifest lives at `skills/development/building-blocks/.claude-plugin/plugin.json` and lists `./subskill-dispatcher`, matching the `skills/scrolls/.claude-plugin/plugin.json` layout.
 
 Run it locally with:
 
@@ -21,7 +21,7 @@ Run it locally with:
 claude --plugin-dir skills/development/building-blocks
 ```
 
-The standalone manifest is intentionally scoped to this skill. A family-level `building-blocks/.claude-plugin/plugin.json` is not added until the group has multiple skills that benefit from shared Claude Code packaging.
+Do not recreate a `.claude-plugin/` directory inside this skill. Add future skills to the family manifest's `skills` array.
 
 ## Scope
 
@@ -47,7 +47,7 @@ Use semantic versioning:
 - Minor: backward-compatible protocol additions.
 - Major: incompatible syntax or contract changes.
 
-Keep `SKILL.md`'s `metadata.version` and `.claude-plugin/plugin.json`'s `version` aligned with the current changelog release in the same commit.
+Keep `SKILL.md`'s `metadata.version`, the family plugin's `version` aligned with the current changelog release in the same commit.
 
 ## Validation
 
