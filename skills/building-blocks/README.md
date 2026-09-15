@@ -8,6 +8,16 @@ Reusable protocol and composition primitives for constructing larger skills and 
 | --- | --- |
 | [`subskill-dispatcher`](subskill-dispatcher/) | Dispatch a named child skill from a parent skill using `::s`, with inherited context, scoped options, explicit resolution, chaining, and failure handling. |
 
+## Claude Code plugin
+
+This group is packaged as a family-level Claude Code plugin at `skills/building-blocks/.claude-plugin/plugin.json`.
+
+```bash
+claude --plugin-dir skills/building-blocks
+```
+
+The manifest's `skills` array should include every installable skill in this group.
+
 ## Composition syntax
 
 Use the dispatcher from a parent skill with:
