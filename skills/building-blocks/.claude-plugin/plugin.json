@@ -1,0 +1,23 @@
+{
+  "name": "building-blocks-skills",
+  "version": "0.2.1",
+  "description": "Reusable protocol and composition primitives for constructing larger skills and slash-command experiences, currently including subskill-dispatcher.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/building-blocks",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "subskills",
+    "slash-commands",
+    "composition",
+    "agent-workflows",
+    "building-blocks"
+  ],
+  "skills": [
+    "./subskill-dispatcher"
+  ]
+}
