@@ -31,6 +31,12 @@ Install only this skill from the repository:
 npx skills add sugatoray/aiskills --skill subskill-dispatcher --yes
 ```
 
+Install it for Claude Code:
+
+```bash
+claude --plugin-dir skills/building-blocks/subskill-dispatcher
+```
+
 From a local clone:
 
 ```bash
@@ -41,7 +47,10 @@ npx skills add . --skill subskill-dispatcher --yes
 
 ```text
 subskill-dispatcher/
+├── .claude-plugin/
+│   └── plugin.json
 ├── agents/
+│   ├── claude-code.yaml
 │   └── openai.yaml
 ├── meta/
 │   └── MAINTAINERS.md
