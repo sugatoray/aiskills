@@ -68,6 +68,28 @@ deliberately: diff the new `arxiv.sty` against this one, re-apply the
 skill's own version — don't silently swap the file in a commit that
 looks like it's about something else.
 
+## CI
+
+[`../../../.github/workflows/latex-arxiv-paper-builder.yml`](../../../.github/workflows/latex-arxiv-paper-builder.yml)
+exists because the development sandbox this skill was authored in has no
+LaTeX/pandoc/SVG-converter/Playwright toolchain installed, so none of
+this could be exercised locally beyond syntax checks. It runs on every
+push/PR touching `skills/latex/**` (plus manual `workflow_dispatch`) and
+covers, in four jobs: `claude plugin validate --strict` on both plugin
+manifests and the marketplace; `shellcheck`/`py_compile` on the scripts;
+an actual `dante-ev/latex-action` compile of `assets/template/main.tex`
+to PDF via `latexmk` (uploaded as a build artifact, so a maintainer can
+open it and eyeball the rendered title block/abstract/sections); and a
+smoke test of `convert_svg.sh` and `render_html.py` against tiny
+generated fixtures. It caught two real bugs on first run — see the
+`[1.0.1]` `CHANGELOG.md` entry — so treat a red run here as signal, not
+flakiness, before assuming otherwise.
+
+If a reference file's guidance ever changes in a way that affects
+`assets/template/main.tex` itself (not just the prose in
+`references/`), keep the CI compile job in mind — it's the only thing
+that actually verifies the template still builds.
+
 ## Versioning
 
 Bump `metadata.version` in `../SKILL.md`'s frontmatter (and add a

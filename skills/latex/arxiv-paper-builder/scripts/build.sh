@@ -18,14 +18,16 @@ if command -v latexmk >/dev/null 2>&1; then
   latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir="$outdir" "$main_tex"
 else
   echo "latexmk not found; falling back to a manual pdflatex/bibtex sequence" >&2
-  cd "$(dirname "$main_tex")"
+  tex_dir="$(dirname "$main_tex")"
   base="$(basename "$main_tex" .tex)"
-  pdflatex -interaction=nonstopmode -halt-on-error "$base.tex"
-  if [ -f "$base.aux" ] && grep -q '\\citation' "$base.aux"; then
-    bibtex "$base"
+  pdflatex -interaction=nonstopmode -halt-on-error -output-directory="$outdir" "$main_tex"
+  if [ -f "$outdir/$base.aux" ] && grep -q '\\citation' "$outdir/$base.aux"; then
+    # BIBINPUTS lets bibtex find references.bib next to main.tex even
+    # when outdir is a separate build directory.
+    BIBINPUTS="$tex_dir:" bibtex "$outdir/$base"
   fi
-  pdflatex -interaction=nonstopmode -halt-on-error "$base.tex"
-  pdflatex -interaction=nonstopmode -halt-on-error "$base.tex"
+  pdflatex -interaction=nonstopmode -halt-on-error -output-directory="$outdir" "$main_tex"
+  pdflatex -interaction=nonstopmode -halt-on-error -output-directory="$outdir" "$main_tex"
 fi
 
 log_file="$outdir/$(basename "$main_tex" .tex).log"

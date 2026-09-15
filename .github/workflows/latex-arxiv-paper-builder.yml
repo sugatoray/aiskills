@@ -1,0 +1,116 @@
+name: latex / arxiv-paper-builder
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "skills/latex/**"
+      - ".claude-plugin/marketplace.json"
+      - ".github/workflows/latex-arxiv-paper-builder.yml"
+  pull_request:
+    paths:
+      - "skills/latex/**"
+      - ".claude-plugin/marketplace.json"
+      - ".github/workflows/latex-arxiv-paper-builder.yml"
+  workflow_dispatch: {}
+
+jobs:
+  validate-plugin-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the Claude Code CLI (for `plugin validate`)
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Validate the arxiv-paper-builder plugin manifest
+        run: claude plugin validate skills/latex/arxiv-paper-builder --strict
+
+      - name: Validate the latex family plugin manifest
+        run: claude plugin validate skills/latex --strict
+
+      - name: Validate the repo marketplace manifest
+        run: claude plugin validate .claude-plugin/marketplace.json --strict
+
+  lint-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Shellcheck the helper scripts
+        run: shellcheck skills/latex/arxiv-paper-builder/scripts/*.sh
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Byte-compile render_html.py
+        run: python3 -m py_compile skills/latex/arxiv-paper-builder/scripts/render_html.py
+
+  compile-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile the vendored template skeleton to PDF
+        uses: dante-ev/latex-action@2026-A
+        with:
+          root_file: main.tex
+          working_directory: skills/latex/arxiv-paper-builder/assets/template
+          args: -pdf -latexoption=-file-line-error -latexoption=-interaction=nonstopmode -latexoption=-halt-on-error
+
+      - name: Verify a non-empty PDF was produced
+        run: test -s skills/latex/arxiv-paper-builder/assets/template/main.pdf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arxiv-paper-builder-template-pdf
+          path: skills/latex/arxiv-paper-builder/assets/template/main.pdf
+          if-no-files-found: error
+
+  figure-tools-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install rsvg-convert (SVG -> PDF path) and Playwright's Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: SVG -> PDF smoke test
+        run: |
+          mkdir -p /tmp/fig-test
+          cat > /tmp/fig-test/sample.svg <<'SVG'
+          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+            <rect width="100" height="100" fill="blue"/>
+          </svg>
+          SVG
+          skills/latex/arxiv-paper-builder/scripts/convert_svg.sh \
+            /tmp/fig-test/sample.svg /tmp/fig-test/sample.pdf
+          test -s /tmp/fig-test/sample.pdf
+
+      - name: HTML -> PNG smoke test
+        run: |
+          cat > /tmp/fig-test/sample.html <<'HTML'
+          <!doctype html>
+          <html><body style="margin:0">
+            <div id="chart" style="width:400px;height:300px;background:tomato;"></div>
+          </body></html>
+          HTML
+          python3 skills/latex/arxiv-paper-builder/scripts/render_html.py \
+            /tmp/fig-test/sample.html /tmp/fig-test/sample.png --selector "#chart"
+          test -s /tmp/fig-test/sample.png
