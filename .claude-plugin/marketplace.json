@@ -54,14 +54,14 @@
     {
       "name": "building-blocks-skills",
       "source": "./development/building-blocks",
-      "description": "Building-block skills: reusable protocol and composition primitives for constructing larger skills and slash-command experiences, currently including subskill-dispatcher.",
-      "category": "developer-tools",
+      "description": "Building-block skills: reusable protocol and composition primitives for constructing larger skills and slash-command experiences, including subskill-dispatcher.",
+      "category": "productivity",
       "keywords": [
         "skills",
         "subskills",
         "slash-commands",
         "composition",
-        "agent-workflows",
+        "developer-workflow",
         "building-blocks"
       ]
     }
