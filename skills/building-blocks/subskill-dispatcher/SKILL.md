@@ -3,6 +3,7 @@ name: subskill-dispatcher
 description: "Dispatch a named subskill from within a parent skill using the ::s syntax, with inherited context, scoped options, explicit resolution, and preserved output contracts."
 license: MIT
 compatibility: "Skill runtimes that support slash-command composition or nested skill loading."
+disable-model-invocation: true
 metadata:
   - name: subskill-dispatcher
     type: skill
