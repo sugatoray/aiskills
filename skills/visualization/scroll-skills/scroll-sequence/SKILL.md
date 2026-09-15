@@ -1,6 +1,14 @@
 ---
 name: scroll-sequence
-description: Create a scroll-controlled visual sequence where discrete frames or states advance and reverse with scrolling. Use for cinematic product reveals, process animations, rendered frame sequences, storyboard-like transitions, and Apple-style pinned scroll experiences.
+description: "Create a scroll-controlled visual sequence where discrete frames or states advance and reverse with scrolling. Use for cinematic product reveals, process animations, rendered frame sequences, storyboard-like transitions, and Apple-style pinned scroll experiences. Trigger when the user invokes /scroll-sequence directly or composes it with /visualize."
+license: MIT
+compatibility: "Modern web browsers with HTML5, CSS sticky positioning, and JavaScript; optional Canvas, SVG/DOM animation, or GSAP ScrollTrigger when appropriate."
+metadata:
+  - name: scroll-sequence
+    type: skill
+    author: sugatoray
+    version: "1.0.0"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/visualization/scroll-skills/scroll-sequence"
 ---
 
 # /scroll-sequence
@@ -38,9 +46,15 @@ Accept any of these:
 1. **Concept**
    - Example: `MacBook opening and revealing internal components`
    - Generate or define the required visual states, then build the scroll experience.
-2. **Video** — Extract a web-appropriate frame sequence first.
-3. **Image sequence** — Use the supplied frames directly.
-4. **DOM/SVG scene** — Animate discrete visual states rather than raster frames when that is more appropriate.
+
+2. **Video**
+   - Extract a web-appropriate frame sequence first.
+
+3. **Image sequence**
+   - Use the supplied frames directly.
+
+4. **DOM/SVG scene**
+   - Animate discrete visual states rather than raster frames when that is more appropriate.
 
 ## Default behavior
 
