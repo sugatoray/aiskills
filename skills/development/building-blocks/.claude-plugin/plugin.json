@@ -1,6 +1,6 @@
 {
   "name": "building-blocks-skills",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Reusable protocol and composition primitives for constructing larger skills and slash-command experiences, currently including subskill-dispatcher.",
   "author": {
     "name": "Sugato Ray",
