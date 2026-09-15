@@ -7,18 +7,18 @@ For people developing this skill — not read as part of handling a live subskil
 - `../SKILL.md` — runtime instructions and the `::s` composition protocol.
 - `../README.md` — human-facing usage, installation, guarantees, and package map.
 - `../CHANGELOG.md` — version history; update it alongside `metadata.version` in `SKILL.md`.
-- `../.claude-plugin/plugin.json` — standalone Claude Code plugin manifest.
+- `../../.claude-plugin/plugin.json` — standalone Claude Code plugin manifest.
 - `../agents/claude-code.yaml`, `../agents/openai.yaml` — per-agent-harness interface metadata.
 - This skill has no scripts, tests, references, or assets; it is pure protocol guidance.
 
 ## Claude Code plugin packaging
 
-This directory is a self-contained Claude Code plugin: `SKILL.md` sits at the plugin root with no nested `skills/` folder, and `../.claude-plugin/plugin.json` provides the manifest.
+This directory is a self-contained Claude Code plugin: `SKILL.md` sits at the plugin root with no nested `skills/` folder, and The family-level manifest lives at `skills/building-blocks/.claude-plugin/plugin.json` and lists `./subskill-dispatcher`.
 
 Run it locally with:
 
 ```bash
-claude --plugin-dir skills/building-blocks/subskill-dispatcher
+claude --plugin-dir skills/building-blocks
 ```
 
 The standalone manifest is intentionally scoped to this skill. A family-level `building-blocks/.claude-plugin/plugin.json` is not added until the group has multiple skills that benefit from shared Claude Code packaging.
