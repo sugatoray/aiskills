@@ -3,6 +3,18 @@
 All notable changes to the `subskill-dispatcher` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-09-15
+
+### Added
+
+- Claude Code plugin packaging through `.claude-plugin/plugin.json`.
+- Claude Code agent metadata through `agents/claude-code.yaml`.
+- Claude Code installation instructions in `README.md`.
+
+### Changed
+
+- Bumped the skill version to `0.2.0` for the packaging addition.
+
 ## [0.1.0] - 2026-09-15
 
 ### Added
