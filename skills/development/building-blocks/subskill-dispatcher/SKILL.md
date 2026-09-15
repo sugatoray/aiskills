@@ -8,7 +8,7 @@ metadata:
   - name: subskill-dispatcher
     type: skill
     author: sugatoray
-    version: "0.2.1"
+    version: "0.2.2"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/building-blocks/subskill-dispatcher"
 ---
 
