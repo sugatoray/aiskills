@@ -1,6 +1,6 @@
 {
   "name": "latex-skills",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "LaTeX skills: assembles markdown docs, PNG/SVG/PDF figures, and HTML artifacts into a research-paper LaTeX project (arXiv/NeurIPS-derived preprint style) and compiles it to PDF.",
   "author": {
     "name": "Sugato Ray",

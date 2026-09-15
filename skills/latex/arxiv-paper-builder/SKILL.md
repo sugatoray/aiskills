@@ -7,7 +7,7 @@ metadata:
   - name: arxiv-paper-builder
     type: skill
     author: sugatoray
-    version: "1.0.1"
+    version: "1.0.2"
     source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/latex/arxiv-paper-builder"
 ---
 

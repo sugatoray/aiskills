@@ -1,9 +1,18 @@
 % Populated from citations found in the source markdown (pandoc-style
-% [@key] citations, an existing .bib, or a manually-transcribed
+% bracket citations, an existing .bib, or a manually-transcribed
 % reference list). See references/markdown-to-latex.md for the
 % conversion convention. This file ships with one example entry so
-% `\citep{example2024}` in a scratch build has something to resolve
-% against; delete it once real entries are added.
+% citing it in a scratch build has something to resolve against;
+% delete it once real entries are added.
+%
+% Note for anyone editing this comment block: do not type the two-
+% character "at" plus "sign" glyph anywhere above the first real entry
+% below, even describing it in prose (as this sentence is doing by
+% spelling it out instead). BibTeX has no comment syntax of its own -
+% it scans for that character to find the next entry regardless of a
+% leading percent sign, so typing it here reads as the start of a
+% malformed entry and bibtex fails with "I was expecting a brace or a
+% parenthesis" on whatever follows.
 
 @article{example2024,
   title   = {An Example Reference Entry},

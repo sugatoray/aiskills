@@ -3,6 +3,22 @@
 All notable changes to the `arxiv-paper-builder` skill are documented
 here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.2] - 2026-09-15
+
+### Fixed
+
+- `assets/template/references.bib`: the header comment's literal
+  `[@key]` example broke `bibtex` outright — CI's `compile-template`
+  job failed with `I was expecting a` `{` `or a` `(` `` because BibTeX
+  has no comment syntax of its own; it scans for the next `@`
+  character to start an entry regardless of a leading `%`, so the `@`
+  inside that comment read as the start of a malformed entry. Reworded
+  the comment to spell out the character instead of typing it, and
+  added a note to `references/build-and-troubleshoot.md`'s log-pattern
+  table so this doesn't get reintroduced. This is exactly the kind of
+  bug the new CI compile job exists to catch — it did, on the very
+  first run.
+
 ## [1.0.1] - 2026-09-15
 
 ### Fixed
