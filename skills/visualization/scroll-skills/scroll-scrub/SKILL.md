@@ -1,6 +1,14 @@
 ---
 name: scroll-scrub
-description: Turn supplied time-based media, especially a video, into a scroll-scrubbed experience where scroll position directly controls playback position. Prefer optimized image-frame playback for deterministic results, with direct video seeking as an optional implementation strategy.
+description: "Turn supplied time-based media, especially a video, into a scroll-scrubbed experience where scroll position directly controls playback position. Prefer optimized image-frame playback for deterministic results, with direct video seeking as an optional implementation strategy. Trigger when the user invokes /scroll-scrub directly or composes it with /visualize."
+license: MIT
+compatibility: "Modern web browsers with HTML5 video, Canvas, CSS sticky positioning, and JavaScript; ffmpeg is recommended when extracting optimized image-frame sequences from source video."
+metadata:
+  - name: scroll-scrub
+    type: skill
+    author: sugatoray
+    version: "1.0.0"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/visualization/scroll-skills/scroll-scrub"
 ---
 
 # /scroll-scrub
