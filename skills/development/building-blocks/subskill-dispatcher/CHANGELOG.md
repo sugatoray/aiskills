@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2] - 2026-09-15
+
+### Changed
+
+- Moved the `building-blocks` family from `skills/building-blocks/` to `skills/development/building-blocks/`.
+- Updated source URLs, installation paths, Claude plugin references, and marketplace registration.
+
+
 All notable changes to the `subskill-dispatcher` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
