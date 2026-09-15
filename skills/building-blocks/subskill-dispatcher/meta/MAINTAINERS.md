@@ -6,9 +6,22 @@ For people developing this skill — not read as part of handling a live subskil
 
 - `../SKILL.md` — runtime instructions and the `::s` composition protocol.
 - `../README.md` — human-facing usage, installation, guarantees, and package map.
-- `../CHANGELOG.md` — version history; update it with `metadata.version` in `SKILL.md`.
-- `../agents/openai.yaml` — OpenAI agent interface metadata.
+- `../CHANGELOG.md` — version history; update it alongside `metadata.version` in `SKILL.md`.
+- `../.claude-plugin/plugin.json` — standalone Claude Code plugin manifest.
+- `../agents/claude-code.yaml`, `../agents/openai.yaml` — per-agent-harness interface metadata.
 - This skill has no scripts, tests, references, or assets; it is pure protocol guidance.
+
+## Claude Code plugin packaging
+
+This directory is a self-contained Claude Code plugin: `SKILL.md` sits at the plugin root with no nested `skills/` folder, and `../.claude-plugin/plugin.json` provides the manifest.
+
+Run it locally with:
+
+```bash
+claude --plugin-dir skills/building-blocks/subskill-dispatcher
+```
+
+The standalone manifest is intentionally scoped to this skill. A family-level `building-blocks/.claude-plugin/plugin.json` is not added until the group has multiple skills that benefit from shared Claude Code packaging.
 
 ## Scope
 
@@ -34,7 +47,7 @@ Use semantic versioning:
 - Minor: backward-compatible protocol additions.
 - Major: incompatible syntax or contract changes.
 
-Keep `SKILL.md`'s `metadata.version` and the current changelog release aligned in the same commit.
+Keep `SKILL.md`'s `metadata.version` and `.claude-plugin/plugin.json`'s `version` aligned with the current changelog release in the same commit.
 
 ## Validation
 
@@ -45,4 +58,5 @@ From the repository root, run the repository's skill validator, if available. At
 - no unfinished scaffold placeholders;
 - all README links resolve;
 - examples use the canonical `::s` grammar;
-- the package remains independent of any single domain skill.
+- the package remains independent of any single domain skill;
+- `claude --plugin-dir skills/building-blocks/subskill-dispatcher` loads the standalone plugin successfully.
