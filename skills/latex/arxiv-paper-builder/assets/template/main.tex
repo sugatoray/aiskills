@@ -1,0 +1,76 @@
+\documentclass{article}
+
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc}    % allow utf-8 input
+\usepackage[T1]{fontenc}       % use 8-bit T1 fonts
+\usepackage{hyperref}          % hyperlinks
+\usepackage{url}               % simple URL typesetting
+\usepackage{booktabs}          % professional-quality tables
+\usepackage{amsmath,amssymb}   % math
+\usepackage{graphicx}          % figures (png/pdf; convert svg to pdf first)
+\usepackage{natbib}            % \citep / \citet
+\usepackage{cleveref}          % \Cref / \cref smart cross-referencing
+\usepackage{microtype}         % microtypography
+
+% ---- Fill in: title, short running title, authors, affiliations ----
+\title{PAPER\_TITLE}
+\renewcommand{\shorttitle}{SHORT\_TITLE}
+
+\author{%
+  AUTHOR\_ONE\thanks{Corresponding author: \texttt{EMAIL\_ONE}} \\
+  AFFILIATION\_ONE \\
+  \And
+  AUTHOR\_TWO \\
+  AFFILIATION\_TWO \\
+}
+
+\hypersetup{
+  pdftitle={PAPER_TITLE},
+  pdfauthor={AUTHOR_ONE, AUTHOR_TWO},
+  pdfkeywords={KEYWORD_ONE, KEYWORD_TWO},
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+ABSTRACT\_TEXT
+\end{abstract}
+
+\keywords{KEYWORD\_ONE \and KEYWORD\_TWO}
+
+% ---- Sections below are populated from the source markdown docs; ----
+% ---- see references/section-mapping.md for the canonical order.  ----
+
+\section{Introduction}
+\label{sec:introduction}
+
+\section{Related Work}
+\label{sec:related-work}
+
+\section{Method}
+\label{sec:method}
+
+\section{Experiments}
+\label{sec:experiments}
+
+\section{Results}
+\label{sec:results}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\section*{Acknowledgments}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\appendix
+\section{Appendix}
+\label{sec:appendix}
+
+\end{document}

@@ -50,6 +50,19 @@
         "developer-workflow",
         "repo-related"
       ]
+    },
+    {
+      "name": "latex-skills",
+      "source": "./latex",
+      "description": "LaTeX skills: assembles markdown docs, PNG/SVG/PDF figures, and HTML artifacts into a research-paper LaTeX project (arXiv/NeurIPS-derived preprint style) and compiles it to PDF.",
+      "category": "writing",
+      "keywords": [
+        "latex",
+        "arxiv",
+        "research-paper",
+        "pdf",
+        "markdown"
+      ]
     }
   ]
 }

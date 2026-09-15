@@ -117,6 +117,40 @@ with every skill twice — pick one.
 
 > 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
 
+## 📄 LaTeX
+
+Skills for producing a LaTeX-formatted research paper from raw writeup
+material — currently: assembling markdown documents, figures
+(PNG/SVG/PDF), and HTML artifacts into a complete project in the
+single-column arXiv/NeurIPS-derived preprint style Meta FAIR's public
+papers commonly resemble, and compiling it to PDF.
+
+**Installation**:
+
+Choose the skill by name: `arxiv-paper-builder` and install
+interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install latex-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**LaTeX README.md**](skills/latex/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
@@ -139,3 +173,7 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Development](skills/development/README.md) | `create-issues-update-pr` | Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list. |
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [LaTeX](skills/latex/README.md) | `arxiv-paper-builder` | Assembles markdown docs, PNG/SVG/PDF figures, and HTML artifacts into a LaTeX research-paper project (arXiv/NeurIPS-derived preprint style) and compiles it to PDF — SVG→PDF conversion, HTML→PNG screenshotting, markdown→LaTeX conversion, and build-log troubleshooting included. |
