@@ -1,0 +1,5 @@
+interface:
+  display_name: "Subskill Dispatcher"
+  short_description: "Compose named subskills inside parent skills with scoped options."
+policy:
+  allow_implicit_invocation: true
