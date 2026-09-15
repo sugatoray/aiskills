@@ -1,42 +1,50 @@
-# LaTeX
+# LaTeX skills
 
 Skills for producing a LaTeX-formatted research paper from raw writeup
-material — currently: assembling markdown documents, figures
-(PNG/SVG/PDF), and HTML artifacts into a complete project in the
-single-column arXiv/NeurIPS-derived preprint style Meta FAIR's public
-papers commonly resemble, and compiling it to PDF.
+material — assembling markdown documents, figures (PNG/SVG/PDF), and
+HTML artifacts into a complete project in the single-column
+arXiv/NeurIPS-derived preprint style Meta FAIR's public papers commonly
+resemble, and compiling it to PDF.
 
-**Installation**:
+## Skills
 
-Choose the skill by name: `arxiv-paper-builder` and install
-interactively.
+| Skill | Purpose |
+| --- | --- |
+| [`arxiv-paper-builder`](arxiv-paper-builder/) | Assembles markdown docs, PNG/SVG/PDF figures, and HTML artifacts into a LaTeX research-paper project (arXiv/NeurIPS-derived preprint style) and compiles it to PDF — SVG→PDF conversion, HTML→PNG screenshotting, markdown→LaTeX conversion, and build-log troubleshooting included. |
 
-```sh
-npx skills add sugatoray/aiskills               # project-level
-npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
-```
+More skills will be added under this folder over time (e.g. a real
+target-venue template pack, a citation-management skill) following the
+same layout as `arxiv-paper-builder/`.
 
-<details>
-<summary><strong>Alternate: Claude Code plugin</strong></summary>
+## This folder
 
-Installs the whole family as a managed, read-only bundle from this
-repo's marketplace. Installing both this and `npx skills` leaves you
-with every skill twice — pick one.
+- `.claude-plugin/plugin.json` — the family-level Claude Code plugin
+  manifest, grouping every skill in this folder into one `latex-skills`
+  plugin listed in the repo-root `.claude-plugin/marketplace.json`. See
+  [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) for its design and
+  keep-in-sync rules — the same layout `skills/stata/` and
+  `skills/scrolls/` use for their own group manifests.
+- `meta/MAINTAINERS.md` — family-wide maintainer notes. Not read at
+  invocation time.
 
-```
-/plugin marketplace add sugatoray/aiskills
-/plugin install latex-skills@sugatoray
-```
+## Layout
 
-</details>
+Each skill's directory has:
 
-> 💡 For more information, refer to the
-> [**arxiv-paper-builder README.md**](arxiv-paper-builder/README.md).
-
-## What's here
-
-- [`arxiv-paper-builder/`](arxiv-paper-builder/) — markdown + figures +
-  HTML artifacts → a compiled LaTeX paper PDF.
-- [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) — family-level
-  maintainer notes (the shared Claude Code plugin manifest and its
-  keep-in-sync rules). Not read at invocation time.
+- `SKILL.md` — the skill's runtime instructions.
+- `README.md` — a minimal, human-facing pointer to the files below; not
+  read at invocation time.
+- `references/` — detailed content loaded on demand rather than held in
+  context on every invocation (template macros, markdown→LaTeX
+  conversion rules, figure handling, build troubleshooting).
+- `assets/template/` — the vendored LaTeX template (style file, a
+  `main.tex` skeleton, a `references.bib` starter).
+- `scripts/` — bundled helper scripts (SVG→PDF conversion, HTML→PNG
+  screenshotting, the compile-and-check-the-log build step).
+- `meta/MAINTAINERS.md` — development notes: layout and versioning.
+  Not read at invocation time.
+- `CHANGELOG.md` — that skill's own version history.
+- `.claude-plugin/plugin.json` — Claude Code plugin manifest, present
+  when the skill also sits at its plugin root with no `skills/`
+  subfolder (true today for `arxiv-paper-builder/`), letting it load
+  directly via `claude --plugin-dir <path>`.
