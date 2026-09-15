@@ -1,6 +1,14 @@
 ---
 name: scroll-explode
-description: Create a scroll-driven exploded-view or assembly/disassembly visualization. Use when an object should separate into parts while scrolling down and recombine while scrolling up, including electronics, watches, machines, furniture, shoes, cameras, vehicles, and product internals.
+description: "Create a scroll-driven exploded-view or assembly/disassembly visualization. Use when an object should separate into parts while scrolling down and recombine while scrolling up, including electronics, watches, machines, furniture, shoes, cameras, vehicles, and product internals. Trigger when the user invokes /scroll-explode directly or composes it with /visualize."
+license: MIT
+compatibility: "Modern web browsers with HTML5, CSS sticky positioning, and JavaScript; supports pre-rendered frame sequences, SVG/DOM layered parts, and optional WebGL/3D when true interactive 3D is required."
+metadata:
+  - name: scroll-explode
+    type: skill
+    author: sugatoray
+    version: "1.0.0"
+    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/visualization/scroll-skills/scroll-explode"
 ---
 
 # /scroll-explode
