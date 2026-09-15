@@ -1,0 +1,5 @@
+interface:
+  display_name: "arXiv-Paper-Builder"
+  short_description: "Turns markdown docs, figures, and HTML artifacts into a compiled LaTeX paper PDF (arXiv/NeurIPS-derived preprint style)."
+policy:
+  allow_implicit_invocation: true

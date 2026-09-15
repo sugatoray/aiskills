@@ -1,0 +1,22 @@
+{
+  "name": "arxiv-paper-builder",
+  "displayName": "arXiv Paper Builder",
+  "version": "1.0.2",
+  "description": "Assembles markdown docs, PNG/SVG/PDF figures, and HTML artifacts into a LaTeX research-paper project (arXiv/NeurIPS-derived preprint style) and compiles it to PDF.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/latex/arxiv-paper-builder",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "latex",
+    "arxiv",
+    "research-paper",
+    "pdf",
+    "markdown",
+    "bibliography",
+    "figures"
+  ]
+}
