@@ -8,7 +8,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "1.3.1"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
+    source_url: "github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
 ---
 
 # Stata command & recipe writer

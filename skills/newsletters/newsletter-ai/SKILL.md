@@ -7,7 +7,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "1.5.2"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/newsletters/newsletter-ai"
+    source_url: "github.com/sugatoray/aiskills/tree/master/skills/newsletters/newsletter-ai"
     aliases:
       - nltr-ai
 ---

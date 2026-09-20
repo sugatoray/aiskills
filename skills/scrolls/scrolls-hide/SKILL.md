@@ -9,7 +9,7 @@ metadata:
     type: skill
     author: sugatoray
     version: "2.1.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-hide"
+    source_url: "github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-hide"
 ---
 
 # Hiding docs/scrolls/
