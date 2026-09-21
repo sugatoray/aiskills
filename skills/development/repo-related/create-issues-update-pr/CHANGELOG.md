@@ -23,6 +23,16 @@ documented here. Format based on
   ("... with brief description and then the details + nested list of
   issues"); it's now what running the skill produces on its own.
 
+## [1.2.1] - 2026-09-21
+
+### Fixed
+
+- Flattened the frontmatter `metadata` field from a one-item YAML list
+  to a flat mapping — GitLab Duo requires `metadata` to be a map, and
+  the list form it had briefly taken on broke compatibility with it.
+  `source_url` kept pointing at this skill's GitHub source. No
+  functional change to the skill's behavior.
+
 ## [1.2.0] - 2026-09-02
 
 ### Changed

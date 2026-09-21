@@ -7,6 +7,16 @@ Work on this skill is tracked under
 [Epic #30](https://github.com/sugatoray/aiskills/issues/30); each entry
 below links to its corresponding closed issue.
 
+## [1.5.3] - 2026-09-21 ([#73](https://github.com/sugatoray/aiskills/pull/73))
+
+### Fixed
+
+- Flattened the frontmatter `metadata` field from a one-item YAML list
+  to a flat mapping — GitLab Duo requires `metadata` to be a map, and
+  the list form it had briefly taken on broke compatibility with it.
+  `source_url` kept pointing at this skill's GitHub source. No
+  functional change to the skill's behavior.
+
 ## [1.5.2] - 2026-08-26 ([#47](https://github.com/sugatoray/aiskills/issues/47))
 
 ### Added

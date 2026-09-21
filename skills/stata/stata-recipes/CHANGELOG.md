@@ -3,6 +3,16 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.2] - 2026-09-21
+
+### Fixed
+
+- Flattened the frontmatter `metadata` field from a one-item YAML list
+  to a flat mapping — GitLab Duo requires `metadata` to be a map, and
+  the list form it had briefly taken on broke compatibility with it.
+  `source_url` kept pointing at this skill's GitHub source. No
+  functional change to the skill's behavior.
+
 ## [1.3.1] - 2026-08-28
 
 ### Added
