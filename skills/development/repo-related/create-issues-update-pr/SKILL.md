@@ -7,7 +7,7 @@ metadata:
   name: create-issues-update-pr
   type: skill
   author: sugatoray
-  version: "1.2.1"
+  version: "1.3.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr"
 ---
 
@@ -93,30 +93,46 @@ useful if the PR actually points back at them.
      same piece of work at a glance — an epic title that was itself kept
      short is usually reusable as-is. Otherwise, write a short, accurate
      title for the single issue's scope. Aim well under 70 characters.
-   - **Body**: add (or rewrite) an `## Issues` section listing every
-     issue created, one per line, in exactly this format:
+   - **Body**: the default shape, whenever this skill is writing or
+     rewriting a body from scratch, is three parts in this order:
+     - A short **Summary** (1-2 sentences): what the PR fixes or adds,
+       in plain terms — the kind of sentence someone skimming a PR list
+       needs, not the mechanism.
+     - A **Details** section: the fuller explanation — root cause (for
+       a fix), the approach taken, what actually changed, and how it
+       was verified — pulled from the real commits/diff for this PR,
+       not written generically from the title alone.
+     - An **Issues** section listing every issue created, one per line,
+       in exactly this format:
 
-     ```
-     - Closes #{{issue-number}} -- {{issue-title}}
-     ```
+       ```
+       - Closes #{{issue-number}} -- {{issue-title}}
+       ```
 
-     The `Closes` keyword is deliberate, on every line including a
-     parent epic's — GitHub auto-closes any issue referenced this way
-     when the PR merges into the repo's default branch, so the list
-     doubles as the mechanism that closes the issues, not just a
-     description of them.
+       The `Closes` keyword is deliberate, on every line including a
+       parent epic's — GitHub auto-closes any issue referenced this way
+       when the PR merges into the repo's default branch, so the list
+       doubles as the mechanism that closes the issues, not just a
+       description of them. Indent each level of child under its
+       parent by two spaces — GitHub renders two-space-indented bullets
+       as a nested list. A flat set of issues with no parent is just
+       one un-indented list.
 
-     Indent each level of child under its parent by two spaces — GitHub
-     renders two-space-indented bullets as a nested list. A flat set of
-     issues with no parent is just one un-indented list. Keep whatever
-     other sections belong in this PR's description (Summary, Key
-     changes, Test plan, whatever the repo's own convention is) — the
-     Issues section is additive. The one exception: if the existing
-     description is generic boilerplate that no longer reflects the PR's
-     actual current state (common after several rounds of commits since
-     it was first written), rewriting the whole body to match reality is
-     the right call — just say that's what you're doing rather than
-     silently overwriting something that looked deliberate.
+     This Summary/Details/Issues shape is the default, not a rigid
+     template to impose everywhere: if the PR already has its own
+     established, still-accurate structure (a repo convention like
+     Summary/Key changes/Test plan, or anything else genuinely
+     reflecting the PR's current state), preserve that structure and
+     just add or refresh the Issues section within it, additively,
+     rather than forcing the Summary/Details split on top of a body
+     that already works. The one case that calls for a full rewrite
+     either way: if the existing description is generic boilerplate
+     that no longer reflects the PR's actual current state (common
+     after several rounds of commits since it was first written) —
+     then rewriting the whole body (into the default Summary/Details/
+     Issues shape, absent some other convention to follow) is the right
+     call — just say that's what you're doing rather than silently
+     overwriting something that looked deliberate.
    - Use `update_pull_request` with both `title` and `body` set in the
      same call.
 
@@ -130,6 +146,36 @@ useful if the PR actually points back at them.
    memory of what you sent.
 
 ## Format reference
+
+The default full body shape — Summary, then Details, then the Issues
+list (see workflow step 6):
+
+```
+## Summary
+
+Fixes a sidebar bug where a row's reading-time estimate with more
+digits than the rest threw its part-number index out of column with
+every other row.
+
+## Details
+
+`.n-meta`'s auto-sized width let a wider time value shift that row's
+whole trailing block, including the index digits, independently of
+every other row. Fixed by giving the time value a fixed, right-aligned
+width instead of letting it size itself. Verified with new tests and
+by regenerating the two affected real editions.
+
+## Issues
+
+- Closes #76 -- Fix sidebar reading-time column misalignment
+  - Closes #77 -- Derive sidebar time-column width from reading_times.total
+  - Closes #78 -- Update scrolls memory for sidebar alignment fix
+```
+
+The rest of these examples show just the `## Issues` fragment itself —
+the part whose exact list/nesting format matters regardless of what
+Summary/Details (or a repo's own alternate sections) look like above
+it.
 
 With a parent epic:
 
