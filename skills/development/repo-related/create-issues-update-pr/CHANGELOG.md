@@ -4,6 +4,35 @@ All notable changes to the `create-issues-update-pr` skill are
 documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-09-21
+
+### Changed
+
+- The PR body's default shape (step 6, "Update the PR") is now three
+  parts in order — a short **Summary**, a **Details** section, then
+  the **Issues** list — instead of just appending an `## Issues`
+  section to whatever the body already contained. This is the default
+  when writing/rewriting a body from scratch; a PR with its own
+  established, still-accurate structure (Summary/Key changes/Test
+  plan, or a repo's own convention) keeps that structure, with the
+  Issues section added or refreshed additively within it, same as
+  before. Added a full worked example of the default shape to the
+  format reference, ahead of the existing Issues-only fragments (which
+  now read as "just the Issues part of the body," not the whole thing).
+  Previously this shape had to be requested explicitly per invocation
+  ("... with brief description and then the details + nested list of
+  issues"); it's now what running the skill produces on its own.
+
+## [1.2.1] - 2026-09-21
+
+### Fixed
+
+- Flattened the frontmatter `metadata` field from a one-item YAML list
+  to a flat mapping — GitLab Duo requires `metadata` to be a map, and
+  the list form it had briefly taken on broke compatibility with it.
+  `source_url` kept pointing at this skill's GitHub source. No
+  functional change to the skill's behavior.
+
 ## [1.2.0] - 2026-09-02
 
 ### Changed

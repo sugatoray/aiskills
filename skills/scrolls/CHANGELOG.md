@@ -18,11 +18,22 @@ Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.1.0 |
-| `scrolls-update` | 2.1.0 |
-| `scrolls-hide` | 2.1.0 |
-| `scrolls-unhide` | 2.1.0 |
-| `scrolls-help` | 2.1.0 |
+| `scrolls-setup` | 2.1.1 |
+| `scrolls-update` | 2.1.1 |
+| `scrolls-hide` | 2.1.1 |
+| `scrolls-unhide` | 2.1.1 |
+| `scrolls-help` | 2.1.1 |
+
+## 2026-09-21 (2.1.1)
+
+- **Frontmatter `metadata` flattened from a list back to a flat
+  mapping**, across all five skills — GitLab Duo requires `metadata` to
+  be a map, and the list form it had briefly taken on broke
+  compatibility with it. `source_url` kept pointing at each skill's
+  GitHub source. No functional change to any skill's behavior — see
+  each skill's own `CHANGELOG.md` for its "synced to 2.1.1" entry.
+  `.claude-plugin/plugin.json` (this family's shared manifest) bumped
+  to match.
 
 ## 2026-08-20 (docs, no version bump)
 

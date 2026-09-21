@@ -3,6 +3,19 @@
 All notable changes to the `scrolls-help` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.1] - 2026-09-21
+
+### Fixed
+
+- Flattened the frontmatter `metadata` field from a one-item YAML list
+  to a flat mapping — GitLab Duo requires `metadata` to be a map, and
+  the list form it had briefly taken on broke compatibility with it.
+  `source_url` kept pointing at this skill's GitHub source. No
+  functional change to the skill's behavior.
+- `../.claude-plugin/plugin.json` (the shared `scrolls-skills` family
+  manifest) had been left at `2.1.0`, out of step with this bump —
+  synced its `version` to `2.1.1` to match.
+
 ## [2.1.0] - 2026-08-20
 
 ### Changed
