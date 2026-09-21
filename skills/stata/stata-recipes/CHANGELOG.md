@@ -12,6 +12,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the list form it had briefly taken on broke compatibility with it.
   `source_url` kept pointing at this skill's GitHub source. No
   functional change to the skill's behavior.
+- `.claude-plugin/plugin.json` had been left at `1.3.1`, out of step
+  with this bump — synced its `version` to `1.3.2` to match.
 
 ## [1.3.1] - 2026-08-28
 
