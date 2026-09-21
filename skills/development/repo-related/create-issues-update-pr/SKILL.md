@@ -4,11 +4,11 @@ description: "Files GitHub issue(s) for work already done (or about to be done) 
 license: MIT
 compatibility: "GitHub MCP server tools with write access to the target repository: issue_write, sub_issue_write, list_issue_types, search_issues/list_issues, pull_request_read, update_pull_request. Works against any GitHub repository the current session has push/write access to, not just this one."
 metadata:
-  - name: create-issues-update-pr
-    type: skill
-    author: sugatoray
-    version: "1.2.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr"
+  name: create-issues-update-pr
+  type: skill
+  author: sugatoray
+  version: "1.2.1"
+  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr"
 ---
 
 # Create GitHub issues from a PR's work, and update the PR

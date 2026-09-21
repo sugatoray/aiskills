@@ -5,11 +5,11 @@ license: MIT
 compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
 metadata:
-  - name: scrolls-help
-    type: skill
-    author: sugatoray
-    version: "2.1.0"
-    source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
+  name: scrolls-help
+  type: skill
+  author: sugatoray
+  version: "2.1.1"
+  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
 ---
 
 # Scrolls help
