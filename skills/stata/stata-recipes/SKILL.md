@@ -4,11 +4,11 @@ description: "Turns a plain-language description of a data/statistics task into 
 license: MIT
 compatibility: "Stata 16+ (Stata 17+ recommended — modern `ardl` command and built-in Python integration); optionally Python 3.9+ with the `pystata`/`stata_setup` package (bundled with Stata 17+) for Stata<->Python interop"
 metadata:
-  - name: stata-recipes
-    type: skill
-    author: sugatoray
-    version: "1.3.2"
-    source_url: "github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
+  name: stata-recipes
+  type: skill
+  author: sugatoray
+  version: "1.3.2"
+  source_url: "github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes"
 ---
 
 # Stata command & recipe writer
