@@ -7,7 +7,7 @@ metadata:
   - name: create-issues-update-pr
     type: skill
     author: sugatoray
-    version: "1.2.0"
+    version: "1.3.0"
     source_url: "github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr"
 ---
 
