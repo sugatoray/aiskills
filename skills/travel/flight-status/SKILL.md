@@ -8,7 +8,7 @@ metadata:
   name: flight-status
   type: skill
   author: sugatoray
-  version: "0.9.2"
+  version: "0.9.3"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/travel/flight-status"
 ---
 
