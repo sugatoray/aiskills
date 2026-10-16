@@ -4,6 +4,17 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.2] - 2026-10-16
+
+### Fixed
+
+- Card header showed hardcoded "LX009 · Chicago → Zurich" for every
+  flight: the live-flight path now passes
+  `"{flight} · {origin_city} → {destination_city}"`, and the
+  `build_card_html` default is a generic "Flight status".
+
+  Red/Green TDD: 2 new tests plus 1 updated (85 total, all green).
+
 ## [0.9.1] - 2026-10-16
 
 ### Fixed
