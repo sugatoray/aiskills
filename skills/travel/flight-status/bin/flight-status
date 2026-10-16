@@ -262,8 +262,13 @@ def status_pill_info(status, cancelled, diverted, landed):
 
 
 def format_time_remaining(remaining_mi, groundspeed_kt):
-    """'≈5h' / '≈11m' from remaining miles and knots; '' when unknown."""
-    if not groundspeed_kt or groundspeed_kt <= 0:
+    """'≈5h' / '≈11m' from remaining miles and knots; '' when unknown.
+
+    A groundspeed under 100 kt means the aircraft isn't cruising yet
+    (taxiing, holding, or no real fix) — dividing by it would give a
+    nonsense number like 408h, so return blank instead.
+    """
+    if not groundspeed_kt or groundspeed_kt < 100:
         return ""
     hours = remaining_mi / groundspeed_kt
     if hours < 1 / 60:
