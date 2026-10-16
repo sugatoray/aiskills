@@ -1,0 +1,5 @@
+interface:
+  display_name: "Flight Status"
+  short_description: "One-shot or repeating flight status reports: distance-based journey progress, route map, and an Eastern-timestamped announcement."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+name: "flight_status"
+title: "Flight Status"
+description: "One-shot or repeating flight status reports: journey percentage by distance, miles covered/to-go, live route map, and a timestamped announcement, delivered as a composite report card."
+category: "Travel and local plans"
+include_in_prompt: true

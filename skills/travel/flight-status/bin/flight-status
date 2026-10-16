@@ -1,0 +1,1179 @@
+#!/usr/bin/env python3
+"""
+flight-status — one-shot or repeating flight status reports with a composite
+report card (journey % by distance + route map) and an Eastern-timestamped
+announcement.
+
+Signature:
+    /flight-status --flight=<flight-number> [--repeat=<30mins|1h|...>]
+                    [--start-datetime="<yyyy-mm-dd HH:MM:SS>"]
+                    [--out-dir=<dir>] [--map-keep-name=<file>]
+
+Outputs (into --out-dir):
+    <flight>-card.html   composite report card (dashboard + full-width map)
+    <flight>-map.png     latest good route map render
+    report.json          machine-readable summary
+Plus the announcement text on stdout.
+
+With --repeat, the run still performs one check; repeating on a schedule is
+the caller's job (see SKILL.md).
+"""
+import argparse
+import base64
+import json
+import math
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import zlib
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+FLIGHTAWARE = "/opt/hatch/bin/flightaware"
+
+# Major airport coordinates (IATA -> (lat, lon)). Fallback: `flightaware airport`.
+AIRPORTS = {
+    "ORD": (41.9742, -87.9073), "ZRH": (47.4647, 8.5492),
+    "JFK": (40.6413, -73.7781), "EWR": (40.6895, -74.1745),
+    "LAX": (33.9416, -118.4085), "SFO": (37.6213, -122.3790),
+    "SEA": (47.4502, -122.3088), "MIA": (25.7932, -80.2906),
+    "ATL": (33.6407, -84.4277), "DFW": (32.8998, -97.0403),
+    "DEN": (39.8561, -104.6737), "BOS": (42.3656, -71.0096),
+    "IAD": (38.9531, -77.4565), "YYZ": (43.6777, -79.6248),
+    "YUL": (45.4706, -73.7408), "MEX": (19.4363, -99.0721),
+    "GRU": (-23.4356, -46.4731), "EZE": (-34.8222, -58.5358),
+    "LHR": (51.4700, -0.4543), "CDG": (49.0097, 2.5479),
+    "FRA": (50.0379, 8.5622), "AMS": (52.3105, 4.7683),
+    "MAD": (40.4983, -3.5676), "FCO": (41.8003, 12.2389),
+    "BCN": (41.2974, 2.0785), "LIS": (38.7742, -9.1342),
+    "DUB": (53.4214, -6.2701), "VIE": (48.1103, 16.5697),
+    "MUC": (48.3538, 11.7861), "IST": (41.2753, 28.7519),
+    "ATH": (37.9364, 23.9445), "TLV": (32.0114, 34.8867),
+    "CAI": (30.1219, 31.4056), "JNB": (-26.1367, 28.2411),
+    "DXB": (25.2532, 55.3657), "DOH": (25.2731, 51.6081),
+    "SIN": (1.3644, 103.9915), "HKG": (22.3080, 113.9145),
+    "NRT": (35.7720, 140.3929), "HND": (35.5494, 139.7798),
+    "ICN": (37.4602, 126.4407), "SYD": (-33.9399, 151.1753),
+}
+
+# IANA timezones for the airports above, used by -t start / -t end and
+# as the fallback when the user's locale cannot be determined.
+AIRPORT_TZ = {
+    "ORD": "America/Chicago", "ZRH": "Europe/Zurich",
+    "JFK": "America/New_York", "EWR": "America/New_York",
+    "LAX": "America/Los_Angeles", "SFO": "America/Los_Angeles",
+    "SEA": "America/Los_Angeles", "MIA": "America/New_York",
+    "ATL": "America/New_York", "DFW": "America/Chicago",
+    "DEN": "America/Denver", "BOS": "America/New_York",
+    "IAD": "America/New_York", "YYZ": "America/Toronto",
+    "YUL": "America/Toronto", "MEX": "America/Mexico_City",
+    "GRU": "America/Sao_Paulo", "EZE": "America/Argentina/Buenos_Aires",
+    "LHR": "Europe/London", "CDG": "Europe/Paris",
+    "FRA": "Europe/Berlin", "AMS": "Europe/Amsterdam",
+    "MAD": "Europe/Madrid", "FCO": "Europe/Rome",
+    "BCN": "Europe/Madrid", "LIS": "Europe/Lisbon",
+    "DUB": "Europe/Dublin", "VIE": "Europe/Vienna",
+    "MUC": "Europe/Berlin", "IST": "Europe/Istanbul",
+    "ATH": "Europe/Athens", "TLV": "Asia/Jerusalem",
+    "CAI": "Africa/Cairo", "JNB": "Africa/Johannesburg",
+    "DXB": "Asia/Dubai", "DOH": "Asia/Qatar",
+    "SIN": "Asia/Singapore", "HKG": "Asia/Hong_Kong",
+    "NRT": "Asia/Tokyo", "HND": "Asia/Tokyo",
+    "ICN": "Asia/Seoul", "SYD": "Australia/Sydney",
+}
+
+
+# ---------------------------------------------------------------- args ---
+
+def parse_repeat(s):
+    m = re.fullmatch(r"\s*(\d+)\s*(mins?|m|hours?|h)\s*", s, re.IGNORECASE)
+    if not m:
+        raise ValueError(f"bad --repeat value: {s!r} (try 30mins, 1h)")
+    n, unit = int(m.group(1)), m.group(2).lower()
+    return n * 3600 if unit.startswith("h") else n * 60
+
+
+def parse_args(argv):
+    p = argparse.ArgumentParser(
+        prog="flight-status",
+        description=(
+            "Check a flight's live status and produce the standard status "
+            "report: a spoken-style announcement plus one composite card "
+            "(percentage-by-distance dashboard fused with the full-width "
+            "route map)."
+        ),
+        epilog=(
+            "examples:\n"
+            "  flight-status -f LX009\n"
+            "  flight-status -f LX009 -r 30mins\n"
+            '  flight-status -f LX009 -s "2026-10-15 22:12:07"\n'
+            "  flight-status -f LX009 -m\n"
+            "  flight-status -f LX009 -m -k paper-plane\n"
+            "  flight-status -f LX009 -t Europe/Zurich\n"
+            "  flight-status -f LX009 -t start\n"
+            "\n"
+            "The CLI performs exactly one check per run; repeating on a "
+            "schedule is the caller's job. See SKILL.md for the agent "
+            "workflow."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("-f", "--flight", required=True,
+                   help='flight number, e.g. "LX009"')
+    p.add_argument("-r", "--repeat", default=None,
+                   help='repeat cadence like "30mins" (scheduling is the caller\'s job)')
+    p.add_argument("-s", "--start-datetime", default=None,
+                   help='"yyyy-mm-dd HH:MM:SS", defaults to now')
+    p.add_argument("-m", "--sample", action="store_true",
+                   help="render a sample report with built-in data (no network)")
+    p.add_argument("-k", "--flight-marker", default="airliner",
+                   choices=["airliner", "knob", "paper-plane"],
+                   help="marker riding the progress bar (default: airliner)")
+    p.add_argument("-t", "--tz", "--timezone", dest="timezone", default=None,
+                   help="display timezone: an IANA name (e.g. 'Europe/Zurich'), "
+                        "'start' for the origin airport zone, or 'end' for "
+                        "the destination airport zone (default: your locale, "
+                        "else the origin airport zone)")
+    p.add_argument("--out-dir", default=".",
+                   help="where to write the card, map and report.json")
+    p.add_argument("--map-keep-name", default=None,
+                   help="filename for the kept route map (default <flight>-map.png)")
+    args = p.parse_args(argv)
+    if args.start_datetime is None:
+        args.start_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        try:
+            datetime.strptime(args.start_datetime, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            raise ValueError(
+                f'bad --start-datetime: {args.start_datetime!r} '
+                '(want "yyyy-mm-dd HH:MM:SS")'
+            )
+    if args.repeat is not None:
+        parse_repeat(args.repeat)  # validate now
+    if args.map_keep_name is None:
+        args.map_keep_name = f"{args.flight.lower()}-map.png"
+    return args
+
+
+def departure_date(args):
+    return datetime.strptime(
+        args.start_datetime, "%Y-%m-%d %H:%M:%S"
+    ).date().isoformat()
+
+
+# ------------------------------------------------------------- geo ----
+
+def haversine_mi(lat1, lon1, lat2, lon2):
+    from math import asin, cos, radians, sin, sqrt
+    R = 3958.8  # earth radius, statute miles
+    la1, lo1, la2, lo2 = map(radians, (lat1, lon1, lat2, lon2))
+    h = sin((la2 - la1) / 2) ** 2 + cos(la1) * cos(la2) * sin((lo2 - lo1) / 2) ** 2
+    return 2 * R * asin(sqrt(h))
+
+
+def journey_split(covered_mi, remaining_mi):
+    total = covered_mi + remaining_mi
+    pct = round(100 * covered_mi / total) if total > 0 else 0
+    return {"pct": pct, "covered_mi": covered_mi, "remaining_mi": remaining_mi}
+
+
+def format_eastern(iso_user_local):
+    """'2026-10-15T23:35:58.000-04:00' -> '11:35 PM EDT' (EST for -05:00)."""
+    dt = datetime.fromisoformat(iso_user_local)
+    off = iso_user_local[-6:]
+    label = "EST" if off == "-05:00" else "EDT" if off == "-04:00" else off
+    h = dt.hour % 12 or 12
+    ampm = "AM" if dt.hour < 12 else "PM"
+    return f"{h}:{dt.minute:02d} {ampm} {label}"
+
+
+def format_in_tz(iso_str, tz_name):
+    """'2026-10-16T05:04:52.000-04:00' in Europe/Zurich -> '11:05 AM CEST'."""
+    dt = datetime.fromisoformat(iso_str).astimezone(ZoneInfo(tz_name))
+    h = dt.hour % 12 or 12
+    ampm = "AM" if dt.hour < 12 else "PM"
+    return f"{h}:{dt.minute:02d} {ampm} {dt.strftime('%Z')}"
+
+
+def _local_timezone_name():
+    """IANA name of the machine/user locale, or None if unavailable."""
+    env_tz = os.environ.get("TZ")
+    if env_tz:
+        try:
+            ZoneInfo(env_tz)
+            return env_tz
+        except Exception:
+            pass
+    key = getattr(datetime.now().astimezone().tzinfo, "key", None)
+    if key:
+        try:
+            ZoneInfo(key)
+            return key
+        except Exception:
+            pass
+    return None
+
+
+def resolve_timezone(tz_arg, origin_iata, dest_iata):
+    """Resolve -t/--tz/--timezone to an IANA name.
+
+    Accepts an IANA name, 'start' (origin airport zone) or 'end'
+    (destination airport zone). With no argument, defaults to the user's
+    locale, falling back to the origin airport zone.
+    """
+    if tz_arg:
+        low = tz_arg.strip().lower()
+        if low == "start":
+            return AIRPORT_TZ.get(origin_iata, "UTC")
+        if low == "end":
+            return AIRPORT_TZ.get(dest_iata, "UTC")
+        try:
+            ZoneInfo(tz_arg)
+        except Exception:
+            raise ValueError(
+                f"unknown timezone: {tz_arg!r} "
+                "(use an IANA name like 'Europe/Zurich', or 'start'/'end')"
+            )
+        return tz_arg
+    return _local_timezone_name() or AIRPORT_TZ.get(origin_iata, "UTC")
+
+
+def status_pill_info(status, cancelled, diverted, landed):
+    """(label, tone) for the corner status pill. Tone: ok|warn|bad|info."""
+    s = status or ""
+    low = s.lower()
+    label = s.replace(" / ", " \u00b7 ") or "Unknown"
+    if landed or "landed" in low or "arrived" in low:
+        return ("Landed", "ok")
+    if cancelled or "cancel" in low:
+        return ("Cancelled", "bad")
+    if diverted or "divert" in low:
+        return ("Diverted", "warn")
+    if "delay" in low:
+        return (label, "warn")
+    if "on time" in low:
+        return (label, "ok")
+    return (label, "info")
+
+
+def format_time_remaining(remaining_mi, groundspeed_kt):
+    """'≈5h' / '≈11m' from remaining miles and knots; '' when unknown."""
+    if not groundspeed_kt or groundspeed_kt <= 0:
+        return ""
+    hours = remaining_mi / groundspeed_kt
+    if hours < 1 / 60:
+        return ""
+    if hours < 2:
+        return f"\u2248{int(round(hours * 60))}m"
+    return f"\u2248{int(round(hours))}h"
+
+
+def format_position_label(lat, lon):
+    """(47.53, -48.43) -> '47.5°N, 48.4°W'."""
+    lat_s = f"{abs(lat):.1f}\u00b0{'N' if lat >= 0 else 'S'}"
+    lon_s = f"{abs(lon):.1f}\u00b0{'E' if lon >= 0 else 'W'}"
+    return f"{lat_s}, {lon_s}"
+
+
+# ------------------------------------------------------- flightaware --
+
+def _run(cmd):
+    proc = subprocess.run([FLIGHTAWARE] + cmd, capture_output=True, text=False)
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"flightaware {' '.join(cmd)} failed: "
+            f"{proc.stderr.decode(errors='replace')[:300]}"
+        )
+    return proc.stdout
+
+
+def _user_local(node):
+    return node.get("user_local") if isinstance(node, dict) else None
+
+
+def parse_canonical_ident(data):
+    return data["body"]["idents"][0]["ident"]
+
+
+def parse_flight_facts(data):
+    f = data["body"]["flights"][0]
+    return {
+        "ident": f.get("ident"),
+        "ident_iata": f.get("ident_iata"),
+        "status": f.get("status"),
+        "cancelled": bool(f.get("cancelled")),
+        "diverted": bool(f.get("diverted")),
+        "fa_flight_id": f.get("fa_flight_id"),
+        "origin_iata": (f.get("origin") or {}).get("code_iata"),
+        "origin_city": (f.get("origin") or {}).get("city"),
+        "destination_iata": (f.get("destination") or {}).get("code_iata"),
+        "destination_city": (f.get("destination") or {}).get("city"),
+        "estimated_landing_user_local": _user_local(f.get("estimated_landing_at")),
+        "estimated_gate_arrival_user_local": _user_local(
+            f.get("estimated_gate_arrival_at")),
+        "scheduled_gate_arrival_user_local": _user_local(
+            f.get("scheduled_gate_arrival_at")),
+        "actual_landing_user_local": _user_local(f.get("actual_landing_at")),
+        "actual_takeoff_user_local": _user_local(f.get("actual_takeoff_at")),
+        "retrieved_at_user_local": (data.get("retrieved_at") or {}).get(
+            "user_local"),
+    }
+
+
+def parse_position(data):
+    p = (data.get("body") or {}).get("last_position")
+    if not p:
+        return None
+    return {
+        "latitude": p["latitude"],
+        "longitude": p["longitude"],
+        "altitude_ft": int(p["altitude"]) * 100,
+        "groundspeed_kt": int(p["groundspeed"]),
+    }
+
+
+def airport_coords(iata):
+    if iata in AIRPORTS:
+        return AIRPORTS[iata]
+    out = _run(["airport", iata])
+    body = json.loads(out)["body"]
+    return (float(body["latitude"]), float(body["longitude"]))
+
+
+def refresh_map(fa_flight_id, tmp_path, keep_path):
+    """Render a fresh route map; on failure keep the previous file.
+
+    Returns (used_previous: bool, note: str). Never leaves a zero-byte file.
+    """
+    try:
+        _run(["map", fa_flight_id, "--save", tmp_path])
+    except Exception:
+        pass
+    if os.path.exists(tmp_path) and os.path.getsize(tmp_path) > 0:
+        shutil.move(tmp_path, keep_path)
+        return (False, "")
+    return (True, "Route map from an earlier render")
+
+
+# ------------------------------------------------------------- card ---
+
+SOURCE_URL = "https://www.flightaware.com/live/flight/SWR9"
+
+
+def _marker_html(marker, pct):
+    """The marker riding the progress boundary: airliner, knob, or paper-plane."""
+    if marker == "knob":
+        return (
+            f'<div style="position:absolute;left:{pct}%;top:50%;width:18px;'
+            'height:18px;margin:-9px 0 0 -9px;border-radius:50%;'
+            'background:var(--hatch-widget-accent);'
+            'border:3px solid var(--hatch-widget-text);box-sizing:border-box;"></div>'
+        )
+    paths = {
+        # classic airliner silhouette (points up); rotated to point east
+        "airliner": ("M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 "
+                     "3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 "
+                     "19v-5.5l8 2.5z", True),
+        "paper-plane": ("M2 21l21-9L2 3v7l15 2-15 2v7z", False),
+    }
+    path, rotate = paths[marker]
+    tr = ' transform="rotate(90 12 12)"' if rotate else ""
+    return (
+        f'<div style="position:absolute;left:{pct}%;top:50%;width:28px;height:28px;'
+        'margin:-14px 0 0 -14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));">'
+        '<svg width="28" height="28" viewBox="0 0 24 24" '
+        'style="fill:var(--hatch-widget-text);stroke:var(--hatch-widget-accent);" '
+        'stroke-width="1" stroke-linejoin="round">'
+        f'<path d="{path}"{tr}/></svg></div>'
+    )
+
+
+def _progress_bar_html(pct, marker="airliner"):
+    """Striped-remainder + milestone-tick progress bar with a flight marker."""
+    ticks = "".join(
+        f'<div style="position:absolute;left:{p}%;top:-3px;bottom:-3px;'
+        f'width:2px;background:var(--hatch-widget-text);opacity:.45;'
+        f'border-radius:1px;"></div>'
+        for p in (25, 50, 75)
+    )
+    labels = "".join(
+        f'<span style="position:absolute;left:{p}%;transform:translateX(-50%);">'
+        f'{p}%</span>'
+        for p in (25, 50, 75)
+    )
+    return (
+        '<div style="position:relative;height:14px;border-radius:8px;'
+        'background:var(--hatch-widget-surface-muted);margin-top:10px;'
+        'display:flex;">'
+        f'<div style="width:{pct}%;border-radius:8px 0 0 8px;'
+        'background:var(--hatch-widget-accent);"></div>'
+        f'<div style="width:{100 - pct}%;border-radius:0 8px 8px 0;'
+        'background:repeating-linear-gradient(-45deg,'
+        'color-mix(in srgb,var(--hatch-widget-accent) 35%,transparent) 0 6px,'
+        'transparent 6px 12px);"></div>'
+        f'{ticks}'
+        f'{_marker_html(marker, pct)}'
+        '</div>'
+        '<div style="position:relative;height:14px;font-size:10px;'
+        'color:var(--hatch-widget-muted);">'
+        f'{labels}'
+        '</div>'
+    )
+
+
+def _status_pill_html(label, tone):
+    """Corner status pill; tone in ok|warn|bad|info."""
+    colors = {"ok": "#34c759", "warn": "#f5a623", "bad": "#ff453a"}
+    color = colors.get(tone)
+    if color:
+        style = (
+            f"color:{color};"
+            f"border:1px solid color-mix(in srgb,{color} 50%,transparent);"
+            f"background:color-mix(in srgb,{color} 14%,transparent);"
+        )
+    else:
+        style = (
+            "color:var(--hatch-widget-accent);"
+            "border:1px solid color-mix(in srgb,var(--hatch-widget-accent) "
+            "50%,transparent);"
+            "background:color-mix(in srgb,var(--hatch-widget-accent) "
+            "14%,transparent);"
+        )
+    return (
+        '<span style="display:inline-block;font-size:12px;font-weight:600;'
+        f'padding:6px 13px;border-radius:999px;{style}">{label}</span>'
+    )
+
+
+def _corner_html(status_pill, status_tone, time_remaining):
+    """Top-right corner: status pill over time remaining. '' when empty."""
+    if not status_pill and not time_remaining:
+        return ""
+    parts = ['<div style="text-align:right;flex-shrink:0;">']
+    if status_pill:
+        parts.append(_status_pill_html(status_pill, status_tone))
+    if time_remaining:
+        parts.append(
+            '<div style="font-size:28px;font-weight:700;margin-top:10px;'
+            f'line-height:1.1;">{time_remaining}</div>'
+            '<div style="font-size:12px;color:var(--hatch-widget-muted);">'
+            "to go</div>"
+        )
+    parts.append("</div>")
+    return "".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Route-map overlay: draw the flown track as a solid line.
+#
+# FlightAware's static map renderer sometimes styles part of the flown track
+# as dashed (observed on oceanic segments), so after a fresh map render we
+# overlay the flight's actual position fixes as a solid line. Pure stdlib
+# (zlib) PNG codec — no Pillow dependency.
+# ---------------------------------------------------------------------------
+
+_TRACK_GREEN = (0, 228, 0)
+
+
+def _encode_png_rgb(width, height, pixels):
+    """Encode RGB triplets (bytearray) as a PNG. Inverse of _decode_png_rgb."""
+    def chunk(typ, data):
+        head = struct.pack(">I", len(data)) + typ + data
+        return head + struct.pack(">I", zlib.crc32(typ + data) & 0xFFFFFFFF)
+
+    raw = bytearray()
+    for y in range(height):
+        raw.append(0)  # filter type 0: None
+        raw += pixels[y * width * 3:(y + 1) * width * 3]
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr)
+            + chunk(b"IDAT", zlib.compress(bytes(raw)))
+            + chunk(b"IEND", b""))
+
+
+def _decode_png_rgb(png_bytes):
+    """Decode a PNG to (width, height, bytearray of RGB triplets).
+
+    Supports 8-bit truecolor (RGB) and truecolor+alpha, non-interlaced.
+    Raises ValueError for anything else.
+    """
+    if png_bytes[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("not a PNG")
+    off, idat = 8, bytearray()
+    width = height = color_type = None
+    while off < len(png_bytes):
+        (length,) = struct.unpack(">I", png_bytes[off:off + 4])
+        typ = png_bytes[off + 4:off + 8]
+        data = png_bytes[off + 8:off + 8 + length]
+        if typ == b"IHDR":
+            width, height, bit_depth, color_type, _, _, interlace = \
+                struct.unpack(">IIBBBBB", data)
+            if bit_depth != 8 or interlace != 0 \
+                    or color_type not in (2, 6):
+                raise ValueError("unsupported PNG format")
+        elif typ == b"IDAT":
+            idat += data
+        elif typ == b"IEND":
+            break
+        off += 12 + length
+    if width is None:
+        raise ValueError("missing IHDR")
+    channels = 3 if color_type == 2 else 4
+    raw = zlib.decompress(bytes(idat))
+    stride = width * channels
+    pixels = bytearray(width * height * 3)
+    prev = bytearray(stride)
+    pos = 0
+    for y in range(height):
+        ftype = raw[pos]
+        pos += 1
+        line = bytearray(raw[pos:pos + stride])
+        pos += stride
+        for i in range(stride):
+            a = line[i - channels] if i >= channels else 0
+            b = prev[i]
+            c = prev[i - channels] if i >= channels else 0
+            if ftype == 1:
+                line[i] = (line[i] + a) & 0xFF
+            elif ftype == 2:
+                line[i] = (line[i] + b) & 0xFF
+            elif ftype == 3:
+                line[i] = (line[i] + (a + b) // 2) & 0xFF
+            elif ftype == 4:
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
+                line[i] = (line[i] + pr) & 0xFF
+        for x in range(width):
+            o = (y * width + x) * 3
+            pixels[o:o + 3] = line[x * channels:x * channels + 3]
+        prev = line
+    return width, height, pixels
+
+
+def _find_airport_dots(png_bytes):
+    """Centroids [(x, y), ...] of the yellow airport dots on the map.
+
+    The origin/destination markers are small solid yellow discs; the yellow
+    airport-code labels are thin text. Discs are picked out by their high
+    fill ratio (blob area vs bounding box). Returns [] when not found.
+    """
+    try:
+        width, height, pixels = _decode_png_rgb(png_bytes)
+    except ValueError:
+        return []
+
+    def is_yellow(i):
+        r, g, b = pixels[i], pixels[i + 1], pixels[i + 2]
+        return r > 170 and g > 170 and b < 150
+
+    yellow = set()
+    for y in range(height):
+        base = y * width * 3
+        for x in range(width):
+            if is_yellow(base + x * 3):
+                yellow.add((x, y))
+
+    seen, dots = set(), []
+    for seed in yellow:
+        if seed in seen:
+            continue
+        stack, comp = [seed], []
+        seen.add(seed)
+        while stack:
+            x, y = stack.pop()
+            comp.append((x, y))
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    n = (x + dx, y + dy)
+                    if n in yellow and n not in seen:
+                        seen.add(n)
+                        stack.append(n)
+        xs = [p[0] for p in comp]
+        ys = [p[1] for p in comp]
+        bw, bh = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+        fill = len(comp) / (bw * bh)
+        squareness = max(bw, bh) / max(min(bw, bh), 1)
+        if fill > 0.55 and squareness < 1.6 and 10 < len(comp) < 200:
+            dots.append((sum(xs) / len(comp), sum(ys) / len(comp), len(comp)))
+    dots.sort(key=lambda d: -d[2])
+    return [(d[0], d[1]) for d in dots[:2]]
+
+
+def _merc_x(lon):
+    return (lon + 180.0) / 360.0
+
+
+def _merc_y(lat):
+    lat = max(min(lat, 85.05112878), -85.05112878)
+    r = math.radians(lat)
+    return (1.0 - math.log(math.tan(r) + 1.0 / math.cos(r)) / math.pi) / 2.0
+
+
+def _make_projection(dot_origin, dot_dest, latlon_origin, latlon_dest):
+    """project(lat, lon) -> (x, y), affine in Web-Mercator space.
+
+    dot_origin/dot_dest are pixel (x, y); latlon_* are (lat, lon).
+    """
+    (x1, y1), (x2, y2) = dot_origin, dot_dest
+    (la1, lo1), (la2, lo2) = latlon_origin, latlon_dest
+    mx1, my1 = _merc_x(lo1), _merc_y(la1)
+    mx2, my2 = _merc_x(lo2), _merc_y(la2)
+
+    def project(lat, lon):
+        mx, my = _merc_x(lon), _merc_y(lat)
+        x = (mx - mx1) / (mx2 - mx1) * (x2 - x1) + x1 if mx2 != mx1 else x1
+        y = (my - my1) / (my2 - my1) * (y2 - y1) + y1 if my2 != my1 else y1
+        return (x, y)
+
+    return project
+
+
+def _draw_thick_polyline(pixels, width, height, points, color, thickness):
+    """Draw a polyline of width `thickness` into RGB triplets (in place)."""
+    r, g, b = color
+    half = thickness // 2
+
+    def stamp(x, y):
+        for dy in range(-half, half + 1):
+            for dx in range(-half, half + 1):
+                xx, yy = x + dx, y + dy
+                if 0 <= xx < width and 0 <= yy < height:
+                    o = (yy * width + xx) * 3
+                    pixels[o], pixels[o + 1], pixels[o + 2] = r, g, b
+
+    for (x1, y1), (x2, y2) in zip(points, points[1:]):
+        x1, y1, x2, y2 = int(round(x1)), int(round(y1)), \
+            int(round(x2)), int(round(y2))
+        dx, dy = abs(x2 - x1), abs(y2 - y1)
+        sx, sy = (1 if x2 > x1 else -1), (1 if y2 > y1 else -1)
+        err, x, y = dx - dy, x1, y1
+        while True:
+            stamp(x, y)
+            if x == x2 and y == y2:
+                break
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x += sx
+            if e2 < dx:
+                err += dx
+                y += sy
+
+
+def _truncate_track(fixes, lat, lon):
+    """Fixes up to and including the fix nearest (lat, lon)."""
+    if not fixes:
+        return []
+    best = min(range(len(fixes)),
+               key=lambda i: (fixes[i][0] - lat) ** 2 + (fixes[i][1] - lon) ** 2)
+    return fixes[:best + 1]
+
+
+def fetch_track(fa_flight_id):
+    """[(lat, lon), ...] position fixes in time order for a flight."""
+    data = json.loads(_run(["track", fa_flight_id, "--compact"]))
+    return [(p["latitude"], p["longitude"])
+            for p in data["body"]["positions"]]
+
+
+def overlay_flown_track(map_png_bytes, fixes, origin_latlon, dest_latlon,
+                        color=_TRACK_GREEN, width=4):
+    """Draw the flown track as a solid line over the route map.
+
+    Returns new PNG bytes. On any failure (no fixes, dots not found,
+    undecodable image) returns the input unchanged — the overlay is
+    best-effort and must never break the card.
+    """
+    try:
+        if not fixes:
+            return map_png_bytes
+        dots = _find_airport_dots(map_png_bytes)
+        if len(dots) < 2:
+            return map_png_bytes
+        # Assign dots to airports by geography: FlightAware maps are
+        # north-up, so the western airport sits on the western dot
+        # (smaller x). Handles antimeridian crossings via the short arc.
+        (lo_o, lo_d) = (origin_latlon[1], dest_latlon[1])
+        eastward = (lo_d - lo_o) % 360.0 <= 180.0
+        dots_by_x = sorted(dots, key=lambda d: d[0])
+        if eastward:
+            dot_o, dot_d = dots_by_x[0], dots_by_x[1]
+        else:
+            dot_o, dot_d = dots_by_x[1], dots_by_x[0]
+        project = _make_projection(dot_o, dot_d, origin_latlon, dest_latlon)
+        width_px, height_px, pixels = _decode_png_rgb(map_png_bytes)
+        points = [project(lat, lon) for lat, lon in fixes]
+        _draw_thick_polyline(pixels, width_px, height_px, points, color, width)
+        return _encode_png_rgb(width_px, height_px, pixels)
+    except Exception:
+        return map_png_bytes
+
+
+def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
+                    report_time, map_png_bytes, map_note,
+                    eta_latest="", eta_old="", journey_total="",
+                    source_url=SOURCE_URL,
+                    header="LX009 &middot; Chicago &rarr; Zurich",
+                    marker="airliner", status_pill="", status_tone="info",
+                    time_remaining="", position_label=""):
+    if map_png_bytes:
+        img_b64 = base64.b64encode(map_png_bytes).decode("ascii")
+        img_html = (
+            '<div onclick="document.getElementById('
+            "'routemapfull').style.display='flex'\" "
+            'style="cursor:zoom-in;" title="Tap to expand">'
+            f'<img src="data:image/png;base64,{img_b64}" '
+            'style="display:block;width:100%;height:auto;" '
+            'alt="route map — tap to expand">'
+            '</div>'
+            '<div id="routemapfull" '
+            'style="display:none;position:fixed;inset:0;'
+            'background:rgba(0,0,0,.92);z-index:9999;align-items:center;'
+            'justify-content:center;cursor:zoom-out;touch-action:none;" '
+            'title="Pinch to zoom, tap to close">'
+            f'<img id="routemapfullimg" '
+            f'src="data:image/png;base64,{img_b64}" '
+            'style="max-width:100%;max-height:100%;object-fit:contain;" '
+            'alt="route map expanded">'
+            '</div>'
+            '<script>(function(){'
+            'var box=document.getElementById("routemapfull"),'
+            'img=document.getElementById("routemapfullimg"),'
+            'scale=1,tx=0,ty=0,sd=0,ss=1,sx=0,sy=0,smx=0,smy=0;'
+            'function apply(){'
+            'img.style.transform='
+            '"translate("+tx+"px,"+ty+"px) scale("+scale+")";}'
+            'function close(){'
+            'box.style.display="none";scale=1;tx=0;ty=0;apply();}'
+            'box.addEventListener("click",function(){close();});'
+            'box.addEventListener("touchstart",function(e){'
+            'if(e.touches.length===2){e.preventDefault();'
+            'sd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,'
+            'e.touches[0].clientY-e.touches[1].clientY);'
+            'ss=scale;sx=tx;sy=ty;'
+            'smx=(e.touches[0].clientX+e.touches[1].clientX)/2;'
+            'smy=(e.touches[0].clientY+e.touches[1].clientY)/2;}},'
+            '{passive:false});'
+            'box.addEventListener("touchmove",function(e){'
+            'if(e.touches.length===2&&sd>0){e.preventDefault();'
+            'var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,'
+            'e.touches[0].clientY-e.touches[1].clientY),'
+            'mx=(e.touches[0].clientX+e.touches[1].clientX)/2,'
+            'my=(e.touches[0].clientY+e.touches[1].clientY)/2;'
+            'scale=Math.min(4,Math.max(1,ss*d/sd));'
+            'tx=sx+(mx-smx);ty=sy+(my-smy);apply();}},'
+            '{passive:false});'
+            'box.addEventListener("touchend",function(e){'
+            'if(e.touches.length<2){sd=0;'
+            'if(scale<=1.01){scale=1;tx=0;ty=0;apply();}}});'
+            '})();</script>'
+        )
+    else:
+        img_html = (
+            '<div style="padding:12px 16px;font-size:12px;'
+            'color:var(--hatch-widget-muted);">Route map unavailable</div>'
+        )
+    note_html = (
+        f'<div style="font-size:11px;color:var(--hatch-widget-muted);'
+        f'margin-top:6px;">{map_note}</div>'
+        if map_note else ""
+    )
+    if eta_latest:
+        old_part = (
+            f' <span style="color:var(--hatch-widget-muted);">'
+            f'[old: {eta_old}]</span>'
+            if eta_old and eta_old != eta_latest else ""
+        )
+        eta_html = (
+            '<div style="font-size:12px;margin-top:8px;">'
+            f'Expected arrival <b>{eta_latest}</b>{old_part}</div>'
+        )
+    else:
+        eta_html = ""
+    journey_html = (
+        '<div style="font-size:12px;color:var(--hatch-widget-muted);'
+        f'margin-top:4px;">Total journey time {journey_total}</div>'
+        if journey_total else ""
+    )
+    corner_html = _corner_html(status_pill, status_tone, time_remaining)
+    meta_bits = [altitude, speed]
+    if position_label:
+        meta_bits.append(position_label)
+    meta_bits.append(f"reported at {report_time}")
+    meta_line = " &middot; ".join(meta_bits)
+    return (
+        '<div style="box-sizing:border-box;max-width:100%;'
+        'border:1px solid var(--hatch-widget-border);border-radius:14px;'
+        'overflow:hidden;background:var(--hatch-widget-surface);'
+        'color:var(--hatch-widget-text);'
+        'font-family:system-ui,-apple-system,sans-serif;">'
+        '<div style="padding:14px 16px 4px;">'
+        '<div style="font-size:13px;font-weight:600;'
+        'color:var(--hatch-widget-muted);letter-spacing:0.02em;">'
+        f'{header}</div>'
+        '<div style="display:flex;justify-content:space-between;'
+        'align-items:flex-start;gap:12px;margin-top:4px;">'
+        '<div>'
+        f'<div style="font-size:44px;font-weight:700;'
+        f'line-height:1.1;">{pct}%</div>'
+        '<div style="font-size:13px;color:var(--hatch-widget-muted);">'
+        'of the journey by distance</div>'
+        '</div>'
+        f'{corner_html}'
+        '</div>'
+        f'{_progress_bar_html(pct, marker)}'
+        '<div style="display:flex;justify-content:space-between;'
+        'font-size:13px;margin-top:8px;">'
+        f'<span>{covered_mi} mi covered</span>'
+        f'<span style="color:var(--hatch-widget-muted);">'
+        f'{remaining_mi} mi to go</span>'
+        '</div>'
+        f'<div style="font-size:12px;color:var(--hatch-widget-muted);'
+        f'margin-top:10px;">{meta_line}</div>'
+        f'{eta_html}'
+        f'{journey_html}'
+        f'{note_html}'
+        '<div style="height:12px;"></div>'
+        '</div>'
+        f'{img_html}'
+        f'<div style="font-size:11px;color:var(--hatch-widget-muted);'
+        f'padding:8px 16px 12px;">Source: '
+        f'<a href="{source_url}" '
+        f'style="color:var(--hatch-widget-accent);">'
+        f'FlightAware &mdash; live track</a></div>'
+        '</div>'
+    )
+
+
+def build_announcement(flight, origin_city, dest_city, pct, covered_mi,
+                       remaining_mi, est_landing, delay_note, report_time):
+    return (
+        f"{flight} is now {pct}% of the way to {dest_city} — about "
+        f"{covered_mi} miles covered, {remaining_mi} to go. "
+        f"Estimated to land around {est_landing}"
+        f"{', ' + delay_note if delay_note else ''} "
+        f"— reported at {report_time}."
+    )
+
+
+def format_duration_hm(start_iso, end_iso):
+    """'8h 4m' from two ISO datetimes, rounded to the nearest minute."""
+    start = datetime.fromisoformat(start_iso)
+    end = datetime.fromisoformat(end_iso)
+    mins = int(round((end - start).total_seconds() / 60))
+    return f"{mins // 60}h {mins % 60}m"
+
+
+def _fmt_mi(x):
+    return f"{int(round(x)):,}"
+
+
+# ------------------------------------------------------ sample mode --
+
+# Representative report values (a real LX009 mid-flight snapshot) used by
+# --sample so the report layout can be previewed without network access.
+SAMPLE = {
+    "pct": 43,
+    "covered_mi": "1,953",
+    "remaining_mi": "2,598",
+    "altitude": "36,000 ft",
+    "speed": "520 kt",
+    # ISO times; rendered in the resolved display timezone.
+    "report_time_iso": "2026-10-16T00:14:00-04:00",
+    "eta_latest_iso": "2026-10-16T05:05:00-04:00",
+    "eta_old_iso": "2026-10-16T04:40:00-04:00",
+    "journey_total": "8h 4m",
+    "status_pill": "En Route \u00b7 Delayed",
+    "status_tone": "warn",
+    "time_remaining": "\u22485h",
+    "position_label": "47.5\u00b0N, 48.4\u00b0W",
+}
+
+
+def run_sample(args, slug):
+    """Render a sample report with built-in data; no FlightAware calls."""
+    keep_map_path = os.path.join(args.out_dir, args.map_keep_name)
+    if os.path.exists(keep_map_path):
+        with open(keep_map_path, "rb") as f:
+            map_bytes = f.read()
+        map_note = ""
+    else:
+        map_bytes = b""
+        map_note = "Route map unavailable in sample mode"
+
+    tz_name = resolve_timezone(args.timezone, "ORD", "ZRH")
+    fmt = (lambda iso: format_in_tz(iso, tz_name)) if args.timezone \
+        else format_eastern
+    report_time = fmt(SAMPLE["report_time_iso"])
+    eta_latest = fmt(SAMPLE["eta_latest_iso"])
+    eta_old = fmt(SAMPLE["eta_old_iso"])
+
+    card_html = build_card_html(
+        pct=SAMPLE["pct"],
+        covered_mi=SAMPLE["covered_mi"],
+        remaining_mi=SAMPLE["remaining_mi"],
+        altitude=SAMPLE["altitude"],
+        speed=SAMPLE["speed"],
+        report_time=report_time,
+        map_png_bytes=map_bytes,
+        map_note=map_note,
+        eta_latest=eta_latest,
+        eta_old=eta_old,
+        journey_total=SAMPLE["journey_total"],
+        header=f"{args.flight} &middot; Sample report",
+        marker=args.flight_marker,
+        status_pill=SAMPLE["status_pill"],
+        status_tone=SAMPLE["status_tone"],
+        time_remaining=SAMPLE["time_remaining"],
+        position_label=SAMPLE["position_label"],
+    )
+    card_path = os.path.join(args.out_dir, slug + "-card.html")
+    with open(card_path, "w") as f:
+        f.write(card_html)
+
+    announcement = (
+        f"{args.flight} is now {SAMPLE['pct']}% of the way to Zurich — "
+        f"about {SAMPLE['covered_mi']} miles covered, "
+        f"{SAMPLE['remaining_mi']} to go. Estimated to land around "
+        f"{eta_latest} — reported at {report_time}. "
+        f"(Sample report — no live data was fetched.)"
+    )
+    print(announcement)
+
+    report = {
+        "flight": args.flight,
+        "sample": True,
+        "status": "En Route / Delayed",
+        "landed": False,
+        "origin": {"iata": "ORD", "city": "Chicago"},
+        "destination": {"iata": "ZRH", "city": "Zurich"},
+        "journey": {
+            "pct": SAMPLE["pct"],
+            "covered_mi": 1953,
+            "remaining_mi": 2598,
+        },
+        "position": None,
+        "estimated_landing_display": eta_latest,
+        "report_time_display": report_time,
+        "display_timezone": tz_name,
+        "files": {
+            "card": card_path,
+            "map": keep_map_path,
+            "report": os.path.join(args.out_dir, "report.json"),
+        },
+    }
+    with open(report["files"]["report"], "w") as f:
+        json.dump(report, f, indent=2)
+    return 0
+
+
+# -------------------------------------------------------------- main --
+
+def _base_report(args, ident, facts, landed, report_time, est_landing,
+                 tz_name):
+    slug = args.flight.lower()
+    return {
+        "flight": args.flight,
+        "ident_icao": ident,
+        "status": facts["status"],
+        "cancelled": facts["cancelled"],
+        "diverted": facts["diverted"],
+        "landed": landed,
+        "origin": {"iata": facts["origin_iata"], "city": facts["origin_city"]},
+        "destination": {"iata": facts["destination_iata"],
+                        "city": facts["destination_city"]},
+        "estimated_landing_display": est_landing,
+        "report_time_display": report_time,
+        "display_timezone": tz_name,
+        "repeat_secs": parse_repeat(args.repeat) if args.repeat else None,
+        "start_datetime": args.start_datetime,
+        "files": {
+            "card": os.path.join(args.out_dir, slug + "-card.html"),
+            "map": os.path.join(args.out_dir, args.map_keep_name),
+            "report": os.path.join(args.out_dir, "report.json"),
+        },
+    }
+
+
+def main(argv=None):
+    args = parse_args(argv or sys.argv[1:])
+    os.makedirs(args.out_dir, exist_ok=True)
+    slug = args.flight.lower()
+
+    if args.sample:
+        return run_sample(args, slug)
+
+    ident = parse_canonical_ident(json.loads(_run(["canonical-flight", args.flight])))
+    facts = parse_flight_facts(
+        json.loads(_run(["flight", ident, "--date", departure_date(args)])))
+    pos = parse_position(json.loads(_run(["position", facts["fa_flight_id"]])))
+
+    landed = (
+        facts["actual_landing_user_local"] is not None
+        or (facts["status"] or "").lower().find("landed") >= 0
+        or (facts["status"] or "").lower().find("arrived") >= 0
+    )
+
+    tz_name = resolve_timezone(
+        args.timezone, facts["origin_iata"], facts["destination_iata"])
+    fmt = (lambda iso: format_in_tz(iso, tz_name)) if args.timezone \
+        else format_eastern
+
+    report_time = fmt(
+        facts["retrieved_at_user_local"]
+        or datetime.now().astimezone().isoformat()
+    )
+    est_landing = (
+        fmt(facts["estimated_landing_user_local"])
+        if facts["estimated_landing_user_local"] else "unknown"
+    )
+
+    if pos is None:
+        # No live position: text-only report, no card, no percentage.
+        announcement = (
+            f"{args.flight} is en route to {facts['destination_city']}. "
+            f"Estimated to land around {est_landing} — reported at "
+            f"{report_time}. (Live position unavailable for this check.)"
+        )
+        print(announcement)
+        report = _base_report(args, ident, facts, landed, report_time,
+                              est_landing, tz_name)
+        report["position"] = None
+        report["journey"] = None
+        with open(report["files"]["report"], "w") as f:
+            json.dump(report, f, indent=2)
+        return 0
+    olat, olon = airport_coords(facts["origin_iata"])
+    dlat, dlon = airport_coords(facts["destination_iata"])
+    covered = haversine_mi(olat, olon, pos["latitude"], pos["longitude"])
+    remaining = haversine_mi(pos["latitude"], pos["longitude"], dlat, dlon)
+    if landed:
+        covered, remaining = covered + remaining, 0.0
+    split = journey_split(covered, remaining)
+
+    delay_note = ""
+    if facts["scheduled_gate_arrival_user_local"] and facts[
+            "estimated_gate_arrival_user_local"]:
+        sched = datetime.fromisoformat(
+            facts["scheduled_gate_arrival_user_local"])
+        est = datetime.fromisoformat(
+            facts["estimated_gate_arrival_user_local"])
+        mins = round((est - sched).total_seconds() / 60)
+        if mins >= 10:
+            delay_note = f"roughly {mins} minutes behind schedule"
+        elif mins <= -10:
+            delay_note = f"roughly {abs(mins)} minutes early"
+
+    used_prev, map_note = refresh_map(
+        facts["fa_flight_id"],
+        os.path.join(args.out_dir, slug + "-map-new.png"),
+        os.path.join(args.out_dir, args.map_keep_name),
+    )
+    keep_map_path = os.path.join(args.out_dir, args.map_keep_name)
+    if not used_prev and os.path.exists(keep_map_path):
+        # Fresh render: overlay the flown track as a solid line. FlightAware
+        # sometimes renders oceanic segments dashed; the overlay guarantees
+        # the elapsed path is solid. Best-effort — never breaks the card.
+        # Only the fixes up to the current position are drawn, so the line
+        # never extends past the plane marker shown in this render.
+        try:
+            fixes = _truncate_track(
+                fetch_track(facts["fa_flight_id"]),
+                pos["latitude"], pos["longitude"])
+            with open(keep_map_path, "rb") as f:
+                fresh = f.read()
+            with open(keep_map_path, "wb") as f:
+                f.write(overlay_flown_track(
+                    fresh, fixes, (olat, olon), (dlat, dlon)))
+        except Exception:
+            pass
+    if os.path.exists(keep_map_path):
+        with open(keep_map_path, "rb") as f:
+            map_bytes = f.read()
+    else:
+        map_bytes = b""
+        map_note = "Route map unavailable this run"
+
+    # Arrival shown on the card: actual landing time once landed,
+    # otherwise the latest estimate. One-shot CLI has no previous run,
+    # so there is no old ETA to bracket.
+    if landed and facts["actual_landing_user_local"]:
+        card_arrival_iso = facts["actual_landing_user_local"]
+        card_eta = fmt(facts["actual_landing_user_local"])
+    else:
+        card_arrival_iso = facts["estimated_landing_user_local"]
+        card_eta = est_landing if est_landing != "unknown" else ""
+    journey_total = ""
+    if facts.get("actual_takeoff_user_local") and card_arrival_iso:
+        journey_total = format_duration_hm(
+            facts["actual_takeoff_user_local"], card_arrival_iso)
+
+    pill_label, pill_tone = status_pill_info(
+        facts["status"], facts["cancelled"], facts["diverted"], landed)
+    time_remaining = format_time_remaining(
+        split["remaining_mi"], pos["groundspeed_kt"])
+    position_label = format_position_label(
+        pos["latitude"], pos["longitude"])
+
+    card_html = build_card_html(
+        pct=split["pct"],
+        covered_mi=_fmt_mi(split["covered_mi"]),
+        remaining_mi=_fmt_mi(split["remaining_mi"]),
+        altitude=f"{pos['altitude_ft']:,} ft",
+        speed=f"{pos['groundspeed_kt']} kt",
+        report_time=report_time,
+        map_png_bytes=map_bytes,
+        map_note=map_note,
+        eta_latest=card_eta,
+        journey_total=journey_total,
+        marker=args.flight_marker,
+        status_pill=pill_label,
+        status_tone=pill_tone,
+        time_remaining=time_remaining,
+        position_label=position_label,
+    )
+    card_path = os.path.join(args.out_dir, slug + "-card.html")
+    with open(card_path, "w") as f:
+        f.write(card_html)
+
+    if landed:
+        actual = fmt(facts["actual_landing_user_local"])
+        announcement = (
+            f"{args.flight} has landed in {facts['destination_city']} at "
+            f"{actual}. Journey complete: 100% of the distance covered "
+            f"— reported at {report_time}."
+        )
+    else:
+        announcement = build_announcement(
+            flight=args.flight,
+            origin_city=facts["origin_city"],
+            dest_city=facts["destination_city"],
+            pct=split["pct"],
+            covered_mi=_fmt_mi(split["covered_mi"]),
+            remaining_mi=_fmt_mi(split["remaining_mi"]),
+            est_landing=est_landing,
+            delay_note=delay_note,
+            report_time=report_time,
+        )
+    print(announcement)
+
+    report = _base_report(args, ident, facts, landed, report_time, est_landing,
+                          tz_name)
+    report["journey"] = {
+        "pct": split["pct"],
+        "covered_mi": int(round(split["covered_mi"])),
+        "remaining_mi": int(round(split["remaining_mi"])),
+    }
+    report["position"] = pos
+    with open(report["files"]["report"], "w") as f:
+        json.dump(report, f, indent=2)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
