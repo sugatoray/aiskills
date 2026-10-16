@@ -83,6 +83,7 @@ AIRPORT_TZ = {
     "SIN": "Asia/Singapore", "HKG": "Asia/Hong_Kong",
     "NRT": "Asia/Tokyo", "HND": "Asia/Tokyo",
     "ICN": "Asia/Seoul", "SYD": "Australia/Sydney",
+    "DEL": "Asia/Kolkata", "CCU": "Asia/Kolkata", "HYD": "Asia/Kolkata",
 }
 
 
@@ -302,8 +303,9 @@ def parse_canonical_ident(data):
 def _select_flight(flights):
     """Pick the most relevant flight when several share a date.
 
-    Prefers the airborne leg (taken off, not landed), then the most
-    recently landed, then falls back to the first entry.
+    Prefers the airborne leg (taken off, not landed), then a leg that has
+    pushed back but not yet taken off (taxiing), then the most recently
+    landed, then falls back to the first entry.
     """
     def has_taken_off(f):
         return bool(_user_local(f.get("actual_takeoff_at")))
@@ -311,8 +313,14 @@ def _select_flight(flights):
     def has_landed(f):
         return bool(_user_local(f.get("actual_landing_at")))
 
+    def has_pushed_back(f):
+        return bool(f.get("actual_out"))
+
     for f in flights:
         if has_taken_off(f) and not has_landed(f):
+            return f
+    for f in flights:
+        if has_pushed_back(f) and not has_landed(f):
             return f
     for f in flights:
         if has_landed(f):
@@ -1076,8 +1084,13 @@ def main(argv=None):
         return 0
     olat, olon = airport_coords(facts["origin_iata"])
     dlat, dlon = airport_coords(facts["destination_iata"])
-    covered = haversine_mi(olat, olon, pos["latitude"], pos["longitude"])
-    remaining = haversine_mi(pos["latitude"], pos["longitude"], dlat, dlon)
+    # A (0,0) position is the feed's "no fix" sentinel (e.g. taxiing before
+    # takeoff); treat the flight as still at the origin.
+    plat, plon = pos["latitude"], pos["longitude"]
+    if plat == 0.0 and plon == 0.0:
+        plat, plon = olat, olon
+    covered = haversine_mi(olat, olon, plat, plon)
+    remaining = haversine_mi(plat, plon, dlat, dlon)
     if landed:
         covered, remaining = covered + remaining, 0.0
     split = journey_split(covered, remaining)
