@@ -4,6 +4,18 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.1] - 2026-10-16
+
+### Fixed
+
+- Flight selection when FlightAware returns multiple legs for one flight
+  number on a date: `parse_flight_facts` now prefers the airborne leg
+  (taken off, not landed), then the most recently landed, instead of
+  blindly taking the first entry. Previously LX146 reported "Scheduled"
+  while the real flight was en route.
+
+  Red/Green TDD: 2 new tests (83 total, all green).
+
 ## [0.9.0] - 2026-10-16
 
 ### Added

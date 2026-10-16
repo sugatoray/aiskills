@@ -299,8 +299,29 @@ def parse_canonical_ident(data):
     return data["body"]["idents"][0]["ident"]
 
 
+def _select_flight(flights):
+    """Pick the most relevant flight when several share a date.
+
+    Prefers the airborne leg (taken off, not landed), then the most
+    recently landed, then falls back to the first entry.
+    """
+    def has_taken_off(f):
+        return bool(_user_local(f.get("actual_takeoff_at")))
+
+    def has_landed(f):
+        return bool(_user_local(f.get("actual_landing_at")))
+
+    for f in flights:
+        if has_taken_off(f) and not has_landed(f):
+            return f
+    for f in flights:
+        if has_landed(f):
+            return f
+    return flights[0]
+
+
 def parse_flight_facts(data):
-    f = data["body"]["flights"][0]
+    f = _select_flight(data["body"]["flights"])
     return {
         "ident": f.get("ident"),
         "ident_iata": f.get("ident_iata"),

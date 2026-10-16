@@ -1114,3 +1114,41 @@ class RenderScreenshotsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FlightSelectionTests(unittest.TestCase):
+    def _load_cli(self):
+        import importlib.util
+        from importlib.machinery import SourceFileLoader
+        loader = SourceFileLoader(
+            "cli_sel",
+            os.path.join(os.path.dirname(__file__), "..", "bin",
+                         "flight-status"))
+        spec = importlib.util.spec_from_loader("cli_sel", loader)
+        mod = importlib.util.module_from_spec(spec)
+        loader.exec_module(mod)
+        return mod
+
+    def test_prefers_en_route_over_scheduled(self):
+        cli = self._load_cli()
+        data = {"body": {"flights": [
+            {"status": "Scheduled", "fa_flight_id": "sched-1",
+             "actual_takeoff_at": None},
+            {"status": "En Route / On Time", "fa_flight_id": "enroute-1",
+             "actual_takeoff_at": {"user_local": "2026-10-16T07:01:01-04:00"}},
+        ]}}
+        facts = cli.parse_flight_facts(data)
+        self.assertEqual(facts["fa_flight_id"], "enroute-1")
+        self.assertEqual(facts["status"], "En Route / On Time")
+
+    def test_single_flight_unchanged(self):
+        cli = self._load_cli()
+        data = {"body": {"flights": [
+            {"status": "Scheduled", "fa_flight_id": "only-1"},
+        ]}}
+        facts = cli.parse_flight_facts(data)
+        self.assertEqual(facts["fa_flight_id"], "only-1")
+
+
+if __name__ == "__main__":
+    unittest.main()
