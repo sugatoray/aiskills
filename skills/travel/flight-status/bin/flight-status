@@ -385,6 +385,11 @@ def refresh_map(fa_flight_id, tmp_path, keep_path):
 SOURCE_URL = "https://www.flightaware.com/live/flight/SWR9"
 
 
+def flightaware_url(ident):
+    """FlightAware live-track URL for an ICAO ident (e.g. SWR146)."""
+    return f"https://www.flightaware.com/live/flight/{ident}"
+
+
 def _marker_html(marker, pct):
     """The marker riding the progress boundary: airliner, knob, or paper-plane."""
     if marker == "knob":
@@ -1159,6 +1164,7 @@ def main(argv=None):
         position_label=position_label,
         header=(f"{args.flight} &middot; {facts['origin_city']} "
                 f"&rarr; {facts['destination_city']}"),
+        source_url=flightaware_url(facts["ident"]),
     )
     card_path = os.path.join(args.out_dir, slug + "-card.html")
     with open(card_path, "w") as f:
