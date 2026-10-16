@@ -4,6 +4,16 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.5] - 2026-10-16
+
+### Fixed
+
+- `format_time_remaining` returned nonsense like "≈408h" when groundspeed
+  was taxi speed (815 mi ÷ 2 kt). Groundspeeds under 100 kt now yield a
+  blank instead of a misleading estimate.
+
+  Red/Green TDD: 3 new tests (92 total, all green).
+
 ## [0.9.4] - 2026-10-16
 
 ### Fixed
