@@ -4,6 +4,20 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-10-16
+
+### Added
+
+- `bin/render-screenshots`: regenerates the README screenshots deterministically
+  from the pinned sample report (`bin/flight-status -m`) and the pinned
+  `assets/sample-map.png` — no network, no browser. Renders
+  `assets/screenshots/card.png` (480px) and `card-wide.png` (900px) with PIL
+  and updates README.md's screenshot section. Re-running produces
+  byte-identical output, so the step stays feasible for auto-generation.
+- README now embeds the example card screenshots.
+
+  Red/Green TDD: 6 new tests (81 total, all green).
+
 ## [0.8.0] - 2026-10-16
 
 ### Added

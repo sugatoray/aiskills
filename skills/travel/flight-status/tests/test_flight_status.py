@@ -8,6 +8,9 @@ import importlib.util
 from importlib.machinery import SourceFileLoader
 import json
 import os
+import shutil
+import subprocess
+import unittest
 import sys
 import unittest
 from datetime import datetime
@@ -1036,6 +1039,77 @@ class TrackOverlayTests(unittest.TestCase):
             cli._truncate_track(fixes, 1.1, 1.1),
             [(0.0, 0.0), (1.0, 1.0)])
         self.assertEqual(cli._truncate_track([], 0.0, 0.0), [])
+
+
+
+
+class RenderScreenshotsTests(unittest.TestCase):
+    SKILL_DIR = os.path.join(os.path.dirname(__file__), "..")
+    SCRIPT = os.path.join(SKILL_DIR, "bin", "render-screenshots")
+    SHOT_DIR = os.path.join(SKILL_DIR, "assets", "screenshots")
+
+    def _load_script(self):
+        import importlib.util
+        from importlib.machinery import SourceFileLoader
+        loader = SourceFileLoader("render_shots", self.SCRIPT)
+        spec = importlib.util.spec_from_loader("render_shots", loader)
+        mod = importlib.util.module_from_spec(spec)
+        loader.exec_module(mod)
+        return mod
+
+    def test_render_script_exists_and_executable(self):
+        self.assertTrue(os.path.isfile(self.SCRIPT))
+        self.assertTrue(os.access(self.SCRIPT, os.X_OK))
+
+    def test_render_script_help(self):
+        r = subprocess.run(
+            [self.SCRIPT, "--help"], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0)
+        self.assertIn("screenshot", r.stdout.lower())
+
+    def test_sample_card_generation_deterministic(self):
+        # bin/flight-status -m twice -> byte-identical HTML (the
+        # reproducibility foundation for auto-generated screenshots).
+        import tempfile
+        cli = os.path.join(self.SKILL_DIR, "bin", "flight-status")
+        outs = []
+        for _ in range(2):
+            with tempfile.TemporaryDirectory() as tmp:
+                # pinned map so the card embeds it deterministically
+                shutil.copy(
+                    os.path.join(self.SKILL_DIR, "assets", "sample-map.png"),
+                    os.path.join(tmp, "lx009-map.png"))
+                r = subprocess.run(
+                    [cli, "-f", "LX009", "-m", "--out-dir", tmp],
+                    capture_output=True, text=True)
+                self.assertEqual(r.returncode, 0)
+                with open(os.path.join(tmp, "lx009-card.html"), "rb") as f:
+                    outs.append(f.read())
+        self.assertEqual(outs[0], outs[1])
+
+    def test_render_card_png_deterministic(self):
+        mod = self._load_script()
+        png1 = mod.render_card_png(mod.sample_data(), mod.sample_map_bytes(),
+                                   480)
+        png2 = mod.render_card_png(mod.sample_data(), mod.sample_map_bytes(),
+                                   480)
+        self.assertEqual(png1, png2)
+        self.assertTrue(png1.startswith(b"\x89PNG"))
+
+    def test_screenshots_exist_with_expected_widths(self):
+        from PIL import Image
+        import io
+        for name, width in (("card.png", 480), ("card-wide.png", 900)):
+            p = os.path.join(self.SHOT_DIR, name)
+            self.assertTrue(os.path.isfile(p), f"missing {name}")
+            im = Image.open(p)
+            self.assertEqual(im.size[0], width)
+
+    def test_readme_embeds_screenshots(self):
+        with open(os.path.join(self.SKILL_DIR, "README.md")) as f:
+            readme = f.read()
+        self.assertIn("assets/screenshots/card.png", readme)
+        self.assertIn("assets/screenshots/card-wide.png", readme)
 
 
 if __name__ == "__main__":
