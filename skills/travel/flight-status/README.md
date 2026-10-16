@@ -14,9 +14,14 @@ flight-status/
 │   └── openai.yaml
 ├── assets/
 │   ├── sample_report.html
-│   └── sample_usage.md
+│   ├── sample_usage.md
+│   ├── sample-map.png
+│   └── screenshots/
+│       ├── card.png
+│       └── card-wide.png
 ├── bin/
-│   └── flight-status
+│   ├── flight-status
+│   └── render-screenshots
 ├── meta/
 │   ├── MAINTAINERS.md
 │   └── SECURITY.md
@@ -69,3 +74,12 @@ bin/flight-status -f LX009 -t end   # times in the destination's zone
 See [`assets/sample_usage.md`](assets/sample_usage.md) for full examples
 and [`assets/sample_report.html`](assets/sample_report.html) for what the
 report card looks like.
+
+<!-- screenshots:start -->
+## Screenshots
+
+![Sample report card (480px)](assets/screenshots/card.png)
+![Sample report card (900px)](assets/screenshots/card-wide.png)
+
+_Regenerated with `bin/render-screenshots` — deterministic from the pinned sample report (`bin/flight-status -m`) and `assets/sample-map.png`._
+<!-- screenshots:end -->
