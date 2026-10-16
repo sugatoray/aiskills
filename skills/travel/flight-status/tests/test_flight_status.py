@@ -1251,3 +1251,22 @@ class SelectFlightTaxiingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TimeRemainingTests(unittest.TestCase):
+    def test_taxi_speed_gives_blank(self):
+        cli = load_cli()
+        # 815 mi at 2 kt taxi speed would be 408h — meaningless before takeoff
+        self.assertEqual(cli.format_time_remaining(815, 2), "")
+
+    def test_cruise_speed_gives_hours(self):
+        cli = load_cli()
+        self.assertEqual(cli.format_time_remaining(2000, 450), "\u22484h")
+
+    def test_zero_speed_gives_blank(self):
+        cli = load_cli()
+        self.assertEqual(cli.format_time_remaining(815, 0), "")
+
+
+if __name__ == "__main__":
+    unittest.main()
