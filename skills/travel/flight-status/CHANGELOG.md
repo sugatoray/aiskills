@@ -4,6 +4,21 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.4] - 2026-10-16
+
+### Fixed
+
+- Flight-leg selection preferred a landed leg over a taxiing one:
+  `_select_flight` now ranks a leg that has pushed back (`actual_out`
+  set) but not yet taken off above landed legs. Previously a taxiing
+  AI2702 fell through to yesterday's landed leg.
+- Added DEL, CCU, HYD to `AIRPORT_TZ` (Asia/Kolkata); `-t start`/`-t end`
+  for Indian airports no longer falls back to UTC.
+- A (0,0) "no fix" position now maps to the origin airport instead of
+  producing nonsense distances (taxiing showed 47% / 5,438 mi covered).
+
+  Red/Green TDD: 2 new tests (89 total, all green).
+
 ## [0.9.3] - 2026-10-16
 
 ### Fixed
