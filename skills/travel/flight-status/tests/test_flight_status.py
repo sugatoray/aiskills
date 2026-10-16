@@ -1226,3 +1226,28 @@ class CardSourceUrlTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SelectFlightTaxiingTests(unittest.TestCase):
+    def _flight(self, actual_takeoff=None, actual_landing=None, actual_out=None):
+        return {
+            "actual_takeoff_at": {"user_local": actual_takeoff} if actual_takeoff else None,
+            "actual_landing_at": {"user_local": actual_landing} if actual_landing else None,
+            "actual_out": actual_out,
+        }
+
+    def test_prefers_taxiing_over_landed(self):
+        cli = load_cli()
+        landed = self._flight(actual_takeoff="2026-10-15T10:00", actual_landing="2026-10-15T12:00")
+        taxiing = self._flight(actual_out="2026-10-16T21:33:00Z")
+        self.assertIs(cli._select_flight([landed, taxiing]), taxiing)
+
+    def test_prefers_airborne_over_taxiing(self):
+        cli = load_cli()
+        taxiing = self._flight(actual_out="2026-10-16T21:33:00Z")
+        airborne = self._flight(actual_takeoff="2026-10-16T21:35", actual_out="2026-10-16T21:33:00Z")
+        self.assertIs(cli._select_flight([taxiing, airborne]), airborne)
+
+
+if __name__ == "__main__":
+    unittest.main()
