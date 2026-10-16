@@ -4,6 +4,18 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.3] - 2026-10-16
+
+### Fixed
+
+- "FlightAware — live track" link pointed to the hardcoded LX009 page
+  (`SWR9`) for every flight: the live-flight path now passes a URL built
+  from the actual flight ident via `flightaware_url(ident)`
+  (e.g. `https://www.flightaware.com/live/flight/SWR146`).
+  `assets/sample_report.html` regenerated from the current template.
+
+  Red/Green TDD: 2 new tests (87 total, all green).
+
 ## [0.9.2] - 2026-10-16
 
 ### Fixed
