@@ -1192,3 +1192,37 @@ class CardHeaderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CardSourceUrlTests(unittest.TestCase):
+    def test_card_source_url_uses_flight_ident(self):
+        cli = load_cli()
+        html = cli.build_card_html(
+            pct=5,
+            covered_mi="188",
+            remaining_mi="3,640",
+            altitude="30,600 ft",
+            speed="491 kt",
+            report_time="7:25 AM EDT",
+            map_png_bytes=b"\x89PNG\r\n\x1a\nfakepng",
+            map_note="",
+            header="LX146 &middot; Zurich &rarr; New Delhi",
+            source_url="https://www.flightaware.com/live/flight/SWR146",
+        )
+        self.assertIn(
+            "https://www.flightaware.com/live/flight/SWR146", html)
+        self.assertNotIn(
+            "https://www.flightaware.com/live/flight/SWR9\"", html)
+
+    def test_flightaware_url_helper(self):
+        cli = load_cli()
+        self.assertEqual(
+            cli.flightaware_url("SWR146"),
+            "https://www.flightaware.com/live/flight/SWR146")
+        self.assertEqual(
+            cli.flightaware_url("SWR9"),
+            "https://www.flightaware.com/live/flight/SWR9")
+
+
+if __name__ == "__main__":
+    unittest.main()
