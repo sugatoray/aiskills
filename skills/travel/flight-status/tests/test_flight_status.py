@@ -458,7 +458,7 @@ class CardTests(unittest.TestCase):
         self.assertIn("UA123 &middot; Sample report", html)
         self.assertNotIn("Chicago", html)
 
-    def test_card_header_defaults_to_lx009(self):
+    def test_card_header_default_is_generic(self):
         cli = load_cli()
         html = cli.build_card_html(
             pct=35,
@@ -470,7 +470,9 @@ class CardTests(unittest.TestCase):
             map_png_bytes=b"\x89PNG\r\n\x1a\nfakepng",
             map_note="",
         )
-        self.assertIn("LX009 &middot; Chicago &rarr; Zurich", html)
+        self.assertIn("Flight status", html)
+        self.assertNotIn("LX009", html)
+        self.assertNotIn("Chicago", html)
 
     def test_card_shows_status_pill_and_time_remaining(self):
         cli = load_cli()
@@ -1148,6 +1150,44 @@ class FlightSelectionTests(unittest.TestCase):
         ]}}
         facts = cli.parse_flight_facts(data)
         self.assertEqual(facts["fa_flight_id"], "only-1")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class CardHeaderTests(unittest.TestCase):
+    def test_card_header_uses_flight_and_cities(self):
+        cli = load_cli()
+        html = cli.build_card_html(
+            pct=5,
+            covered_mi="188",
+            remaining_mi="3,640",
+            altitude="30,600 ft",
+            speed="491 kt",
+            report_time="7:25 AM EDT",
+            map_png_bytes=b"\x89PNG\r\n\x1a\nfakepng",
+            map_note="",
+            header="LX146 &middot; Zurich &rarr; New Delhi",
+        )
+        self.assertIn("LX146 &middot; Zurich &rarr; New Delhi", html)
+        self.assertNotIn("LX009", html)
+        self.assertNotIn("Chicago", html)
+
+    def test_card_default_header_not_lx009_specific(self):
+        cli = load_cli()
+        html = cli.build_card_html(
+            pct=5,
+            covered_mi="188",
+            remaining_mi="3,640",
+            altitude="30,600 ft",
+            speed="491 kt",
+            report_time="7:25 AM EDT",
+            map_png_bytes=b"\x89PNG\r\n\x1a\nfakepng",
+            map_note="",
+        )
+        self.assertNotIn("LX009", html)
+        self.assertNotIn("Chicago", html)
 
 
 if __name__ == "__main__":

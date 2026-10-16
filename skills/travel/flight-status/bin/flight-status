@@ -739,7 +739,7 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
                     report_time, map_png_bytes, map_note,
                     eta_latest="", eta_old="", journey_total="",
                     source_url=SOURCE_URL,
-                    header="LX009 &middot; Chicago &rarr; Zurich",
+                    header="Flight status",
                     marker="airliner", status_pill="", status_tone="info",
                     time_remaining="", position_label=""):
     if map_png_bytes:
@@ -1157,6 +1157,8 @@ def main(argv=None):
         status_tone=pill_tone,
         time_remaining=time_remaining,
         position_label=position_label,
+        header=(f"{args.flight} &middot; {facts['origin_city']} "
+                f"&rarr; {facts['destination_city']}"),
     )
     card_path = os.path.join(args.out_dir, slug + "-card.html")
     with open(card_path, "w") as f:
