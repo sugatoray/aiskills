@@ -26,7 +26,7 @@
     {
       "name": "stata-skills",
       "source": "./stata",
-      "description": "Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-bad command guidance, Python↔Stata interop, and a growing recipe library (ARDL, time-series and panel regression, unit-root tests).",
+      "description": "Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-bad command guidance, Python\u2194Stata interop, and a growing recipe library (ARDL, time-series and panel regression, unit-root tests).",
       "category": "data-science",
       "keywords": [
         "stata",
@@ -49,6 +49,18 @@
         "pull-requests",
         "developer-workflow",
         "repo-related"
+      ]
+    },
+    {
+      "name": "diagrams-skills",
+      "source": "./diagrams",
+      "description": "Animated architecture and network diagrams with flowing packets, orthogonal routing, selectable nodes, and scenario playback.",
+      "category": "productivity",
+      "keywords": [
+        "diagrams",
+        "architecture",
+        "network-flow",
+        "visualization"
       ]
     }
   ]

@@ -117,6 +117,18 @@ with every skill twice — pick one.
 
 > 💡 For more information, refer to the [**Development README.md**](skills/development/README.md).
 
+## Diagrams
+
+Create interactive architecture and network diagrams with animated packets,
+scenario playback, selectable components, and downloadable offline HTML.
+
+```sh
+npx skills add sugatoray/aiskills --skill network-flow
+```
+
+See the [Diagrams README](skills/diagrams/README.md) and
+[network-flow usage](skills/diagrams/network-flow/README.md).
+
 [#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,help%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
