@@ -49,6 +49,10 @@ Open the generated HTML in a browser. Python generation uses only the standard
 library; playback needs no server, package installation, API key, or network.
 Use `examples/rag.html` to open the already generated example directly.
 
+The original delivered demo is preserved separately in
+[`assets/examples/rag_demo.html`](assets/examples/rag_demo.html), alongside its
+exact [`rag_prompt.md`](assets/examples/rag_prompt.md) invocation.
+
 ## Scope
 
 This release renders simulated flows. It does not collect network traffic or

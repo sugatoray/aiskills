@@ -11,6 +11,9 @@ For people developing this skill — not read as part of answering a
 - `../agents/openai.yaml` — interface metadata; explicit invocation, like scrolls.
 - `../assets/template.html` — generic shell; never embed a specific system here.
 - `../assets/runtime/` — original generic styling and renderer.
+- `../assets/examples/rag_demo.html` — original delivered standalone HTML snapshot.
+- `../assets/examples/rag_prompt.md` — exact invocation for that snapshot; keep
+  this pair together. Do not regenerate the snapshot from the newer renderer.
 - `../scripts/` — standard-library schema validation and offline rendering.
 - `../references/` — schema, routing, telemetry boundary, verification.
 - `../examples/rag.json` — source for the generated `rag.html`; edit JSON first.

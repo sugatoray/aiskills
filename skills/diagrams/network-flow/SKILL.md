@@ -98,6 +98,10 @@ retrieval, reranking, context assembly, generation, citation resolution, bounded
 retry, and abstention. The handbook quotation is illustrative, not sourced policy.
 The retry playback explicitly labels the exhausted path as an alternative outcome.
 
+For the original delivered visual and its exact invocation, use
+`assets/examples/rag_demo.html` and `assets/examples/rag_prompt.md`. These are a
+preserved example pair; `examples/rag.json` remains the editable renderer fixture.
+
 The design reference is the interactive architecture graphic in
 [Vercel's Python announcement](https://vercel.com/blog/python-on-vercel-is-now-generally-available).
 No Vercel source code, logos, or branded assets are bundled.
