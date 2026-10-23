@@ -305,12 +305,17 @@ def parse_canonical_ident(data):
     return data["body"]["idents"][0]["ident"]
 
 
-def _select_flight(flights):
+def _select_flight(flights, target_date=None):
     """Pick the most relevant flight when several share a date.
 
-    Prefers the airborne leg (taken off, not landed), then a leg that has
-    pushed back but not yet taken off (taxiing), then the most recently
-    landed, then falls back to the first entry.
+    When a target date is given, legs scheduled to depart on that date
+    (in the user's local zone) are considered first — a dated query can
+    return neighbouring days' legs, and yesterday's landed leg must not
+    shadow today's not-yet-departed one (nor tomorrow's scheduled leg
+    today's landed one). Within the pool, prefers the airborne leg
+    (taken off, not landed), then a leg that has pushed back but not yet
+    taken off (taxiing), then the most recently landed, then falls back
+    to the first entry.
     """
     def has_taken_off(f):
         return bool(_user_local(f.get("actual_takeoff_at")))
@@ -321,20 +326,30 @@ def _select_flight(flights):
     def has_pushed_back(f):
         return bool(f.get("actual_out"))
 
-    for f in flights:
+    def departs_on_target(f):
+        dep = _user_local(f.get("scheduled_gate_departure_at"))
+        return bool(dep) and dep[:10] == target_date
+
+    pool = flights
+    if target_date:
+        dated = [f for f in flights if departs_on_target(f)]
+        if dated:
+            pool = dated
+
+    for f in pool:
         if has_taken_off(f) and not has_landed(f):
             return f
-    for f in flights:
+    for f in pool:
         if has_pushed_back(f) and not has_landed(f):
             return f
-    for f in flights:
+    for f in pool:
         if has_landed(f):
             return f
-    return flights[0]
+    return pool[0]
 
 
-def parse_flight_facts(data):
-    f = _select_flight(data["body"]["flights"])
+def parse_flight_facts(data, target_date=None):
+    f = _select_flight(data["body"]["flights"], target_date=target_date)
     return {
         "ident": f.get("ident"),
         "ident_iata": f.get("ident_iata"),
@@ -1049,7 +1064,8 @@ def main(argv=None):
 
     ident = parse_canonical_ident(json.loads(_run(["canonical-flight", args.flight])))
     facts = parse_flight_facts(
-        json.loads(_run(["flight", ident, "--date", departure_date(args)])))
+        json.loads(_run(["flight", ident, "--date", departure_date(args)])),
+        target_date=departure_date(args))
     pos = parse_position(json.loads(_run(["position", facts["fa_flight_id"]])))
 
     landed = (
