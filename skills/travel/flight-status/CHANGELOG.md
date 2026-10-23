@@ -4,6 +4,19 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.6] - 2026-10-23
+
+### Fixed
+
+- Flight-leg selection picked yesterday's landed leg over today's
+  not-yet-departed leg: `_select_flight` now takes the requested date
+  and first restricts to legs whose scheduled gate departure (user-local)
+  falls on that date, applying the existing airborne → taxiing → landed
+  ranking within that pool. Falls back to the full pool when no leg
+  matches the date.
+
+  Red/Green TDD: 3 new tests, all green.
+
 ## [0.9.5] - 2026-10-16
 
 ### Fixed
