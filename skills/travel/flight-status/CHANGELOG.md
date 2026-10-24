@@ -4,6 +4,35 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.8] - 2026-10-24
+
+### Added
+
+- New `-d`/`--departure-datetime` flag: pins the dated leg the CLI queries
+  and selects. Accepts a date, a time, or both (`"2026-10-23"`, `"16:15"`,
+  `"2026-10-23 16:15:00"`); omitted parts fall back to
+  `--start-datetime`, and `report.json` records the resolved value as
+  `departure_datetime`. Motivation: LX2647 (DEL → ZRH, 2026-10-23) was
+  still airborne after midnight, when the `-s` date rolled to Oct 24 and
+  leg selection picked the next day's not-yet-departed leg — the report
+  read "Delayed" with no live position and a stale 2:45 AM ETA while the
+  flight was in fact en route and on time.
+
+  Red/Green TDD: 8 new tests (104 total, all green).
+
+## [0.9.7] - 2026-10-23
+
+### Fixed
+
+- The CLI crashed with an unhandled `IndexError` when FlightAware returned
+  zero flights for a query (e.g. a non-operating flight number like LX2347).
+  `_select_flight` now raises a dedicated `NoFlightFoundError` on an empty
+  legs list (and `parse_canonical_ident` on an empty idents list); `main`
+  catches it and reports "No flight found for <flight> on <date>" cleanly
+  with a non-zero exit instead of a traceback.
+
+  Red/Green TDD: 4 new tests (96 total, all green).
+
 ## [0.9.6] - 2026-10-23
 
 ### Fixed
