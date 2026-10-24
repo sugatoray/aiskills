@@ -8,7 +8,7 @@ metadata:
   name: flight-status
   type: skill
   author: sugatoray
-  version: "0.9.6"
+  version: "0.9.8"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/travel/flight-status"
 ---
 
@@ -27,6 +27,7 @@ Run the bundled CLI:
   -f LX009 \
   [-r 30mins] \
   [-s "2026-10-15 22:12:07"] \
+  [-d "2026-10-23 16:15"] \
   [-m] \
   [-k airliner|knob|paper-plane] \
   [-t <iana|start|end>] \
@@ -38,6 +39,7 @@ Run the bundled CLI:
 | `-f`, `--flight` | yes | Flight number, e.g. `LX009` (IATA or ICAO form both work) |
 | `-r`, `--repeat` | no | Cadence like `30mins`, `30m`, `1h`. Default: none (one-shot). The CLI performs exactly one check; repeating on a schedule is the agent's job (see Repeating). |
 | `-s`, `--start-datetime` | no | `"yyyy-mm-dd HH:MM:SS"`. Default: now. Its date selects the dated leg; its time is the reporting anchor. |
+| `-d`, `--departure-datetime` | no | Departure date and/or time of the leg to report: `"yyyy-mm-dd"`, `"HH:MM"`, or `"yyyy-mm-dd HH:MM[:SS]"`; parts omitted fall back to `-s`. When given, its date (not the `-s` date) selects the dated leg — use it for a flight still airborne after midnight, when the `-s` date would roll to the next day's leg. `report.json` records the resolved value as `departure_datetime`. |
 | `-m`, `--sample` | no | Render a sample report with built-in data (a real LX009 mid-flight snapshot). No FlightAware calls, no network. Useful for previewing the card layout. |
 | `-k`, `--flight-marker` | no | Marker riding the progress bar: `airliner` (default), `knob`, or `paper-plane`. |
 | `-t`, `--tz`, `--timezone` | no | Display timezone: an IANA name (e.g. `Europe/Zurich`), `start` for the origin airport's zone, or `end` for the destination airport's zone. Default: the user's locale, else the origin airport's zone. |
