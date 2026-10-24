@@ -140,6 +140,51 @@ class ArgParsingTests(unittest.TestCase):
         self.assertEqual(args.start_datetime, "2026-10-15 22:12:07")
         self.assertEqual(cli.departure_date(args), "2026-10-15")
 
+    def test_departure_datetime_defaults_to_none(self):
+        cli = load_cli()
+        args = cli.parse_args(["-f", "LX009"])
+        self.assertIsNone(args.departure_datetime)
+
+    def test_departure_datetime_full_value_overrides_start_date(self):
+        cli = load_cli()
+        args = cli.parse_args(
+            ["-f", "LX2647", "-s", "2026-10-24 00:10:00",
+             "-d", "2026-10-23 16:15:00"]
+        )
+        self.assertEqual(args.departure_datetime, "2026-10-23 16:15:00")
+        self.assertEqual(cli.departure_date(args), "2026-10-23")
+
+    def test_departure_datetime_long_flag_without_seconds(self):
+        cli = load_cli()
+        args = cli.parse_args(
+            ["--flight=LX2647", "--departure-datetime=2026-10-23 16:15"]
+        )
+        self.assertEqual(args.departure_datetime, "2026-10-23 16:15:00")
+        self.assertEqual(cli.departure_date(args), "2026-10-23")
+
+    def test_departure_datetime_date_only_keeps_start_time(self):
+        cli = load_cli()
+        args = cli.parse_args(
+            ["-f", "LX2647", "-s", "2026-10-24 00:10:00", "-d", "2026-10-23"]
+        )
+        self.assertEqual(args.departure_datetime, "2026-10-23 00:10:00")
+        self.assertEqual(cli.departure_date(args), "2026-10-23")
+
+    def test_departure_datetime_time_only_keeps_start_date(self):
+        cli = load_cli()
+        args = cli.parse_args(
+            ["-f", "LX2647", "-s", "2026-10-23 00:10:00", "-d", "16:15"]
+        )
+        self.assertEqual(args.departure_datetime, "2026-10-23 16:15:00")
+        self.assertEqual(cli.departure_date(args), "2026-10-23")
+
+    def test_departure_datetime_rejects_garbage(self):
+        cli = load_cli()
+        with self.assertRaises(ValueError):
+            cli.parse_args(["-f", "LX2647", "-d", "next Friday"])
+        with self.assertRaises(ValueError):
+            cli.parse_args(["-f", "LX2647", "-d", "2026-13-40 99:99"])
+
     def test_short_flags_combined(self):
         cli = load_cli()
         args = cli.parse_args(
@@ -190,6 +235,7 @@ class ArgParsingTests(unittest.TestCase):
             self.assertIn("--flight", out)
             self.assertIn("--repeat", out)
             self.assertIn("--start-datetime", out)
+            self.assertIn("--departure-datetime", out)
             self.assertIn("--sample", out)
             self.assertIn("--flight-marker", out)
             self.assertIn("--timezone", out)
@@ -1321,3 +1367,101 @@ class SelectFlightByDateTests(unittest.TestCase):
         data = {"body": {"flights": [landed_yday]}}
         facts = cli.parse_flight_facts(data, target_date="2026-10-23")
         self.assertEqual(facts["fa_flight_id"], "yday-3")
+
+
+class NoFlightFoundTests(unittest.TestCase):
+    """v0.9.7: empty FlightAware results must report cleanly, not crash."""
+
+    def test_empty_flights_raises_no_flight_found(self):
+        cli = load_cli()
+        with self.assertRaises(cli.NoFlightFoundError):
+            cli.parse_flight_facts({"body": {"flights": []}})
+
+    def test_empty_flights_with_date_raises_no_flight_found(self):
+        cli = load_cli()
+        with self.assertRaises(cli.NoFlightFoundError):
+            cli.parse_flight_facts({"body": {"flights": []}},
+                                   target_date="2026-10-23")
+
+    def test_empty_idents_raises_no_flight_found(self):
+        cli = load_cli()
+        with self.assertRaises(cli.NoFlightFoundError):
+            cli.parse_canonical_ident({"body": {"idents": []}})
+
+    def test_main_reports_no_flight_cleanly(self):
+        import io
+        import tempfile
+        from contextlib import redirect_stdout
+
+        cli = load_cli()
+        empty_flights = {"body": {"flights": []}, "ok": True}
+
+        def fake_empty(cmd):
+            if cmd[0] == "canonical-flight":
+                return json.dumps(CANONICAL_JSON).encode()
+            if cmd[0] == "flight":
+                return json.dumps(empty_flights).encode()
+            raise AssertionError(f"unexpected command {cmd}")
+
+        buf = io.StringIO()
+        with tempfile.TemporaryDirectory() as out:
+            with mock.patch.object(cli, "_run", side_effect=fake_empty):
+                with redirect_stdout(buf):
+                    rc = cli.main(["--flight=LX2347", f"--out-dir={out}"])
+        self.assertEqual(rc, 1)
+        self.assertIn("No flight found", buf.getvalue())
+        self.assertIn("LX2347", buf.getvalue())
+
+
+class DepartureDatetimeEndToEndTests(unittest.TestCase):
+    """-d/--departure-datetime pins the dated leg the CLI queries.
+
+    Regression scenario (LX2647, 2026-10-23/24): the flight departed
+    New Delhi on Oct 23 but was still airborne after midnight, when the
+    -s date rolled to Oct 24 and the CLI selected the next day's
+    not-yet-departed leg ("Delayed", no live position). Passing
+    -d "2026-10-23 ..." must keep the query on the Oct 23 leg.
+    """
+
+    def _run_main_capturing_date(self, argv):
+        import tempfile
+
+        cli = load_cli()
+        seen = {}
+
+        def fake(cmd):
+            if cmd[0] == "canonical-flight":
+                return json.dumps(CANONICAL_JSON).encode()
+            if cmd[0] == "flight":
+                seen["date"] = cmd[cmd.index("--date") + 1]
+                return json.dumps(FLIGHT_JSON).encode()
+            if cmd[0] == "position":
+                return json.dumps(POSITION_JSON).encode()
+            if cmd[0] == "map":
+                return b""
+            raise AssertionError(f"unexpected command {cmd}")
+
+        with tempfile.TemporaryDirectory() as out:
+            with mock.patch.object(cli, "_run", side_effect=fake):
+                rc = cli.main(argv + [f"--out-dir={out}"])
+            with open(os.path.join(out, "report.json")) as f:
+                report = json.load(f)
+        return rc, seen, report
+
+    def test_departure_datetime_drives_flight_query_date(self):
+        rc, seen, report = self._run_main_capturing_date(
+            ["-f", "LX009", "-s", "2026-10-24 00:10:00",
+             "-d", "2026-10-23 16:15"]
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(seen["date"], "2026-10-23")
+        self.assertEqual(report["departure_datetime"], "2026-10-23 16:15:00")
+        self.assertEqual(report["start_datetime"], "2026-10-24 00:10:00")
+
+    def test_without_departure_datetime_query_uses_start_date(self):
+        rc, seen, report = self._run_main_capturing_date(
+            ["-f", "LX009", "-s", "2026-10-24 00:10:00"]
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(seen["date"], "2026-10-24")
+        self.assertIsNone(report["departure_datetime"])
