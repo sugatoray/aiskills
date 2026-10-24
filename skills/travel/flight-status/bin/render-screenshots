@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""Regenerate the README screenshots from the deterministic sample card.
+
+Fully reproducible for auto-generation:
+  - Sample data is pinned: bin/flight-status -m uses built-in SAMPLE values,
+    no network calls.
+  - Sample map is pinned: assets/sample-map.png (committed).
+  - Rendering is deterministic PIL output (fixed fonts, layout, colors).
+
+Usage:
+  bin/render-screenshots            regenerate PNGs + update README
+  bin/render-screenshots --help     show this help
+
+Outputs:
+  assets/screenshots/card.png       480px wide
+  assets/screenshots/card-wide.png  900px wide
+"""
+
+import argparse
+import os
+import re
+import sys
+
+from PIL import Image, ImageDraw, ImageFont
+
+SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SCREENSHOT_DIR = os.path.join(SKILL_DIR, "assets", "screenshots")
+SAMPLE_MAP = os.path.join(SKILL_DIR, "assets", "sample-map.png")
+README = os.path.join(SKILL_DIR, "README.md")
+
+VIEWPORTS = [(480, "card.png"), (900, "card-wide.png")]
+
+# Pinned sample values (mirrors bin/flight-status SAMPLE + its formatting).
+def sample_data():
+    return {
+        "header": "LX009 \u00b7 Sample report",
+        "pct": 43,
+        "covered_mi": "1,953",
+        "remaining_mi": "2,598",
+        "altitude": "36,000 ft",
+        "speed": "520 kt",
+        "position": "47.5\u00b0N, 48.4\u00b0W",
+        "report_time": "12:14 AM EDT",
+        "eta_latest": "5:05 AM EDT",
+        "eta_old": "4:40 AM EDT",
+        "journey_total": "8h 4m",
+        "status_pill": "En Route \u00b7 Delayed",
+        "time_remaining": "\u22485h",
+    }
+
+
+def sample_map_bytes():
+    with open(SAMPLE_MAP, "rb") as f:
+        return f.read()
+
+
+def _font(size, bold=False):
+    """Pinned DejaVu Sans; falls back to PIL's bitmap font."""
+    name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
+    for base in ("/usr/share/fonts/truetype/dejavu",
+                 "/usr/share/fonts/truetype/liberation"):
+        p = os.path.join(base, name)
+        if os.path.exists(p):
+            return ImageFont.truetype(p, size)
+    return ImageFont.load_default()
+
+
+def _draw_striped_bar(draw, x0, y0, x1, y1, fill_ratio):
+    """Progress bar: solid green covered, diagonal-striped remainder,
+    quarter ticks, and a marker knob at the boundary."""
+    # track background (remainder)
+    draw.rounded_rectangle([x0, y0, x1, y1], radius=7, fill=(235, 235, 235))
+    # diagonal stripes on the remainder
+    stripe = Image.new("RGBA", (x1 - x0, y1 - y0), (235, 235, 235, 255))
+    sd = ImageDraw.Draw(stripe)
+    for sx in range(-(y1 - y0), (x1 - x0) + (y1 - y0), 10):
+        sd.line([(x0 + sx - x0, y1 - y0), (x0 + sx + (y1 - y0) - x0, 0)],
+                fill=(210, 210, 210, 255), width=4)
+    draw.bitmap((x0, y0), stripe)
+    # solid covered portion
+    fx = int(x0 + (x1 - x0) * fill_ratio)
+    if fx > x0:
+        draw.rounded_rectangle([x0, y0, fx, y1], radius=7, fill=(0, 200, 0))
+        # square off the right edge where it meets the remainder
+        draw.rectangle([fx - 7, y0, fx, y1], fill=(0, 200, 0))
+    # quarter ticks
+    for q in (0.25, 0.5, 0.75):
+        tx = int(x0 + (x1 - x0) * q)
+        draw.line([(tx, y0), (tx, y1)], fill=(150, 150, 150), width=2)
+    # marker knob at the boundary
+    draw.ellipse([fx - 8, (y0 + y1) // 2 - 8, fx + 8, (y0 + y1) // 2 + 8],
+                 fill=(0, 160, 0), outline=(255, 255, 255), width=2)
+    return fx
+
+
+def render_card_png(data, map_png_bytes, width):
+    """Render the sample report card as PNG bytes (light theme)."""
+    import io
+
+    pad = 16
+    W = width
+    # fonts
+    f_header = _font(17, bold=True)
+    f_pct = _font(44, bold=True)
+    f_body = _font(13)
+    f_small = _font(11)
+    f_pill = _font(11, bold=True)
+    f_big_remain = _font(26, bold=True)
+
+    # measure text helper
+    tmp = Image.new("RGB", (8, 8))
+    td = ImageDraw.Draw(tmp)
+
+    def tw(text, font):
+        b = td.textbbox((0, 0), text, font=font)
+        return b[2] - b[0]
+
+    def th(text, font):
+        b = td.textbbox((0, 0), text, font=font)
+        return b[3] - b[1]
+
+    # layout (y cursor)
+    y = pad
+    header_h = th(data["header"], f_header) + 8
+    pct_h = th("43%", f_pct) + 4
+    miles_h = th("1,953", f_body) + 6
+    bar_h = 14
+    bar_gap = 12
+    map_img = Image.open(io.BytesIO(map_png_bytes)).convert("RGB")
+    map_w = W - pad * 2
+    map_h = int(map_img.height * map_w / map_img.width)
+    eta_h = th("Expected", f_body) + 6
+    journey_h = th("Total", f_small) + 4
+    meta_h = th("reported", f_small) * 2 + 8
+    source_h = th("Source", f_small) + pad
+
+    H = (y + header_h + 10 + pct_h + miles_h + bar_gap + bar_h + 12
+         + map_h + 12 + eta_h + journey_h + meta_h + source_h)
+
+    img = Image.new("RGB", (W, H), (255, 255, 255))
+    d = ImageDraw.Draw(img)
+    # card border
+    d.rounded_rectangle([0, 0, W - 1, H - 1], radius=14, outline=(220, 220, 220),
+                        width=1)
+
+    ink, muted, accent = (26, 26, 26), (110, 110, 110), (0, 150, 0)
+
+    # header + status pill (top-right)
+    d.text((pad, y), data["header"], font=f_header, fill=ink)
+    pill_text = data["status_pill"]
+    pw = tw(pill_text, f_pill) + 20
+    ph = th(pill_text, f_pill) + 12
+    px1 = W - pad - pw
+    d.rounded_rectangle([px1, y, W - pad, y + ph], radius=ph // 2,
+                        fill=(255, 243, 205))
+    d.text((px1 + 10, y + 6), pill_text, font=f_pill, fill=(133, 100, 4))
+    # time remaining under the pill
+    tr = data["time_remaining"] + " to go"
+    d.text((W - pad - tw(tr, f_small), y + ph + 4), tr, font=f_small,
+           fill=muted)
+    y += header_h + 10
+
+    # percentage + miles
+    d.text((pad, y), f"{data['pct']}%", font=f_pct, fill=ink)
+    y += pct_h
+    d.text((pad, y),
+           f"{data['covered_mi']} mi covered \u00b7 "
+           f"{data['remaining_mi']} mi to go",
+           font=f_body, fill=muted)
+    y += miles_h + bar_gap
+
+    # progress bar
+    _draw_striped_bar(d, pad, y, W - pad, y + bar_h, data["pct"] / 100.0)
+    y += bar_h + 12
+
+    # map
+    img.paste(map_img.resize((map_w, map_h), Image.LANCZOS), (pad, y))
+    y += map_h + 12
+
+    # ETA + journey
+    eta_line = f"Expected arrival {data['eta_latest']}"
+    d.text((pad, y), eta_line, font=f_body, fill=ink)
+    old = f" [old: {data['eta_old']}]"
+    d.text((pad + tw(eta_line, f_body), y), old, font=f_body, fill=muted)
+    y += eta_h
+    d.text((pad, y), f"Total journey time {data['journey_total']}",
+           font=f_small, fill=muted)
+    y += journey_h
+
+    # meta line
+    meta = (f"{data['altitude']} \u00b7 {data['speed']} \u00b7 "
+            f"{data['position']} \u00b7 reported at {data['report_time']}")
+    # wrap to two lines if needed
+    words, lines, cur = meta.split(" "), [], ""
+    for w_ in words:
+        trial = (cur + " " + w_).strip()
+        if tw(trial, f_small) > W - pad * 2 and cur:
+            lines.append(cur)
+            cur = w_
+        else:
+            cur = trial
+    lines.append(cur)
+    for line in lines:
+        d.text((pad, y), line, font=f_small, fill=muted)
+        y += th(line, f_small) + 4
+    y += 4
+
+    # source
+    d.text((pad, y), "Source: FlightAware \u2014 LX009 live track",
+           font=f_small, fill=muted)
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+SCREENSHOT_SECTION = """<!-- screenshots:start -->
+## Screenshots
+
+![Sample report card (480px)](assets/screenshots/card.png)
+![Sample report card (900px)](assets/screenshots/card-wide.png)
+
+_Regenerated with `bin/render-screenshots` — deterministic from the pinned sample report (`bin/flight-status -m`) and `assets/sample-map.png`._
+<!-- screenshots:end -->"""
+
+
+def update_readme():
+    with open(README) as f:
+        readme = f.read()
+    pattern = re.compile(r"<!-- screenshots:start -->.*<!-- screenshots:end -->",
+                         re.DOTALL)
+    if pattern.search(readme):
+        readme = pattern.sub(SCREENSHOT_SECTION, readme)
+    else:
+        readme = readme.rstrip("\n") + "\n\n" + SCREENSHOT_SECTION + "\n"
+    with open(README, "w") as f:
+        f.write(readme)
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Regenerate README screenshots from the deterministic "
+                    "sample card (no network). Writes "
+                    "assets/screenshots/card.png (480px) and "
+                    "assets/screenshots/card-wide.png (900px), then updates "
+                    "README.md.")
+    ap.parse_args(argv)
+
+    os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+    data = sample_data()
+    map_bytes = sample_map_bytes()
+    for width, name in VIEWPORTS:
+        png = render_card_png(data, map_bytes, width)
+        with open(os.path.join(SCREENSHOT_DIR, name), "wb") as f:
+            f.write(png)
+        print(f"wrote assets/screenshots/{name} ({width}px)")
+    update_readme()
+    print("README.md screenshot section updated")
+
+
+if __name__ == "__main__":
+    main()
