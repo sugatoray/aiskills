@@ -1,0 +1,14 @@
+{
+  "name": "create-lib-docs",
+  "displayName": "Create Library Docs",
+  "version": "1.1.0",
+  "description": "Writes verified user documentation for a library, CLI or framework, structured like FastAPI, Pydantic, DuckDB and Effect docs: Getting Started, Tutorial, How-to Guides, Concepts, Reference, FAQ, SVG diagrams, and llms.txt for AI agents. Every snippet is run before it is published.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills/tree/master/skills/docs/create-lib-docs",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": ["documentation", "docs", "diataxis", "markdown", "llms-txt", "api-reference", "tutorial"]
+}

@@ -50,6 +50,21 @@
         "developer-workflow",
         "repo-related"
       ]
+    },
+    {
+      "name": "docs-skills",
+      "source": "./docs",
+      "description": "Docs skills: writes verified user documentation for a library, CLI or framework, structured like FastAPI, Pydantic, DuckDB and Effect docs: Getting Started, Tutorial, How-to Guides, Concepts, Reference, FAQ, SVG diagrams, and llms.txt for AI agents. Every snippet is run before it is published.",
+      "category": "documentation",
+      "keywords": [
+        "documentation",
+        "docs",
+        "diataxis",
+        "markdown",
+        "llms-txt",
+        "api-reference",
+        "tutorial"
+      ]
     }
   ]
 }
