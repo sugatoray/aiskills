@@ -32,5 +32,4 @@ Each skill's directory has:
 - `scripts/` and `tests/`: deterministic helpers the skill runs, with their regression tests.
 - `meta/MAINTAINERS.md`: development notes. Not read at invocation time.
 - `CHANGELOG.md`: that skill's own version history.
-- `.claude-plugin/plugin.json` and `agents/`: the single-skill plugin manifest and agent display
-  metadata.
+- `agents/`: agent display metadata.

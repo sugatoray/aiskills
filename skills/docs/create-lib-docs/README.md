@@ -13,8 +13,6 @@ SVG diagrams, structured the way FastAPI, Pydantic, DuckDB and Effect structure 
 
 ```text
 create-lib-docs/
-├── .claude-plugin/
-│   └── plugin.json        single-skill Claude Code plugin manifest
 ├── agents/
 │   ├── claude-code.yaml   display name and invocation policy
 │   └── openai.yaml

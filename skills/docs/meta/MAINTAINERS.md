@@ -19,8 +19,7 @@ The root `.claude-plugin/marketplace.json` lists it as `"source": "./docs"` (res
 **Keep it in sync, every time:**
 
 - **Version:** `plugin.json`'s `"version"` must equal `create-lib-docs/SKILL.md`'s
-  `metadata.version` and `create-lib-docs/.claude-plugin/plugin.json`'s `"version"`. Three files, one
-  version, bumped in the same commit.
+  `metadata.version`. Two files, one version, bumped in the same commit.
 - **New skill:** add its `./<skill-name>` path to the `"skills"` array in the commit that adds it.
 - **Skill retired:** remove its entry in the commit that renames its `SKILL.md` away (see
   `../../scrolls/meta/MAINTAINERS.md`, "Renaming convention that discards a skill from installing").

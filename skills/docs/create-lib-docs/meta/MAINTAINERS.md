@@ -14,8 +14,7 @@ request; that's `../SKILL.md`.
   Both use only the standard library, and both are pure functions plus a `main()`, so they can be
   tested without the network.
 - `../CHANGELOG.md`: update it together with `metadata.version` in `SKILL.md`, and keep
-  `../.claude-plugin/plugin.json`'s `version` and the family manifest
-  (`../../.claude-plugin/plugin.json`) equal to it. Three files, one version (see
+  the family manifest (`../../.claude-plugin/plugin.json`) equal to it. Two files, one version (see
   [`../../meta/MAINTAINERS.md`](../../meta/MAINTAINERS.md)).
 - Origin: written in [`sugatoray/devx`](https://github.com/sugatoray/devx) (`skills/docs/create-lib-docs/`,
   1.0.x). This copy is the published one; port fixes in either direction.

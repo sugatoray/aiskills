@@ -9,8 +9,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Published in [`sugatoray/aiskills`](https://github.com/sugatoray/aiskills) under `skills/docs/`,
   installable with `npx skills add sugatoray/aiskills` or as the `docs-skills` Claude Code plugin.
-- `.claude-plugin/plugin.json` (single-skill plugin manifest) and `agents/claude-code.yaml` /
-  `agents/openai.yaml` (display name and implicit-invocation policy), matching the other skills here.
+- `agents/claude-code.yaml` / `agents/openai.yaml` (display name and implicit-invocation policy), matching the other skills here.
 - `metadata.source_url` in `SKILL.md`'s frontmatter.
 
 No change to the skill's instructions, references or scripts.
