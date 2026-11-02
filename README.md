@@ -153,4 +153,40 @@ with every skill twice — pick one.
 
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
-| [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ARDL, time-series and panel regression, Dickey-Fuller/unit-root/Im-Pesaran-Shin tests). | 
+| [Stata](skills/stata/README.md) | `stata-recipes` | Turns a plain-language requirement into a runnable Stata `.do` file or command sequence — good-vs-bad Stata patterns, Python↔Stata interop, and a growing library of named recipes (ARDL, time-series and panel regression, Dickey-Fuller/unit-root/Im-Pesaran-Shin tests). |
+
+---
+
+### 📚 Docs
+
+Skills for writing documentation people and AI agents can rely on: every fact taken from the code,
+every example run before it is published.
+
+**Installation**:
+
+Run one of the following, choose the skill by name: `create-lib-docs` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install docs-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Docs README.md**](skills/docs/README.md).
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Docs](skills/docs/README.md) | `create-lib-docs` | Writes verified user documentation for a library, CLI or framework, structured like FastAPI's, Pydantic's, DuckDB's and Effect's docs: Getting Started, Tutorial, How-to Guides, Concepts, Reference, FAQ, SVG diagrams, and `llms.txt` for AI agents. Every snippet is run before it is published. |
