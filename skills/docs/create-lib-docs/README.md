@@ -14,8 +14,7 @@ SVG diagrams, structured the way FastAPI, Pydantic, DuckDB and Effect structure 
 ```text
 create-lib-docs/
 ├── agents/
-│   ├── claude-code.yaml   display name and invocation policy
-│   └── openai.yaml
+│   └── openai.yaml        display name and invocation policy
 ├── meta/
 │   └── MAINTAINERS.md
 ├── references/

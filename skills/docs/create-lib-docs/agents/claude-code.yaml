@@ -1,5 +1,0 @@
-interface:
-  display_name: "Create-Lib-Docs"
-  short_description: "Writes verified, FastAPI/Pydantic-style user docs for a library or CLI, with diagrams and llms.txt."
-policy:
-  allow_implicit_invocation: true
