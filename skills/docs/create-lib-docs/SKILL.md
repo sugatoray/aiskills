@@ -2,6 +2,7 @@
 name: create-lib-docs
 description: "Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI, Pydantic, DuckDB and Effect structure theirs: a landing page with a 30-second example, Getting Started, a progressive Tutorial with runnable steps, task-oriented How-to Guides, Concepts (explanations with diagrams), an exhaustive Reference (CLI flags, API, config, output schemas, one anchor per error with cause and fix), FAQ/troubleshooting, and llms.txt / llms-full.txt so AI agents can load the docs. Every fact is taken from the code, --help output and tests (never from memory), and every snippet is run before it is published. Use this whenever the user asks to write, create, restructure or overhaul documentation / docs / a user guide / a manual / API reference for a library, package, CLI or framework, wants docs 'like FastAPI's / Pydantic's / DuckDB's / Effect's', wants docs that help both humans and AI agents, or invokes /create-lib-docs."
 license: MIT
+disable-model-invocation: true
 metadata:
   name: create-lib-docs
   type: skill

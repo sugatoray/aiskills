@@ -37,8 +37,9 @@ create-lib-docs/
 
 ## Usage
 
-Invoke as `/create-lib-docs` (or ask for "docs like FastAPI's for this library"). Options are in
-`SKILL.md`: `--lib`, `--out`, `--update` and `--sections`.
+Invoke explicitly as `/create-lib-docs`. The skill sets `disable-model-invocation: true`, so it is
+never loaded automatically, even when you ask for "docs like FastAPI's for this library". Options
+are in `SKILL.md`: `--lib`, `--out`, `--update` and `--sections`.
 
 Install it with `npx skills add sugatoray/aiskills` (choose `create-lib-docs`), or as part of the
 `docs-skills` Claude Code plugin; see [`../README.md`](../README.md).
