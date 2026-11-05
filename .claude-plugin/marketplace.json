@@ -65,6 +65,18 @@
         "api-reference",
         "tutorial"
       ]
+    },
+    {
+      "name": "diagrams-skills",
+      "source": "./diagrams",
+      "description": "Animated architecture and network diagrams with flowing packets, orthogonal routing, selectable nodes, and scenario playback.",
+      "category": "productivity",
+      "keywords": [
+        "diagrams",
+        "architecture",
+        "network-flow",
+        "visualization"
+      ]
     }
   ]
 }

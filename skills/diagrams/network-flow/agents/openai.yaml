@@ -1,0 +1,6 @@
+interface:
+  display_name: "Network Flow"
+  short_description: "Animated network diagrams with inspectable flows"
+  default_prompt: "Use $network-flow to explain a system with animated packets, scenarios, and selectable nodes."
+policy:
+  allow_implicit_invocation: false

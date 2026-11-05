@@ -1,0 +1,558 @@
+{
+  "nodes": [
+    {
+      "id": "docs",
+      "name": "Source documents",
+      "kind": "Knowledge",
+      "sub": "PDFs · pages · records",
+      "color": "ingest",
+      "detail": "Collect approved documents with stable document IDs, version metadata, and access permissions. This demonstration uses an invented employee handbook."
+    },
+    {
+      "id": "chunks",
+      "name": "Parse & chunk",
+      "kind": "Preparation",
+      "sub": "Text + source references",
+      "color": "ingest",
+      "detail": "Extract text and split it into useful passages. Attach document ID, section, chunk ID, version, and permissions so evidence can be traced later."
+    },
+    {
+      "id": "embed",
+      "name": "Embed passages",
+      "kind": "Representation",
+      "sub": "Vectors from each chunk",
+      "color": "ingest",
+      "detail": "Encode each passage using the embedding model used by query retrieval. Store vectors alongside the original text and provenance."
+    },
+    {
+      "id": "index",
+      "name": "Knowledge index",
+      "kind": "Storage",
+      "sub": "Vectors · text · metadata",
+      "color": "ingest",
+      "detail": "Index passage vectors and text with provenance and access metadata. Retrieval uses the same embedding space; permission filters limit which chunks can be returned."
+    },
+    {
+      "id": "query",
+      "name": "User question",
+      "kind": "Input",
+      "sub": "“Can I carry over leave?”",
+      "color": "answer",
+      "detail": "Receive the question and access context. The example asks how many annual leave days can be carried over."
+    },
+    {
+      "id": "retrieve",
+      "name": "Retrieve candidates",
+      "kind": "Search",
+      "sub": "Embed query · top-k search",
+      "color": "answer",
+      "detail": "Embed the question, search the knowledge index, and return candidate passages with their source references. Retry uses a rewritten question. Empty or unusable results go to the evidence gate."
+    },
+    {
+      "id": "rerank",
+      "name": "Rerank evidence",
+      "kind": "Relevance",
+      "sub": "Score · filter · order",
+      "color": "answer",
+      "detail": "Score candidate passages against the question, remove irrelevant evidence, and order the strongest matches. If all candidates are rejected, send the result to the evidence gate."
+    },
+    {
+      "id": "context",
+      "name": "Assemble context",
+      "kind": "Grounding",
+      "sub": "Top passages + source IDs",
+      "color": "answer",
+      "detail": "Build the model input from selected passages and their source IDs. Keep the question and instructions separate from retrieved content, and stay within the context budget."
+    },
+    {
+      "id": "guard",
+      "name": "Evidence gate",
+      "kind": "Failure handling",
+      "sub": "No usable evidence",
+      "color": "fail",
+      "detail": "Handle an empty search or a reranker that rejects every passage. Allow one query rewrite. If the second attempt still has no usable evidence, abstain instead of generating an unsupported answer."
+    },
+    {
+      "id": "rewrite",
+      "name": "Rewrite & retry",
+      "kind": "Bounded recovery",
+      "sub": "One retry · same access",
+      "color": "retry",
+      "detail": "Clarify or expand the search wording without changing the user intent or access scope. Retry retrieval once. The simulation then shows recovered evidence; the exhausted branch remains visible."
+    },
+    {
+      "id": "generate",
+      "name": "Generate answer",
+      "kind": "Language model",
+      "sub": "Answer from supplied evidence",
+      "color": "answer",
+      "detail": "Generate an answer grounded in the retrieved passages and attach source markers to supported claims. Relevant retrieval improves grounding but does not guarantee that every generated claim is correct."
+    },
+    {
+      "id": "citations",
+      "name": "Resolve citations",
+      "kind": "Provenance",
+      "sub": "Claims → source passages",
+      "color": "answer",
+      "detail": "Map generated source markers to real retrieved chunk IDs and source locations. Check that IDs exist and the referenced passages support the claims. Drop or flag unsupported claims; reference validity alone is not proof of support."
+    },
+    {
+      "id": "abstain",
+      "name": "Abstain safely",
+      "kind": "No evidence",
+      "sub": "Ask for a source or clarification",
+      "color": "fail",
+      "detail": "When the retry budget is exhausted, explain that the available documents do not contain enough evidence. Ask for a document or a clearer question; do not invent a supported answer."
+    },
+    {
+      "id": "answer",
+      "name": "Grounded response",
+      "kind": "Output",
+      "sub": "Answer + inspectable sources",
+      "color": "answer",
+      "detail": "Show the answer with inspectable citations. Example: “You may carry over up to five days [1].” The source is the illustrative employee handbook, section 4.2, chunk-017."
+    }
+  ],
+  "edges": [
+    {
+      "id": "parse",
+      "from": "docs",
+      "to": "chunks",
+      "kind": "ingest"
+    },
+    {
+      "id": "encode",
+      "from": "chunks",
+      "to": "embed",
+      "kind": "ingest"
+    },
+    {
+      "id": "store",
+      "from": "embed",
+      "to": "index",
+      "kind": "ingest"
+    },
+    {
+      "id": "ask",
+      "from": "query",
+      "to": "retrieve",
+      "kind": "answer"
+    },
+    {
+      "id": "lookup",
+      "from": "index",
+      "to": "retrieve",
+      "kind": "answer"
+    },
+    {
+      "id": "candidates",
+      "from": "retrieve",
+      "to": "rerank",
+      "kind": "answer"
+    },
+    {
+      "id": "ranked",
+      "from": "rerank",
+      "to": "context",
+      "kind": "answer"
+    },
+    {
+      "id": "prompt",
+      "from": "context",
+      "to": "generate",
+      "kind": "answer"
+    },
+    {
+      "id": "draft",
+      "from": "generate",
+      "to": "citations",
+      "kind": "answer"
+    },
+    {
+      "id": "deliver",
+      "from": "citations",
+      "to": "answer",
+      "kind": "answer"
+    },
+    {
+      "id": "empty",
+      "from": "retrieve",
+      "to": "guard",
+      "kind": "fail"
+    },
+    {
+      "id": "rejected",
+      "from": "rerank",
+      "to": "guard",
+      "kind": "fail"
+    },
+    {
+      "id": "reformulate",
+      "from": "guard",
+      "to": "rewrite",
+      "kind": "retry"
+    },
+    {
+      "id": "retry-search",
+      "from": "rewrite",
+      "to": "retrieve",
+      "kind": "retry"
+    },
+    {
+      "id": "exhausted",
+      "from": "guard",
+      "to": "abstain",
+      "kind": "fail"
+    }
+  ],
+  "scenarios": {
+    "ingest": {
+      "label": "INGEST",
+      "steps": [
+        {
+          "edge": "parse",
+          "text": "Extract text, then preserve document IDs while splitting passages."
+        },
+        {
+          "edge": "encode",
+          "text": "Encode each passage into a vector. Keep the original text and source reference."
+        },
+        {
+          "edge": "store",
+          "text": "Store vectors, passage text, permissions, and provenance in the knowledge index."
+        }
+      ],
+      "scope": [
+        "parse",
+        "encode",
+        "store"
+      ]
+    },
+    "answer": {
+      "label": "ANSWER",
+      "steps": [
+        {
+          "edge": "ask",
+          "text": "Start with the question: “Can I carry over annual leave?”"
+        },
+        {
+          "edge": "lookup",
+          "text": "Search the index using the question embedding and access filters."
+        },
+        {
+          "edge": "candidates",
+          "text": "Return candidate passages with their source references."
+        },
+        {
+          "edge": "ranked",
+          "text": "Rerank the candidates and retain evidence relevant to carryover limits."
+        },
+        {
+          "edge": "prompt",
+          "text": "Assemble the strongest passages into the generation context."
+        },
+        {
+          "edge": "draft",
+          "text": "Generate a draft with source markers for supported claims."
+        },
+        {
+          "edge": "deliver",
+          "text": "Resolve citations: up to five days [1], linked to handbook §4.2."
+        }
+      ],
+      "scope": [
+        "ask",
+        "lookup",
+        "candidates",
+        "ranked",
+        "prompt",
+        "draft",
+        "deliver"
+      ]
+    },
+    "retry": {
+      "label": "RETRY",
+      "steps": [
+        {
+          "edge": "ask",
+          "text": "The initial question enters retrieval."
+        },
+        {
+          "edge": "lookup",
+          "text": "The initial search finds no usable passage."
+        },
+        {
+          "edge": "empty",
+          "text": "No evidence: route to the evidence gate before generating an answer."
+        },
+        {
+          "edge": "reformulate",
+          "text": "One rewrite is allowed: “annual leave carryover policy maximum days.”"
+        },
+        {
+          "edge": "retry-search",
+          "text": "Retry retrieval once with the clearer wording and the same access filters."
+        },
+        {
+          "edge": "lookup",
+          "text": "Search the index again. In this simulated branch, a useful passage is found."
+        },
+        {
+          "edge": "candidates",
+          "text": "Recovered: the handbook carryover passage is returned."
+        },
+        {
+          "edge": "ranked",
+          "text": "Rerank the recovered evidence and keep the strongest passage."
+        },
+        {
+          "edge": "prompt",
+          "text": "Build a context containing the recovered passage and its source ID."
+        },
+        {
+          "edge": "draft",
+          "text": "Generate only after usable evidence is available."
+        },
+        {
+          "edge": "deliver",
+          "text": "Recovered answer: up to five days [1]."
+        },
+        {
+          "edge": "exhausted",
+          "text": "Alternative: if retry also finds no evidence, abstain and request clarification."
+        }
+      ],
+      "scope": [
+        "ask",
+        "lookup",
+        "empty",
+        "reformulate",
+        "retry-search",
+        "candidates",
+        "ranked",
+        "prompt",
+        "draft",
+        "deliver",
+        "exhausted"
+      ]
+    },
+    "all": {
+      "label": "ALL",
+      "steps": [],
+      "scope": [
+        "parse",
+        "encode",
+        "store",
+        "ask",
+        "lookup",
+        "candidates",
+        "ranked",
+        "prompt",
+        "draft",
+        "deliver",
+        "empty",
+        "rejected",
+        "reformulate",
+        "retry-search",
+        "exhausted"
+      ]
+    }
+  },
+  "layouts": {
+    "wide": {
+      "docs": [
+        0,
+        0
+      ],
+      "chunks": [
+        1,
+        0
+      ],
+      "embed": [
+        2,
+        0
+      ],
+      "index": [
+        3,
+        0
+      ],
+      "query": [
+        0,
+        1
+      ],
+      "retrieve": [
+        1,
+        1
+      ],
+      "rerank": [
+        2,
+        1
+      ],
+      "context": [
+        3,
+        1
+      ],
+      "guard": [
+        0,
+        2
+      ],
+      "rewrite": [
+        1,
+        2
+      ],
+      "generate": [
+        2,
+        2
+      ],
+      "citations": [
+        3,
+        2
+      ],
+      "abstain": [
+        0,
+        3
+      ],
+      "answer": [
+        3,
+        3
+      ]
+    },
+    "medium": {
+      "docs": [
+        0,
+        0
+      ],
+      "chunks": [
+        1,
+        0
+      ],
+      "embed": [
+        2,
+        0
+      ],
+      "index": [
+        2,
+        1
+      ],
+      "query": [
+        0,
+        1
+      ],
+      "retrieve": [
+        1,
+        1
+      ],
+      "rerank": [
+        0,
+        2
+      ],
+      "context": [
+        1,
+        2
+      ],
+      "generate": [
+        2,
+        2
+      ],
+      "guard": [
+        0,
+        3
+      ],
+      "rewrite": [
+        1,
+        3
+      ],
+      "citations": [
+        2,
+        3
+      ],
+      "abstain": [
+        0,
+        4
+      ],
+      "answer": [
+        2,
+        4
+      ]
+    },
+    "narrow": {
+      "docs": [
+        0,
+        0
+      ],
+      "chunks": [
+        1,
+        0
+      ],
+      "embed": [
+        0,
+        1
+      ],
+      "index": [
+        1,
+        1
+      ],
+      "query": [
+        0,
+        2
+      ],
+      "retrieve": [
+        1,
+        2
+      ],
+      "rerank": [
+        0,
+        3
+      ],
+      "context": [
+        1,
+        3
+      ],
+      "generate": [
+        0,
+        4
+      ],
+      "citations": [
+        1,
+        4
+      ],
+      "guard": [
+        0,
+        5
+      ],
+      "rewrite": [
+        1,
+        5
+      ],
+      "abstain": [
+        0,
+        6
+      ],
+      "answer": [
+        1,
+        6
+      ]
+    }
+  },
+  "title": "From knowledge to grounded answers.",
+  "subtitle": "Follow the evidence. See what happens when retrieval fails.",
+  "eyebrow": "NETWORK FLOW / RAG ARCHITECTURE",
+  "colors": {
+    "ingest": "#33d4ba",
+    "answer": "#53abff",
+    "retry": "#f9b653",
+    "fail": "#ff7385"
+  },
+  "legend": {
+    "ingest": "Ingestion",
+    "answer": "Answer flow",
+    "retry": "Retry",
+    "fail": "Failure / abstain"
+  },
+  "footer": {
+    "label": "ILLUSTRATIVE EVIDENCE · NOT A LIVE ANSWER",
+    "text": "“Employees may carry over up to five days of annual leave.” [1]",
+    "reference": "[1] Employee handbook · §4.2 · chunk-017",
+    "note": "Document IDs and chunk references stay attached through retrieval, reranking, and generation."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "diagrams-skills",
+  "version": "1.0.0",
+  "description": "Interactive architecture and network diagrams with flowing packets, scenario playback, and inspectable connections.",
+  "author": {"name": "Sugato Ray", "url": "https://github.com/sugatoray"},
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": ["diagrams", "architecture", "network-flow", "visualization"],
+  "skills": ["./network-flow"]
+}

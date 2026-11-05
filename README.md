@@ -192,3 +192,39 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Docs](skills/docs/README.md) | `create-lib-docs` | Writes verified user documentation for a library, CLI or framework, structured like FastAPI's, Pydantic's, DuckDB's and Effect's docs: Getting Started, Tutorial, How-to Guides, Concepts, Reference, FAQ, SVG diagrams, and `llms.txt` for AI agents. Every snippet is run before it is published. |
+
+---
+
+### 🗺️ Diagrams
+
+Skills for interactive architecture and network diagrams: animated packets,
+scenario playback, selectable components, and a single offline HTML file.
+
+**Installation**:
+
+Run one of the following, choose the skill by name: `network-flow` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install diagrams-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Diagrams README.md**](skills/diagrams/README.md).
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Diagrams](skills/diagrams/README.md) | `network-flow` | Turns a system description into an interactive, offline HTML architecture diagram with flowing packets, orthogonal connections, scenario playback, and selectable components. Flows are simulated; no telemetry is collected. See [usage](skills/diagrams/network-flow/README.md). |
