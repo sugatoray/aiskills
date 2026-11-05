@@ -1,6 +1,7 @@
 # Changelog
 
 All notable changes to this skill are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [1.0.0] - 2026-10-17
 
@@ -17,5 +18,12 @@ All notable changes to this skill are documented here.
   original HTML and its exact invocation in `original/`, and the editable graph
   JSON with its rendered HTML in `generated/`.
 - Schema, layout, telemetry boundary, and verification references.
-- Unit and browser regression checks, agent interface metadata, maintainer notes,
-  README, and diagrams-family plugin registration.
+- Unit tests for graph integrity, layouts, serialization safety, unsupported
+  modes, and example reproducibility.
+- Playwright browser check for the RAG example: layout at 1280, 820, 390, and
+  320 px, packet motion, pause/resume, scenario timelines, replay, node tracing,
+  reduced motion, and offline playback. It installs its fake clock before
+  loading the page; installing it afterwards froze the animation under
+  SwiftShader and failed the check on every run.
+- Agent interface metadata, maintainer notes, README, and diagrams-family
+  plugin registration.

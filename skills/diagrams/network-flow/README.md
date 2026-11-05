@@ -29,9 +29,15 @@ npx skills add sugatoray/aiskills --skill network-flow --global
 To install from a branch, append `#<branch>` to the repository. From a local
 checkout, run `npx skills add . --skill network-flow`.
 
-The optional Claude Code family plugin is `diagrams-skills@sugatoray`; register
-this repository's marketplace first. Choose either the skills CLI or plugin to
-avoid duplicate installations.
+Or install the whole diagrams family as a Claude Code plugin:
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install diagrams-skills@sugatoray
+```
+
+Use either the skills CLI or the plugin, not both; installing both gives you
+every skill twice.
 
 ## Run the included example
 
@@ -47,11 +53,15 @@ python3 skills/diagrams/network-flow/scripts/render.py \
 
 Open the generated HTML in a browser. Python generation uses only the standard
 library; playback needs no server, package installation, API key, or network.
-Use `assets/examples/rag/generated/rag.html` to open the already generated example directly.
+To see the result without running anything, open
+[`assets/examples/rag/generated/rag.html`](assets/examples/rag/generated/rag.html).
+It is rendered from `rag.json`, so edit the JSON and render again; never edit the
+HTML by hand. The unit tests fail if the two drift apart.
 
-The original delivered demo is preserved separately in
-[`assets/examples/rag/original/rag_demo.html`](assets/examples/rag/original/rag_demo.html), alongside its
-exact [`rag_prompt.md`](assets/examples/rag/original/rag_prompt.md) invocation.
+The original hand-built demo is kept, frozen, in
+[`assets/examples/rag/original/`](assets/examples/rag/original/) with the exact
+prompt that produced it. See [the example's README](assets/examples/rag/README.md)
+for what each folder holds.
 
 ## Scope
 
@@ -66,8 +76,9 @@ Crossing wires do not imply connections; only edge endpoints define connectivity
 | [SKILL.md](SKILL.md) | Invocation instructions and options |
 | [meta/MAINTAINERS.md](meta/MAINTAINERS.md) | Development and verification |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
-| [references/graph-schema.md](references/graph-schema.md) | Reusable graph contract |
-| [assets/runtime/](assets/runtime/) | Original reusable renderer and styling |
+| [references/](references/) | Graph schema, layout, telemetry boundary, verification |
+| [scripts/](scripts/) | Graph validation and HTML rendering (Python standard library) |
+| [assets/runtime/](assets/runtime/) | Reusable renderer and styling |
 | [assets/examples/rag/](assets/examples/rag/) | RAG example: original snapshot and generated output |
 | [tests/](tests/) | Validation and browser checks |
 
