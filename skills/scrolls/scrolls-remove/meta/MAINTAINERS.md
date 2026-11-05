@@ -23,7 +23,7 @@ For people developing this skill. It isn't read when answering a
 ## Design decisions worth keeping
 
 - **One commit, recorded restore point.** The commit message format is a
-  contract. A future `/scrolls-restore` will parse it, so treat any change
+  contract. `/scrolls-restore` parses it (and tests it end to end), so treat any change
   to it as breaking:
   - the subject, `maint(memory): scrolls-removed`
   - the `- previous commit: #<sha>` line

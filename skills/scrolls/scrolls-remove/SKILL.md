@@ -8,7 +8,7 @@ metadata:
   name: scrolls-remove
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.3.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-remove"
 ---
 
@@ -109,7 +109,7 @@ Scrolls-Kept: AGENTS.md
 Scrolls-Pruned: docs
 ```
 
-The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. A future `/scrolls-restore` reads these with `git log --format='%(trailers)'`. **Never hand-edit or reword this message.**
+The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. `/scrolls-restore` reads these to put back exactly what was removed. **Never hand-edit or reword this message.**
 
 If `git commit` fails (exit 4, usually a pre-commit or commit-msg hook), the removal stays staged. Report the hook's output and the `git commit -F <git-dir>/SCROLLS_REMOVE_MSG` command to finish with. Never retry with `--no-verify`.
 
@@ -126,7 +126,7 @@ Give:
 - the new commit SHA, and the previous-commit SHA it records
 - what was removed, deleted, stripped, purged, kept, or pruned
 - anything flagged for review
-- how to undo it: `git revert --no-edit <new-sha>`, or `git checkout <previous-sha> -- <paths>` to bring back specific files
+- how to undo it: `/scrolls-restore`, which brings back just the memory into the repo as it is now, or `git revert --no-edit <new-sha>` straight away
 
 ## Limitations
 

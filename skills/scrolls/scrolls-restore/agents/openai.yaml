@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Restore"
+  short_description: "Restores the Scrolls agentic memory from a /scrolls-remove checkpoint (or any commit), optionally onto another branch."
+policy:
+  allow_implicit_invocation: false

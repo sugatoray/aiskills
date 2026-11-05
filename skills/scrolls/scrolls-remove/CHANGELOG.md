@@ -3,6 +3,15 @@
 All notable changes to the `scrolls-remove` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.3.0] - 2026-11-05
+
+### Changed
+
+- Synced to `2.3.0` for the new `/scrolls-restore` skill. The removal's
+  behavior and commit message format are unchanged. `SKILL.md` and
+  `meta/MAINTAINERS.md` now refer to `/scrolls-restore` as the way to
+  undo a removal, instead of calling it a future skill.
+
 ## [2.2.0] - 2026-11-05
 
 ### Added

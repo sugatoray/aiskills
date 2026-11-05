@@ -5,7 +5,7 @@ The exact opposite of /scrolls-setup: deletes the scrolls folder
 (docs/.scrolls or docs/scrolls), cleans the SCROLLS.md / CLAUDE.md /
 AGENTS.md pointer chain setup installed, and records everything in ONE
 git commit whose message names the commit just before the removal, so
-the removal can always be undone (and later parsed by /scrolls-restore).
+the removal can always be undone (and parsed by /scrolls-restore).
 
 This file holds all of the logic. remove.sh and remove.ps1 are thin
 launchers that only locate a Python interpreter and pass every argument

@@ -11,20 +11,43 @@ updates. For a specific skill's own version history, see its own
 - [`scrolls-unhide/CHANGELOG.md`](scrolls-unhide/CHANGELOG.md)
 - [`scrolls-help/CHANGELOG.md`](scrolls-help/CHANGELOG.md)
 - [`scrolls-remove/CHANGELOG.md`](scrolls-remove/CHANGELOG.md)
+- [`scrolls-restore/CHANGELOG.md`](scrolls-restore/CHANGELOG.md)
 
 ## Current versions
 
-All six skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
+All seven skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
 Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.2.0 |
-| `scrolls-update` | 2.2.0 |
-| `scrolls-hide` | 2.2.0 |
-| `scrolls-unhide` | 2.2.0 |
-| `scrolls-help` | 2.2.0 |
-| `scrolls-remove` | 2.2.0 |
+| `scrolls-setup` | 2.3.0 |
+| `scrolls-update` | 2.3.0 |
+| `scrolls-hide` | 2.3.0 |
+| `scrolls-unhide` | 2.3.0 |
+| `scrolls-help` | 2.3.0 |
+| `scrolls-remove` | 2.3.0 |
+| `scrolls-restore` | 2.3.0 |
+
+## 2026-11-05 (2.3.0)
+
+- **New skill: `/scrolls-restore`**, the counterpart to `/scrolls-remove`.
+  - It restores only the agentic memory: the scrolls folders, plus the
+    pointer stubs re-inserted into `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md`
+    as those files are now. Nothing else in the repository is rolled back.
+  - By default it uses the newest removal checkpoint in HEAD's history
+    and skips it if that checkpoint was already restored. With no
+    checkpoint, it falls back to the commit before a plain deletion.
+  - It also takes any `<COMMIT>`. `--onto REF` (with `-b NEW_BRANCH` for
+    non-branch refs) commits onto another branch through a temporary
+    worktree, leaving the current checkout untouched.
+  - Flags: `-p`/`-t`/`-l`/`-r`, `--full`, `-f`, `--list [--all]`, `-n`,
+    `-y`, `--no-commit`.
+  - The restore is recorded as one `maint(memory): scrolls-restored`
+    commit with `Scrolls-*` trailers.
+- All six existing skills, `.claude-plugin/plugin.json`, and the root
+  `marketplace.json` were bumped to `2.3.0`. `/scrolls-remove`'s docs now
+  point at `/scrolls-restore`. HELP.md, the READMEs, and the install
+  commands cover the seventh command.
 
 ## 2026-11-05 (2.2.0)
 

@@ -1,6 +1,6 @@
 ---
 name: scrolls-help
-description: "Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove) — what each command does, their shared -p/-t/-l/-r/-u/-x flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the five commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell)."
+description: "Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the six commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell)."
 license: MIT
 compatibility: "bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies)"
 disable-model-invocation: true
@@ -8,7 +8,7 @@ metadata:
   name: scrolls-help
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.3.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help"
 ---
 
