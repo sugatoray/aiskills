@@ -8,7 +8,7 @@ metadata:
   name: scrolls-setup
   type: skill
   author: sugatoray
-  version: "2.1.1"
+  version: "2.2.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup"
 ---
 
@@ -20,7 +20,7 @@ This skill's own `assets/templates/` directory holds the source templates — co
 
 ## Cross-platform
 
-Unlike the other four scrolls skills, this one has no bundled `.sh`/`.ps1` script to choose between — nothing here needed porting. File creation happens through your own Read/Write/Edit tools (not raw shell commands), and the one external command this skill relies on (`git rev-parse --show-toplevel`) behaves identically whether invoked from bash or PowerShell — both support the same `$(...)` command-substitution syntax used throughout this file. Works the same on macOS, Linux, and Windows without any environment-specific branching.
+Unlike the other five scrolls skills, this one has no bundled `.sh`/`.ps1` script to choose between — nothing here needed porting. File creation happens through your own Read/Write/Edit tools (not raw shell commands), and the one external command this skill relies on (`git rev-parse --show-toplevel`) behaves identically whether invoked from bash or PowerShell — both support the same `$(...)` command-substitution syntax used throughout this file. Works the same on macOS, Linux, and Windows without any environment-specific branching.
 
 ## Options
 

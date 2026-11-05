@@ -3,6 +3,15 @@
 All notable changes to the `scrolls-hide` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-11-05
+
+### Changed
+
+- Synced to `2.2.0` to stay in lockstep with the other `scrolls-*`
+  skills. This skill has no functional change of its own in this
+  release. The minor bump is for the new `/scrolls-remove` skill; see
+  `../CHANGELOG.md`.
+
 ## [2.1.1] - 2026-09-21
 
 ### Fixed

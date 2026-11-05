@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to the `scrolls-remove` skill are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [2.2.0] - 2026-11-05
+
+### Added
+
+- Initial release. It undoes `/scrolls-setup`:
+  - deletes the scrolls folder (`.scrolls` or `scrolls`) and a `docs/`
+    folder left empty
+  - deletes `SCROLLS.md`, or cuts the setup block out of it
+  - cuts the scrolls stub out of `CLAUDE.md`, and the dangling pointer
+    out of `AGENTS.md`, deleting either file when nothing else is left
+  - commits the removal as one `maint(memory): scrolls-removed` commit
+    that records the previous commit's SHA, plus human-readable notes and
+    machine-readable `Scrolls-*` trailers
+- Supports `-p`/`-t`/`-l`/`-r`, `-x`/`--purge` (`SCROLLS.md`,
+  `CLAUDE.md`, `AGENTS.md`, any other file name, or `all`), `-n`, `-y`,
+  and `--no-commit`.
+- Refuses when it couldn't be undone: uncommitted, untracked, or ignored
+  content under the targets, or no commits in the repository. Also
+  refuses when unrelated changes are staged.

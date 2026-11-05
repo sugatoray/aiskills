@@ -1,6 +1,6 @@
 # Maintaining the scrolls family
 
-Family-wide maintainer notes for all five `scrolls-*` skills under
+Family-wide maintainer notes for all six `scrolls-*` skills under
 `skills/scrolls/` — not read as part of answering any `/scrolls-*`
 request; each skill's own `SKILL.md` is what's actually read at
 invocation time. For a specific skill's own layout, running its tests,
@@ -10,18 +10,21 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
 - [`scrolls-update/meta/MAINTAINERS.md`](../scrolls-update/meta/MAINTAINERS.md)
 - [`scrolls-hide/meta/MAINTAINERS.md`](../scrolls-hide/meta/MAINTAINERS.md)
 - [`scrolls-unhide/meta/MAINTAINERS.md`](../scrolls-unhide/meta/MAINTAINERS.md)
+- [`scrolls-remove/meta/MAINTAINERS.md`](../scrolls-remove/meta/MAINTAINERS.md)
 - [`scrolls-help/meta/MAINTAINERS.md`](../scrolls-help/meta/MAINTAINERS.md)
   (plus [`SECURITY.md`](../scrolls-help/meta/SECURITY.md) for its local
   `-e`/`--online` server)
 
-## What's shared across all five
+## What's shared across all six
 
 - **License / authorship**: MIT, `metadata.author: sugatoray` — keep
   both consistent across every skill's `SKILL.md`.
 - **Cross-platform**: every bundled script ships as both bash (`.sh`)
   and PowerShell (`.ps1`) with identical flags and behavior.
   `scrolls-setup` is the one exception — no bundled script at all; see
-  its own `meta/MAINTAINERS.md`.
+  its own `meta/MAINTAINERS.md`. `scrolls-remove` keeps all its logic
+  in one stdlib `remove.py`, so its `.sh`/`.ps1` are thin launchers that
+  pass flags through unchanged.
 - **Shared location flags** (`-p`/`-t`/`-l`/`-r`, plus `-u` on
   `scrolls-setup` only): keep semantics and defaults identical across
   every command that takes them. `../README.md`'s "Shared flags" table
@@ -32,14 +35,14 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   developed and changed test-first — write or update the failing test
   in that skill's `tests/` before touching the script, confirm it fails
   for the right reason, then make it pass.
-- **Versioning — locked in lockstep**: all five `scrolls-*` skills
+- **Versioning — locked in lockstep**: all six `scrolls-*` skills
   share a single version number, kept identical across every skill's
-  `metadata.version` in `SKILL.md` — as of this writing, `2.0.0`
+  `metadata.version` in `SKILL.md` — as of this writing, `2.2.0`
   everywhere. A version bump is still only warranted by a change
   visible to an actual `/scrolls-*` invocation (new/changed flag,
   changed default, changed behavior) somewhere in the family — pure
   documentation or test-only changes don't trigger one. But once
-  *anything* in the family earns a bump, bump **all five** to that
+  *anything* in the family earns a bump, bump **all six** to that
   same new number in the same commit, including skills with no
   functional change of their own. Never let one skill's version number
   outpace or lag the others — a mismatched set of versions across the
@@ -54,7 +57,7 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   look for what actually shipped in each shared version, across the
   whole family.
 - **`../README.md`** (this directory's README) is the user-facing
-  overview across all five commands — update it whenever a skill's
+  overview across all six commands — update it whenever a skill's
   directory layout or shared-flag behavior changes, not just that
   skill's own docs.
 

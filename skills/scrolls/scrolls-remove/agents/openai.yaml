@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Remove"
+  short_description: "Removes the Scrolls agentic memory system and commits the removal, recording the restore point."
+policy:
+  allow_implicit_invocation: false
