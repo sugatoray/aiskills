@@ -39,19 +39,19 @@ From the repository root:
 
 ```sh
 python3 skills/diagrams/network-flow/scripts/validate_graph.py \
-  skills/diagrams/network-flow/examples/rag.json
+  skills/diagrams/network-flow/assets/examples/rag/generated/rag.json
 python3 skills/diagrams/network-flow/scripts/render.py \
-  skills/diagrams/network-flow/examples/rag.json \
+  skills/diagrams/network-flow/assets/examples/rag/generated/rag.json \
   --output output/rag-network-flow.html
 ```
 
 Open the generated HTML in a browser. Python generation uses only the standard
 library; playback needs no server, package installation, API key, or network.
-Use `examples/rag.html` to open the already generated example directly.
+Use `assets/examples/rag/generated/rag.html` to open the already generated example directly.
 
 The original delivered demo is preserved separately in
-[`assets/examples/rag_demo.html`](assets/examples/rag_demo.html), alongside its
-exact [`rag_prompt.md`](assets/examples/rag_prompt.md) invocation.
+[`assets/examples/rag/original/rag_demo.html`](assets/examples/rag/original/rag_demo.html), alongside its
+exact [`rag_prompt.md`](assets/examples/rag/original/rag_prompt.md) invocation.
 
 ## Scope
 
@@ -68,7 +68,7 @@ Crossing wires do not imply connections; only edge endpoints define connectivity
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
 | [references/graph-schema.md](references/graph-schema.md) | Reusable graph contract |
 | [assets/runtime/](assets/runtime/) | Original reusable renderer and styling |
-| [examples/](examples/) | RAG configuration and standalone output |
+| [assets/examples/rag/](assets/examples/rag/) | RAG example: original snapshot and generated output |
 | [tests/](tests/) | Validation and browser checks |
 
 License: MIT. Visual inspiration: the interactive diagram in

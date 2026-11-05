@@ -78,7 +78,7 @@ class GraphTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'out.html'
             result = subprocess.run([sys.executable, str(ROOT / 'scripts/render.py'),
-                                     str(ROOT / 'examples/rag.json'), '--mode', 'live',
+                                     str(ROOT / 'assets/examples/rag/generated/rag.json'), '--mode', 'live',
                                      '--output', str(output)], capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('invalid choice', result.stderr)
@@ -92,9 +92,9 @@ class GraphTests(unittest.TestCase):
         with self.assertRaises(ValueError): normalize_graph(value)
 
     def test_bundled_example_is_reproducible(self):
-        graph = json.loads((ROOT / 'examples/rag.json').read_text())
+        graph = json.loads((ROOT / 'assets/examples/rag/generated/rag.json').read_text())
         result = render(graph)
-        self.assertEqual(result, (ROOT / 'examples/rag.html').read_text())
+        self.assertEqual(result, (ROOT / 'assets/examples/rag/generated/rag.html').read_text())
         self.assertEqual(len(normalize_graph(graph)['scenarios']), 4)
 
 

@@ -4,7 +4,7 @@ const path=require('node:path');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 (async()=>{
-const example=process.argv[2]||path.join(__dirname,'../examples/rag.html');
+const example=process.argv[2]||path.join(__dirname,'../assets/examples/rag/generated/rag.html');
 const screenshots=process.env.NETWORK_FLOW_SCREENSHOTS;
 if(screenshots)fs.mkdirSync(screenshots,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.NETWORK_FLOW_CHROMIUM,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});

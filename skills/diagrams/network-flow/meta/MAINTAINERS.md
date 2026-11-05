@@ -11,12 +11,12 @@ For people developing this skill — not read as part of answering a
 - `../agents/openai.yaml` — interface metadata; explicit invocation, like scrolls.
 - `../assets/template.html` — generic shell; never embed a specific system here.
 - `../assets/runtime/` — original generic styling and renderer.
-- `../assets/examples/rag_demo.html` — original delivered standalone HTML snapshot.
-- `../assets/examples/rag_prompt.md` — exact invocation for that snapshot; keep
+- `../assets/examples/rag/original/rag_demo.html` — original delivered standalone HTML snapshot.
+- `../assets/examples/rag/original/rag_prompt.md` — exact invocation for that snapshot; keep
   this pair together. Do not regenerate the snapshot from the newer renderer.
 - `../scripts/` — standard-library schema validation and offline rendering.
 - `../references/` — schema, routing, telemetry boundary, verification.
-- `../examples/rag.json` — source for the generated `rag.html`; edit JSON first.
+- `../assets/examples/rag/generated/rag.json` — source for the generated `rag.html`; edit JSON first.
 - `../tests/` — input-validation, serialization, and browser checks.
 
 ## Frontmatter validation
@@ -42,8 +42,8 @@ From the repository root:
 
 ```sh
 python3 -m unittest discover -s skills/diagrams/network-flow/tests -p 'test_*.py'
-python3 skills/diagrams/network-flow/scripts/validate_graph.py skills/diagrams/network-flow/examples/rag.json
-python3 skills/diagrams/network-flow/scripts/render.py skills/diagrams/network-flow/examples/rag.json --output skills/diagrams/network-flow/examples/rag.html
+python3 skills/diagrams/network-flow/scripts/validate_graph.py skills/diagrams/network-flow/assets/examples/rag/generated/rag.json
+python3 skills/diagrams/network-flow/scripts/render.py skills/diagrams/network-flow/assets/examples/rag/generated/rag.json --output skills/diagrams/network-flow/assets/examples/rag/generated/rag.html
 node --check skills/diagrams/network-flow/assets/runtime/renderer.js
 ```
 

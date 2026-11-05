@@ -46,7 +46,7 @@ requested adapter separately; never label this simulated renderer as telemetry.
    Identify assumptions and label fictional examples. Keep alternative failure
    outcomes explicit; do not depict both outcomes as one successful execution.
 2. **Write graph JSON.** Read [references/graph-schema.md](references/graph-schema.md).
-   Reuse the shape in `examples/rag.json`; replace its content for another system.
+   Reuse the shape in `assets/examples/rag/generated/rag.json`; replace its content for another system.
    Attach source provenance to evidence where relevant. Express simulated steps
    in order. Limit a diagram to 24 nodes; split larger systems into scoped diagrams.
 3. **Lay out and validate.** Prefer curated wide/medium/narrow positions for complex
@@ -93,14 +93,14 @@ requested adapter separately; never label this simulated renderer as telemetry.
 
 ## Bundled example
 
-`examples/rag.json` and its generated `examples/rag.html` cover ingestion,
+`assets/examples/rag/generated/rag.json` and its generated `rag.html` cover ingestion,
 retrieval, reranking, context assembly, generation, citation resolution, bounded
 retry, and abstention. The handbook quotation is illustrative, not sourced policy.
 The retry playback explicitly labels the exhausted path as an alternative outcome.
 
 For the original delivered visual and its exact invocation, use
-`assets/examples/rag_demo.html` and `assets/examples/rag_prompt.md`. These are a
-preserved example pair; `examples/rag.json` remains the editable renderer fixture.
+`assets/examples/rag/original/rag_demo.html` and `rag_prompt.md`. These are a preserved
+example pair; `assets/examples/rag/generated/rag.json` remains the editable renderer fixture.
 
 The design reference is the interactive architecture graphic in
 [Vercel's Python announcement](https://vercel.com/blog/python-on-vercel-is-now-generally-available).

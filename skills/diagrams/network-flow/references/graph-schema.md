@@ -53,4 +53,4 @@ sequences, not distributed-system traces: label concurrent/alternative behavior.
 }
 ```
 
-For a full example with failure and recovery, read `../examples/rag.json`.
+For a full example with failure and recovery, read `../assets/examples/rag/generated/rag.json`.
