@@ -9,8 +9,10 @@ const screenshots=process.env.NETWORK_FLOW_SCREENSHOTS;
 if(screenshots)fs.mkdirSync(screenshots,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.NETWORK_FLOW_CHROMIUM,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const page=await browser.newPage({viewport:{width:1280,height:1100},deviceScaleFactor:1});const requests=[];page.on('request',r=>{if(!r.url().startsWith('file:'))requests.push(r.url());});const errors=[];page.on('pageerror',e=>errors.push(e.message));
-await page.goto(pathToFileURL(path.resolve(example)).href);await page.waitForSelector('#network-flow[data-ready=true]');
+// Install the fake clock before navigation: installing it after load strands the
+// page's pending native requestAnimationFrame under SwiftShader and freezes packets.
 await page.clock.install();
+await page.goto(pathToFileURL(path.resolve(example)).href);await page.waitForSelector('#network-flow[data-ready=true]');
 const sizes=[1280,820,390,320];
 for(const width of sizes){await page.setViewportSize({width,height:1100});await page.clock.runFor(100);
 const report=await page.evaluate(()=>{const r=document.querySelector('#network-flow'),nodes=[...r.querySelectorAll('[data-node]')],boxes=nodes.map(n=>{const b=n.getBoundingClientRect();return{id:n.dataset.node,x:b.x,y:b.y,w:b.width,h:b.height}});const board=r.querySelector('.rf-board').getBoundingClientRect();let collisions=[];for(const g of r.querySelectorAll('[data-edge]')){const values=[...g.querySelector('path').getAttribute('d').matchAll(/[ML]([\d.-]+),([\d.-]+)/g)].map(m=>[Number(m[1])+board.x,Number(m[2])+board.y]);for(let i=1;i<values.length;i++){const p=values[i-1],q=values[i];if(p[0]!==q[0]&&p[1]!==q[1])collisions.push('not orthogonal '+g.dataset.edge);for(const n of boxes){const l=n.x+2,rr=n.x+n.w-2,t=n.y+2,bt=n.y+n.h-2;const hit=p[0]===q[0]?p[0]>l&&p[0]<rr&&Math.max(p[1],q[1])>t&&Math.min(p[1],q[1])<bt:p[1]>t&&p[1]<bt&&Math.max(p[0],q[0])>l&&Math.min(p[0],q[0])<rr;if(hit)collisions.push(g.dataset.edge+' hits '+n.id);}}}return{overflow:document.documentElement.scrollWidth>innerWidth,collisions,count:nodes.length,clipped:nodes.filter(n=>n.scrollHeight>n.clientHeight+1||n.scrollWidth>n.clientWidth+1).map(n=>n.dataset.node)};});
