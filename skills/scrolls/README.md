@@ -8,7 +8,7 @@ entry point; a `SCROLLS.md` file tells new sessions to read it first, with
 a short `CLAUDE.md` pointer to `SCROLLS.md` and a matching `AGENTS.md`
 pointer to `CLAUDE.md` for other agent harnesses.
 
-All five commands work the same way on macOS, Linux, and Windows. Every
+All six commands work the same way on macOS, Linux, and Windows. Every
 bundled script — all but `/scrolls-setup`, which needs none — ships as
 both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version.
 
@@ -23,26 +23,28 @@ to view it as a styled local web page instead of chat text).
 | [`/scrolls-update`](scrolls-update/) | Updates an existing `docs/.scrolls/` to reflect what happened in the current session, following each file's own update rule. The counterpart to `/scrolls-setup` — use this one for every session afterward. |
 | [`/scrolls-hide`](scrolls-hide/) | Renames an already-set-up `docs/scrolls/` to dotfile-hidden `docs/.scrolls/`, rewriting path references so nothing breaks. Retrofit path for a project set up visible. |
 | [`/scrolls-unhide`](scrolls-unhide/) | The opposite of `/scrolls-hide`: renames `docs/.scrolls/` to visible `docs/scrolls/`, rewriting path references so nothing breaks. |
+| [`/scrolls-remove`](scrolls-remove/) | The opposite of `/scrolls-setup`. It removes `docs/.scrolls/` and `SCROLLS.md` and strips the scrolls pointers from `CLAUDE.md`/`AGENTS.md`, all as one `maint(memory): scrolls-removed` commit that records the previous commit's SHA for restoring. `-x`/`--purge` deletes pointer files outright. |
 | [`/scrolls-help`](scrolls-help/) | Crisp, example-driven reference for the whole family — what each command does, their shared flags, and common usage examples. Supports `-e`/`--online` to serve it as a styled local page (light/dark and colorize/plain toggles) instead of chat text. |
 
 ## Shared flags
 
-`/scrolls-setup`, `/scrolls-update`, `/scrolls-hide`, and `/scrolls-unhide`
-share a common set of flags for targeting *where* the scrolls folder lives,
-so the same mental model applies across all four:
+`/scrolls-setup`, `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide`, and
+`/scrolls-remove` share a common set of flags for targeting *where* the
+scrolls folder lives, so the same mental model applies across all five:
 
 | Flag | Meaning |
 | --- | --- |
-| `-p`, `--path` | Custom docs location. Repeatable on `/scrolls-hide`/`/scrolls-unhide` to target multiple locations in one run. |
+| `-p`, `--path` | Custom docs location. Repeatable on `/scrolls-hide`/`/scrolls-unhide`/`/scrolls-remove` to target multiple locations in one run. |
 | `-t`, `--reporoot` | Pin to the git repository's top level, regardless of which subdirectory you're in. |
 | `-l`, `--local` | Pin explicitly to the current directory. |
 | `-r`, `--recurse` | Scan/sweep recursively instead of checking one exact location (e.g. every package in a monorepo in one run). |
+| `-x`, `--purge [files]` | `/scrolls-remove` only. Deletes the named pointer files outright (`SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all`, the default), even when they hold other content. |
 | `-u`, `--unhide` | `/scrolls-setup` only — create the folder visible (`scrolls`) instead of dotfile-hidden (`.scrolls`). |
 
 Default (no `-p`/`-t`/`-l`): the current directory, with a warning first if
 that differs from the repo root, so a subdirectory invocation doesn't
-silently create or miss a disconnected scrolls system. `/scrolls-hide` and
-`/scrolls-unhide` also honor a `DEFAULT_SCROLLS_RELPATH` environment
+silently create or miss a disconnected scrolls system. `/scrolls-hide`,
+`/scrolls-unhide`, and `/scrolls-remove` also honor a `DEFAULT_SCROLLS_RELPATH` environment
 variable to change that default location.
 
 ## Layout
@@ -62,6 +64,8 @@ Command-specific additions:
 - `/scrolls-setup` — `assets/templates/` for the scaffolded markdown
   files. No bundled script or `tests/`: file creation goes through
   Read/Write/Edit tools directly, not a script.
+- `/scrolls-remove` — `scripts/remove.py` (all the logic, stdlib Python)
+  with thin `remove.sh`/`remove.ps1` launchers, and `tests/`.
 - `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide` — `scripts/`
   (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green TDD) for
   their one bundled script.
@@ -78,6 +82,6 @@ carrying out a request — neither is ever read as instructions while a
 
 This directory (`skills/scrolls/`) has its own `meta/MAINTAINERS.md` and
 `CHANGELOG.md` too — family-wide maintainer notes (shared conventions
-across all five, versioning, where the installable artifacts live) and a
+across all six, versioning, where the installable artifacts live) and a
 family-wide change log for anything that isn't tied to a single skill's
 own version, neither of which belong in any single skill's own docs.

@@ -10,19 +10,39 @@ updates. For a specific skill's own version history, see its own
 - [`scrolls-hide/CHANGELOG.md`](scrolls-hide/CHANGELOG.md)
 - [`scrolls-unhide/CHANGELOG.md`](scrolls-unhide/CHANGELOG.md)
 - [`scrolls-help/CHANGELOG.md`](scrolls-help/CHANGELOG.md)
+- [`scrolls-remove/CHANGELOG.md`](scrolls-remove/CHANGELOG.md)
 
 ## Current versions
 
-All five skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
+All six skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
 Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.1.1 |
-| `scrolls-update` | 2.1.1 |
-| `scrolls-hide` | 2.1.1 |
-| `scrolls-unhide` | 2.1.1 |
-| `scrolls-help` | 2.1.1 |
+| `scrolls-setup` | 2.2.0 |
+| `scrolls-update` | 2.2.0 |
+| `scrolls-hide` | 2.2.0 |
+| `scrolls-unhide` | 2.2.0 |
+| `scrolls-help` | 2.2.0 |
+| `scrolls-remove` | 2.2.0 |
+
+## 2026-11-05 (2.2.0)
+
+- **New skill: `/scrolls-remove`**, which undoes `/scrolls-setup`.
+  - It deletes the scrolls folder and `SCROLLS.md`. It strips the scrolls
+    pointers out of `CLAUDE.md` and `AGENTS.md`, deleting either file only
+    if nothing else is left in it.
+  - It commits everything as one `maint(memory): scrolls-removed` commit.
+    The commit records the previous commit's SHA, plus `Scrolls-*` git
+    trailers that a future `/scrolls-restore` can parse.
+  - It takes the shared `-p`/`-t`/`-l`/`-r` flags, with `-r` sweeping
+    every match into the one commit, as on hide/unhide. It also adds
+    `-x`/`--purge`, `-n`/`--dry-run`, `-y`/`--yes`, and `--no-commit`.
+  - All five existing skills, `.claude-plugin/plugin.json`, and the root
+    `marketplace.json` are bumped to `2.2.0` to stay in lockstep.
+    `/scrolls-help`'s `references/HELP.md`, this directory's `README.md`,
+    and the install commands in every per-skill README now cover the
+    sixth command.
 
 ## 2026-09-21 (2.1.1)
 

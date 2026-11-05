@@ -15,7 +15,7 @@ Every command here works the same way on macOS, Linux, and Windows — each bund
 
 That covers the typical single-repo workflow completely. Everything below is for less common cases: running from a subdirectory, monorepos, and toggling the folder's visibility.
 
-## The four commands
+## The five commands
 
 | Command | Does |
 |---|---|
@@ -23,20 +23,22 @@ That covers the typical single-repo workflow completely. Everything below is for
 | `/scrolls-update` | Updates an existing scrolls system to reflect what happened this session — the one to run regularly. |
 | `/scrolls-hide` | Renames an existing `scrolls/` folder to dotfile-hidden `.scrolls/`. |
 | `/scrolls-unhide` | Renames an existing `.scrolls/` folder to visible `scrolls/`. |
+| `/scrolls-remove` | Removes the scrolls system and commits the removal, recording the previous commit so it can be undone. |
 
 `/scrolls-hide` and `/scrolls-unhide` are retrofit tools — for a brand-new project, `/scrolls-setup -u` already creates it visible in one step, no separate toggle needed.
 
 ## Flags
 
-All four commands share the same location flags. `-u` only makes sense on `setup`; `-r` means something specific to each command.
+All five commands share the same location flags. `-u` only makes sense on `setup` and `-x` only on `remove`; `-r` means something specific to each command.
 
-| Flag | Meaning | setup | update | hide / unhide |
-|---|---|---|---|---|
-| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable |
-| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ |
-| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ |
-| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode |
-| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — |
+| Flag | Meaning | setup | update | hide / unhide | remove |
+|---|---|---|---|---|---|
+| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable | repeatable |
+| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ | ✓ |
+| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ | ✓ |
+| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode | sweep mode |
+| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — | — |
+| `-x`, `--purge [files]` | Also delete these pointer files outright: `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all` (default) | — | — | — | ✓ |
 
 `-p`, `-t`, and `-l` are three ways to answer the same question ("where?") — pick at most one. `-r` is independent and stacks with any of them, or with none.
 
@@ -44,6 +46,7 @@ All four commands share the same location flags. `-u` only makes sense on `setup
 - `/scrolls-setup -r` — before creating anything, scans recursively for a scrolls folder that already exists nearby, and checks with you rather than silently creating a disconnected duplicate.
 - `/scrolls-update -r` — if nothing's at the exact expected spot, searches recursively instead of just reporting "not set up" (and asks you to pick if it finds more than one).
 - `/scrolls-hide -r` / `/scrolls-unhide -r` — without it, these check exactly one location; with it, they sweep an entire directory tree for every matching folder (e.g. every package in a monorepo, in one run).
+- `/scrolls-remove -r` — removes every scrolls folder under the directory, with each one's pointer files, in a single commit.
 
 **Default, with no flags at all**: everything happens relative to the current directory. If that's not the git repository's root, `/scrolls-setup` and `/scrolls-update` say so and check with you before proceeding — cwd still wins if you don't have a preference, it just won't happen silently.
 
@@ -88,6 +91,20 @@ Not sure exactly where the scrolls live relative to here:
 /scrolls-hide -t -r
 ```
 
+**Remove the scrolls system (shows the plan and asks first):**
+```
+/scrolls-remove
+```
+Also delete `CLAUDE.md`/`AGENTS.md` outright, even though they hold other notes:
+```
+/scrolls-remove -x CLAUDE.md,AGENTS.md
+```
+Remove every scrolls folder in a monorepo, in one commit:
+```
+/scrolls-remove -t -r
+```
+The commit is `maint(memory): scrolls-removed`, and its body names the previous commit. Undo it with `git revert <sha>`.
+
 ## How the pieces fit together
 
 - `docs/.scrolls/STARTER.md` (or `docs/scrolls/STARTER.md`) is the entry point: it lists the other six files in reading order and says when to update each.
@@ -96,6 +113,7 @@ Not sure exactly where the scrolls live relative to here:
 
 ## Troubleshooting
 
+- **"`/scrolls-remove` refused to run."** Something it would delete has uncommitted, untracked, or ignored changes, or unrelated changes are already staged. The restore point only holds committed content, so it won't risk anything else. Commit or discard those changes, then run it again.
 - **"It created a second scrolls system in a subdirectory I didn't expect."** You ran `/scrolls-setup` or `/scrolls-update` from somewhere other than the repo root without `-t`. Re-run with `-t` to target the repo root, or `-p`/`-l` to be explicit about where you meant.
 - **"hide/unhide didn't find anything."** By default they check exactly one location (`<base>/docs/.scrolls` or `.../scrolls`). Add `-r` to search recursively, or `-t` if you meant the repo root.
 - **"A monorepo package's `SCROLLS.md` got the wrong text after a sweep."** Shouldn't happen — hide/unhide only ever touch the one `SCROLLS.md` that's a direct sibling of the `docs` folder being renamed, never a broader search, specifically to avoid cross-wiring sibling packages that happen to share the same short reference text. `CLAUDE.md` itself is never touched by a sweep — it's a fixed pointer to `SCROLLS.md`, not a scrolls-path reference. If this happens, it's a bug worth reporting.

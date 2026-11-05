@@ -44,7 +44,7 @@ visible to a `/scrolls-hide` invocation changes (new flag, changed default,
 changed rename/rewrite behavior) — not for pure documentation or test-only
 changes.
 
-This skill's version is locked in step with the other four `scrolls-*`
+This skill's version is locked in step with the other five `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all five to the same new number in the same commit,
+here means bumping all six to the same new number in the same commit,
 even the ones with nothing of their own to report that release.
