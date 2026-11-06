@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Copies <repo>/skills -> <package>/skills (and the repo LICENSE) so the
-// published tarball carries the skills folder intact. Runs on `prepack`,
+// Copies <repo>/skills -> <package>/skills, plus the repo LICENSE and
+// <repo>/.claude-plugin/marketplace.json (used by the CLI for skill groups),
+// so the published tarball carries the skills folder intact. Runs on `prepack`,
 // i.e. before every `npm pack` / `npm publish`.
 //
 //   node scripts/vendor-skills.mjs          # (re)vendor
 //   node scripts/vendor-skills.mjs --clean  # remove vendored copies
 
-import { cpSync, existsSync, readdirSync, renameSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +17,8 @@ const srcSkills = join(repoRoot, "skills");
 const destSkills = join(pkgDir, "skills");
 const srcLicense = join(repoRoot, "LICENSE");
 const destLicense = join(pkgDir, "LICENSE");
+const srcMarket = join(repoRoot, ".claude-plugin", "marketplace.json");
+const destMarketDir = join(pkgDir, ".claude-plugin");
 
 // Local build/runtime junk that is never part of a skill.
 const JUNK = new Set([
@@ -28,9 +31,10 @@ const JUNK = new Set([
 const isJunk = (p) => JUNK.has(basename(p)) || p.endsWith(".pyc");
 
 rmSync(destSkills, { recursive: true, force: true });
+rmSync(destMarketDir, { recursive: true, force: true });
 if (process.argv.includes("--clean")) {
   rmSync(destLicense, { force: true });
-  console.log("[aiskills] removed vendored skills/ and LICENSE");
+  console.log("[aiskills] removed vendored skills/, .claude-plugin/ and LICENSE");
   process.exit(0);
 }
 
@@ -44,6 +48,12 @@ cpSync(srcSkills, destSkills, {
   filter: (src) => !isJunk(src),
 });
 if (existsSync(srcLicense)) cpSync(srcLicense, destLicense);
+if (existsSync(srcMarket)) {
+  mkdirSync(destMarketDir, { recursive: true });
+  cpSync(srcMarket, join(destMarketDir, "marketplace.json"));
+} else {
+  console.error(`[aiskills] warning: ${srcMarket} not found; skill groups will be unavailable`);
+}
 
 // npm never ships files named .gitignore/.npmignore (and would treat them
 // as ignore rules while packing). Rename them; the installer restores the

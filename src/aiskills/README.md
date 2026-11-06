@@ -26,9 +26,10 @@ npx @sugatoray-ai/aiskills install        # or: aiskills install
 ## CLI
 
 ```text
-aiskills install   [-g|-p] [-a agents] [-s skills] [--copy] [-- <extra npx skills args>]
-aiskills uninstall [-g|-p] [-a agents] [-s skills] [--purge] [-f] [-n] [-- <extra args>]
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [-- <extra npx skills args>]
+aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
+aiskills groups [--json]     # skill groups and the skills in each
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
 aiskills sync                # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
@@ -41,7 +42,46 @@ Install examples:
 aiskills install -a claude-code,codex          # only these agents
 aiskills install -s scrolls-setup,scrolls-help # only these skills
 aiskills install --project                     # into the current project
+aiskills install --group scrolls --global --agent claude-code
 ```
+
+## Skill groups
+
+The package bundles the repo's `.claude-plugin/marketplace.json` and saves it
+to `~/.config/sugatoray/aiskills/.claude-plugin/marketplace.json`, next to
+`skills/`. The CLI reads that file only to group the skills. Nothing is
+installed as a Claude Code plugin; installs still go through `npx skills add`.
+
+Each plugin entry in the file is a group. Its skills are the `SKILL.md` files
+under the entry's `source` folder.
+
+```sh
+aiskills groups
+```
+
+| Group | Alias | Skills |
+| --- | --- | --- |
+| `scrolls-skills` | `scrolls` | scrolls-setup, -update, -hide, -unhide, -remove, -restore, -help |
+| `stata-skills` | `stata` | stata-recipes |
+| `repo-related-skills` | `repo-related` | create-issues-update-pr |
+| `docs-skills` | `docs` | create-lib-docs |
+| `diagrams-skills` | `diagrams` | network-flow |
+| `personas-skills` | `personas` | prodigy |
+| `all` | | every skill, including ones in no group (e.g. newsletter-ai) |
+
+You can give a group by its full name or its alias (the name without
+`-skills`), in any letter case. `-G/--group` takes a comma-separated list, can
+be repeated, and combines with `-s`:
+
+```sh
+aiskills install --group scrolls --global --agent claude-code
+aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+aiskills install -G stata --project
+aiskills uninstall -G scrolls          # remove a whole group
+```
+
+The groups update automatically whenever a new plugin entry is added to the
+repo's `marketplace.json` and the package is republished.
 
 ## Uninstall
 
@@ -50,7 +90,8 @@ aiskills install --project                     # into the current project
 - **Full uninstall** (no `-s`): removes every skill that `npx skills list`
   says was installed from `~/.config/sugatoray/aiskills`. Skills with the same
   name from other sources aren't touched.
-- **Partial uninstall** (`-s a,b`): removes only the named skills. Names this
+- **Partial uninstall** (`-s a,b` and/or `-G group`): removes only the named
+  skills, or every installed skill in the named groups. Names this
   package doesn't provide are rejected unless you pass `-f/--force`.
 - **Per agent** (`-a codex`): unlinks the skills from those agents only.
 - **`--purge`**: after a full uninstall, also deletes
@@ -99,6 +140,7 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_SCOPE=project` | Install to the project npm was invoked from instead of globally |
 | `AISKILLS_AGENTS` | Comma-separated agent list passed as `--agent` |
 | `AISKILLS_SKILLS` | Comma-separated skill list passed as `--skill` (default: all) |
+| `AISKILLS_GROUPS` | Comma-separated skill groups (combined with `AISKILLS_SKILLS`) |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
@@ -106,8 +148,9 @@ aiskills skills update -g                       # npx skills update -g
 ## Maintainers: building & publishing
 
 The package source lives in `src/aiskills/` of the repo. The skills are **not**
-committed here. `prepack` (`scripts/vendor-skills.mjs`) copies `<repo>/skills`
-and `LICENSE` into this folder right before `npm pack` / `npm publish`.
+committed here. `prepack` (`scripts/vendor-skills.mjs`) copies `<repo>/skills`,
+`<repo>/.claude-plugin/marketplace.json` and `LICENSE` into this folder right
+before `npm pack` / `npm publish`.
 
 ```sh
 cd src/aiskills

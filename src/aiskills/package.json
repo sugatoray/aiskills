@@ -30,6 +30,7 @@
     "scripts/installer.mjs",
     "scripts/postinstall.mjs",
     "skills/",
+    ".claude-plugin/marketplace.json",
     "README.md",
     "LICENSE"
   ],

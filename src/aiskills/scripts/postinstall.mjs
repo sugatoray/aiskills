@@ -7,7 +7,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { PKG_DIR, PKG_SKILLS, envOptions, log, skillsAdd, syncSkills, warn } from "./installer.mjs";
+import { PKG_DIR, PKG_SKILLS, envOptions, log, selectedSkills, skillsAdd, syncSkills, warn } from "./installer.mjs";
 
 const truthy = (v) => /^(1|true|yes)$/i.test(v || "");
 
@@ -30,7 +30,8 @@ function main() {
   const opts = envOptions();
   // Project scope installs into the directory npm was invoked from.
   const cwd = opts.global ? root : process.env.INIT_CWD || process.cwd();
-  const status = skillsAdd(root, { ...opts, cwd });
+  const picked = selectedSkills(opts, root); // AISKILLS_SKILLS / AISKILLS_GROUPS
+  const status = skillsAdd(root, { ...opts, skills: picked ?? ["*"], cwd });
   if (status !== 0) {
     warn(`'npx skills add' exited with ${status}. Skills are saved in ${root}/skills;`);
     warn(`register them later with:  npx skills add ${root} --global`);

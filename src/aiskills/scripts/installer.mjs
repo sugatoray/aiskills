@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 export const PKG_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const PKG_SKILLS = join(PKG_DIR, "skills");
+export const MARKETPLACE_REL = join(".claude-plugin", "marketplace.json");
 
 /** ~/.config/sugatoray/aiskills (override with AISKILLS_HOME). */
 export function installRoot() {
@@ -35,7 +36,7 @@ function restoreDotfiles(dir) {
 }
 
 /** Copy <package>/skills -> <installRoot>/skills, atomically-ish. */
-export function syncSkills({ root = installRoot(), version } = {}) {
+export function syncSkills({ root = installRoot(), version, quiet = false } = {}) {
   if (!existsSync(PKG_SKILLS)) {
     throw new Error(`no vendored skills folder at ${PKG_SKILLS}`);
   }
@@ -47,6 +48,15 @@ export function syncSkills({ root = installRoot(), version } = {}) {
   restoreDotfiles(staging);
   rmSync(dest, { recursive: true, force: true });
   renameSync(staging, dest);
+  // Keep the repo layout: <root>/.claude-plugin/marketplace.json next to
+  // <root>/skills. Only used for grouping (`--group`); `npx skills add`
+  // discovers the same skills with or without it.
+  const market = join(root, MARKETPLACE_REL);
+  rmSync(market, { force: true });
+  if (existsSync(join(PKG_DIR, MARKETPLACE_REL))) {
+    mkdirSync(dirname(market), { recursive: true });
+    cpSync(join(PKG_DIR, MARKETPLACE_REL), market);
+  }
   writeFileSync(
     join(root, "aiskills.json"),
     JSON.stringify(
@@ -55,7 +65,7 @@ export function syncSkills({ root = installRoot(), version } = {}) {
       2,
     ) + "\n",
   );
-  log(`skills saved to ${dest}`);
+  if (!quiet) log(`skills saved to ${dest}`);
   return root;
 }
 
@@ -119,24 +129,99 @@ export function skillsAdd(root = installRoot(), opts = {}) {
 
 // ---------------------------------------------------------------- uninstall
 
-/** Skill names (SKILL.md frontmatter `name:`, else folder name) under <root>/skills. */
-export function packageSkillNames(root = installRoot()) {
+/** Skill names (SKILL.md frontmatter `name:`, else folder name) under <dir>. */
+export function skillNamesIn(dir) {
   const names = new Set();
-  const base = join(root, "skills");
-  if (!existsSync(base)) return names;
-  (function walk(dir) {
-    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+  if (!existsSync(dir)) return names;
+  (function walk(d) {
+    for (const ent of readdirSync(d, { withFileTypes: true })) {
       if (ent.name === "node_modules" || ent.name === ".git") continue;
-      const p = join(dir, ent.name);
+      const p = join(d, ent.name);
       if (ent.isDirectory()) walk(p);
       else if (ent.name === "SKILL.md") {
         const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(p, "utf8"));
         const m = fm && /^name:\s*["']?([^"'\r\n]+?)["']?\s*$/m.exec(fm[1]);
-        names.add(m ? m[1].trim() : basename(dir));
+        names.add(m ? m[1].trim() : basename(d));
       }
     }
-  })(base);
+  })(dir);
   return names;
+}
+
+/** All skill names under <root>/skills. */
+export function packageSkillNames(root = installRoot()) {
+  return skillNamesIn(join(root, "skills"));
+}
+
+// ------------------------------------------------------------------- groups
+
+/**
+ * Skill groups, taken from <root>/.claude-plugin/marketplace.json: each
+ * plugin entry is a group whose skills are the SKILL.md files under its
+ * `source` folder (relative to metadata.pluginRoot). Returns
+ * { groups: [{ name, alias, description, source, skills: [] }], ungrouped: [] }.
+ */
+export function loadGroups(root = installRoot()) {
+  const file = join(root, MARKETPLACE_REL);
+  const all = packageSkillNames(root);
+  if (!existsSync(file)) return { groups: [], ungrouped: [...all].sort(), missing: true };
+  const market = JSON.parse(readFileSync(file, "utf8"));
+  const pluginRoot = resolve(root, market?.metadata?.pluginRoot ?? ".");
+  const groups = [];
+  for (const p of market.plugins ?? []) {
+    if (!p?.name || typeof p.source !== "string") continue; // remote sources: not bundled
+    const dir = resolve(pluginRoot, p.source);
+    groups.push({
+      name: p.name,
+      alias: p.name.replace(/-skills$/, ""),
+      description: p.description ?? "",
+      source: dir,
+      skills: [...skillNamesIn(dir)].sort(),
+    });
+  }
+  const grouped = new Set(groups.flatMap((g) => g.skills));
+  return { groups, ungrouped: [...all].filter((n) => !grouped.has(n)).sort() };
+}
+
+/**
+ * Expand group names (exact plugin name, or without the "-skills" suffix,
+ * case-insensitive; "all" = every skill) into skill names.
+ */
+export function skillsForGroups(names, root = installRoot()) {
+  const { groups, missing } = loadGroups(root);
+  if (missing) throw new Error(`no ${MARKETPLACE_REL} in ${root}; run 'aiskills sync' first`);
+  const out = new Set();
+  const unknown = [];
+  for (const raw of names) {
+    const n = raw.toLowerCase();
+    if (n === "all") {
+      packageSkillNames(root).forEach((s) => out.add(s));
+      continue;
+    }
+    const g = groups.find((x) => x.name.toLowerCase() === n || x.alias.toLowerCase() === n);
+    if (g) g.skills.forEach((s) => out.add(s));
+    else unknown.push(raw);
+  }
+  if (unknown.length) {
+    throw new Error(
+      `unknown group(s): ${unknown.join(", ")}\n` +
+        `  available: ${groups.map((g) => `${g.name} (${g.alias})`).join(", ")}, all\n` +
+        `  see 'aiskills groups'`,
+    );
+  }
+  return [...out].sort();
+}
+
+/**
+ * Final skill list for install/uninstall from opts.skills (+ opts.groups).
+ * Returns null for "everything" (no -s/-G given, or -s '*').
+ */
+export function selectedSkills(opts, root = installRoot()) {
+  const explicit = (opts.skills ?? []).filter((s) => s !== "*");
+  const wantAll = (opts.skills ?? []).includes("*") && !(opts.groups ?? []).length && !explicit.length;
+  if (wantAll || (!explicit.length && !(opts.groups ?? []).length)) return null;
+  const fromGroups = (opts.groups ?? []).length ? skillsForGroups(opts.groups, root) : [];
+  return [...new Set([...explicit, ...fromGroups])].sort();
 }
 
 /**
@@ -186,6 +271,7 @@ export function envOptions() {
     global: (e.AISKILLS_SCOPE || "global").toLowerCase() !== "project",
     agents: csv(e.AISKILLS_AGENTS),
     skills: csv(e.AISKILLS_SKILLS).length ? csv(e.AISKILLS_SKILLS) : ["*"],
+    groups: csv(e.AISKILLS_GROUPS),
     copy: /^(1|true|yes)$/i.test(e.AISKILLS_COPY || ""),
   };
 }
