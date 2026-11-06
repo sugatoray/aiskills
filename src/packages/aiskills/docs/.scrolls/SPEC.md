@@ -23,7 +23,7 @@ Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/
 `-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable, which the npm postinstall step also reads.
 
 ## Uninstall
-`aiskills uninstall` removes, through `npx skills remove`, exactly the skills `npx skills list` says came from `~/.config/sugatoray/aiskills`. It also supports partial (`-s`, `-G`), per-agent (`-a`) and project (`-p`) removal, `--purge` to delete the local folder after a full uninstall, `-n/--dry-run`, and `-f/--force` for names the package doesn't provide.
+`aiskills uninstall` removes, through `npx skills remove`, exactly the skills `npx skills list` says came from `~/.config/sugatoray/aiskills`. It also supports partial (`-s`, `-G`), per-agent (`-a`) and project (`-p`) removal, `--purge` to delete the local folder after a full uninstall, `-n/--dry-run` (prints the exact `npx` command, pinned version included), and `-f/--force` for names the package doesn't provide.
 
 ## Skill groups from marketplace.json
 Each plugin entry in the bundled `marketplace.json` is a group: its `name` is the group name, and its skills are those whose original folder (per `.aiskills/layout.json`) is under its `source` folder. `-G/--group` accepts the name or an alias the CLI derives by stripping `-skills` (`scrolls-skills` → `scrolls`), plus the built-in `all`. `aiskills groups [--json]` lists them. No Claude Code plugin is installed; the file is only read for grouping.
@@ -36,6 +36,9 @@ With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always w
 
 ## Safety checks
 `npx` always runs a pinned `skills@1.7.6` (override: `AISKILLS_SKILLS_VERSION`); `--route` ignores registry results with anything but letters, digits, `.`, `_`, `-`; on Windows no `cmd.exe` shell characters ever reach `npx`; `sync`/`install`/`uninstall --purge` refuse to replace or delete a folder that isn't an aiskills folder. See `SECURITY.md`.
+
+## User documentation
+Full user docs live in the repo at `src/packages/aiskills/docs/docsite/` (not in the npm package): getting started, a page for every bundled skill, a 5-step tutorial, how-to guides (including use from AI agents and scripts), concepts with diagrams, an exhaustive reference (every command, option, environment variable, file format, and error with its cause and fix), and an FAQ. The same docs come as one HTML page with tabs, search and a dark theme (`index.html`), and as `llms.txt` / `llms-full.txt` for AI agents. Every example that shows output was run, and the tests fail if the docs drift from the code or the skills.
 
 ## `.skillsignore`
 A `.skillsignore` (`.gitignore` syntax) in the repo's `skills/` or any folder below leaves matching files, folders or whole skills out of the package, and so out of every install and the `--nested` rebuild. The ignore files never ship; ignoring only a `SKILL.md` is refused; what was left out is listed in `.aiskills/layout.json` (`ignored`).
