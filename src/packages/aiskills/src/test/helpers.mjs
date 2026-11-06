@@ -2,7 +2,7 @@
 //
 // Nothing here touches the real $HOME, the real package folder, or the
 // network: every test gets its own temp folder holding
-//   pkg/    a copy of src/scripts/ (no tests) and package.json plus a small fixture
+//   pkg/    a copy of src/bin/, src/scripts/ and package.json plus a small fixture
 //           skills/ tree and .claude-plugin/marketplace.json, laid out the
 //           way the published tarball is (incl. a renamed _gitignore)
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
@@ -78,7 +78,7 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 
 /**
  * A fresh sandbox. Returns helpers:
- *   run(args, {env})       run src/scripts/cli.mjs, returns { status, out, calls }
+ *   run(args, {env})       run src/bin/cli.mjs, returns { status, out, calls }
  *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
@@ -86,7 +86,7 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 export function sandbox() {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
-  cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
+  for (const d of ["bin", "scripts"]) cpSync(join(PKG_SRC, "src", d), join(pkg, "src", d), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
   writeFixtureTree(pkg);
   const home = join(dir, "home");
@@ -136,7 +136,7 @@ export function sandbox() {
     pkg,
     home,
     root,
-    run: (args, { env } = {}) => exec(join(pkg, "src", "scripts", "cli.mjs"), args, env),
+    run: (args, { env } = {}) => exec(join(pkg, "src", "bin", "cli.mjs"), args, env),
     postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),

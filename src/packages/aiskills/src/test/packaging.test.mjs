@@ -65,7 +65,7 @@ describe("npm pack", () => {
       "package.json",
       "README.md",
       "LICENSE",
-      "src/scripts/cli.mjs",
+      "src/bin/cli.mjs",
       "src/scripts/installer.mjs",
       "src/scripts/postinstall.mjs",
       ".claude-plugin/marketplace.json",
@@ -79,7 +79,7 @@ describe("npm pack", () => {
   test("all shipped code is the runtime files under src/scripts/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["src/scripts/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
+    assert.deepEqual(code.sort(), ["src/bin/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
   });
 
   test("leaves out tests, dev scripts and the scrolls memory", (t) => {

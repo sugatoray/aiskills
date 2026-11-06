@@ -23,7 +23,7 @@ import {
   skillsRemove,
   syncSkills,
   warn,
-} from "./installer.mjs";
+} from "../scripts/installer.mjs";
 
 const { version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
 const ROOT = installRoot();

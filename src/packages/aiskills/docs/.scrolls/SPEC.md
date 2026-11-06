@@ -11,7 +11,7 @@ The repo's `skills/` folder ships inside the package unchanged (file-for-file id
 Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/scripts/postinstall.mjs`)
 
 ## `aiskills` CLI
-`install`, `uninstall`, `installed`, `groups`, `find`, `sync`, `list`, `path`, and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/scripts/cli.mjs`, shared logic in `src/scripts/installer.mjs`)
+`install`, `uninstall`, `installed`, `groups`, `find`, `sync`, `list`, `path`, and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/bin/cli.mjs`, shared logic in `src/scripts/installer.mjs`)
 
 ## Choosing what to install: scope, agents, skills
 `-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable, which the npm postinstall step also reads.

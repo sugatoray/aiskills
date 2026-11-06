@@ -23,10 +23,10 @@
   "author": "Sugato Ray (https://github.com/sugatoray)",
   "type": "module",
   "bin": {
-    "aiskills": "src/scripts/cli.mjs"
+    "aiskills": "src/bin/cli.mjs"
   },
   "files": [
-    "src/scripts/cli.mjs",
+    "src/bin/cli.mjs",
     "src/scripts/installer.mjs",
     "src/scripts/postinstall.mjs",
     "skills/",
