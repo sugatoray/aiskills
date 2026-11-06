@@ -39,7 +39,7 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   for the right reason, then make it pass.
 - **Versioning — locked in lockstep**: all seven `scrolls-*` skills
   share a single version number, kept identical across every skill's
-  `metadata.version` in `SKILL.md` — as of this writing, `2.3.0`
+  `metadata.version` in `SKILL.md` — as of this writing, `2.4.0`
   everywhere. A version bump is still only warranted by a change
   visible to an actual `/scrolls-*` invocation (new/changed flag,
   changed default, changed behavior) somewhere in the family — pure

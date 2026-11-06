@@ -3,11 +3,15 @@
 All notable changes to the `scrolls-restore` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [2.4.0] - 2026-11-06
+
+### Fixed
+
+- The message for an already-restored checkpoint no longer says "Nothing to restore" twice.
 
 ### Added
 
-- `assets/EXAMPLES.md`: worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output sections, written in ASD-STE100 Simplified Technical English. Linked from `SKILL.md` (as an on-demand read) and `README.md`. Documentation only; no version bump.
+- `assets/EXAMPLES.md`: worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output sections, written in ASD-STE100 Simplified Technical English. Linked from `SKILL.md` (as an on-demand read) and `README.md`.
 
 ## [2.3.0] - 2026-11-05
 

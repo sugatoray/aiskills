@@ -6,6 +6,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 - **`master`:** six `scrolls-*` skills at `2.2.0`: setup, update, hide, unhide, help, and the new **remove**. PR #7 (2.1.0) and PR #110 (`/scrolls-remove`, 2.2.0) are both merged.
 - **Branch `claude/scrolls-restore`:** one commit (`2a46fb5`) on top of `master` adds **`/scrolls-restore`** and bumps the whole family to `2.3.0`. It's pushed, but **no PR has been opened yet**.
+- **Later on that branch:** every skill gained `assets/EXAMPLES.md` (ASD-STE100, linked from `SKILL.md` and `README.md`), and the family was bumped to **`2.4.0`**. PR #114 is open for the branch, with issues #115–#118.
 - **Stale branch:** `claude/confident-maxwell-d6ws37` on the remote still points at the pre-squash `/scrolls-remove` commit (`d5f06d2`), whose content is already on `master` as `c692f5d`. Leave it or delete it; don't build on it.
 
 ## What just happened

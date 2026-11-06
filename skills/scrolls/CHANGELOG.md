@@ -20,21 +20,24 @@ Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.3.0 |
-| `scrolls-update` | 2.3.0 |
-| `scrolls-hide` | 2.3.0 |
-| `scrolls-unhide` | 2.3.0 |
-| `scrolls-help` | 2.3.0 |
-| `scrolls-remove` | 2.3.0 |
-| `scrolls-restore` | 2.3.0 |
+| `scrolls-setup` | 2.4.0 |
+| `scrolls-update` | 2.4.0 |
+| `scrolls-hide` | 2.4.0 |
+| `scrolls-unhide` | 2.4.0 |
+| `scrolls-help` | 2.4.0 |
+| `scrolls-remove` | 2.4.0 |
+| `scrolls-restore` | 2.4.0 |
 
-## 2026-11-06 (docs, no version bump)
+## 2026-11-06 (2.4.0)
 
-- **`assets/EXAMPLES.md` added to all seven `scrolls-*` skills.**
+- **All seven skills bumped to `2.4.0`** together, in lockstep, along with `.claude-plugin/plugin.json`.
+- **`assets/EXAMPLES.md` added to every `scrolls-*` skill.**
   - Each file holds worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output.
-  - The examples are written in ASD-STE100 Simplified Technical English (about 80%), and each file states that rule at the top.
-  - Expected output for the bundled scripts (hide, unhide, remove, restore, help `-e`) was captured from real runs.
-  - Each `SKILL.md` links its file as an on-demand read (progressive disclosure), and each `README.md` links it and lists it in `## Layout`.
+  - Written in ASD-STE100 Simplified Technical English (about 80%), with that rule stated at the top of each file.
+  - Expected output for the bundled scripts (hide, unhide, remove, restore, help `-e`/`--stop`) was captured from real runs.
+  - Each `SKILL.md` links the file as an on-demand read (progressive disclosure), and each `README.md` links it and lists it in `## Layout`.
+- **`/scrolls-restore`:** the message for an already-restored checkpoint no longer says "Nothing to restore" twice.
+- **`/scrolls-remove`:** `SKILL.md` states again exactly how `/scrolls-restore` reads the trailers (`git log --format='%(trailers:unfold,only)'`, with `--grep='^Scrolls-Action:'`).
 
 ## 2026-11-05 (2.3.0)
 

@@ -22,7 +22,7 @@ Every one of the five `scrolls-*` skills now has its own `meta/MAINTAINERS.md` (
 
 ## Family version lockstep
 
-All `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.2.0` on `master` (six skills), `2.3.0` on the unmerged `claude/scrolls-restore` branch (seven skills).
+All `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.2.0` on `master` (six skills), `2.4.0` on the unmerged `claude/scrolls-restore` branch (seven skills).
 
 ## Idempotent `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill on `/scrolls-update`
 
