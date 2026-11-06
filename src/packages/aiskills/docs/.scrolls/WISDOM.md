@@ -33,6 +33,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 Bad patterns or decisions to never take, and why they were rejected.
 
 - Never let the postinstall step fail `npm install`. Catch everything, warn, and point at `aiskills install`.
+- Don't add `s`, `l` or `u` as command aliases: `s` could mean `sync` or `skills`, `l` reads as `list` but sits next to `ls` (= `installed`), and many CLIs use `u` for "update". Prefer `npm`'s own short forms (`i`, `r`, `ls`).
 - Don't make install-time behaviour opt-in through an env var. The install script stays (so scanners and pnpm still flag it), the hint it prints is hidden by npm 7+, and users lose the one-step install. Either keep the script doing its job or remove it entirely (AIS-7).
 - Never run `npx skills` interactively from scripts; always pass `--yes` (postinstall has no TTY).
 - Never auto-pick among several registry matches for a name under `--route`. List them and make the user pin `owner/repo@skill`; it's third-party code with full agent permissions.
