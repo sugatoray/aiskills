@@ -40,5 +40,8 @@ With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always w
 ## User documentation
 Full user docs live in the repo at `src/packages/aiskills/docs/docsite/` (not in the npm package): getting started, a page for every bundled skill, a 5-step tutorial, how-to guides (including use from AI agents and scripts), concepts with diagrams, an exhaustive reference (every command, option, environment variable, file format, and error with its cause and fix), and an FAQ. The same docs come as one HTML page with tabs, search and a dark theme (`index.html`), and as `llms.txt` / `llms-full.txt` for AI agents. Every example that shows output was run, and the tests fail if the docs drift from the code or the skills.
 
+## Banner
+The package README and the docs' landing page open with a banner (1280 × 640): the version, Node range, license, skill and group counts, the install command, a terminal demo of real `ais`/`aix` output, and the skill groups. Its values come from the package and the bundled skills, so it stays accurate across releases. Maintainers edit it in `docs/banner/config.yaml`, or in the browser (`docs/banner/aiskills-banner.html`), and export PNGs for dark, white, black or transparent backgrounds; text that wouldn't be readable on a background can't be chosen.
+
 ## `.skillsignore`
 A `.skillsignore` (`.gitignore` syntax) in the repo's `skills/` or any folder below leaves matching files, folders or whole skills out of the package, and so out of every install and the `--nested` rebuild. The ignore files never ship; ignoring only a `SKILL.md` is refused; what was left out is listed in `.aiskills/layout.json` (`ignored`).
