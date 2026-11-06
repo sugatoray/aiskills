@@ -24,6 +24,6 @@ src/test/               node:test suite
 
 ## Known issues / open threads
 - PR #122 is open; publish only after it's merged (AIS-1).
-- Awaiting the user's decision on AIS-7 (make the automatic install at npm-install time opt-in).
+- Awaiting the user's decision on AIS-7: keep the automatic install during `npm install` (A) or remove the `postinstall` script entirely (B). The env-var opt-in was dropped; see `PLAN.md` for the trade-offs.
 - `--route` lookups were only tested against a local fake of the skills.sh search API (AIS-2).
 - See `GAP_ANALYSIS.md` for the rest.
