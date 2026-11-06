@@ -3,3 +3,13 @@
 # what ships.
 node_modules/
 *.tgz
+
+# Project memory for working on this package; never published.
+# The "files" list already keeps these out (and npm never lets .npmignore
+# exclude anything "files" lists); these lines are a safety net in case
+# "files" is ever removed. Anchored with a leading "/" so files of the
+# same name inside the bundled skills/ folder are NOT excluded.
+/AGENTS.md
+/CLAUDE.md
+/SCROLLS.md
+/docs/.scrolls/

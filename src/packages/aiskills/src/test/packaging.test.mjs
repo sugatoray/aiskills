@@ -1,7 +1,7 @@
 // Packaging tests: what `prepack` vendors and what `npm pack` would publish.
 // Runs on a throwaway copy of the repo (helpers.repoCopy), never in place.
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { after, before, describe, test } from "node:test";
 
@@ -87,6 +87,40 @@ describe("npm pack", () => {
     if (!copy) return t.skip("git not available");
     for (const p of files) {
       assert.doesNotMatch(p, /^(src\/aiskills\/test\/|docs\/|SCROLLS\.md$|CLAUDE\.md$|AGENTS\.md$|src\/aiskills\/vendor-skills\.mjs$)/, p);
+    }
+  });
+});
+
+describe(".npmignore", () => {
+  // "files" in package.json already keeps these out, and npm never lets
+  // .npmignore exclude anything "files" lists. So drop "files" here to test
+  // the .npmignore safety net on its own.
+  test("keeps the package's own memory files out, but not same-named files inside a skill", (t) => {
+    const c = repoCopy();
+    if (!c) return t.skip("git not available");
+    try {
+      const pj = JSON.parse(readFileSync(join(c.pkg, "package.json"), "utf8"));
+      delete pj.files;
+      writeFileSync(join(c.pkg, "package.json"), JSON.stringify(pj, null, 2));
+      const put = (base, rel) => {
+        mkdirSync(join(base, rel, ".."), { recursive: true });
+        writeFileSync(join(base, rel), "x\n");
+      };
+      // The package's project memory (must NOT ship) ...
+      for (const rel of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md"]) put(c.pkg, rel);
+      // ... and a bundled skill that happens to use the same names (must ship).
+      for (const rel of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md", "SKILL.md"]) {
+        put(c.repo, `skills/zz-fixture/demo/${rel}`);
+      }
+      const res = npm(["pack", "--dry-run", "--json"], { cwd: c.pkg });
+      assert.equal(res.status, 0, res.stderr);
+      const files = JSON.parse(res.stdout)[0].files.map((f) => f.path);
+      for (const p of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md"]) {
+        assert.ok(!files.includes(p), `root ${p} must not ship`);
+        assert.ok(files.includes(`skills/zz-fixture/demo/${p}`), `skills/.../${p} must ship`);
+      }
+    } finally {
+      rmSync(c.dir, { recursive: true, force: true });
     }
   });
 });
