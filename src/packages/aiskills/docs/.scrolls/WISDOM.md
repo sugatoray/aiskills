@@ -37,7 +37,9 @@ Bad patterns or decisions to never take, and why they were rejected.
 Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code.
-- **End-to-end recipe:** `npm pack --pack-destination <tmp>` → `HOME=<tmp>/home npm install -g --prefix <tmp>/prefix <tgz>` → drive `<tmp>/prefix/bin/aiskills` with `HOME=<tmp>/home` → `npm run clean`.
+- **Run `npm test` before every change and after it.** New behaviour gets a test in `test/cli.test.mjs` (stand-in `npx` on `PATH`; assert the exact `npx skills` args via `skillsArgs`) or `test/unit.test.mjs`. Add a failing test first (Red/Green).
+- Tests must never touch the real `HOME` or write vendored files into the package folder: use `sandbox()` / `repoCopy()` from `test/helpers.mjs`.
+- **End-to-end recipe** (now automated as `npm run test:e2e`): `npm pack --pack-destination <tmp>` → `HOME=<tmp>/home npm install -g --prefix <tmp>/prefix <tgz>` → drive `<tmp>/prefix/bin/aiskills` with `HOME=<tmp>/home` → `npm run clean`.
 - **Check the tarball:** compare `npm pack --dry-run --json` (with `_gitignore` mapped back) against `git ls-files skills`; they should be identical.
 - `npx skills list --json` gives `source` and `sourceType` per skill. Bundled rows are `sourceType: "local"` with `source` equal to the install folder.
 - `npx skills add <empty dir> --list --agent <bogus>` prints "Valid agents: ..." and installs nothing; that's how agent patterns get their list.

@@ -39,7 +39,9 @@
     "clean": "node scripts/vendor-skills.mjs --clean",
     "prepack": "node scripts/vendor-skills.mjs",
     "postinstall": "node scripts/postinstall.mjs",
-    "pack:dry": "npm pack --dry-run"
+    "pack:dry": "npm pack --dry-run",
+    "test": "node --test test/*.test.mjs",
+    "test:e2e": "AISKILLS_E2E=1 node --test test/e2e.test.mjs"
   },
   "engines": {
     "node": ">=18.17"

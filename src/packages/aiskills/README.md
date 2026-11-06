@@ -360,12 +360,31 @@ before `npm pack` / `npm publish`.
 
 ```sh
 cd src/packages/aiskills
+npm test              # run the test suite first
 npm run vendor        # optional: vendor locally to inspect
 npm run pack:dry      # list what will ship
 npm version patch     # bump the version
 npm publish           # prepack re-vendors the skills automatically
 npm run clean         # remove the vendored copy
 ```
+
+### Tests
+
+The suite uses the built-in `node:test` runner and has no dependencies.
+
+```sh
+npm test            # unit + CLI + packaging tests: offline, a few seconds
+npm run test:e2e    # also a real install with the real `npx skills` (needs network)
+```
+
+| File | What it covers |
+| --- | --- |
+| `test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
+| `test/cli.test.mjs` | `bin/aiskills.mjs` and `scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: every git-tracked file under `skills/` ships (with `.gitignore` files renamed), and `test/`, `docs/` and the scrolls files don't. |
+| `test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--purge`. |
+
+Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.
 
 npm never ships files named `.gitignore`/`.npmignore`. To get around this, the
 vendor step renames them to `_gitignore`/`_npmignore`, and the installer

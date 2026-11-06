@@ -11,7 +11,7 @@ One long session built the package from scratch (see `SPEC.md`). Along the way i
 - moved from `src/aiskills/` to `src/packages/aiskills/` (git rename; `vendor-skills.mjs` now finds the repo root by walking up instead of assuming a depth);
 - given its scrolls memory (`/scrolls-setup`, then this `/scrolls-update`).
 
-Every feature was checked by hand: `npm pack`, then `npm install -g --prefix <tmp>` with `HOME` pointed at a throwaway folder (recipe in `WISDOM.md`). There are no automated tests.
+There is now a `node:test` suite (`npm test`: 83 offline tests, about 6 seconds; `npm run test:e2e`: a real install with the real `npx skills`, needs network). Both pass. A deliberate-bug check confirmed the suite catches regressions in env scrubbing, dotfile restoring, full-uninstall scope and ambiguous `--route` matches.
 
 ## Known issues / open threads
 - PR #122 is open; publishing (`cd src/packages/aiskills && npm publish`) should wait until it's merged.
