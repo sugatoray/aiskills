@@ -1,0 +1,5 @@
+# Present so npm does NOT fall back to .gitignore (which ignores the
+# vendored skills/ folder). The "files" list in package.json decides
+# what ships.
+node_modules/
+*.tgz

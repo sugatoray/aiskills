@@ -1,0 +1,5 @@
+# Vendored at pack/publish time from <repo>/skills by scripts/vendor-skills.mjs
+/skills/
+/LICENSE
+node_modules/
+*.tgz

@@ -1,0 +1,49 @@
+{
+  "name": "@sugatoray/aiskills",
+  "version": "0.1.0",
+  "description": "Sugato Ray's curated agent skills (scrolls, stata, personas, ...) vendored as an npm package and registered with `npx skills add` on install.",
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "claude-code",
+    "codex",
+    "ai",
+    "scrolls"
+  ],
+  "homepage": "https://github.com/sugatoray/aiskills#readme",
+  "bugs": {
+    "url": "https://github.com/sugatoray/aiskills/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sugatoray/aiskills.git",
+    "directory": "src/aiskills"
+  },
+  "license": "MIT",
+  "author": "Sugato Ray (https://github.com/sugatoray)",
+  "type": "module",
+  "bin": {
+    "aiskills": "bin/aiskills.mjs"
+  },
+  "files": [
+    "bin/",
+    "scripts/installer.mjs",
+    "scripts/postinstall.mjs",
+    "skills/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "vendor": "node scripts/vendor-skills.mjs",
+    "clean": "node scripts/vendor-skills.mjs --clean",
+    "prepack": "node scripts/vendor-skills.mjs",
+    "postinstall": "node scripts/postinstall.mjs",
+    "pack:dry": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
