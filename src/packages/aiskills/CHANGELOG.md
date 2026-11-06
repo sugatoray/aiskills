@@ -68,7 +68,18 @@ First release. Not yet published to npm; this section gets its date when it is.
 - **Test suite** (`npm test`, and `npm run test:e2e` with network) using the
   built-in `node:test` runner.
 - **`SECURITY.md`**: how to report a vulnerability, what the package writes
-  and which network calls happen, and known limitations.
+  and which network calls happen, and the protections below.
+
+### Security
+
+- `npx` always runs a pinned, tested `skills` CLI (`skills@1.7.6`);
+  `AISKILLS_SKILLS_VERSION` overrides it.
+- `--route` / `aix` ignore `npx skills find` results whose
+  `owner/repo@skill` contains anything but letters, digits, `.`, `_` and `-`.
+- On Windows, `npx` is never started with arguments containing `cmd.exe`
+  shell characters; arguments with spaces are quoted.
+- `sync`, `install` and `uninstall --purge` refuse to replace or delete an
+  existing folder that isn't an aiskills folder (no `aiskills.json`).
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122

@@ -33,3 +33,6 @@ Each plugin entry in the bundled `marketplace.json` is a group: its `name` is th
 
 ## External skills via `--route`
 With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always when run as `aix`, `-s` entries that aren't bundled go to `npx skills`. A bare name is looked up with `npx skills find` and installed only on a unique exact-name match; `owner/repo[@skill]`, URLs and paths go straight to `npx skills add`. `uninstall --route` also matches skills from other sources, while a full uninstall stays bundled-only. `installed --route` lists every skill with its source. `aiskills find <query>` searches the registry.
+
+## Safety checks
+`npx` always runs a pinned `skills@1.7.6` (override: `AISKILLS_SKILLS_VERSION`); `--route` ignores registry results with anything but letters, digits, `.`, `_`, `-`; on Windows no `cmd.exe` shell characters ever reach `npx`; `sync`/`install`/`uninstall --purge` refuse to replace or delete a folder that isn't an aiskills folder. See `SECURITY.md`.

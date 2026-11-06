@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
-import { FIXTURE_SKILLS, listTree, row, sandbox, skillsArgs } from "./helpers.mjs";
+import { FIXTURE_SKILLS, listTree, row, sandbox, skillsArgs, skillsPackage } from "./helpers.mjs";
 
 const posixOnly = { skip: process.platform === "win32" && "stand-in npx is a POSIX script" };
 
@@ -396,6 +396,76 @@ describe("aix (= aiskills --route)", posixOnly, () => {
   test("other commands work unchanged, and --help explains aix", () => {
     assert.equal(sb.aix(["p"]).out.trim(), sb.root);
     assert.match(sb.aix(["--help"]).out, /The 'aix' command is 'aiskills --route'/);
+  });
+});
+
+describe("security: registry text, folder guard, pinned skills CLI", posixOnly, () => {
+  // 1. --route must never pass unsafe registry text on to npx.
+  test("--route ignores registry results with unsafe characters and installs nothing", () => {
+    for (const evil of ["ev&il/tools@ext", "acme/tools@ext&calc", "acme/to|ols@ext", "acme/tools@e%x%t", "acme/../x@ext"]) {
+      sb.setFind(`${evil} 9 installs\n`);
+      const r = sb.run(["install", "--route", "-s", "ext"]);
+      assert.equal(r.status, 1, `${evil}: ${r.out}`);
+      assert.match(r.out, /ignored .*unsafe/i, evil);
+      assert.deepEqual(changes(r.calls), [], evil);
+    }
+  });
+
+  test("--route still uses the safe result when an unsafe one is listed too", () => {
+    sb.setFind("ev&il/tools@ext 99 installs\nacme/tools@ext 1 installs\n");
+    const r = sb.run(["install", "--route", "-s", "ext"]);
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(changes(r.calls), [["add", "acme/tools@ext", "--global", "--yes"]]);
+  });
+
+  // 2. Never delete or replace a folder that isn't an aiskills install folder.
+  const foreign = () => {
+    mkdirSync(join(sb.root, "skills"), { recursive: true });
+    writeFileSync(join(sb.root, "precious.txt"), "keep me\n");
+    writeFileSync(join(sb.root, "skills", "mine.md"), "keep me too\n");
+  };
+
+  test("--purge refuses a folder without aiskills.json and leaves it intact", () => {
+    foreign();
+    const r = sb.run(["uninstall", "--purge"]);
+    assert.equal(r.status, 1, r.out);
+    assert.match(r.out, /not an aiskills folder/);
+    assert.ok(existsSync(join(sb.root, "precious.txt")));
+    assert.ok(existsSync(join(sb.root, "skills", "mine.md")));
+  });
+
+  test("sync / install refuse to replace skills/ in a folder without aiskills.json", () => {
+    foreign();
+    for (const args of [["sync"], ["install"]]) {
+      const r = sb.run(args);
+      assert.equal(r.status, 1, `${args}: ${r.out}`);
+      assert.match(r.out, /not an aiskills folder/);
+      assert.ok(existsSync(join(sb.root, "skills", "mine.md")), String(args));
+      assert.deepEqual(changes(r.calls), [], String(args));
+    }
+  });
+
+  test("a missing or empty folder, or a real install folder, is fine", () => {
+    assert.equal(sb.run(["sync"]).status, 0, "missing");
+    assert.equal(sb.run(["uninstall", "--purge"]).status, 0, "own folder");
+    assert.ok(!existsSync(sb.root));
+    mkdirSync(sb.root, { recursive: true });
+    assert.equal(sb.run(["sync"]).status, 0, "empty");
+    assert.equal(sb.run(["uninstall", "--purge"]).status, 0, "purge after sync");
+    assert.equal(sb.run(["uninstall", "--purge"]).status, 0, "purge when already gone");
+  });
+
+  // 3. npx runs a pinned, tested version of the skills CLI.
+  test("npx runs skills@<pinned version>, overridable with AISKILLS_SKILLS_VERSION", () => {
+    const pinned = sb.run(["install"]).calls.map(skillsPackage);
+    assert.ok(pinned.length > 0);
+    for (const p of pinned) assert.match(p, /^skills@\d+\.\d+\.\d+$/);
+    const latest = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "latest" } }).calls.map(skillsPackage);
+    for (const p of latest) assert.equal(p, "skills@latest");
+    const bad = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "1.0 && calc" } });
+    assert.equal(bad.status, 1);
+    assert.match(bad.out, /AISKILLS_SKILLS_VERSION/);
+    assert.deepEqual(bad.calls, []);
   });
 });
 

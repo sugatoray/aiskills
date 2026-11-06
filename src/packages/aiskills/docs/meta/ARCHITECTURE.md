@@ -34,8 +34,9 @@ src/packages/aiskills/
 | `installer.mjs` – sync | The install folder and its layout | `syncSkills`, `resolveLayout`, `installRoot`, `packageLayout` |
 | `installer.mjs` – skills | Reading skill names and groups | `readSkillName`, `skillNamesIn`, `packageSkillNames`, `loadGroups` |
 | `installer.mjs` – selection | Turning `-s`/`-G`/`-a` into exact names | `globToRegExp`, `expandPatterns`, `skillsForGroups`, `selectedSkills`, `knownAgents`, `expandAgents` |
-| `installer.mjs` – `npx skills` | Every call to the `skills` CLI | `runSkills` (the only place `npx` is started), `skillsAdd`, `skillsRemove`, `listInstalled`, `installedFromRoot`, `isFromRoot` |
-| `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill`, `resolveExternal`, `skillsAddExternal` |
+| `installer.mjs` – `npx skills` | Every call to the `skills` CLI | `runSkills` (the only place `npx` is started; pins `skills@SKILLS_CLI_VERSION`, checks Windows shell characters), `skillsAdd`, `skillsRemove`, `listInstalled`, `installedFromRoot`, `isFromRoot` |
+| `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill` (drops results failing `isSafeRegistrySpec`), `resolveExternal`, `skillsAddExternal` |
+| `installer.mjs` – guards | Not damaging what isn't ours | `assertInstallFolder` (used by `syncSkills`, `purgeRoot`, and `uninstall --purge` up front) |
 | `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups` |
 | `postinstall.mjs` | What `npm install` does | `main` (reads only `AISKILLS_*` env) |
 
@@ -134,5 +135,8 @@ folder next to it, then swaps it in.
 | Strip `npm_*` env before `npx` | Inside `postinstall`, npm's variables make the nested `npx` resolve into the wrong prefix. |
 | Parse `npx skills` text for the agent list and `find` | `skills` has no machine-readable form for these; both fail loudly if the format changes. `list --json` is used everywhere else. |
 | No runtime dependencies | Smaller attack surface and faster installs. |
+| Pin the `skills` CLI version | A new `skills` release must be tested before users get it. |
+| Treat registry text as untrusted | `npx skills find` output decides what gets installed and, on Windows, passes through `cmd.exe`. |
+| Refuse to replace or delete a non-aiskills folder | `AISKILLS_HOME` can point anywhere; `aiskills.json` marks folders we own. |
 
 See [`../../SECURITY.md`](../../SECURITY.md) for the security side of these.

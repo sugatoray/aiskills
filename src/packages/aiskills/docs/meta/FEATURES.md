@@ -47,6 +47,7 @@ The whole CLI is also available as **`ais`** (identical) and **`aix`**
 add up. Command-line values replace the env defaults.
 
 Other environment variables: `AISKILLS_HOME` (install folder),
+`AISKILLS_SKILLS_VERSION` (the `skills` CLI version `npx` runs; pinned by default),
 `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1` (also implied by
 `CI`).
 
@@ -64,6 +65,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule; pinned specs; any-source uninstall | README "`--route`" | `cli.test.mjs` |
 | Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte; remembered | README "Layouts" | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
 | Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | README "Install", "CLI" | `cli.test.mjs`, `e2e.test.mjs` |
+| Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md) | `cli.test.mjs`, `unit.test.mjs` |
 | `npx skills` passthrough | `aiskills skills <args>` with `:root` | README "Using `npx skills` directly" | `cli.test.mjs` |
 
 ## Not features (on purpose)

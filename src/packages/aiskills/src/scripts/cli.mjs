@@ -5,6 +5,7 @@ import {
   PKG_DIR,
   envOptions,
   expandAgents,
+  assertInstallFolder,
   installRoot,
   installedFromRoot,
   isFromRoot,
@@ -152,6 +153,8 @@ function parse(argv, allowed) {
 }
 
 function uninstall(opts) {
+  // Check --purge's target before removing anything, so a refusal changes nothing.
+  if (opts.purge && !opts.dryRun) assertInstallFolder(ROOT);
   const cwd = opts.global ? ROOT : process.cwd();
   const scope = opts.global ? "global" : "project";
   const provided = packageSkillNames(ROOT);

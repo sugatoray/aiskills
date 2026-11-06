@@ -71,7 +71,8 @@ const FAKE_NPX = `#!/usr/bin/env node
 const fs = require("fs");
 const args = process.argv.slice(2);
 if (process.env.FAKE_NPX_LOG) fs.appendFileSync(process.env.FAKE_NPX_LOG, JSON.stringify({ args, cwd: process.cwd(), npmEnv: Object.keys(process.env).filter((k) => /^npm_/i.test(k)) }) + "\\n");
-const a = args.slice(args.indexOf("skills") + 1);
+const at = args.findIndex((x) => x === "skills" || x.startsWith("skills@"));
+const a = args.slice(at + 1);
 const read = (k, d) => (process.env[k] ? fs.readFileSync(process.env[k], "utf8") : d);
 if (a[0] === "list" && a.includes("--json")) { process.stdout.write(read("FAKE_LIST_FILE", "[]")); process.exit(0); }
 if (a[0] === "add" && a.includes("__aiskills_probe__")) {
@@ -157,7 +158,13 @@ export function sandbox() {
 }
 
 /** The `npx skills` part of a logged call, e.g. ["add", "<root>", "--global", ...]. */
-export const skillsArgs = (call) => call.args.slice(call.args.indexOf("skills") + 1);
+export const skillsArgs = (call) => call.args.slice(skillsIndex(call) + 1);
+
+/** Index of the `skills` / `skills@<version>` package argument in a logged npx call. */
+const skillsIndex = (call) => call.args.findIndex((x) => x === "skills" || x.startsWith("skills@"));
+
+/** The package spec npx was asked to run, e.g. "skills@1.7.6". */
+export const skillsPackage = (call) => call.args[skillsIndex(call)];
 
 /** A `npx skills list --json` row. */
 export const row = (name, source, sourceType = "local") => ({

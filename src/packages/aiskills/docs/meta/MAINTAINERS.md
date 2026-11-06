@@ -74,7 +74,11 @@ Set `HOME` per command, not with `export`: an exported `HOME` breaks the next
 ### Rules of thumb
 
 - `runSkills()` in `installer.mjs` is the only place that starts `npx`. Keep
-  it that way.
+  it that way: it pins the `skills` version and does the Windows shell check.
+- Treat anything from `npx skills find` (or any other outside source) as
+  untrusted: check it like `isSafeRegistrySpec()` does before using it.
+- Anything that deletes or replaces files under the install folder must call
+  `assertInstallFolder()` first.
 - Tests never touch the real `HOME` or write into this folder: always use
   `sandbox()` / `repoCopy()`.
 - Check every input and do every lookup before the first install.
@@ -98,6 +102,17 @@ picks them up at the next `npm pack`.
   folder under `skills/`. Its alias is the name minus `-skills`.
 - Run `npm test` here afterwards: the packaging tests compare the package
   with every git-tracked file under `skills/`.
+
+## Updating the pinned `skills` CLI
+
+`SKILLS_CLI_VERSION` in `src/scripts/installer.mjs` is the `skills` version
+every `npx` call runs. To move to a newer one:
+
+1. `AISKILLS_SKILLS_VERSION=<new> npm run test:e2e` to try it.
+2. Read the new version's changes, especially the output of `find`, the
+   "Valid agents:" message and `list --json`, which `aiskills` parses.
+3. Update `SKILLS_CLI_VERSION`, run `npm test` and `npm run test:e2e`, and add
+   a CHANGELOG line.
 
 ## Releasing
 
@@ -129,6 +144,7 @@ The first release (`0.1.0`) is ticket AIS-1 in `docs/.scrolls/PLAN.md`.
 
 ## Security
 
-See [`../../SECURITY.md`](../../SECURITY.md) for how to report problems and
-the known limitations (unpinned `skills` CLI, Windows shell use under
-`--route`, `--purge` and `AISKILLS_HOME`).
+See [`../../SECURITY.md`](../../SECURITY.md) for how to report problems, what
+the package touches, and the protections that must stay in place (pinned
+`skills` CLI, registry text checks, Windows shell-character check, install
+folder guard).

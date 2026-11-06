@@ -39,7 +39,7 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 
 | Path | Written by | Notes |
 | --- | --- | --- |
-| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | `postinstall`, `install`, `sync`, `list`, `groups` | `skills/` is **replaced** on every sync; `--purge` deletes the **whole folder** (see [Known limitations](#known-limitations)). |
+| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | `postinstall`, `install`, `sync`, `list`, `groups` | `skills/` is **replaced** on every sync; `--purge` deletes the **whole folder**. Both refuse a folder that isn't an aiskills folder (see [Protections](#protections-against-known-risks)). |
 | `~/.agents/skills/`, `~/.claude/skills/` and other agents' skill folders | `npx skills add` / `remove`, run by `install` / `uninstall` | Global scope. The `skills` CLI decides the exact folders. |
 | `./.claude/skills/`, `./skills-lock.json` etc. in the current folder | `npx skills`, with `-p`/`--project` | Project scope. |
 | A temporary folder under the OS temp dir | the agent-list lookup for `-a` patterns | Empty; deleted straight after. |
@@ -51,9 +51,9 @@ It never reads or changes your code, git state, or anything else.
 `aiskills` itself makes **no** network requests. All of them come from the
 programs it starts:
 
-- **`npx -y skills ...`** downloads the [`skills`](https://www.npmjs.com/package/skills)
-  CLI from the npm registry if it isn't cached. The version isn't pinned, so it's
-  the latest one (see [Known limitations](#known-limitations)).
+- **`npx -y skills@1.7.6 ...`** downloads the [`skills`](https://www.npmjs.com/package/skills)
+  CLI from the npm registry if it isn't cached. The version is pinned (see
+  [Protections](#protections-against-known-risks)).
 - **The `skills` CLI** sends anonymous usage data and audit lookups to
   `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. `aiskills`
   passes both variables through, so setting either one turns this off.
@@ -63,7 +63,8 @@ programs it starts:
 ### Running other programs
 
 - The only program it starts is `npx` (`npx.cmd` on Windows), always as
-  `npx -y skills <args>`, with an argument array (no shell on macOS and Linux).
+  `npx -y skills@<pinned version> <args>`, with an argument array (no shell on
+  macOS and Linux; on Windows, see the shell-character check below).
 - npm's own lifecycle variables (`npm_config_global`, `npm_config_prefix`,
   `npm_lifecycle_*`, …) are removed before `npx` runs; registry, proxy and
   certificate settings are kept.
@@ -82,7 +83,8 @@ your agent may run **with your permissions**.
 - **External skills** (`--route`, `aix`) are third-party code. `aiskills`
   installs a bare name only when **exactly one** registry result has that
   exact name; with several, it stops and asks you to pin `owner/repo@skill`.
-  It never picks for you. All lookups run before anything is installed.
+  It never picks for you, and ignores results with unsafe characters. All
+  lookups run before anything is installed.
   Prefer pinned `owner/repo@skill` specs from sources you trust.
 
 ### What the package build guarantees
@@ -95,19 +97,33 @@ your agent may run **with your permissions**.
   `../evil`), two skills with the same name, and skills nested inside skills.
 - The package has **no runtime dependencies**.
 
-## Known limitations
+## Protections against known risks
 
-These are known and tracked; reports with better fixes are welcome.
+Each of these has tests in `src/test/` (`npm test`).
 
-- **`npx -y skills` isn't pinned to a version.** A compromised or broken new
-  release of the `skills` CLI would be used automatically. The fix is to pin a
-  tested version in `runSkills()` (`src/scripts/installer.mjs`).
-- **Windows: `--route` passes registry data through `cmd.exe`.** On Windows,
-  `npx.cmd` is started with `shell: true`, and the `owner/repo@skill` string
-  that `npx skills find` returns is passed on unchecked. A crafted registry
-  entry containing shell characters (`&`, `|`, `^`, …) could run a command.
-  Until this is fixed, don't use `--route`/`aix` with bare names on Windows;
-  pinned `owner/repo@skill` specs you typed yourself are fine.
-- **`--purge` deletes `AISKILLS_HOME` recursively** without checking that it
-  is an aiskills folder. Never point `AISKILLS_HOME` at a folder that holds
-  anything else (and never at your home folder).
+- **The `skills` CLI version is pinned.** Every call runs
+  `npx -y skills@1.7.6` (`SKILLS_CLI_VERSION` in `src/scripts/installer.mjs`),
+  so a new or compromised `skills` release is never used silently. The
+  maintainers bump it after testing. `AISKILLS_SKILLS_VERSION` overrides it
+  (an exact version, `latest` or `next`; anything else is refused).
+- **Registry text is checked before use.** Under `--route` / `aix`, an
+  `owner/repo@skill` result from `npx skills find` is used only if every part
+  is made of letters, digits, `.`, `_` and `-`. Other results are ignored with
+  a warning, and are never passed to `npx`.
+- **No shell syntax reaches `cmd.exe`.** On Windows, where `npx.cmd` must run
+  through `cmd.exe`, `aiskills` refuses to start `npx` if any argument contains
+  `& | < > ^ % ! " ( )`, and quotes arguments that contain spaces.
+- **Only aiskills folders are replaced or deleted.** `sync`/`install` (which
+  replace `skills/`) and `uninstall --purge` (which deletes the folder) refuse
+  to touch an existing folder that has other files but no `aiskills.json`.
+  A missing or empty folder is fine. This protects against an `AISKILLS_HOME`
+  pointed at the wrong place. `--purge` checks this before removing any
+  skill, so a refusal changes nothing.
+
+## Remaining caveats
+
+- Setting `AISKILLS_SKILLS_VERSION=latest` gives up the pinning above.
+- An `owner/repo@skill` you type yourself is passed to `npx skills add` as you
+  typed it (on Windows, still subject to the shell-character check).
+- Anything already in an aiskills folder's `skills/` is replaced on every
+  sync. Don't keep your own files there.

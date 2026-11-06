@@ -432,6 +432,7 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route`. Also lets the postinstall step route non-bundled names in `AISKILLS_SKILLS` |
+| `AISKILLS_SKILLS_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version; e.g. `latest`) |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
 

@@ -82,6 +82,7 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
   if (!existsSync(pkgSkills)) {
     throw new Error(`no vendored skills folder at ${pkgSkills}`);
   }
+  assertInstallFolder(root);
   const mode = resolveLayout(layout, root);
   const map = packageLayout(pkgDir);
   if (mode === "nested" && !map) throw new Error(`this package has no ${LAYOUT_REL}, so --nested can't rebuild the nested layout`);
@@ -145,11 +146,42 @@ const quote = (a) => (/[\s*'"]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
  * Run `npx -y skills <args...>` with inherited stdio; returns the exit code.
  * opts: { cwd, capture=false } — capture returns { status, stdout } instead.
  */
+// The `skills` CLI version every npx call runs. Pinned so a new (or
+// compromised) release is never picked up silently; bump it after testing
+// (npm test && npm run test:e2e). AISKILLS_SKILLS_VERSION overrides it,
+// e.g. "latest".
+export const SKILLS_CLI_VERSION = "1.7.6";
+const VERSION_SPEC = /^(latest|next|\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$/;
+
+/** "skills@<version>" for npx; throws on a malformed AISKILLS_SKILLS_VERSION. */
+export function skillsPackageSpec() {
+  const v = process.env.AISKILLS_SKILLS_VERSION?.trim() || SKILLS_CLI_VERSION;
+  if (!VERSION_SPEC.test(v)) {
+    throw new Error(`AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '${v}'`);
+  }
+  return `skills@${v}`;
+}
+
+// On Windows, npx.cmd has to run through cmd.exe, which interprets these.
+const WINDOWS_SHELL_CHARS = /[&|<>^%!"()]/;
+
+/** The arguments cmd.exe would treat as shell syntax (none are allowed on Windows). */
+export const unsafeForWindowsShell = (args) => args.filter((a) => WINDOWS_SHELL_CHARS.test(a));
+
+/** cmd.exe splits on spaces: quote arguments that contain whitespace (they can't contain '"'). */
+export const quoteForCmd = (args) => args.map((a) => (/\s/.test(a) ? `"${a}"` : a));
+
 export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false } = {}) {
-  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-  const full = ["-y", "skills", ...args];
+  const win = process.platform === "win32";
+  const npx = win ? "npx.cmd" : "npx";
+  const full = ["-y", skillsPackageSpec(), ...args];
+  if (win) {
+    const bad = unsafeForWindowsShell(full);
+    if (bad.length) throw new Error(`refusing to pass shell characters to cmd.exe: ${bad.join(" ")}`);
+  }
   if (!quiet) log(`running: npx ${full.map(quote).join(" ")}`);
-  const res = spawnSync(npx, full, {
+  const argv = win ? quoteForCmd(full) : full;
+  const res = spawnSync(npx, argv, {
     stdio: capture ? ["ignore", "pipe", captureStderr ? "pipe" : "inherit"] : "inherit",
     encoding: "utf8",
     // The install root may not exist (e.g. after --purge); run from $HOME then.
@@ -462,14 +494,30 @@ const stripAnsi = (t) => t.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
  * Look a skill up on the skills registry via `npx skills find <name>`.
  * Returns [{ spec: "owner/repo@name", source, name, installs }].
  */
+const SAFE_PART = "[A-Za-z0-9][A-Za-z0-9._-]*";
+const SAFE_REGISTRY_SPEC = new RegExp(`^${SAFE_PART}/${SAFE_PART}@${SAFE_PART}$`);
+
+/** True for an owner/repo@skill made only of letters, digits, '.', '_' and '-'. */
+export const isSafeRegistrySpec = (spec) => SAFE_REGISTRY_SPEC.test(spec);
+
+/**
+ * Look a skill up on the skills registry via `npx skills find <name>`.
+ * Registry text is untrusted: only results that pass isSafeRegistrySpec are
+ * returned; the rest are listed in `unsafe`.
+ * Returns { hits: [{ spec, source, name, installs }], unsafe: [spec] }.
+ */
 export function findSkill(query) {
   const { stdout } = runSkills(["find", query], { capture: true, quiet: true });
-  const out = [];
+  const hits = [];
+  const unsafe = [];
   for (const line of stripAnsi(stdout).split(/\r?\n/)) {
     const m = /^\s*(\S+)@([^\s@]+)(?:\s+(.*))?$/.exec(line);
-    if (m && m[1].includes("/")) out.push({ spec: `${m[1]}@${m[2]}`, source: m[1], name: m[2], installs: (m[3] ?? "").trim() });
+    if (!m || !m[1].includes("/")) continue;
+    const spec = `${m[1]}@${m[2]}`;
+    if (isSafeRegistrySpec(spec)) hits.push({ spec, source: m[1], name: m[2], installs: (m[3] ?? "").trim() });
+    else unsafe.push(spec);
   }
-  return out;
+  return { hits, unsafe };
 }
 
 /**
@@ -487,7 +535,10 @@ export function resolveExternal(entries) {
       continue;
     }
     log(`'${entry}' is not bundled; looking it up with 'npx skills find ${entry}' ...`);
-    const hits = findSkill(entry);
+    const { hits, unsafe } = findSkill(entry);
+    if (unsafe.length) {
+      warn(`ignored ${unsafe.length} registry result(s) with unsafe characters: ${unsafe.map((u) => JSON.stringify(u)).join(", ")}`);
+    }
     const exact = hits.filter((h) => h.name.toLowerCase() === entry.toLowerCase());
     const show = (list) => list.slice(0, 10).map((h) => `    ${h.spec}${h.installs ? `  (${h.installs})` : ""}`).join("\n");
     if (exact.length === 1) {
@@ -529,7 +580,23 @@ export function skillsRemove(names, opts = {}) {
 }
 
 /** Delete <root> (the ~/.config/sugatoray/aiskills folder). */
+/**
+ * Throws unless <root> is safe to replace or delete: missing, empty, or an
+ * aiskills install folder (has our aiskills.json). Protects against an
+ * AISKILLS_HOME that points at a folder holding anything else.
+ */
+export function assertInstallFolder(root = installRoot()) {
+  if (!existsSync(root)) return;
+  if (readdirSync(root).length === 0) return;
+  if (readJson(join(root, "aiskills.json"))?.package === "@sugatoray-ai/aiskills") return;
+  throw new Error(
+    `${root} is not an aiskills folder (it has other files but no aiskills.json), so it won't be replaced or deleted.\n` +
+      `  Point AISKILLS_HOME at a new or empty folder instead.`,
+  );
+}
+
 export function purgeRoot(root = installRoot()) {
+  assertInstallFolder(root);
   rmSync(root, { recursive: true, force: true });
   log(`deleted ${root}`);
 }

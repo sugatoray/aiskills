@@ -10,6 +10,10 @@ import {
   globToRegExp,
   isGlob,
   isSourceSpec,
+  isSafeRegistrySpec,
+  SKILLS_CLI_VERSION,
+  unsafeForWindowsShell,
+  quoteForCmd,
   loadGroups,
   packageSkillNames,
   readSkillName,
@@ -368,5 +372,42 @@ describe("resolveLayout", () => {
       else process.env.AISKILLS_LAYOUT = saved;
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("isSafeRegistrySpec", () => {
+  test("accepts owner/repo@skill made of letters, digits, . _ -", () => {
+    for (const s of ["acme/tools@ext", "a.b/c_d@e-f", "Anthropics/skills@pdf"]) assert.equal(isSafeRegistrySpec(s), true, s);
+  });
+  test("rejects shell characters, spaces, traversal and odd shapes", () => {
+    for (const s of ["ev&il/x@y", "a/b@c|d", "a/b@c^d", "a/b@%x%", "a/b@c d", "a/../b@c", "../a/b@c", "a@b", "a/b/c@d", "a/b@", "/b@c", 'a/b@c"', "a/b@c!x"]) {
+      assert.equal(isSafeRegistrySpec(s), false, s);
+    }
+  });
+});
+
+describe("unsafeForWindowsShell", () => {
+  test("finds arguments cmd.exe would interpret", () => {
+    assert.deepEqual(unsafeForWindowsShell(["add", "acme/tools@ext", "--skill", "*", "--yes"]), []);
+    assert.deepEqual(unsafeForWindowsShell(["add", "a&b", "x|y", "ok", "%PATH%", "q^", "<in", "out>", '"', "!x", "(", ")"]), [
+      "a&b", "x|y", "%PATH%", "q^", "<in", "out>", '"', "!x", "(", ")",
+    ]);
+  });
+});
+
+describe("SKILLS_CLI_VERSION", () => {
+  test("is an exact semver version", () => {
+    assert.match(SKILLS_CLI_VERSION, /^\d+\.\d+\.\d+$/);
+  });
+});
+
+describe("quoteForCmd", () => {
+  test("quotes only arguments with whitespace", () => {
+    assert.deepEqual(quoteForCmd(["add", "C:\\Users\\Jane Doe\\.config\\x", "--skill", "*"]), [
+      "add",
+      '"C:\\Users\\Jane Doe\\.config\\x"',
+      "--skill",
+      "*",
+    ]);
   });
 });
