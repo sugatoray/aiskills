@@ -92,6 +92,7 @@ published to npm, so it can't be installed on its own.
   dependency, thanks to the flat `skills/` folder.
 - **Test suite** (`npm test`, and `npm run test:e2e` with network) using the
   built-in `node:test` runner.
+
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
 [0.2.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122
