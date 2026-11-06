@@ -3,7 +3,7 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-`@sugatoray-ai/aiskills` `0.1.0` (folder `src/packages/aiskills/`) is feature-complete for a first release: bundling, postinstall, and the `aiskills` CLI with install / uninstall / installed / groups / find / passthrough, skill groups, glob patterns and `--route`. `npm test` runs 84 offline tests (about 6 s) and `npm run test:e2e` runs 3 tests that use the real `npx skills` (they need network). Both pass. Everything is on branch `claude/focused-faraday-nqvduf` in the open PR [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122). Nothing has been published to npm.
+`@sugatoray-ai/aiskills` `0.1.0` (folder `src/packages/aiskills/`) is feature-complete for a first release: bundling, postinstall, and the `aiskills` CLI with install / uninstall / installed / groups / find / passthrough, skill groups, glob patterns and `--route`. `npm test` runs 85 offline tests (about 6 s) and `npm run test:e2e` runs 3 tests that use the real `npx skills` (they need network). Both pass. Everything is on branch `claude/focused-faraday-nqvduf` in the open PR [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122). Nothing has been published to npm.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -15,9 +15,8 @@ src/test/               node:test suite
 ```
 
 ## What just happened
-- Added the `node:test` suite (unit, CLI with a stand-in `npx`, packaging, gated e2e). A deliberate-bug check showed it catches regressions.
-- Restructured the package several times at the user's request: everything under `src/aiskills/`, then `src/scripts/` + `src/test/`, then `cli.mjs` in `src/bin/`, and finally the layout above. The user asked to model it on `sugatoray/pptxdiff`; that repo's root package keeps `bin/cli.js` at the top and its code in `src/pptxdiff/`. None of its `src/packages/*` packages has an inner `src/`.
-- Researched how npm packages that ship skills are structured (findings in `WISDOM.md`). This produced two proposals the user hasn't answered yet: `PLAN.md` AIS-6 and AIS-7.
+- Added `/AGENTS.md`, `/CLAUDE.md`, `/SCROLLS.md` and `/docs/.scrolls/` to the package's `.npmignore`, anchored to the package root. They change nothing today, because the `"files"` list already keeps these out and npm never lets `.npmignore` exclude anything `"files"` lists. They're a safety net in case `"files"` is ever removed. A new packaging test drops `"files"` in a scratch copy and checks both directions (memory files out, same-named files inside a skill still in); it fails if the entries are missing or unanchored.
+- Earlier this session: the test suite, the final layout (`bin/aiskills.mjs` → `src/scripts/`, tests in `src/test/`), and the research on how npm packages ship skills (see `WISDOM.md`).
 
 ## Known issues / open threads
 - PR #122 is open; publish only after it's merged (AIS-1).
