@@ -3,6 +3,25 @@
 All notable changes to the `scrolls-remove` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - 2026-11-06
+
+### Changed
+
+- `SKILL.md`: say again exactly how `/scrolls-restore` reads the trailers (`git log --format='%(trailers:unfold,only)'`, with `--grep='^Scrolls-Action:'`). The 2.3.0 wording dropped that detail.
+
+### Added
+
+- `assets/EXAMPLES.md`: worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output sections, written in ASD-STE100 Simplified Technical English. Linked from `SKILL.md` (as an on-demand read) and `README.md`.
+
+## [2.3.0] - 2026-11-05
+
+### Changed
+
+- Synced to `2.3.0` for the new `/scrolls-restore` skill. The removal's
+  behavior and commit message format are unchanged. `SKILL.md` and
+  `meta/MAINTAINERS.md` now refer to `/scrolls-restore` as the way to
+  undo a removal, instead of calling it a future skill.
+
 ## [2.2.0] - 2026-11-05
 
 ### Added

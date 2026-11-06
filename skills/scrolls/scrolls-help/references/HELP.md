@@ -15,7 +15,7 @@ Every command here works the same way on macOS, Linux, and Windows — each bund
 
 That covers the typical single-repo workflow completely. Everything below is for less common cases: running from a subdirectory, monorepos, and toggling the folder's visibility.
 
-## The five commands
+## The six commands
 
 | Command | Does |
 |---|---|
@@ -24,21 +24,23 @@ That covers the typical single-repo workflow completely. Everything below is for
 | `/scrolls-hide` | Renames an existing `scrolls/` folder to dotfile-hidden `.scrolls/`. |
 | `/scrolls-unhide` | Renames an existing `.scrolls/` folder to visible `scrolls/`. |
 | `/scrolls-remove` | Removes the scrolls system and commits the removal, recording the previous commit so it can be undone. |
+| `/scrolls-restore` | Brings the memory back from the newest removal checkpoint (or any commit) into the repo as it is now, optionally `--onto` another branch. |
 
 `/scrolls-hide` and `/scrolls-unhide` are retrofit tools — for a brand-new project, `/scrolls-setup -u` already creates it visible in one step, no separate toggle needed.
 
 ## Flags
 
-All five commands share the same location flags. `-u` only makes sense on `setup` and `-x` only on `remove`; `-r` means something specific to each command.
+All six commands share the same location flags. `-u` only makes sense on `setup`, `-x` only on `remove`, and `--onto`/`-b` only on `restore`; `-r` means something specific to each command.
 
-| Flag | Meaning | setup | update | hide / unhide | remove |
-|---|---|---|---|---|---|
-| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable | repeatable |
-| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ | ✓ |
-| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ | ✓ |
-| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode | sweep mode |
-| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — | — |
-| `-x`, `--purge [files]` | Also delete these pointer files outright: `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all` (default) | — | — | — | ✓ |
+| Flag | Meaning | setup | update | hide / unhide | remove | restore |
+|---|---|---|---|---|---|---|
+| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable | repeatable | repeatable |
+| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode | sweep mode | sweep mode |
+| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — | — | — |
+| `-x`, `--purge [files]` | Also delete these pointer files outright: `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all` (default) | — | — | — | ✓ | — |
+| `--onto REF`, `-b NAME` | Put the restored memory on another branch (or a new branch at any commit), without touching the current checkout | — | — | — | — | ✓ |
 
 `-p`, `-t`, and `-l` are three ways to answer the same question ("where?") — pick at most one. `-r` is independent and stacks with any of them, or with none.
 
@@ -47,6 +49,7 @@ All five commands share the same location flags. `-u` only makes sense on `setup
 - `/scrolls-update -r` — if nothing's at the exact expected spot, searches recursively instead of just reporting "not set up" (and asks you to pick if it finds more than one).
 - `/scrolls-hide -r` / `/scrolls-unhide -r` — without it, these check exactly one location; with it, they sweep an entire directory tree for every matching folder (e.g. every package in a monorepo, in one run).
 - `/scrolls-remove -r` — removes every scrolls folder under the directory, with each one's pointer files, in a single commit.
+- `/scrolls-restore -r` — restores every folder from the checkpoint under the directory, not just the one at the exact spot (undoes a `remove -r` sweep).
 
 **Default, with no flags at all**: everything happens relative to the current directory. If that's not the git repository's root, `/scrolls-setup` and `/scrolls-update` say so and check with you before proceeding — cwd still wins if you don't have a preference, it just won't happen silently.
 
@@ -103,7 +106,22 @@ Remove every scrolls folder in a monorepo, in one commit:
 ```
 /scrolls-remove -t -r
 ```
-The commit is `maint(memory): scrolls-removed`, and its body names the previous commit. Undo it with `git revert <sha>`.
+The commit is `maint(memory): scrolls-removed`, and its body names the previous commit.
+
+**Bring it back later** — just the memory, into the code as it is now:
+```
+/scrolls-restore
+```
+See every checkpoint (`--all` searches other branches too), then restore a specific one:
+```
+/scrolls-restore --list --all
+/scrolls-restore 1a2b3c4d
+```
+Mount the memory onto another branch, or a new branch at a release tag, without leaving your current checkout:
+```
+/scrolls-restore --onto feature/x
+/scrolls-restore --onto v1.4.0 -b memory/v1.4.0
+```
 
 ## How the pieces fit together
 
@@ -113,6 +131,7 @@ The commit is `maint(memory): scrolls-removed`, and its body names the previous 
 
 ## Troubleshooting
 
+- **"`/scrolls-restore` says the folder already exists."** The memory is already there. Run `/scrolls-update` to bring it up to date, or pass `-f` to replace it with the checkpoint's version.
 - **"`/scrolls-remove` refused to run."** Something it would delete has uncommitted, untracked, or ignored changes, or unrelated changes are already staged. The restore point only holds committed content, so it won't risk anything else. Commit or discard those changes, then run it again.
 - **"It created a second scrolls system in a subdirectory I didn't expect."** You ran `/scrolls-setup` or `/scrolls-update` from somewhere other than the repo root without `-t`. Re-run with `-t` to target the repo root, or `-p`/`-l` to be explicit about where you meant.
 - **"hide/unhide didn't find anything."** By default they check exactly one location (`<base>/docs/.scrolls` or `.../scrolls`). Add `-r` to search recursively, or `-t` if you meant the repo root.

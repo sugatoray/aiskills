@@ -8,7 +8,7 @@ metadata:
   name: scrolls-setup
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.4.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup"
 ---
 
@@ -20,7 +20,7 @@ This skill's own `assets/templates/` directory holds the source templates — co
 
 ## Cross-platform
 
-Unlike the other five scrolls skills, this one has no bundled `.sh`/`.ps1` script to choose between — nothing here needed porting. File creation happens through your own Read/Write/Edit tools (not raw shell commands), and the one external command this skill relies on (`git rev-parse --show-toplevel`) behaves identically whether invoked from bash or PowerShell — both support the same `$(...)` command-substitution syntax used throughout this file. Works the same on macOS, Linux, and Windows without any environment-specific branching.
+Unlike the other six scrolls skills, this one has no bundled `.sh`/`.ps1` script to choose between — nothing here needed porting. File creation happens through your own Read/Write/Edit tools (not raw shell commands), and the one external command this skill relies on (`git rev-parse --show-toplevel`) behaves identically whether invoked from bash or PowerShell — both support the same `$(...)` command-substitution syntax used throughout this file. Works the same on macOS, Linux, and Windows without any environment-specific branching.
 
 ## Options
 
@@ -121,6 +121,10 @@ Then do the same, in that same directory, for `AGENTS.md` — the convention sev
 ### 5. Report back
 
 Summarize what was created vs. what already existed and was left untouched — including whether `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md` were created, updated, or left alone — and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
+
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
 
 ## Development
 

@@ -3,6 +3,20 @@
 All notable changes to the `scrolls-setup` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - 2026-11-06
+
+### Added
+
+- `assets/EXAMPLES.md`: worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output sections, written in ASD-STE100 Simplified Technical English. Linked from `SKILL.md` (as an on-demand read) and `README.md`.
+
+## [2.3.0] - 2026-11-05
+
+### Changed
+
+- Synced to `2.3.0` to stay in lockstep with the other `scrolls-*`
+  skills. No functional change of its own. The minor bump is for the
+  new `/scrolls-restore` skill; see `../CHANGELOG.md`.
+
 ## [2.2.0] - 2026-11-05
 
 ### Changed

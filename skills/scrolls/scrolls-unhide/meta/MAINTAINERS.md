@@ -5,6 +5,7 @@ For people developing this skill — not read as part of answering a
 
 ## Layout
 
+- `../assets/EXAMPLES.md`: worked examples, linked from `SKILL.md` and `README.md`. Follow the writing rule at its top (ASD-STE100, about 80%) when you change it, and keep each example's expected output true to what the skill really prints.
 - `../SKILL.md` — the only file read at invocation time.
 - `../README.md` — minimal, human-facing pointer to the files below;
   not read at invocation time.
@@ -44,7 +45,7 @@ visible to a `/scrolls-unhide` invocation changes (new flag, changed
 default, changed rename/rewrite behavior) — not for pure documentation or
 test-only changes.
 
-This skill's version is locked in step with the other five `scrolls-*`
+This skill's version is locked in step with the other six `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all six to the same new number in the same commit,
+here means bumping all seven to the same new number in the same commit,
 even the ones with nothing of their own to report that release.

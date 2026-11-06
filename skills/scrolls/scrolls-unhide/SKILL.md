@@ -8,7 +8,7 @@ metadata:
   name: scrolls-unhide
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.4.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-unhide"
 ---
 
@@ -62,6 +62,10 @@ For each file the script lists under "Other references... left for manual review
 ### 3. Report back
 
 List each folder that was unhidden (old path → new path), what was auto-fixed for each (its own files, `SCROLLS.md`), any that were skipped and why (target already existed), and what you fixed manually in step 2, if anything.
+
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
 
 ## Development
 

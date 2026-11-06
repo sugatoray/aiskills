@@ -8,7 +8,7 @@ metadata:
   name: scrolls-update
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.4.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-update"
 ---
 
@@ -109,6 +109,10 @@ If it's unclear whether something shipped versus just started, treat it as unshi
 ### 7. Report what changed
 
 List which scrolls files were touched and a one-line reason for each. If a file was deliberately left alone despite session activity (e.g. nothing shipped, so `SPEC.md` didn't need a new entry), it's fine to just not mention it — no need to enumerate every file that wasn't touched. Include `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` only if step 2 actually created or updated one of them — silent when all three were already correct, same as any other untouched file.
+
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
 
 ## Development
 

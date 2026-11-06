@@ -4,10 +4,12 @@ Hard-won lessons for this project. Read this LAST, right before editing code, so
 
 ## Constraints — respect and conform to them
 
-- All five `scrolls-*` skills are versioned in lockstep (`skills/scrolls/meta/MAINTAINERS.md`). Never bump one skill's `metadata.version` without bumping all five to the same new number in the same commit.
+- All `scrolls-*` skills (seven as of `2.3.0`) are versioned in lockstep (`skills/scrolls/meta/MAINTAINERS.md`). Never bump one skill's `metadata.version` without bumping every one to the same new number in the same commit. That includes `.claude-plugin/plugin.json` and the root `marketplace.json` description, and every `README.md` install line that lists all the skills.
 - `CLAUDE.md` is always assumed to be an exact, direct sibling of the `docs` folder (`dirname(docs_dir)`) across the whole family's rewrite/backfill logic (`scrolls-hide`, `scrolls-unhide`, and now `scrolls-update`'s backfill). This is a deliberate, documented simplifying assumption inherited from the original `scrolls-setup` convention — don't try to generalize it away.
-- `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` content templates live in exactly one place — `scrolls-setup/assets/templates/` — and every other skill that needs that content (`scrolls-update`'s backfill) reads it from there rather than duplicating it, to avoid drift.
+- `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` content templates live in exactly one place: `scrolls-setup/assets/templates/`. Every other skill that needs that content reads it from there. The one exception is `remove.py`/`restore.py`: they also embed fallback copies for standalone installs, and each has a test that fails if those copies drift from the templates.
+- `/scrolls-remove`'s commit message (subject, `- previous commit: #<sha>`, `Scrolls-*` trailers) is a contract that `/scrolls-restore` parses. Change either side only together, with a test.
 - This sandboxed environment has no `pwsh` — never claim a `.ps1` change was "tested," only that it mirrors verified `.sh` behavior.
+- This session's permission classifier blocks downloading outside code (e.g. a `pwsh` tarball), and blocks `git push --force-with-lease` even onto a branch that holds only already-merged history. After a squash-merge, push follow-up work to a fresh branch, with the user's OK, rather than trying to force-push.
 - `skills.sh` (the domain, not the CLI) is blocked by this environment's egress proxy (org policy 403) — audit pages there have to come from the user as screenshots/pasted text, not fetched directly.
 
 ## Traps — avoid them always
@@ -20,6 +22,8 @@ Hard-won lessons for this project. Read this LAST, right before editing code, so
 
 - The `skills` CLI's unattended install (`--yes`, no `--agent`) doesn't require or default to a hardcoded agent — it calls its own `detectInstalledAgents()` (checks for markers like `~/.claude`, `~/.cursor`, `~/.cline` etc.) and installs to exactly that detected set, matching what the interactive picker shows pre-checked. Verified by reading the CLI's own bundled source (`node_modules/skills/dist/cli.mjs`, cached locally by `npx`) rather than relying on `--help` text alone — `--help` only lists flag names, not what happens when a flag is *omitted*, and that omitted-flag behavior turned out to be the actually useful thing to document. When a CLI's documented `--help` doesn't answer "what's the default," check whether its source is sitting in the local npm/npx cache before guessing or asking the user to test it live.
 
+- `git log --grep` / `%(trailers)` only see trailers in the **last paragraph** of a commit message. If any prose follows the trailer block, the trailers silently become invisible. Keep `Scrolls-*` trailers last, with nothing after them.
+
 ## Ditches — bad patterns or decisions to avoid
 
 - Don't leave GitHub issues open-ended prose when the ask is "group some into bigger issues with subtasks" — use the real `sub_issue_write` API (native GitHub sub-issue hierarchy) over markdown checklists when it's available; it's genuinely a different, better-supported feature (progress bars, linked issue views), not just a formatting choice.
@@ -30,4 +34,8 @@ Hard-won lessons for this project. Read this LAST, right before editing code, so
 - Always use Red/Green TDD while developing or fixing code.
 - Before writing "tested" install/CLI instructions into any doc, actually run every documented command form against the real target (in an isolated scratch dir, or with a clear rollback plan) first, verify the outcome, then fully clean up and confirm via `git status` / a directory sweep — never write down an untested command as if it were verified.
 - When a family of sibling skills/packages shares content or conventions, put the canonical copy in exactly one of them and have the others reference it (relative path, explicit "single source of truth" note in each `meta/MAINTAINERS.md`) rather than hand-syncing duplicated copies.
+- For a script that must exist as both `.sh` and `.ps1`, put **all** logic in one stdlib Python file and make the two shell files thin launchers that forward their arguments. This removes the hand-mirroring drift that the hide/unhide `.ps1` ports carry, and it matters most here because `pwsh` can't be run in this environment. `/scrolls-remove` and `/scrolls-restore` follow this pattern.
+- For destructive commands: default to printing the plan, apply only with `-y`, and refuse (don't work around) whenever the result couldn't be undone, e.g. uncommitted content that the recorded restore point wouldn't contain.
+- When a new suite passes on its first run, mutation-check it: break the code on purpose in a couple of places and confirm the right assertions fail before trusting it.
+- When a branch's PR has been squash-merged, restart follow-up work from the latest default branch (or a fresh branch) rather than stacking on the merged history.
 - When a breaking change is deliberately introduced (e.g. `scrolls-hide`/`scrolls-unhide`'s rewrite-target change), say so explicitly in the changelog *and* give the concrete, safe remediation step (here: re-running `/scrolls-setup` against an old project is safe and closes the gap) — don't just describe the change and leave the reader to work out what to do about it.

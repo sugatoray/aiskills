@@ -8,7 +8,7 @@ metadata:
   name: scrolls-remove
   type: skill
   author: sugatoray
-  version: "2.2.0"
+  version: "2.4.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-remove"
 ---
 
@@ -109,7 +109,7 @@ Scrolls-Kept: AGENTS.md
 Scrolls-Pruned: docs
 ```
 
-The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. A future `/scrolls-restore` reads these with `git log --format='%(trailers)'`. **Never hand-edit or reword this message.**
+The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. `/scrolls-restore` reads these with `git log --format='%(trailers:unfold,only)'` (finding removal commits with `--grep='^Scrolls-Action:'`), and uses them to put back exactly what was removed. **Never hand-edit or reword this message.**
 
 If `git commit` fails (exit 4, usually a pre-commit or commit-msg hook), the removal stays staged. Report the hook's output and the `git commit -F <git-dir>/SCROLLS_REMOVE_MSG` command to finish with. Never retry with `--no-verify`.
 
@@ -126,7 +126,7 @@ Give:
 - the new commit SHA, and the previous-commit SHA it records
 - what was removed, deleted, stripped, purged, kept, or pruned
 - anything flagged for review
-- how to undo it: `git revert --no-edit <new-sha>`, or `git checkout <previous-sha> -- <paths>` to bring back specific files
+- how to undo it: `/scrolls-restore`, which brings back just the memory into the repo as it is now, or `git revert --no-edit <new-sha>` straight away
 
 ## Limitations
 
@@ -134,6 +134,10 @@ Give:
 - Only committed content can be restored from the previous commit, which is why any uncommitted, untracked, or ignored content under the targets blocks the run.
 - With `-p`, pointer files are looked for only next to the `docs` folder that contains the scrolls folder. That's where setup puts them for `-t`, `-l`, and the default. A custom-`--path` setup that put them elsewhere will have them reported as other references rather than cleaned.
 - The commit type `maint` isn't a standard Conventional Commits type, so a strict commitlint hook may reject it (exit 4, above).
+
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
 
 ## Development
 

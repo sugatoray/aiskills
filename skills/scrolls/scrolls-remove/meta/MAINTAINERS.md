@@ -5,6 +5,7 @@ For people developing this skill. It isn't read when answering a
 
 ## Layout
 
+- `../assets/EXAMPLES.md`: worked examples, linked from `SKILL.md` and `README.md`. Follow the writing rule at its top (ASD-STE100, about 80%) when you change it, and keep each example's expected output true to what the skill really prints.
 - `../SKILL.md`: the only file read at invocation time.
 - `../README.md`: a short, human-facing pointer to the files below. Not
   read at invocation time.
@@ -23,7 +24,7 @@ For people developing this skill. It isn't read when answering a
 ## Design decisions worth keeping
 
 - **One commit, recorded restore point.** The commit message format is a
-  contract. A future `/scrolls-restore` will parse it, so treat any change
+  contract. `/scrolls-restore` parses it (and tests it end to end), so treat any change
   to it as breaking:
   - the subject, `maint(memory): scrolls-removed`
   - the `- previous commit: #<sha>` line

@@ -15,6 +15,7 @@ scrolls-setup/
 ├── agents/
 │   └── openai.yaml
 ├── assets/
+│   ├── EXAMPLES.md
 │   └── templates/
 │       ├── AGENTS_MD_BLOCK.md
 │       ├── CLAUDE_MD_BLOCK.md
@@ -34,6 +35,7 @@ scrolls-setup/
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
+- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)
 - **Skill family**: [`../README.md`](../README.md)
@@ -46,7 +48,7 @@ run and verified against this repository before being written down here.
 
 **Pick skills interactively, global or local** — omit `--skill`/`--yes`
 and the CLI prompts you to choose the agent and which skills to install;
-select all six `scrolls-*` skills (or just `scrolls-setup`) at the prompt:
+select all seven `scrolls-*` skills (or just `scrolls-setup`) at the prompt:
 
 ```
 npx skills add sugatoray/aiskills              # project-level
@@ -63,8 +65,8 @@ npx skills add sugatoray/aiskills --skill scrolls-setup            # local
 **Fully unattended, every scrolls-* skill, global or project:**
 
 ```
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove --yes            # project
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove --global --yes   # global
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --yes            # project
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --global --yes   # global
 ```
 
 **Fully unattended, just this skill, global or project:**
