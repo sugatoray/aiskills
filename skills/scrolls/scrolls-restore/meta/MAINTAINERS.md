@@ -5,6 +5,7 @@ These notes are for people developing this skill. They aren't read when answerin
 
 ## Layout
 
+- `../assets/EXAMPLES.md`: worked examples, linked from `SKILL.md` and `README.md`. Follow the writing rule at its top (ASD-STE100, about 80%) when you change it, and keep each example's expected output true to what the skill really prints.
 - `../SKILL.md`: the only file read at invocation time.
 - `../README.md`: a short pointer for humans. Not read at invocation time.
 - `../CHANGELOG.md`: this skill's version history.

@@ -13,6 +13,8 @@ Run it with `/scrolls-help`.
 scrolls-help/
 ├── agents/
 │   └── openai.yaml
+├── assets/
+│   └── EXAMPLES.md
 ├── meta/
 │   ├── MAINTAINERS.md
 │   └── SECURITY.md
@@ -31,6 +33,7 @@ scrolls-help/
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
+- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
 - **Reference content**: [`references/HELP.md`](references/HELP.md)
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Security posture**: [`meta/SECURITY.md`](meta/SECURITY.md)

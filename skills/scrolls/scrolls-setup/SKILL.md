@@ -122,6 +122,10 @@ Then do the same, in that same directory, for `AGENTS.md` — the convention sev
 
 Summarize what was created vs. what already existed and was left untouched — including whether `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md` were created, updated, or left alone — and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
 
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
+
 ## Development
 
 See `meta/MAINTAINERS.md` for layout and versioning notes. Not read as

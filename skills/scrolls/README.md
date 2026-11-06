@@ -54,6 +54,9 @@ variable to change that default location.
 
 Every command's directory has:
 
+- `assets/EXAMPLES.md` — worked examples (premise, usage, caveats,
+  expected output), linked from that skill's `SKILL.md` and `README.md`.
+
 - `SKILL.md` — the skill's runtime instructions.
 - `README.md` — a minimal, human-facing pointer to the files below;
   not read at invocation time.

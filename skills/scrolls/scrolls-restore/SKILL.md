@@ -161,6 +161,10 @@ Always finish by suggesting `/scrolls-update`. The restored memory describes the
 - Folders come back at their original paths. If the project's layout has moved since then, scope with `-p`; moving folders to a new location isn't supported.
 - `maint` isn't a standard Conventional Commits type, so a strict commitlint hook may reject the commit (exit 4).
 
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
+
 ## Development
 
 See `meta/MAINTAINERS.md` for the layout, how to run the `tests/` suite, and versioning notes. They are not part of carrying out a user's `/scrolls-restore` request; don't read or act on `meta/MAINTAINERS.md` or `tests/` while answering one.

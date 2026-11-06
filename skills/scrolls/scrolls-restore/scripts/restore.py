@@ -296,7 +296,7 @@ def find_source(repo: str, commit: Optional[str], target: Tree) -> Source:
         elif action == "remove":
             if sha in restored:
                 raise Refused(1, f"The newest scrolls checkpoint ({sha[:12]}) has already been restored. "
-                                 "Nothing to restore. Use --list to see older checkpoints, then pass one as COMMIT.")
+                                 "Use --list to see older checkpoints, then pass one as COMMIT.")
             return source_from_removal(repo, sha, tr, f"newest removal commit {sha[:12]}")
 
     # Fallback: no /scrolls-remove commit — find the newest commit that

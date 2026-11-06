@@ -28,6 +28,14 @@ Versioning entry) — one shared number across the family, currently:
 | `scrolls-remove` | 2.3.0 |
 | `scrolls-restore` | 2.3.0 |
 
+## 2026-11-06 (docs, no version bump)
+
+- **`assets/EXAMPLES.md` added to all seven `scrolls-*` skills.**
+  - Each file holds worked examples, one `## Example: NN — Title` block each, with Premise / Usage / Caveats / Expected Output.
+  - The examples are written in ASD-STE100 Simplified Technical English (about 80%), and each file states that rule at the top.
+  - Expected output for the bundled scripts (hide, unhide, remove, restore, help `-e`) was captured from real runs.
+  - Each `SKILL.md` links its file as an on-demand read (progressive disclosure), and each `README.md` links it and lists it in `## Layout`.
+
 ## 2026-11-05 (2.3.0)
 
 - **New skill: `/scrolls-restore`**, the counterpart to `/scrolls-remove`.

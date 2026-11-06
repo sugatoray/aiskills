@@ -46,6 +46,10 @@ Read the invocation text for an optional **`-e` / `--online`** — instead of (o
 5. Keep the reference file's own tone and formatting when you present it (in chat or via the rendered page) — it's already written to be crisp; don't editorialize, pad, or re-explain what it already says clearly.
 
 
+## Examples
+
+Example invocations of `/scrolls-help` itself are in `assets/EXAMPLES.md`. Read that file only when you need it, for example to check how `-e` or `--stop` behaves. It is not the content to present: `references/HELP.md` is. For worked examples of another scrolls command, point the user at that skill's own `assets/EXAMPLES.md`.
+
 ## Development
 
 See `meta/MAINTAINERS.md` for how to keep `references/HELP.md` current and

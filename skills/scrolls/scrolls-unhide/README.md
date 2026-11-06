@@ -14,6 +14,8 @@ examples, run `/scrolls-help`.
 scrolls-unhide/
 ├── agents/
 │   └── openai.yaml
+├── assets/
+│   └── EXAMPLES.md
 ├── meta/
 │   └── MAINTAINERS.md
 ├── scripts/
@@ -28,6 +30,7 @@ scrolls-unhide/
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
+- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)
 - **Skill family**: [`../README.md`](../README.md)

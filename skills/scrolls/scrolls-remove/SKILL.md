@@ -135,6 +135,10 @@ Give:
 - With `-p`, pointer files are looked for only next to the `docs` folder that contains the scrolls folder. That's where setup puts them for `-t`, `-l`, and the default. A custom-`--path` setup that put them elsewhere will have them reported as other references rather than cleaned.
 - The commit type `maint` isn't a standard Conventional Commits type, so a strict commitlint hook may reject it (exit 4, above).
 
+## Examples
+
+Worked examples are in `assets/EXAMPLES.md`. Each example has a premise, the usage, caveats, and the expected output. Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
+
 ## Development
 
 See `meta/MAINTAINERS.md` for the layout, running the `tests/` regression
