@@ -6,8 +6,8 @@
 //    are registered with the user's agents (Claude Code, Codex, ...).
 
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -89,12 +89,12 @@ const quote = (a) => (/[\s*'"]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
  * Run `npx -y skills <args...>` with inherited stdio; returns the exit code.
  * opts: { cwd, capture=false } — capture returns { status, stdout } instead.
  */
-export function runSkills(args, { cwd, capture = false, quiet = false } = {}) {
+export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false } = {}) {
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
   const full = ["-y", "skills", ...args];
   if (!quiet) log(`running: npx ${full.map(quote).join(" ")}`);
   const res = spawnSync(npx, full, {
-    stdio: capture ? ["ignore", "pipe", "inherit"] : "inherit",
+    stdio: capture ? ["ignore", "pipe", captureStderr ? "pipe" : "inherit"] : "inherit",
     encoding: "utf8",
     // The install root may not exist (e.g. after --purge); run from $HOME then.
     cwd: cwd && existsSync(cwd) ? cwd : cwd ? homedir() : process.cwd(),
@@ -104,7 +104,7 @@ export function runSkills(args, { cwd, capture = false, quiet = false } = {}) {
   });
   if (res.error) throw res.error;
   const status = res.status ?? 1;
-  return capture ? { status, stdout: res.stdout ?? "" } : status;
+  return capture ? { status, stdout: res.stdout ?? "", stderr: res.stderr ?? "" } : status;
 }
 
 /**
@@ -183,28 +183,96 @@ export function loadGroups(root = installRoot()) {
   return { groups, ungrouped: [...all].filter((n) => !grouped.has(n)).sort() };
 }
 
+// -------------------------------------------------------------------- globs
+
+/** True if <s> uses glob syntax: *, ? or [...]. */
+export const isGlob = (s) => /[*?[]/.test(s);
+
 /**
- * Expand group names (exact plugin name, or without the "-skills" suffix,
- * case-insensitive; "all" = every skill) into skill names.
+ * Glob -> case-insensitive RegExp matching the whole string.
+ *   *      any run of characters (including none)
+ *   ?      exactly one character
+ *   [abc]  one of a, b, c   ([a-z] ranges, [!abc] / [^abc] negation)
  */
-export function skillsForGroups(names, root = installRoot()) {
+export function globToRegExp(glob) {
+  let re = "";
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === "*") re += ".*";
+    else if (c === "?") re += ".";
+    else if (c === "[") {
+      const close = glob.indexOf("]", i + 2);
+      if (close === -1) {
+        re += "\\[";
+        continue;
+      }
+      let body = glob.slice(i + 1, close);
+      if (body[0] === "!") body = "^" + body.slice(1);
+      re += "[" + body.replace(/\\/g, "\\\\") + "]";
+      i = close;
+    } else re += c.replace(/[.+^${}()|\\\]\/]/g, "\\$&");
+  }
+  return new RegExp(`^${re}$`, "i");
+}
+
+/**
+ * Expand <patterns> against <candidates>. Literals are matched
+ * case-insensitively and returned in their canonical spelling; a literal with
+ * no match is reported in `unknown`. A glob that matches nothing is reported
+ * in `empty`. Returns { matched: Set, literals: Set, unknown: [], empty: [] }.
+ */
+export function expandPatterns(patterns, candidates) {
+  const list = [...candidates];
+  const matched = new Set();
+  const literals = new Set();
+  const unknown = [];
+  const empty = [];
+  for (const p of patterns) {
+    if (isGlob(p)) {
+      const re = globToRegExp(p);
+      const hits = list.filter((c) => re.test(c));
+      if (!hits.length) empty.push(p);
+      hits.forEach((h) => matched.add(h));
+    } else {
+      const hit = list.find((c) => c.toLowerCase() === p.toLowerCase());
+      if (hit) {
+        matched.add(hit);
+        literals.add(hit);
+      } else {
+        unknown.push(p);
+        literals.add(p);
+      }
+    }
+  }
+  return { matched, literals, unknown, empty };
+}
+
+// ---------------------------------------------------------- group selection
+
+/**
+ * Expand group names/aliases/globs into skill names. "all" (or a glob that
+ * matches a group) works too; every entry must match at least one group.
+ */
+export function skillsForGroups(patterns, root = installRoot()) {
   const { groups, missing } = loadGroups(root);
   if (missing) throw new Error(`no ${MARKETPLACE_REL} in ${root}; run 'aiskills sync' first`);
   const out = new Set();
-  const unknown = [];
-  for (const raw of names) {
-    const n = raw.toLowerCase();
-    if (n === "all") {
+  const bad = [];
+  for (const p of patterns) {
+    if (p.toLowerCase() === "all" || p === "*") {
       packageSkillNames(root).forEach((s) => out.add(s));
       continue;
     }
-    const g = groups.find((x) => x.name.toLowerCase() === n || x.alias.toLowerCase() === n);
-    if (g) g.skills.forEach((s) => out.add(s));
-    else unknown.push(raw);
+    const re = isGlob(p) ? globToRegExp(p) : null;
+    const hits = groups.filter((g) =>
+      re ? re.test(g.name) || re.test(g.alias) : [g.name, g.alias].some((n) => n.toLowerCase() === p.toLowerCase()),
+    );
+    if (!hits.length) bad.push(p);
+    hits.forEach((g) => g.skills.forEach((s) => out.add(s)));
   }
-  if (unknown.length) {
+  if (bad.length) {
     throw new Error(
-      `unknown group(s): ${unknown.join(", ")}\n` +
+      `no group matches: ${bad.join(", ")}\n` +
         `  available: ${groups.map((g) => `${g.name} (${g.alias})`).join(", ")}, all\n` +
         `  see 'aiskills groups'`,
     );
@@ -213,15 +281,71 @@ export function skillsForGroups(names, root = installRoot()) {
 }
 
 /**
- * Final skill list for install/uninstall from opts.skills (+ opts.groups).
- * Returns null for "everything" (no -s/-G given, or -s '*').
+ * Final skill list from opts.skills (names/globs) + opts.groups (names/
+ * aliases/globs), expanded against <universe> (default: the package's
+ * skills). Returns null for "everything" (nothing given, or -s '*').
+ * Otherwise returns { names: [...], literals: Set, unknown: [] } where
+ * `unknown` holds literal skill names not in the universe.
  */
-export function selectedSkills(opts, root = installRoot()) {
-  const explicit = (opts.skills ?? []).filter((s) => s !== "*");
-  const wantAll = (opts.skills ?? []).includes("*") && !(opts.groups ?? []).length && !explicit.length;
-  if (wantAll || (!explicit.length && !(opts.groups ?? []).length)) return null;
-  const fromGroups = (opts.groups ?? []).length ? skillsForGroups(opts.groups, root) : [];
-  return [...new Set([...explicit, ...fromGroups])].sort();
+export function selectedSkills(opts, root = installRoot(), universe = packageSkillNames(root)) {
+  const skills = opts.skills ?? [];
+  const groups = opts.groups ?? [];
+  if (skills.includes("*")) return null;
+  if (!skills.length && !groups.length) return null;
+  const { matched, literals, unknown, empty } = expandPatterns(skills, universe);
+  if (empty.length) {
+    throw new Error(
+      `no skill matches: ${empty.join(", ")}\n  available: ${[...universe].sort().join(", ") || "(none)"}`,
+    );
+  }
+  const fromGroups = groups.length ? skillsForGroups(groups, root) : [];
+  const names = new Set([...matched, ...unknown, ...fromGroups]);
+  return { names: [...names].sort(), literals, unknown };
+}
+
+// ------------------------------------------------------------------- agents
+
+let agentCache;
+/**
+ * Agent ids accepted by `npx skills --agent`, read from the CLI itself: an
+ * unknown agent makes `skills add <empty dir> --list` print "Valid agents:"
+ * without installing anything.
+ */
+export function knownAgents() {
+  if (agentCache) return agentCache;
+  const empty = mkdtempSync(join(tmpdir(), "aiskills-probe-"));
+  try {
+    const { stdout, stderr } = runSkills(["add", empty, "--list", "--agent", "__aiskills_probe__"], {
+      cwd: empty,
+      capture: true,
+      captureStderr: true,
+      quiet: true,
+    });
+    const text = (stdout + "\n" + stderr).replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
+    const m = /Valid agents:\s*([^\n]+)/.exec(text);
+    if (!m) throw new Error("could not read the agent list from 'npx skills'");
+    agentCache = m[1].split(",").map((a) => a.trim()).filter(Boolean);
+    return agentCache;
+  } finally {
+    rmSync(empty, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Expand agent globs (e.g. 'claude*', 'codex,cursor', 'qoder*') into agent ids.
+ * A lone '*' and plain names are passed through untouched ('npx skills'
+ * understands '*' and validates names itself).
+ */
+export function expandAgents(patterns) {
+  if (!patterns?.length || !patterns.some((p) => p !== "*" && isGlob(p))) return patterns ?? [];
+  if (patterns.includes("*")) return ["*"];
+  const { matched, unknown, empty } = expandPatterns(patterns, knownAgents());
+  if (empty.length) {
+    throw new Error(`no agent matches: ${empty.join(", ")}\n  valid agents: ${knownAgents().join(", ")}`);
+  }
+  const out = [...matched, ...unknown];
+  log(`agents: ${out.join(", ")}`);
+  return out;
 }
 
 /**
@@ -270,7 +394,7 @@ export function envOptions() {
   return {
     global: (e.AISKILLS_SCOPE || "global").toLowerCase() !== "project",
     agents: csv(e.AISKILLS_AGENTS),
-    skills: csv(e.AISKILLS_SKILLS).length ? csv(e.AISKILLS_SKILLS) : ["*"],
+    skills: csv(e.AISKILLS_SKILLS),
     groups: csv(e.AISKILLS_GROUPS),
     copy: /^(1|true|yes)$/i.test(e.AISKILLS_COPY || ""),
   };

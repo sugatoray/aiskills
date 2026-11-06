@@ -7,7 +7,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { PKG_DIR, PKG_SKILLS, envOptions, log, selectedSkills, skillsAdd, syncSkills, warn } from "./installer.mjs";
+import { PKG_DIR, PKG_SKILLS, envOptions, expandAgents, log, selectedSkills, skillsAdd, syncSkills, warn } from "./installer.mjs";
 
 const truthy = (v) => /^(1|true|yes)$/i.test(v || "");
 
@@ -30,8 +30,11 @@ function main() {
   const opts = envOptions();
   // Project scope installs into the directory npm was invoked from.
   const cwd = opts.global ? root : process.env.INIT_CWD || process.cwd();
-  const picked = selectedSkills(opts, root); // AISKILLS_SKILLS / AISKILLS_GROUPS
-  const status = skillsAdd(root, { ...opts, skills: picked ?? ["*"], cwd });
+  // AISKILLS_SKILLS / AISKILLS_GROUPS / AISKILLS_AGENTS may use globs.
+  const picked = selectedSkills(opts, root);
+  if (picked?.unknown.length) throw new Error(`unknown skill(s) in AISKILLS_SKILLS: ${picked.unknown.join(", ")}`);
+  const agents = expandAgents(opts.agents);
+  const status = skillsAdd(root, { ...opts, agents, skills: picked?.names ?? ["*"], cwd });
   if (status !== 0) {
     warn(`'npx skills add' exited with ${status}. Skills are saved in ${root}/skills;`);
     warn(`register them later with:  npx skills add ${root} --global`);

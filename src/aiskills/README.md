@@ -26,6 +26,7 @@ npx @sugatoray-ai/aiskills install        # or: aiskills install
 ## CLI
 
 ```text
+# -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
 aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [-- <extra npx skills args>]
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
@@ -115,8 +116,11 @@ installed version. At the time of writing:
   repeat the option (`-G scrolls -G personas`).
 - `-G` combines with `-s`. You get the union of the named skills and every
   skill in the named groups.
-- An unknown group name fails before anything is installed and lists the valid
-  names.
+- Glob patterns work too, matched against both the group name and the alias:
+  `-G 'scroll*'`, `-G '*-skills'`, `-G 'd*'` (docs and diagrams). See
+  [Patterns](#patterns-for--s--g-and--a).
+- An unknown group name, or a pattern that matches no group, fails before
+  anything is installed and lists the valid names.
 
 ```sh
 aiskills install --group scrolls-skills --global --agent claude-code   # full group name
@@ -135,6 +139,65 @@ Add a plugin entry to the repo's `.claude-plugin/marketplace.json` that points
 at a folder under `skills/`, then publish a new version of this package. The
 new group appears automatically; no CLI code needs to change.
 
+## Patterns for `-s`, `-G` and `-a`
+
+`-s/--skill`, `-G/--group` and `-a/--agent` all accept
+[glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns, on both
+`install` and `uninstall`. The same applies to `AISKILLS_SKILLS`,
+`AISKILLS_GROUPS` and `AISKILLS_AGENTS` in the npm postinstall step.
+
+| Pattern | Matches | Example |
+| --- | --- | --- |
+| `*` | any text, including none | `scrolls-*` |
+| `?` | exactly one character | `?????-recipes` |
+| `[abc]` | one of the listed characters | `scrolls-[hu]*` → scrolls-help, -hide, -unhide, -update |
+| `[a-z]` | one character in the range | `scrolls-[r-u]*` |
+| `[!abc]` or `[^abc]` | one character **not** listed | `scrolls-[!hu]*` → scrolls-remove, -restore, -setup |
+
+Rules:
+
+- **Ignores case.** This applies to patterns and plain names alike.
+- **Whole-name match.** `scroll*` matches `scrolls-skills`; `croll` alone
+  matches nothing.
+- **Mix freely.** Patterns and plain names can share one comma-separated list
+  (`-s 'scrolls-*,prodigy'`), and `-s/-G/-a` can each be repeated.
+- **No match is an error.** A pattern that matches nothing stops the command
+  before anything changes, and lists the valid values.
+- **Quote patterns** (`'scrolls-*'`). Otherwise your shell may expand them
+  into file names first.
+
+What each option matches against:
+
+| Option | Matched against |
+| --- | --- |
+| `-s/--skill` | **install:** every skill in the package. **uninstall:** every skill in the package plus every skill installed from `~/.config/sugatoray/aiskills`. |
+| `-G/--group` | Group names **and** aliases from [Skill groups](#skill-groups). `all` is a built-in group; `-G '*'` means the same. |
+| `-a/--agent` | The agent ids `npx skills` accepts (`claude-code`, `codex`, `cursor`, `qoder`, `qoder-cn`, …). The CLI reads this list from `npx skills` itself, so it always matches your installed version. |
+
+Special cases:
+
+- **`-s '*'`** means every skill, just as if you gave no `-s`.
+- **`-a '*'`** is passed straight to `npx skills`, which reads it as "all
+  agents". It isn't expanded.
+- **Plain agent names** aren't checked by `aiskills`. They go to
+  `npx skills`, which reports invalid ones.
+- **Uninstall with patterns or groups** only removes skills that are actually
+  installed from `~/.config/sugatoray/aiskills`. Names typed out in full are
+  always passed to `npx skills remove`, so `-f` can still remove a skill that
+  came from somewhere else.
+- **Check first.** `-n` on uninstall shows what a pattern expands to, and
+  install prints `selected: ...` and `agents: ...` before running.
+
+```sh
+aiskills install -G 'scroll*,d*' -a 'claude*,codex'      # scrolls + docs + diagrams -> claude-code, codex
+aiskills install -s 'stata-*' -a 'cursor,qoder*'         # -> cursor, qoder, qoder-cn
+aiskills install -s 'scrolls-*,prodigy' --project
+aiskills uninstall -s 'scrolls-[hu]*' -n                 # preview: help, hide, unhide, update
+aiskills uninstall -s 'scrolls-[hu]*' -a 'claude*'
+aiskills uninstall -G 'd*'                               # docs-skills + diagrams-skills
+AISKILLS_GROUPS='pers*' AISKILLS_AGENTS='claude-c*' npm i -g @sugatoray-ai/aiskills
+```
+
 ## Uninstall
 
 `aiskills uninstall` calls `npx skills remove ... --yes`.
@@ -142,10 +205,12 @@ new group appears automatically; no CLI code needs to change.
 - **Full uninstall** (no `-s`): removes every skill that `npx skills list`
   says was installed from `~/.config/sugatoray/aiskills`. Skills with the same
   name from other sources aren't touched.
-- **Partial uninstall** (`-s a,b` and/or `-G group`): removes only the named
-  skills, or every installed skill in the named groups. Names this
+- **Partial uninstall** (`-s a,b` and/or `-G group`, either may use
+  [patterns](#patterns-for--s--g-and--a)): removes only the named skills, or
+  every installed skill that matches or belongs to the named groups. Names this
   package doesn't provide are rejected unless you pass `-f/--force`.
-- **Per agent** (`-a codex`): unlinks the skills from those agents only.
+- **Per agent** (`-a codex`, or a pattern like `-a 'qoder*'`): unlinks the
+  skills from those agents only.
 - **`--purge`**: after a full uninstall, also deletes
   `~/.config/sugatoray/aiskills`. Without it, the files are kept so that
   `aiskills install` can re-add them offline.
@@ -190,9 +255,9 @@ aiskills skills update -g                       # npx skills update -g
 | --- | --- |
 | `AISKILLS_HOME` | Override the install root (default `~/.config/sugatoray/aiskills`) |
 | `AISKILLS_SCOPE=project` | Install to the project npm was invoked from instead of globally |
-| `AISKILLS_AGENTS` | Comma-separated agent list passed as `--agent` |
-| `AISKILLS_SKILLS` | Comma-separated skill list passed as `--skill` (default: all) |
-| `AISKILLS_GROUPS` | Comma-separated group names or aliases (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
+| `AISKILLS_AGENTS` | Comma-separated agents or [patterns](#patterns-for--s--g-and--a), passed as `--agent` |
+| `AISKILLS_SKILLS` | Comma-separated skills or [patterns](#patterns-for--s--g-and--a), passed as `--skill` (default: all) |
+| `AISKILLS_GROUPS` | Comma-separated group names, aliases or [patterns](#patterns-for--s--g-and--a) (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |

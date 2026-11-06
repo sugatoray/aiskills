@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   PKG_DIR,
   envOptions,
+  expandAgents,
   installRoot,
   installedFromRoot,
   loadGroups,
@@ -39,11 +40,14 @@ Commands:
 Scope/selection options (install, uninstall, installed):
   -g, --global           User-level (default)
   -p, --project          Current project instead of user-level
-  -a, --agent <names>    Comma-separated agents (e.g. claude-code,codex); default: all
+  -a, --agent <names>    Comma-separated agents (e.g. claude-code,codex); default: auto-detect
   -s, --skill <names>    Comma-separated skill names; default: all skills from this package
   -G, --group <names>    Comma-separated skill groups (e.g. scrolls-skills or just scrolls;
                          'all' = everything). Combines with -s. See 'aiskills groups'.
   -s/-G/-a may be repeated; values accumulate.
+  -s/-G/-a accept glob patterns: * (any text), ? (one character), [abc] / [a-z] / [!a]
+  (one of / range / not). Matching ignores case. A pattern that matches nothing is an
+  error. Quote patterns so your shell doesn't expand them: -s 'scrolls-*'.
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
@@ -61,6 +65,9 @@ Examples:
   aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
+  aiskills install -G 'scroll*,d*' -a 'claude*,codex'
+  aiskills install -s 'scrolls-*' -a 'cursor,qoder*'
+  aiskills uninstall -s 'scrolls-[hu]*'       # scrolls-hide, -unhide, -update
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
@@ -120,12 +127,13 @@ function uninstall(opts) {
   const installed = installedFromRoot(ROOT, { global: opts.global, cwd });
   const installedNames = new Set((installed ?? []).map((r) => r.name));
 
-  const picked = selectedSkills(opts, ROOT);
+  const known = new Set([...provided, ...installedNames]);
+  const picked = selectedSkills(opts, ROOT, known);
+  const agents = expandAgents(opts.agents);
   let names;
   if (picked) {
     if (opts.purge) throw new Error("--purge only applies to a full uninstall (drop -s/-G)");
-    const known = new Set([...provided, ...installedNames]);
-    const unknown = picked.filter((n) => !known.has(n));
+    const { unknown } = picked;
     if (unknown.length && !opts.force) {
       throw new Error(
         `not provided by this package: ${unknown.join(", ")}\n` +
@@ -133,10 +141,11 @@ function uninstall(opts) {
           `  use -f/--force to remove them anyway`,
       );
     }
-    // Skip group members that aren't installed (npx skills remove would no-op).
-    names = installed && opts.groups.length
-      ? picked.filter((n) => installedNames.has(n) || opts.skills.includes(n))
-      : picked;
+    // Skills reached via a glob or a group are only removed if installed;
+    // names typed out in full are always passed on (needed for --force).
+    names = installed
+      ? picked.names.filter((n) => installedNames.has(n) || picked.literals.has(n))
+      : picked.names;
   } else if (installed) {
     // Full uninstall: exactly what 'npx skills' recorded as coming from ROOT.
     names = [...installedNames];
@@ -151,9 +160,9 @@ function uninstall(opts) {
   } else if (opts.dryRun) {
     log(`[dry-run] would remove (${scope}): ${names.join(", ")}`);
     log(`[dry-run] npx -y skills remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
-      `${opts.agents.map((a) => ` --agent ${a}`).join("")} --yes ${opts.extra.join(" ")}`.trimEnd());
+      `${agents.map((a) => ` --agent '${a}'`).join("")} --yes ${opts.extra.join(" ")}`.trimEnd());
   } else {
-    const status = skillsRemove(names, { ...opts, cwd });
+    const status = skillsRemove(names, { ...opts, agents, cwd });
     if (status !== 0) return status;
   }
 
@@ -205,9 +214,21 @@ function main() {
       const opts = parse(rest, ["scope", "agent", "skill", "group", "copy"]);
       const root = syncSkills({ version });
       const picked = selectedSkills(opts, root);
-      if (picked && !picked.length) throw new Error("the selected group(s) contain no skills");
-      if (picked) log(`selected: ${picked.join(", ")}`);
-      return skillsAdd(root, { ...opts, skills: picked ?? ["*"], cwd: opts.global ? root : process.cwd() });
+      if (picked?.unknown.length) {
+        throw new Error(
+          `not provided by this package: ${picked.unknown.join(", ")}\n` +
+            `  available: ${[...packageSkillNames(root)].sort().join(", ")}`,
+        );
+      }
+      if (picked && !picked.names.length) throw new Error("the selected group(s) contain no skills");
+      if (picked) log(`selected: ${picked.names.join(", ")}`);
+      const agents = expandAgents(opts.agents);
+      return skillsAdd(root, {
+        ...opts,
+        agents,
+        skills: picked?.names ?? ["*"],
+        cwd: opts.global ? root : process.cwd(),
+      });
     }
     case "uninstall":
     case "remove":
