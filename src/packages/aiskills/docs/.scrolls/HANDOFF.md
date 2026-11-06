@@ -9,6 +9,7 @@ Layout (decided by the user; see `WISDOM.md` → Constraints):
 
 ```text
 package.json            "bin": { aiskills, ais -> bin/aiskills.mjs; aix -> bin/aix.mjs }
+CHANGELOG.md            Keep a Changelog + SemVer; ships with the package
 bin/aiskills.mjs        thin entry point: imports ../src/scripts/cli.mjs
 bin/aix.mjs             sets AISKILLS_ROUTE=1, then imports the same CLI (aix = aiskills --route)
 src/scripts/            cli.mjs, installer.mjs, postinstall.mjs, vendor-skills.mjs
@@ -17,9 +18,8 @@ src/test/               node:test suite
 ```
 
 ## What just happened
-- **Two more commands:** `ais` (same as `aiskills`; a third `"bin"` entry to the same file) and `aix` (= `aiskills --route`, via `bin/aix.mjs`). Chosen after discussing names: `ask` was rejected (Amazon's Alexa Skills Kit CLI uses it), and `aix`'s clash with IBM's AIX was accepted by the user. README "Install" has a command table; `--help` lists all three.
-- Tests: `aix` and `aiskills --route` give identical `npx skills` calls for install/uninstall/installed; `package.json` `bin` is checked; e2e confirms npm creates `ais` and `aix` and that they behave as described. A deliberate break (aix not setting route mode) turned 2 tests red.
-- Earlier in this stretch: single-letter aliases (`i`, `r`, `ls`, `g`, `f`, `p`, `h`), AIS-7 rewritten as keep-vs-remove `postinstall`, AIS-6 flat `skills/` + `--nested`.
+- **Added `CHANGELOG.md`** (Keep a Changelog 1.1.0 + SemVer 2.0.0). It defines MAJOR/MINOR/PATCH for this package (new or updated bundled skills count as MINOR), has an empty `## [Unreleased]`, and lists the whole first release under `## [0.1.0] - Unreleased`, to be dated at publish time. It's in `"files"`, so it ships; the packaging test checks that. The README's publish steps and AIS-1 include dating it.
+- Just before: the `ais` and `aix` commands, the single-letter aliases, AIS-7 rewritten, AIS-6 (flat `skills/` + `--nested`).
 
 ## Known issues / open threads
 - PR #122 is open; publish only after it's merged (AIS-1).
