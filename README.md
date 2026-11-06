@@ -39,6 +39,7 @@ folder. See [`src/aiskills`](src/aiskills/README.md).
 
 ```sh
 npm install -g @sugatoray-ai/aiskills
+aiskills uninstall --purge     # later: remove the skills + local folder
 ```
 
 </details>

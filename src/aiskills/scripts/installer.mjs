@@ -6,9 +6,9 @@
 //    are registered with the user's agents (Claude Code, Codex, ...).
 
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const PKG_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -73,13 +73,37 @@ function childEnv() {
   return env;
 }
 
+const quote = (a) => (/[\s*'"]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
+
+/**
+ * Run `npx -y skills <args...>` with inherited stdio; returns the exit code.
+ * opts: { cwd, capture=false } — capture returns { status, stdout } instead.
+ */
+export function runSkills(args, { cwd, capture = false, quiet = false } = {}) {
+  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+  const full = ["-y", "skills", ...args];
+  if (!quiet) log(`running: npx ${full.map(quote).join(" ")}`);
+  const res = spawnSync(npx, full, {
+    stdio: capture ? ["ignore", "pipe", "inherit"] : "inherit",
+    encoding: "utf8",
+    // The install root may not exist (e.g. after --purge); run from $HOME then.
+    cwd: cwd && existsSync(cwd) ? cwd : cwd ? homedir() : process.cwd(),
+    shell: process.platform === "win32",
+    env: childEnv(),
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  if (res.error) throw res.error;
+  const status = res.status ?? 1;
+  return capture ? { status, stdout: res.stdout ?? "" } : status;
+}
+
 /**
  * Run `npx -y skills add <root> ...`.
  * opts: { global=true, agents=[], skills=['*'], copy=false, list=false, cwd, extra=[] }
  */
 export function skillsAdd(root = installRoot(), opts = {}) {
   const { global = true, agents = [], skills = ["*"], copy = false, list = false, cwd, extra = [] } = opts;
-  const args = ["-y", "skills", "add", root];
+  const args = ["add", root];
   if (list) {
     args.push("--list");
   } else {
@@ -90,17 +114,67 @@ export function skillsAdd(root = installRoot(), opts = {}) {
     args.push("--yes");
   }
   args.push(...extra);
+  return runSkills(args, { cwd });
+}
 
-  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-  log(`running: npx ${args.map((a) => (/[\s*]/.test(a) ? `'${a}'` : a)).join(" ")}`);
-  const res = spawnSync(npx, args, {
-    stdio: "inherit",
-    cwd: cwd ?? process.cwd(),
-    shell: process.platform === "win32",
-    env: childEnv(),
-  });
-  if (res.error) throw res.error;
-  return res.status ?? 1;
+// ---------------------------------------------------------------- uninstall
+
+/** Skill names (SKILL.md frontmatter `name:`, else folder name) under <root>/skills. */
+export function packageSkillNames(root = installRoot()) {
+  const names = new Set();
+  const base = join(root, "skills");
+  if (!existsSync(base)) return names;
+  (function walk(dir) {
+    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+      if (ent.name === "node_modules" || ent.name === ".git") continue;
+      const p = join(dir, ent.name);
+      if (ent.isDirectory()) walk(p);
+      else if (ent.name === "SKILL.md") {
+        const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(p, "utf8"));
+        const m = fm && /^name:\s*["']?([^"'\r\n]+?)["']?\s*$/m.exec(fm[1]);
+        names.add(m ? m[1].trim() : basename(dir));
+      }
+    }
+  })(base);
+  return names;
+}
+
+/**
+ * Skills that `npx skills list` reports as installed from <root>.
+ * Returns null if the list could not be read.
+ */
+export function installedFromRoot(root = installRoot(), { global = true, cwd } = {}) {
+  const args = ["list", "--json"];
+  if (global) args.push("--global");
+  const { status, stdout } = runSkills(args, { cwd, capture: true, quiet: true });
+  if (status !== 0) return null;
+  try {
+    const start = stdout.indexOf("[");
+    const rows = JSON.parse(stdout.slice(start));
+    const want = resolve(root);
+    return rows.filter((r) => r.source && resolve(r.source) === want);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Run `npx -y skills remove <names...> [--global] [--agent a] --yes`.
+ * opts: { global=true, agents=[], cwd, extra=[] }
+ */
+export function skillsRemove(names, opts = {}) {
+  const { global = true, agents = [], cwd, extra = [] } = opts;
+  const args = ["remove", ...names];
+  if (global) args.push("--global");
+  for (const a of agents) args.push("--agent", a);
+  args.push("--yes", ...extra);
+  return runSkills(args, { cwd });
+}
+
+/** Delete <root> (the ~/.config/sugatoray/aiskills folder). */
+export function purgeRoot(root = installRoot()) {
+  rmSync(root, { recursive: true, force: true });
+  log(`deleted ${root}`);
 }
 
 const csv = (v) => (v ? v.split(",").map((s) => s.trim()).filter(Boolean) : []);
