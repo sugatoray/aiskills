@@ -32,8 +32,8 @@ const HELP = `aiskills ${version} — Sugato Ray's agent skills
 Usage: aiskills <command> [options]
 
 Commands:
-  install        Save skills to ${ROOT}/skills and run 'npx skills add' on it (default)
-  uninstall      Remove skills installed from ${ROOT} via 'npx skills remove'
+  install, i     Save skills to ${ROOT}/skills and run 'npx skills add' on it (default)
+  uninstall, rm  Remove skills installed from ${ROOT} via 'npx skills remove' (also: remove)
   installed      Show skills currently installed from ${ROOT}
   groups         List skill groups (from .claude-plugin/marketplace.json) and their skills
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
@@ -267,7 +267,8 @@ function main() {
   }
   const [cmd = "install", ...rest] = argv;
   switch (cmd) {
-    case "install": {
+    case "install":
+    case "i": {
       const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout"]);
       const root = syncSkills({ version, layout: opts.layout });
       const picked = selectedSkills(opts, root);

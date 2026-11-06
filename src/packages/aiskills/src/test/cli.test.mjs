@@ -42,6 +42,25 @@ describe("aiskills (basics)", posixOnly, () => {
     assert.equal(sb.run(["--version"]).out.trim(), version);
   });
 
+  test("i is install, rm and remove are uninstall", () => {
+    const long = sb.run(["install", "-G", "alpha", "-a", "codex"]);
+    const short = sb.run(["i", "-G", "alpha", "-a", "codex"]);
+    assert.equal(short.status, 0, short.out);
+    assert.deepEqual(changes(short.calls), changes(long.calls));
+    assert.ok(changes(short.calls).length === 1);
+
+    sb.setList([row("a1", sb.root)]);
+    for (const cmd of ["uninstall", "rm", "remove"]) {
+      assert.deepEqual(changes(sb.run([cmd, "-s", "a1"]).calls), [["remove", "a1", "--global", "--yes"]], cmd);
+    }
+  });
+
+  test("aliases also work after a leading --route / --nested", () => {
+    const r = sb.run(["--nested", "i", "-s", "a1"]);
+    assert.equal(r.status, 0, r.out);
+    assert.equal(JSON.parse(readFileSync(join(sb.root, "aiskills.json"), "utf8")).layout, "nested");
+  });
+
   test("an unknown command or option fails", () => {
     assert.equal(sb.run(["frobnicate"]).status, 1);
     const r = sb.run(["install", "--bogus"]);

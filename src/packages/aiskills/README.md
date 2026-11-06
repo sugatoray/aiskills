@@ -78,8 +78,8 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--nested|--flat] [-- <extra npx skills args>]
-aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--nested|--flat] [-- <extra npx skills args>]   # alias: i
+aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]   # aliases: rm, remove
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills
 aiskills find <query>        # search the skills registry (= npx skills find)
@@ -90,6 +90,10 @@ aiskills sync [--nested|--flat]   # only refresh ~/.config/sugatoray/aiskills/sk
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills
 ```
+
+`aiskills i` is short for `aiskills install` (as in `npm i`), and `aiskills rm`
+or `aiskills remove` for `aiskills uninstall`. Options work the same way:
+`aiskills i -G scrolls -a claude-code`.
 
 Install examples:
 
