@@ -11,7 +11,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - Group name = the plugin entry's `name`, exactly. The alias (name minus `-skills`) and the `all` group are CLI inventions; the README must keep saying so.
 - npm never runs uninstall lifecycle scripts, so `aiskills uninstall` has to be run before `npm uninstall -g`.
 - npm 7+ hides postinstall output unless `--foreground-scripts`; pnpm and bun skip postinstall unless allowed; `--ignore-scripts` skips it too. `aiskills install` is the fallback for all of these.
-- The CLI entry point is `src/bin/cli.mjs`, the rest of the code is in `src/scripts/` and tests in `src/test/`; `package.json`, README and docs stay at the package root. `"bin"` points straight at `src/bin/cli.mjs` (no `bin/` folder).
+- `bin/aiskills.mjs` is a thin entry point; the code (incl. `cli.mjs`) is in `src/scripts/` and tests in `src/test/`; `package.json`, README and docs stay at the package root. `"bin"` points at `bin/aiskills.mjs`, which only imports `src/scripts/cli.mjs`.
 - The `files` list in `package.json` decides what ships. The scrolls files, `CLAUDE.md` etc. must stay out of the tarball.
 
 ## Traps — avoid them always

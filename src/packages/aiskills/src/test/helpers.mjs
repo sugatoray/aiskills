@@ -2,7 +2,7 @@
 //
 // Nothing here touches the real $HOME, the real package folder, or the
 // network: every test gets its own temp folder holding
-//   pkg/    a copy of src/bin/, src/scripts/ and package.json plus a small fixture
+//   pkg/    a copy of bin/, src/scripts/ and package.json plus a small fixture
 //           skills/ tree and .claude-plugin/marketplace.json, laid out the
 //           way the published tarball is (incl. a renamed _gitignore)
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
@@ -78,7 +78,7 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 
 /**
  * A fresh sandbox. Returns helpers:
- *   run(args, {env})       run src/bin/cli.mjs, returns { status, out, calls }
+ *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/cli.mjs), returns { status, out, calls }
  *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
@@ -86,7 +86,8 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 export function sandbox() {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
-  for (const d of ["bin", "scripts"]) cpSync(join(PKG_SRC, "src", d), join(pkg, "src", d), { recursive: true });
+  cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
+  cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
   writeFixtureTree(pkg);
   const home = join(dir, "home");
@@ -136,7 +137,7 @@ export function sandbox() {
     pkg,
     home,
     root,
-    run: (args, { env } = {}) => exec(join(pkg, "src", "bin", "cli.mjs"), args, env),
+    run: (args, { env } = {}) => exec(join(pkg, "bin", "aiskills.mjs"), args, env),
     postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
@@ -167,7 +168,7 @@ export function trackedFiles(dir) {
  * A throwaway copy of the repo shaped like the real one, so vendoring and
  * `npm pack` never write into the working tree:
  *   <tmp>/repo/{skills, .claude-plugin/marketplace.json, LICENSE}
- *   <tmp>/repo/src/packages/aiskills/{src, package.json, README.md, .npmignore, .gitignore}
+ *   <tmp>/repo/src/packages/aiskills/{bin, src, package.json, README.md, .npmignore, .gitignore}
  * Only git-tracked skill files are copied. Returns { dir, repo, pkg } or null.
  */
 export function repoCopy() {
@@ -181,7 +182,7 @@ export function repoCopy() {
     cpSync(join(REPO_ROOT, rel), dest);
   }
   const pkg = join(repo, "src", "packages", "aiskills");
-  for (const p of ["src", "package.json", "README.md", ".npmignore", ".gitignore"]) {
+  for (const p of ["bin", "src", "package.json", "README.md", ".npmignore", ".gitignore"]) {
     cpSync(join(PKG_SRC, p), join(pkg, p), { recursive: true });
   }
   return { dir, repo, pkg, skills };

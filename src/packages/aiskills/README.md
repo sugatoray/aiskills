@@ -372,12 +372,13 @@ npm run clean         # remove the vendored copy
 
 ```text
 src/packages/aiskills/
-├── package.json              # "bin": { "aiskills": "src/bin/cli.mjs" }
+├── package.json              # "bin": { "aiskills": "bin/aiskills.mjs" }
 ├── README.md
+├── bin/
+│   └── aiskills.mjs          # thin entry point: imports src/scripts/cli.mjs
 ├── src/
-│   ├── bin/
-│   │   └── cli.mjs           # the `aiskills` command (package.json "bin")
-│   ├── scripts/              # the rest of the code
+│   ├── scripts/              # the code
+│   │   ├── cli.mjs           # the `aiskills` command
 │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
 │   │   ├── postinstall.mjs   # npm postinstall hook
 │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
@@ -398,7 +399,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | File | What it covers |
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
-| `src/test/cli.test.mjs` | `src/bin/cli.mjs` (the `aiskills` command) and `src/scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/cli.mjs` (the `aiskills` command) and `src/scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: every git-tracked file under `skills/` ships (with `.gitignore` files renamed), and `src/test/`, the vendor script, `docs/` and the scrolls files don't. |
 | `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--purge`. |
 
