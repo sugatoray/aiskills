@@ -9,6 +9,7 @@ The package (`@sugatoray-ai/aiskills` `0.1.0`, folder `src/packages/aiskills/`) 
 One long session built the package from scratch (see `SPEC.md`). Along the way it was:
 - renamed from `@sugatoray/aiskills` to `@sugatoray-ai/aiskills` (the user owns the `sugatoray-ai` npm org);
 - moved from `src/aiskills/` to `src/packages/aiskills/` (git rename; `vendor-skills.mjs` now finds the repo root by walking up instead of assuming a depth);
+- reorganised so code lives in `src/scripts/` and tests in `src/test/`, with `package.json`, README and docs at the package root;
 - given its scrolls memory (`/scrolls-setup`, then this `/scrolls-update`).
 
 There is now a `node:test` suite (`npm test`: 83 offline tests, about 6 seconds; `npm run test:e2e`: a real install with the real `npx skills`, needs network). Both pass. A deliberate-bug check confirmed the suite catches regressions in env scrubbing, dotfile restoring, full-uninstall scope and ambiguous `--route` matches.

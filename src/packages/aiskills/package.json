@@ -23,25 +23,25 @@
   "author": "Sugato Ray (https://github.com/sugatoray)",
   "type": "module",
   "bin": {
-    "aiskills": "src/aiskills/cli.mjs"
+    "aiskills": "src/scripts/cli.mjs"
   },
   "files": [
-    "src/aiskills/cli.mjs",
-    "src/aiskills/installer.mjs",
-    "src/aiskills/postinstall.mjs",
+    "src/scripts/cli.mjs",
+    "src/scripts/installer.mjs",
+    "src/scripts/postinstall.mjs",
     "skills/",
     ".claude-plugin/marketplace.json",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "vendor": "node src/aiskills/vendor-skills.mjs",
-    "clean": "node src/aiskills/vendor-skills.mjs --clean",
-    "prepack": "node src/aiskills/vendor-skills.mjs",
-    "postinstall": "node src/aiskills/postinstall.mjs",
+    "vendor": "node src/scripts/vendor-skills.mjs",
+    "clean": "node src/scripts/vendor-skills.mjs --clean",
+    "prepack": "node src/scripts/vendor-skills.mjs",
+    "postinstall": "node src/scripts/postinstall.mjs",
     "pack:dry": "npm pack --dry-run",
-    "test": "node --test src/aiskills/test/*.test.mjs",
-    "test:e2e": "AISKILLS_E2E=1 node --test src/aiskills/test/e2e.test.mjs"
+    "test": "node --test src/test/*.test.mjs",
+    "test:e2e": "AISKILLS_E2E=1 node --test src/test/e2e.test.mjs"
   },
   "engines": {
     "node": ">=18.17"

@@ -11,7 +11,7 @@ import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// This file lives at <package>/src/aiskills/installer.mjs.
+// This file lives at <package>/src/scripts/installer.mjs.
 export const PKG_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const PKG_SKILLS = join(PKG_DIR, "skills");
 export const MARKETPLACE_REL = join(".claude-plugin", "marketplace.json");
@@ -26,7 +26,7 @@ export function installRoot() {
 export const log = (...a) => console.log("[aiskills]", ...a);
 export const warn = (...a) => console.warn("[aiskills]", ...a);
 
-// Reverse of the renames done by src/aiskills/vendor-skills.mjs.
+// Reverse of the renames done by src/scripts/vendor-skills.mjs.
 const DOTFILES = { _gitignore: ".gitignore", _npmignore: ".npmignore" };
 function restoreDotfiles(dir) {
   for (const ent of readdirSync(dir, { withFileTypes: true })) {

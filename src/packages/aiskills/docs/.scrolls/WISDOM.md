@@ -11,7 +11,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - Group name = the plugin entry's `name`, exactly. The alias (name minus `-skills`) and the `all` group are CLI inventions; the README must keep saying so.
 - npm never runs uninstall lifecycle scripts, so `aiskills uninstall` has to be run before `npm uninstall -g`.
 - npm 7+ hides postinstall output unless `--foreground-scripts`; pnpm and bun skip postinstall unless allowed; `--ignore-scripts` skips it too. `aiskills install` is the fallback for all of these.
-- All code lives under `src/aiskills/`; `package.json`, README and docs stay at the package root. `"bin"` points straight at `src/aiskills/cli.mjs` (no `bin/` folder).
+- Code lives in `src/scripts/` and tests in `src/test/`; `package.json`, README and docs stay at the package root. `"bin"` points straight at `src/scripts/cli.mjs` (no `bin/` folder).
 - The `files` list in `package.json` decides what ships. The scrolls files, `CLAUDE.md` etc. must stay out of the tarball.
 
 ## Traps — avoid them always
@@ -38,8 +38,8 @@ Bad patterns or decisions to never take, and why they were rejected.
 Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code.
-- **Run `npm test` before every change and after it.** New behaviour gets a test in `src/aiskills/test/cli.test.mjs` (stand-in `npx` on `PATH`; assert the exact `npx skills` args via `skillsArgs`) or `src/aiskills/test/unit.test.mjs`. Add a failing test first (Red/Green).
-- Tests must never touch the real `HOME` or write vendored files into the package folder: use `sandbox()` / `repoCopy()` from `src/aiskills/test/helpers.mjs`.
+- **Run `npm test` before every change and after it.** New behaviour gets a test in `src/test/cli.test.mjs` (stand-in `npx` on `PATH`; assert the exact `npx skills` args via `skillsArgs`) or `src/test/unit.test.mjs`. Add a failing test first (Red/Green).
+- Tests must never touch the real `HOME` or write vendored files into the package folder: use `sandbox()` / `repoCopy()` from `src/test/helpers.mjs`.
 - **End-to-end recipe** (now automated as `npm run test:e2e`): `npm pack --pack-destination <tmp>` → `HOME=<tmp>/home npm install -g --prefix <tmp>/prefix <tgz>` → drive `<tmp>/prefix/bin/aiskills` with `HOME=<tmp>/home` → `npm run clean`.
 - **Check the tarball:** compare `npm pack --dry-run --json` (with `_gitignore` mapped back) against `git ls-files skills`; they should be identical.
 - `npx skills list --json` gives `source` and `sourceType` per skill. Bundled rows are `sourceType: "local"` with `source` equal to the install folder.

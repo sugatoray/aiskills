@@ -2,7 +2,7 @@
 //
 // Nothing here touches the real $HOME, the real package folder, or the
 // network: every test gets its own temp folder holding
-//   pkg/    a copy of src/aiskills/ (no tests) and package.json plus a small fixture
+//   pkg/    a copy of src/scripts/ (no tests) and package.json plus a small fixture
 //           skills/ tree and .claude-plugin/marketplace.json, laid out the
 //           way the published tarball is (incl. a renamed _gitignore)
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
@@ -11,11 +11,11 @@
 import { spawnSync } from "node:child_process";
 import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, dirname, join, resolve, sep } from "node:path";
+import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// This file lives at <package>/src/aiskills/test/helpers.mjs.
-export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+// This file lives at <package>/src/test/helpers.mjs.
+export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const REPO_ROOT = resolve(PKG_SRC, "..", "..", "..");
 
 /** Fixture skills: two groups (alpha, beta), one ungrouped skill. */
@@ -78,18 +78,15 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 
 /**
  * A fresh sandbox. Returns helpers:
- *   run(args, {env})       run src/aiskills/cli.mjs, returns { status, out, calls }
- *   postinstall({env})     run src/aiskills/postinstall.mjs the way npm would
+ *   run(args, {env})       run src/scripts/cli.mjs, returns { status, out, calls }
+ *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
  */
 export function sandbox() {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
-  cpSync(join(PKG_SRC, "src", "aiskills"), join(pkg, "src", "aiskills"), {
-    recursive: true,
-    filter: (p) => !p.includes(`${sep}test`),
-  });
+  cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
   writeFixtureTree(pkg);
   const home = join(dir, "home");
@@ -139,8 +136,8 @@ export function sandbox() {
     pkg,
     home,
     root,
-    run: (args, { env } = {}) => exec(join(pkg, "src", "aiskills", "cli.mjs"), args, env),
-    postinstall: ({ env } = {}) => exec(join(pkg, "src", "aiskills", "postinstall.mjs"), [], env),
+    run: (args, { env } = {}) => exec(join(pkg, "src", "scripts", "cli.mjs"), args, env),
+    postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),

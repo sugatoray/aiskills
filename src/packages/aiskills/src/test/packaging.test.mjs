@@ -65,9 +65,9 @@ describe("npm pack", () => {
       "package.json",
       "README.md",
       "LICENSE",
-      "src/aiskills/cli.mjs",
-      "src/aiskills/installer.mjs",
-      "src/aiskills/postinstall.mjs",
+      "src/scripts/cli.mjs",
+      "src/scripts/installer.mjs",
+      "src/scripts/postinstall.mjs",
       ".claude-plugin/marketplace.json",
     ]) {
       assert.ok(files.includes(p), p);
@@ -76,10 +76,10 @@ describe("npm pack", () => {
     assert.deepEqual(shipped, [...copy.skills].sort());
   });
 
-  test("all shipped code is the runtime files under src/aiskills/", (t) => {
+  test("all shipped code is the runtime files under src/scripts/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["src/aiskills/cli.mjs", "src/aiskills/installer.mjs", "src/aiskills/postinstall.mjs"]);
+    assert.deepEqual(code.sort(), ["src/scripts/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
   });
 
   test("leaves out tests, dev scripts and the scrolls memory", (t) => {

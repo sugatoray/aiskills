@@ -1,4 +1,4 @@
-// Unit tests for the pure helpers in src/aiskills/installer.mjs.
+// Unit tests for the pure helpers in src/scripts/installer.mjs.
 import assert from "node:assert/strict";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -16,7 +16,7 @@ import {
   skillNamesIn,
   skillsForGroups,
   specSkillName,
-} from "../installer.mjs";
+} from "../scripts/installer.mjs";
 import { tempDir, writeFixtureTree } from "./helpers.mjs";
 
 let root;

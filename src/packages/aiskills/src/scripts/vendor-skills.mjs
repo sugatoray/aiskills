@@ -4,14 +4,14 @@
 // so the published tarball carries the skills folder intact. Runs on `prepack`,
 // i.e. before every `npm pack` / `npm publish`.
 //
-//   node src/aiskills/vendor-skills.mjs          # (re)vendor   (npm run vendor)
-//   node src/aiskills/vendor-skills.mjs --clean  # remove copies (npm run clean)
+//   node src/scripts/vendor-skills.mjs          # (re)vendor   (npm run vendor)
+//   node src/scripts/vendor-skills.mjs --clean  # remove copies (npm run clean)
 
 import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// This file lives at <package>/src/aiskills/vendor-skills.mjs.
+// This file lives at <package>/src/scripts/vendor-skills.mjs.
 const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 // The repo root is the nearest ancestor that holds both skills/ and
 // .claude-plugin/marketplace.json (currently <repo>/src/packages/aiskills -> <repo>).
