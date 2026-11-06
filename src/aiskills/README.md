@@ -31,6 +31,9 @@ aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [-- <ext
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills
+aiskills find <query>        # search the skills registry (= npx skills find)
+# --route (before or after the command) hands non-bundled skills to npx skills
+aiskills --route install|uninstall|installed ...
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
 aiskills sync                # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
@@ -198,6 +201,91 @@ aiskills uninstall -G 'd*'                               # docs-skills + diagram
 AISKILLS_GROUPS='pers*' AISKILLS_AGENTS='claude-c*' npm i -g @sugatoray-ai/aiskills
 ```
 
+## Bundled and external skills (`--route`)
+
+Without `--route`, `aiskills` only manages the **bundled** skills, the ones in
+`~/.config/sugatoray/aiskills/skills/`. It rejects any other skill name and
+suggests adding `--route`.
+
+With `--route`, every `-s` entry that isn't bundled is handed to `npx skills`.
+That lets you manage bundled and external (registry / GitHub) skills from one
+CLI. `--route` can go before or after the command, or you can set
+`AISKILLS_ROUTE=1`.
+
+```sh
+aiskills --route install -s scrolls-setup,pdf -a claude-code
+aiskills install --route -s scrolls-setup,pdf -a claude-code   # same
+```
+
+### `install --route`
+
+Each `-s` entry is handled as follows:
+
+| `-s` entry | What happens |
+| --- | --- |
+| A bundled skill name, or a pattern | Installed from `~/.config/sugatoray/aiskills`, the same as without `--route`. |
+| A bare name that isn't bundled, e.g. `pdf` | Looked up with `npx skills find pdf`. If **exactly one** result has that exact name, `npx skills add <owner/repo>@pdf` installs it. |
+| `owner/repo@skill` | Passed straight to `npx skills add owner/repo@skill`, with no lookup. |
+| `owner/repo`, a git URL, or a local path | Passed straight to `npx skills add <spec>`, which installs the skills found there. |
+
+- **Same flags.** External installs get the same `-g/-p`, `-a` (patterns
+  included) and `--copy` as the bundled ones.
+- **Lookups first.** Every external lookup runs before anything is installed.
+  If one fails, nothing is installed.
+- **Several matches.** If more than one skill has the exact name, the command
+  stops and lists them, e.g. `a/one@dupe` and `b/two@dupe`. Pick one with
+  `-s owner/repo@skill`. `aiskills` never chooses for you.
+- **No exact match.** The command stops and shows the closest results from
+  `npx skills find`.
+- **Patterns and groups** (`-s 'x*'`, `-G`) only match bundled skills. The
+  registry can't be searched with a pattern, so use `aiskills find <query>` to
+  browse it.
+
+```sh
+aiskills find pdf                                    # browse the registry
+aiskills --route install -s pdf -a claude-code       # look up + install
+aiskills --route install -s anthropics/skills@docx   # pinned, no lookup
+aiskills --route install -G scrolls -s pdf -p        # bundled group + external skill, project scope
+```
+
+External skills are installed straight from their source, the same way
+`npx skills add` would install them. They aren't copied into
+`~/.config/sugatoray/aiskills`.
+
+### `uninstall --route`
+
+- **Any source.** `-s` names and patterns also match skills installed from
+  other sources, not only bundled ones. For example,
+  `aiskills --route uninstall -s 'pdf,do*'` removes the external `pdf` and
+  `docx`.
+- **`owner/repo@skill`** is reduced to `skill`. A bare `owner/repo` is
+  rejected, because it doesn't name a skill.
+- **Not installed.** Names that aren't installed in that scope are skipped
+  with a warning.
+- **Full uninstall** (no `-s`/`-G`) still removes **only bundled** skills,
+  even with `--route`. External skills are removed only when you name them.
+- **Same name from two sources.** `npx skills remove` removes by name, so
+  `--route uninstall -s <name>` removes the skill whichever source it came
+  from.
+
+```sh
+aiskills --route uninstall -s pdf -n           # preview
+aiskills --route uninstall -s pdf,docx
+aiskills --route uninstall -s anthropics/skills@pdf
+```
+
+### `installed --route`
+
+Lists **every** installed skill in that scope, with a source column:
+`bundled` for skills from `~/.config/sugatoray/aiskills`, otherwise the
+source `npx skills` recorded (e.g. `anthropics/skills`).
+
+```text
+$ aiskills --route installed
+docx                       anthropics/skills              -                      Claude Code
+scrolls-setup              bundled                        scrolls-skills         Claude Code
+```
+
 ## Uninstall
 
 `aiskills uninstall` calls `npx skills remove ... --yes`.
@@ -259,6 +347,7 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_SKILLS` | Comma-separated skills or [patterns](#patterns-for--s--g-and--a), passed as `--skill` (default: all) |
 | `AISKILLS_GROUPS` | Comma-separated group names, aliases or [patterns](#patterns-for--s--g-and--a) (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
+| `AISKILLS_ROUTE=1` | Same as `--route`. Also lets the postinstall step route non-bundled names in `AISKILLS_SKILLS` |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
 

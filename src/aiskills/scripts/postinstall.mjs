@@ -7,7 +7,19 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { PKG_DIR, PKG_SKILLS, envOptions, expandAgents, log, selectedSkills, skillsAdd, syncSkills, warn } from "./installer.mjs";
+import {
+  PKG_DIR,
+  PKG_SKILLS,
+  envOptions,
+  expandAgents,
+  log,
+  resolveExternal,
+  selectedSkills,
+  skillsAdd,
+  skillsAddExternal,
+  syncSkills,
+  warn,
+} from "./installer.mjs";
 
 const truthy = (v) => /^(1|true|yes)$/i.test(v || "");
 
@@ -32,9 +44,17 @@ function main() {
   const cwd = opts.global ? root : process.env.INIT_CWD || process.cwd();
   // AISKILLS_SKILLS / AISKILLS_GROUPS / AISKILLS_AGENTS may use globs.
   const picked = selectedSkills(opts, root);
-  if (picked?.unknown.length) throw new Error(`unknown skill(s) in AISKILLS_SKILLS: ${picked.unknown.join(", ")}`);
+  const external = picked?.unknown ?? [];
+  if (external.length && !opts.route) {
+    throw new Error(`unknown skill(s) in AISKILLS_SKILLS: ${external.join(", ")} (set AISKILLS_ROUTE=1 to look them up)`);
+  }
   const agents = expandAgents(opts.agents);
-  const status = skillsAdd(root, { ...opts, agents, skills: picked?.names ?? ["*"], cwd });
+  const routed = external.length ? resolveExternal(external) : [];
+  const bundled = picked ? picked.names.filter((n) => !external.includes(n)) : ["*"];
+  let status = bundled.length ? skillsAdd(root, { ...opts, agents, skills: bundled, cwd }) : 0;
+  for (const { spec } of routed) {
+    status = skillsAddExternal(spec, { ...opts, agents, cwd: opts.global ? undefined : cwd }) || status;
+  }
   if (status !== 0) {
     warn(`'npx skills add' exited with ${status}. Skills are saved in ${root}/skills;`);
     warn(`register them later with:  npx skills add ${root} --global`);

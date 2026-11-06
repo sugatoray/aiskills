@@ -40,6 +40,7 @@ folder. See [`src/aiskills`](src/aiskills/README.md).
 ```sh
 npm install -g @sugatoray-ai/aiskills
 aiskills install --group scrolls --global --agent claude-code   # one group only
+aiskills --route install -s scrolls-setup,pdf                    # bundled + external (via npx skills)
 aiskills uninstall --purge     # later: remove the skills + local folder
 ```
 

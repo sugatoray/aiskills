@@ -352,19 +352,105 @@ export function expandAgents(patterns) {
  * Skills that `npx skills list` reports as installed from <root>.
  * Returns null if the list could not be read.
  */
-export function installedFromRoot(root = installRoot(), { global = true, cwd } = {}) {
+export function installedFromRoot(root = installRoot(), opts = {}) {
+  const rows = listInstalled(opts);
+  if (!rows) return null;
+  return rows.filter((r) => isFromRoot(r, root));
+}
+
+/** True if an `npx skills list --json` row was installed from <root>. */
+export function isFromRoot(row, root = installRoot()) {
+  return row.sourceType === "local" && !!row.source && resolve(row.source) === resolve(root);
+}
+
+/** Every skill `npx skills list --json` reports (any source); null on error. */
+export function listInstalled({ global = true, cwd } = {}) {
   const args = ["list", "--json"];
   if (global) args.push("--global");
   const { status, stdout } = runSkills(args, { cwd, capture: true, quiet: true });
   if (status !== 0) return null;
   try {
-    const start = stdout.indexOf("[");
-    const rows = JSON.parse(stdout.slice(start));
-    const want = resolve(root);
-    return rows.filter((r) => r.source && resolve(r.source) === want);
+    return JSON.parse(stdout.slice(stdout.indexOf("[")));
   } catch {
     return null;
   }
+}
+
+// ------------------------------------------------------------------ routing
+//
+// With --route, skills that are not in the bundled set are handed to
+// `npx skills` instead of being rejected:
+//   owner/repo, owner/repo@skill, URLs, paths  -> npx skills add <spec>
+//   a bare name                                -> npx skills find <name>,
+//                                                 then npx skills add <source>@<name>
+
+/** True if <entry> is a source spec for `npx skills add` rather than a bare skill name. */
+export const isSourceSpec = (entry) => /[/\\:]/.test(entry) || entry.startsWith("~") || entry.startsWith(".");
+
+/** Skill name a source spec / bare name refers to, for uninstall. */
+export function specSkillName(entry) {
+  if (!isSourceSpec(entry)) return entry;
+  const at = entry.lastIndexOf("@");
+  return at > 0 && !entry.slice(at).includes("/") ? entry.slice(at + 1) : null;
+}
+
+const stripAnsi = (t) => t.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
+
+/**
+ * Look a skill up on the skills registry via `npx skills find <name>`.
+ * Returns [{ spec: "owner/repo@name", source, name, installs }].
+ */
+export function findSkill(query) {
+  const { stdout } = runSkills(["find", query], { capture: true, quiet: true });
+  const out = [];
+  for (const line of stripAnsi(stdout).split(/\r?\n/)) {
+    const m = /^\s*(\S+)@([^\s@]+)(?:\s+(.*))?$/.exec(line);
+    if (m && m[1].includes("/")) out.push({ spec: `${m[1]}@${m[2]}`, source: m[1], name: m[2], installs: (m[3] ?? "").trim() });
+  }
+  return out;
+}
+
+/**
+ * Turn the entries that aren't bundled into `npx skills add` specs.
+ * A bare name must have exactly one exact-name match in `npx skills find`;
+ * otherwise this throws with the candidates so the user can pin
+ * owner/repo@skill. Returns [{ entry, spec }].
+ */
+export function resolveExternal(entries) {
+  const resolved = [];
+  const problems = [];
+  for (const entry of entries) {
+    if (isSourceSpec(entry)) {
+      resolved.push({ entry, spec: entry });
+      continue;
+    }
+    log(`'${entry}' is not bundled; looking it up with 'npx skills find ${entry}' ...`);
+    const hits = findSkill(entry);
+    const exact = hits.filter((h) => h.name.toLowerCase() === entry.toLowerCase());
+    const show = (list) => list.slice(0, 10).map((h) => `    ${h.spec}${h.installs ? `  (${h.installs})` : ""}`).join("\n");
+    if (exact.length === 1) {
+      log(`found ${exact[0].spec}`);
+      resolved.push({ entry, spec: exact[0].spec });
+    } else if (exact.length > 1) {
+      problems.push(`'${entry}' matches several skills; pick one with -s <owner/repo@skill>:\n${show(exact)}`);
+    } else if (hits.length) {
+      problems.push(`no skill named exactly '${entry}'; closest results:\n${show(hits)}`);
+    } else {
+      problems.push(`no skill named '${entry}' found by 'npx skills find'`);
+    }
+  }
+  if (problems.length) throw new Error(problems.join("\n"));
+  return resolved;
+}
+
+/** `npx skills add <spec> [--global] [--agent a] [--copy] --yes`. */
+export function skillsAddExternal(spec, { global = true, agents = [], copy = false, cwd, extra = [] } = {}) {
+  const args = ["add", spec];
+  if (global) args.push("--global");
+  for (const a of agents) args.push("--agent", a);
+  if (copy) args.push("--copy");
+  args.push("--yes", ...extra);
+  return runSkills(args, { cwd });
 }
 
 /**
@@ -397,5 +483,6 @@ export function envOptions() {
     skills: csv(e.AISKILLS_SKILLS),
     groups: csv(e.AISKILLS_GROUPS),
     copy: /^(1|true|yes)$/i.test(e.AISKILLS_COPY || ""),
+    route: /^(1|true|yes)$/i.test(e.AISKILLS_ROUTE || ""),
   };
 }

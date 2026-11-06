@@ -7,6 +7,11 @@ import {
   expandAgents,
   installRoot,
   installedFromRoot,
+  isFromRoot,
+  listInstalled,
+  resolveExternal,
+  skillsAddExternal,
+  specSkillName,
   loadGroups,
   log,
   packageSkillNames,
@@ -34,6 +39,7 @@ Commands:
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
   path           Print the folder that holds skills/
+  find <query>   Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ${ROOT}
   help           Show this help
 
@@ -48,6 +54,13 @@ Scope/selection options (install, uninstall, installed):
   -s/-G/-a accept glob patterns: * (any text), ? (one character), [abc] / [a-z] / [!a]
   (one of / range / not). Matching ignores case. A pattern that matches nothing is an
   error. Quote patterns so your shell doesn't expand them: -s 'scrolls-*'.
+
+Routing (install, uninstall, installed; may also go before the command):
+      --route            Hand skills that are NOT bundled to 'npx skills':
+                           install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
+                                      -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
+                           uninstall: -s <name|pattern>     -> also matches skills from other sources
+                           installed: lists every installed skill with its source
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
@@ -68,6 +81,10 @@ Examples:
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'
   aiskills install -s 'scrolls-*' -a 'cursor,qoder*'
   aiskills uninstall -s 'scrolls-[hu]*'       # scrolls-hide, -unhide, -update
+  aiskills --route install -s scrolls-setup,pdf -a claude-code      # bundled + registry lookup
+  aiskills install --route -s anthropics/skills@pdf -g              # external, pinned
+  aiskills --route uninstall -s pdf                                 # remove an external skill
+  aiskills --route installed                                        # bundled + external
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
@@ -78,6 +95,7 @@ Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
                          Defaults for the options above (also used by the npm postinstall)
+  AISKILLS_ROUTE=1              Same as --route
   AISKILLS_SKIP_POSTINSTALL=1   Skip the npm postinstall hook entirely
   AISKILLS_SKIP_SKILLS_ADD=1    Postinstall copies files but skips 'npx skills add'
 `;
@@ -108,6 +126,7 @@ function parse(argv, allowed) {
     else if ((a === "-s" || a === "--skill") && ok("skill")) add("skills", args[++i]);
     else if ((a === "-G" || a === "--group" || a === "--groups") && ok("group")) add("groups", args[++i]);
     else if (a === "--json" && ok("json")) opts.json = true;
+    else if (a === "--route" && ok("route")) opts.route = true;
     else if (a === "--copy" && ok("copy")) opts.copy = true;
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
@@ -124,10 +143,20 @@ function uninstall(opts) {
   const cwd = opts.global ? ROOT : process.cwd();
   const scope = opts.global ? "global" : "project";
   const provided = packageSkillNames(ROOT);
-  const installed = installedFromRoot(ROOT, { global: opts.global, cwd });
+  const all = listInstalled({ global: opts.global, cwd });
+  const installed = all && all.filter((r) => isFromRoot(r, ROOT));
   const installedNames = new Set((installed ?? []).map((r) => r.name));
+  const anyNames = new Set((all ?? []).map((r) => r.name));
 
-  const known = new Set([...provided, ...installedNames]);
+  // --route: owner/repo@skill -> skill; names/patterns may match skills from any source.
+  if (opts.route) {
+    opts.skills = opts.skills.map((e) => {
+      const n = specSkillName(e);
+      if (!n) throw new Error(`'${e}' names a source, not a skill; use -s <skill> or <owner/repo@skill>`);
+      return n;
+    });
+  }
+  const known = new Set([...provided, ...installedNames, ...(opts.route ? anyNames : [])]);
   const picked = selectedSkills(opts, ROOT, known);
   const agents = expandAgents(opts.agents);
   let names;
@@ -135,16 +164,21 @@ function uninstall(opts) {
     if (opts.purge) throw new Error("--purge only applies to a full uninstall (drop -s/-G)");
     const { unknown } = picked;
     if (unknown.length && !opts.force) {
-      throw new Error(
-        `not provided by this package: ${unknown.join(", ")}\n` +
-          `  available: ${[...known].sort().join(", ") || "(none)"}\n` +
-          `  use -f/--force to remove them anyway`,
-      );
+      if (opts.route) {
+        warn(`not installed (${scope}), skipping: ${unknown.join(", ")}`);
+      } else {
+        throw new Error(
+          `not provided by this package: ${unknown.join(", ")}\n` +
+            `  available: ${[...known].sort().join(", ") || "(none)"}\n` +
+            `  use --route to also match skills installed from other sources, or -f/--force`,
+        );
+      }
     }
     // Skills reached via a glob or a group are only removed if installed;
-    // names typed out in full are always passed on (needed for --force).
-    names = installed
-      ? picked.names.filter((n) => installedNames.has(n) || picked.literals.has(n))
+    // with --force, names typed out in full are always passed on.
+    const have = opts.route ? anyNames : installedNames;
+    names = all
+      ? picked.names.filter((n) => have.has(n) || (opts.force && picked.literals.has(n)))
       : picked.names;
   } else if (installed) {
     // Full uninstall: exactly what 'npx skills' recorded as coming from ROOT.
@@ -156,7 +190,7 @@ function uninstall(opts) {
   names.sort();
 
   if (!names.length) {
-    log(`no ${scope} skills installed from ${ROOT}.`);
+    log(picked ? `nothing to remove (${scope}).` : `no ${scope} skills installed from ${ROOT}.`);
   } else if (opts.dryRun) {
     log(`[dry-run] would remove (${scope}): ${names.join(", ")}`);
     log(`[dry-run] npx -y skills remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
@@ -176,16 +210,21 @@ function uninstall(opts) {
 }
 
 function installed(opts) {
-  const rows = installedFromRoot(ROOT, { global: opts.global, cwd: opts.global ? ROOT : process.cwd() });
-  if (rows === null) {
+  const all = listInstalled({ global: opts.global, cwd: opts.global ? ROOT : process.cwd() });
+  if (all === null) {
     warn("could not read 'npx skills list'");
     return 1;
   }
-  if (!rows.length) log(`no ${opts.global ? "global" : "project"} skills installed from ${ROOT}.`);
+  const rows = opts.route ? all : all.filter((r) => isFromRoot(r, ROOT));
+  const where = opts.route ? "" : ` from ${ROOT}`;
+  if (!rows.length) log(`no ${opts.global ? "global" : "project"} skills installed${where}.`);
   const groupOf = new Map();
   for (const g of loadGroups(ROOT).groups) for (const n of g.skills) groupOf.set(n, g.name);
   for (const r of rows.sort((a, b) => a.name.localeCompare(b.name))) {
-    console.log(`${r.name.padEnd(26)} ${(groupOf.get(r.name) ?? "-").padEnd(22)} ${(r.agents ?? []).join(", ")}`);
+    const bundled = isFromRoot(r, ROOT);
+    const group = bundled ? groupOf.get(r.name) ?? "-" : "-";
+    const source = opts.route ? `${(bundled ? "bundled" : r.source ?? "?").padEnd(30)} ` : "";
+    console.log(`${r.name.padEnd(26)} ${source}${group.padEnd(22)} ${(r.agents ?? []).join(", ")}`);
   }
   return 0;
 }
@@ -208,34 +247,51 @@ function groups(opts) {
 }
 
 function main() {
-  const [cmd = "install", ...rest] = process.argv.slice(2);
+  // '--route' may come before the command (aiskills --route install ...).
+  let argv = process.argv.slice(2);
+  while (argv[0] === "--route") {
+    process.env.AISKILLS_ROUTE = "1";
+    argv = argv.slice(1);
+  }
+  const [cmd = "install", ...rest] = argv;
   switch (cmd) {
     case "install": {
-      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy"]);
+      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route"]);
       const root = syncSkills({ version });
       const picked = selectedSkills(opts, root);
-      if (picked?.unknown.length) {
+      const external = picked?.unknown ?? [];
+      if (external.length && !opts.route) {
         throw new Error(
-          `not provided by this package: ${picked.unknown.join(", ")}\n` +
-            `  available: ${[...packageSkillNames(root)].sort().join(", ")}`,
+          `not provided by this package: ${external.join(", ")}\n` +
+            `  available: ${[...packageSkillNames(root)].sort().join(", ")}\n` +
+            `  add --route to look them up with 'npx skills' instead`,
         );
       }
+      const bundled = picked ? picked.names.filter((n) => !external.includes(n)) : null;
       if (picked && !picked.names.length) throw new Error("the selected group(s) contain no skills");
-      if (picked) log(`selected: ${picked.names.join(", ")}`);
       const agents = expandAgents(opts.agents);
-      return skillsAdd(root, {
-        ...opts,
-        agents,
-        skills: picked?.names ?? ["*"],
-        cwd: opts.global ? root : process.cwd(),
-      });
+      // Resolve every external skill before installing anything.
+      const routed = external.length ? resolveExternal(external) : [];
+      const cwd = opts.global ? root : process.cwd();
+      let status = 0;
+      if (!picked || bundled.length) {
+        if (picked) log(`bundled: ${bundled.join(", ")}`);
+        status = skillsAdd(root, { ...opts, agents, skills: bundled ?? ["*"], cwd });
+      }
+      for (const { spec } of routed) {
+        log(`external: ${spec}`);
+        status = skillsAddExternal(spec, { ...opts, agents, cwd: opts.global ? undefined : process.cwd() }) || status;
+      }
+      return status;
     }
     case "uninstall":
     case "remove":
     case "rm":
-      return uninstall(parse(rest, ["scope", "agent", "skill", "group", "purge", "force", "dryRun"]));
+      return uninstall(parse(rest, ["scope", "agent", "skill", "group", "purge", "force", "dryRun", "route"]));
     case "installed":
-      return installed(parse(rest, ["scope"]));
+      return installed(parse(rest, ["scope", "route"]));
+    case "find":
+      return runSkills(["find", ...rest]);
     case "groups":
       return groups(parse(rest, ["json"]));
     case "skills":
