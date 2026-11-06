@@ -435,7 +435,19 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
 
+## Security
+
+Skills are code that your agent may run with your permissions. See
+[SECURITY.md](SECURITY.md) for what this package writes, which network calls
+happen (and how to turn off the `skills` CLI's telemetry), known limitations,
+and how to report a vulnerability.
+
 ## Maintainers: building & publishing
+
+Maintainer docs: [docs/meta/MAINTAINERS.md](docs/meta/MAINTAINERS.md) (workflow
+and releases), [docs/meta/ARCHITECTURE.md](docs/meta/ARCHITECTURE.md) (how it's
+built) and [docs/meta/FEATURES.md](docs/meta/FEATURES.md) (every feature, with
+where it's documented and tested).
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
 committed here. `prepack` (`src/scripts/vendor-skills.mjs`) runs right before
@@ -469,6 +481,7 @@ src/packages/aiskills/
 ├── package.json              # "bin": { aiskills, ais -> bin/aiskills.mjs; aix -> bin/aix.mjs }
 ├── README.md
 ├── CHANGELOG.md              # Keep a Changelog + SemVer
+├── SECURITY.md               # reporting + what the package touches
 ├── bin/
 │   ├── aiskills.mjs          # thin entry point: imports src/scripts/cli.mjs
 │   └── aix.mjs               # the same, in --route mode
@@ -479,6 +492,7 @@ src/packages/aiskills/
 │   │   ├── postinstall.mjs   # npm postinstall hook
 │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
 │   └── test/                 # node:test suite (not published)
+├── docs/meta/                # ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 ├── docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   # project memory (not published)
 └── skills/, .aiskills/, .claude-plugin/, LICENSE      # vendored at pack time (git-ignored)
 ```

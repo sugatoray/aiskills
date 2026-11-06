@@ -37,6 +37,7 @@
     ".aiskills/",
     "README.md",
     "CHANGELOG.md",
+    "SECURITY.md",
     "LICENSE"
   ],
   "scripts": {

@@ -179,7 +179,7 @@ export function trackedFiles(dir) {
  * A throwaway copy of the repo shaped like the real one, so vendoring and
  * `npm pack` never write into the working tree:
  *   <tmp>/repo/{skills, .claude-plugin/marketplace.json, LICENSE}
- *   <tmp>/repo/src/packages/aiskills/{bin, src, package.json, README.md, CHANGELOG.md, .npmignore, .gitignore}
+ *   <tmp>/repo/src/packages/aiskills/{bin, src, package.json, README.md, CHANGELOG.md, SECURITY.md, .npmignore, .gitignore}
  * Only git-tracked skill files are copied. Returns { dir, repo, pkg } or null.
  */
 export function repoCopy() {
@@ -193,7 +193,7 @@ export function repoCopy() {
     cpSync(join(REPO_ROOT, rel), dest);
   }
   const pkg = join(repo, "src", "packages", "aiskills");
-  for (const p of ["bin", "src", "package.json", "README.md", "CHANGELOG.md", ".npmignore", ".gitignore"]) {
+  for (const p of ["bin", "src", "package.json", "README.md", "CHANGELOG.md", "SECURITY.md", ".npmignore", ".gitignore"]) {
     cpSync(join(PKG_SRC, p), join(pkg, p), { recursive: true });
   }
   return { dir, repo, pkg, skills };

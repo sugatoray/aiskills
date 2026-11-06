@@ -95,6 +95,7 @@ describe("npm pack", () => {
       "package.json",
       "README.md",
       "CHANGELOG.md",
+      "SECURITY.md",
       "LICENSE",
       "bin/aiskills.mjs",
       "bin/aix.mjs",

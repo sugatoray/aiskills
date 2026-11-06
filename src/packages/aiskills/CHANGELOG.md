@@ -67,6 +67,8 @@ First release. Not yet published to npm; this section gets its date when it is.
   dependency, thanks to the flat `skills/` folder.
 - **Test suite** (`npm test`, and `npm run test:e2e` with network) using the
   built-in `node:test` runner.
+- **`SECURITY.md`**: how to report a vulnerability, what the package writes
+  and which network calls happen, and known limitations.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122
