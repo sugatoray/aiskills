@@ -94,6 +94,7 @@ describe("npm pack", () => {
     for (const p of [
       "package.json",
       "README.md",
+      "CHANGELOG.md",
       "LICENSE",
       "bin/aiskills.mjs",
       "bin/aix.mjs",

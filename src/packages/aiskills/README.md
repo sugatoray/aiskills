@@ -456,7 +456,8 @@ cd src/packages/aiskills
 npm test              # run the test suite first
 npm run vendor        # optional: vendor locally to inspect
 npm run pack:dry      # list what will ship
-npm version patch     # bump the version
+# move the CHANGELOG.md "Unreleased" entries under the new version, with today's date
+npm version patch     # bump the version (patch/minor/major, see CHANGELOG.md)
 npm publish           # prepack re-vendors the skills automatically
 npm run clean         # remove the vendored copy
 ```
@@ -465,10 +466,12 @@ npm run clean         # remove the vendored copy
 
 ```text
 src/packages/aiskills/
-├── package.json              # "bin": { "aiskills": "bin/aiskills.mjs" }
+├── package.json              # "bin": { aiskills, ais -> bin/aiskills.mjs; aix -> bin/aix.mjs }
 ├── README.md
+├── CHANGELOG.md              # Keep a Changelog + SemVer
 ├── bin/
-│   └── aiskills.mjs          # thin entry point: imports src/scripts/cli.mjs
+│   ├── aiskills.mjs          # thin entry point: imports src/scripts/cli.mjs
+│   └── aix.mjs               # the same, in --route mode
 ├── src/
 │   ├── scripts/              # the code
 │   │   ├── cli.mjs           # the `aiskills` command

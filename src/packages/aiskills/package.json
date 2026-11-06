@@ -36,6 +36,7 @@
     ".claude-plugin/marketplace.json",
     ".aiskills/",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
