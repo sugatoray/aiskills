@@ -353,13 +353,13 @@ aiskills skills update -g                       # npx skills update -g
 
 ## Maintainers: building & publishing
 
-The package source lives in `src/aiskills/` of the repo. The skills are **not**
+The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
 committed here. `prepack` (`scripts/vendor-skills.mjs`) copies `<repo>/skills`,
 `<repo>/.claude-plugin/marketplace.json` and `LICENSE` into this folder right
 before `npm pack` / `npm publish`.
 
 ```sh
-cd src/aiskills
+cd src/packages/aiskills
 npm run vendor        # optional: vendor locally to inspect
 npm run pack:dry      # list what will ship
 npm version patch     # bump the version

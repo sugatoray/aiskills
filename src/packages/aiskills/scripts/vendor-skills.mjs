@@ -12,7 +12,18 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const repoRoot = resolve(pkgDir, "..", "..");
+// The repo root is the nearest ancestor that holds both skills/ and
+// .claude-plugin/marketplace.json (currently <repo>/src/packages/aiskills -> <repo>).
+function findRepoRoot(start) {
+  for (let dir = resolve(start, ".."); ; dir = dirname(dir)) {
+    if (existsSync(join(dir, "skills")) && existsSync(join(dir, ".claude-plugin", "marketplace.json"))) return dir;
+    if (dirname(dir) === dir) {
+      console.error(`[aiskills] cannot vendor: no ancestor of ${start} contains skills/ and .claude-plugin/marketplace.json`);
+      process.exit(1);
+    }
+  }
+}
+const repoRoot = findRepoRoot(pkgDir);
 const srcSkills = join(repoRoot, "skills");
 const destSkills = join(pkgDir, "skills");
 const srcLicense = join(repoRoot, "LICENSE");

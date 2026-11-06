@@ -17,7 +17,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sugatoray/aiskills.git",
-    "directory": "src/aiskills"
+    "directory": "src/packages/aiskills"
   },
   "license": "MIT",
   "author": "Sugato Ray (https://github.com/sugatoray)",

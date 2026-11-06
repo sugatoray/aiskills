@@ -28,7 +28,7 @@ function main() {
     log("AISKILLS_SKIP_POSTINSTALL set; skipping.");
     return;
   }
-  // In the source checkout (src/aiskills) nothing is vendored yet: no-op.
+  // In the source checkout (src/packages/aiskills) nothing is vendored yet: no-op.
   if (!existsSync(PKG_SKILLS)) return;
 
   const { version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
