@@ -109,7 +109,7 @@ Scrolls-Kept: AGENTS.md
 Scrolls-Pruned: docs
 ```
 
-The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. `/scrolls-restore` reads these to put back exactly what was removed. **Never hand-edit or reword this message.**
+The `Notes:` section is for people. The final paragraph is standard git trailers, for tools: one `Scrolls-<Kind>:` line per path, with paths relative to the repository root. Kinds are `Folder`, `Deleted`, `Stripped`, `Purged`, `Kept`, `Review`, and `Pruned`. `/scrolls-restore` reads these with `git log --format='%(trailers:unfold,only)'` (finding removal commits with `--grep='^Scrolls-Action:'`), and uses them to put back exactly what was removed. **Never hand-edit or reword this message.**
 
 If `git commit` fails (exit 4, usually a pre-commit or commit-msg hook), the removal stays staged. Report the hook's output and the `git commit -F <git-dir>/SCROLLS_REMOVE_MSG` command to finish with. Never retry with `--no-verify`.
 
