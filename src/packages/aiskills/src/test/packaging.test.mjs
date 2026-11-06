@@ -19,6 +19,14 @@ const walk = (dir, base = dir) =>
   );
 const unrename = (p) => p.replace(/(^|\/)_gitignore$/, "$1.gitignore").replace(/(^|\/)_npmignore$/, "$1.npmignore");
 
+/** The repo files that should ship: tracked files minus .skillsignore files and what they ignore. */
+const shippable = (tracked, layout) =>
+  tracked.filter((p) => {
+    if (p.endsWith("/.skillsignore")) return false;
+    const rel = p.slice("skills/".length);
+    return !(layout.ignored ?? []).some((i) => (i.endsWith("/") ? rel.startsWith(i) : rel === i));
+  });
+
 /**
  * Map shipped package paths back to the repo's nested skills/ paths using
  * .aiskills/layout.json: skills/<name>/x -> skills/<original>/x and
@@ -52,7 +60,7 @@ describe("vendor-skills.mjs", () => {
       ...walk(join(copy.pkg, ".aiskills", "nested")).map((p) => ".aiskills/nested/" + p),
     ];
     const repoPaths = toRepoPaths(pkgPaths, layout);
-    assert.deepEqual([...repoPaths].sort(), [...copy.skills].sort());
+    assert.deepEqual([...repoPaths].sort(), shippable(copy.skills, layout).sort());
     pkgPaths.forEach((p, i) => {
       assert.ok(readFileSync(join(copy.pkg, p)).equals(readFileSync(join(copy.repo, repoPaths[i]))), `${p} == ${repoPaths[i]}`);
     });
@@ -108,7 +116,7 @@ describe("npm pack", () => {
       assert.ok(files.includes(p), p);
     }
     const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
-    assert.deepEqual(toRepoPaths(files, layout).sort(), [...copy.skills].sort());
+    assert.deepEqual(toRepoPaths(files, layout).sort(), shippable(copy.skills, layout).sort());
   });
 
   test("ships only the bin/ entry point and the runtime files under src/scripts/", (t) => {
@@ -160,6 +168,28 @@ describe(".npmignore", () => {
         assert.ok(files.includes(`skills/demo/${p}`), `skills/demo/${p} must ship`);
       }
       assert.ok(files.includes(".aiskills/nested/zz-fixture/CLAUDE.md"), "group-level CLAUDE.md must ship");
+    } finally {
+      rmSync(c.dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe(".skillsignore in the repo", () => {
+  test("npm pack leaves out what it ignores, and the .skillsignore itself", (t) => {
+    const c = repoCopy();
+    if (!c) return t.skip("git not available");
+    try {
+      writeFileSync(join(c.repo, "skills", ".skillsignore"), "# test\n**/tests/\n**/meta/MAINTAINERS.md\n");
+      const res = npm(["pack", "--dry-run", "--json"], { cwd: c.pkg });
+      assert.equal(res.status, 0, res.stderr);
+      const files = JSON.parse(res.stdout)[0].files.map((f) => f.path);
+      assert.ok(!files.some((p) => /\/tests\//.test(p)), "no tests/ folders ship");
+      assert.ok(!files.some((p) => p.endsWith("meta/MAINTAINERS.md")), "no meta/MAINTAINERS.md ships");
+      assert.ok(!files.some((p) => p.endsWith(".skillsignore")), "the ignore file doesn't ship");
+      const layout = JSON.parse(readFileSync(join(c.pkg, ".aiskills", "layout.json"), "utf8"));
+      assert.ok(layout.ignored.length > 0);
+      assert.deepEqual(toRepoPaths(files, layout).sort(), shippable(c.skills, layout).sort());
+      assert.ok(c.skills.some((p) => /\/tests\//.test(p)), "the repo really has tests/ folders to ignore");
     } finally {
       rmSync(c.dir, { recursive: true, force: true });
     }

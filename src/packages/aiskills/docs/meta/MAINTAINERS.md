@@ -100,8 +100,13 @@ picks them up at the next `npm pack`.
 - **A new group:** add a plugin entry to the repo's
   `.claude-plugin/marketplace.json` whose `source` points at the group's
   folder under `skills/`. Its alias is the name minus `-skills`.
+- **Leaving files out of the package:** add rules to a `.skillsignore` in
+  `skills/` or any folder below it (`.gitignore` syntax; see the README's
+  "Leaving files out" section). Ignore a skill's folder to drop the skill.
+  Check with `npm run vendor`, then `npm run clean`.
 - Run `npm test` here afterwards: the packaging tests compare the package
-  with every git-tracked file under `skills/`.
+  with every git-tracked file under `skills/` that no `.skillsignore`
+  excludes.
 
 ## Updating the pinned `skills` CLI
 

@@ -5,7 +5,8 @@
 //   <repo>/skills/scrolls/scrolls-setup/...  ->  <package>/skills/scrolls-setup/...
 //
 // One folder per skill, one level deep, which is the layout
-// `npx skills experimental_sync` looks for in node_modules. Nothing is lost:
+// `npx skills experimental_sync` looks for in node_modules. Files excluded by
+// a .skillsignore (see skillsignore.mjs) are left out; nothing else is lost:
 //
 //   <package>/.aiskills/layout.json   each skill's original nested path, plus
 //                                     the list of files that sit outside any
@@ -13,18 +14,20 @@
 //                                     meta/...)
 //   <package>/.aiskills/nested/...    those files, at their original paths
 //
-// so `aiskills --nested` can rebuild <repo>/skills exactly, and the skill
+// so `aiskills --nested` can rebuild <repo>/skills exactly (minus ignored
+// files and the .skillsignore files themselves), and the skill
 // groups from marketplace.json keep working in both layouts. LICENSE and
 // .claude-plugin/marketplace.json are copied too.
 //
 //   node src/scripts/vendor-skills.mjs          # (re)vendor    (npm run vendor)
 //   node src/scripts/vendor-skills.mjs --clean  # remove copies (npm run clean)
 
-import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { LAYOUT_REL, NESTED_EXTRAS_REL, readSkillName } from "./installer.mjs";
+import { IGNORE_FILE, isIgnored, parseIgnore } from "./skillsignore.mjs";
 
 // Local build/runtime junk that is never part of a skill.
 const JUNK = new Set(["node_modules", "__pycache__", ".pytest_cache", ".venv", ".DS_Store"]);
@@ -37,18 +40,32 @@ const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 const toPosix = (p) => p.split(sep).join("/");
 
-/** Every file under <dir> (posix paths relative to <dir>), skipping junk. */
+/**
+ * Every file under <dir> to ship (posix paths relative to <dir>), skipping
+ * junk, .skillsignore files, and whatever the .skillsignore rules exclude.
+ * Returns { files, ignored } (ignored folders end with "/").
+ */
 function listFiles(dir) {
-  const out = [];
-  (function walk(d) {
+  const files = [];
+  const ignored = [];
+  (function walk(d, layers) {
+    const rel = toPosix(relative(dir, d));
+    const own = join(d, IGNORE_FILE);
+    if (existsSync(own)) layers = [...layers, { base: rel, rules: parseIgnore(readFileSync(own, "utf8")) }];
     for (const ent of readdirSync(d, { withFileTypes: true })) {
-      if (isJunk(ent.name)) continue;
+      if (isJunk(ent.name) || ent.name === IGNORE_FILE) continue;
       const p = join(d, ent.name);
-      if (ent.isDirectory()) walk(p);
-      else out.push(toPosix(relative(dir, p)));
+      const path = rel ? `${rel}/${ent.name}` : ent.name;
+      const isDir = ent.isDirectory();
+      if (isIgnored(layers, path, isDir)) {
+        ignored.push(isDir ? path + "/" : path);
+        continue;
+      }
+      if (isDir) walk(p, layers);
+      else files.push(path);
     }
-  })(dir);
-  return out.sort();
+  })(dir, []);
+  return { files: files.sort(), ignored: ignored.sort() };
 }
 
 function renameDotfiles(dir) {
@@ -85,7 +102,12 @@ export function vendor({ repoRoot, pkgDir }) {
   const srcSkills = join(repoRoot, "skills");
   if (!existsSync(srcSkills) || !statSync(srcSkills).isDirectory()) throw new Error(`${srcSkills} not found`);
 
-  const files = listFiles(srcSkills);
+  const { files, ignored } = listFiles(srcSkills);
+  const lostSkillMd = ignored.filter((p) => basename(p) === "SKILL.md");
+  if (lostSkillMd.length) {
+    const p = lostSkillMd[0];
+    throw new Error(`${IGNORE_FILE} ignores ${p}; to drop a skill, ignore the folder (${dirname(p)}/) instead`);
+  }
   const skillDirs = files.filter((f) => basename(f) === "SKILL.md").map((f) => dirname(f));
   if (skillDirs.includes(".")) throw new Error(`${srcSkills}/SKILL.md: a skill can't sit directly in skills/`);
 
@@ -104,8 +126,13 @@ export function vendor({ repoRoot, pkgDir }) {
 
   clean(pkgDir);
   const destSkills = join(pkgDir, "skills");
+  // Copy file by file from the filtered list, so ignored files stay out.
   for (const [name, dir] of Object.entries(skills)) {
-    cpSync(join(srcSkills, dir), join(destSkills, name), { recursive: true, filter: (p) => !isJunk(basename(p)) });
+    for (const f of files.filter((f) => f.startsWith(dir + "/"))) {
+      const dest = join(destSkills, name, f.slice(dir.length + 1));
+      mkdirSync(dirname(dest), { recursive: true });
+      cpSync(join(srcSkills, f), dest);
+    }
   }
   const destExtras = join(pkgDir, NESTED_EXTRAS_REL);
   for (const f of extras) {
@@ -120,9 +147,12 @@ export function vendor({ repoRoot, pkgDir }) {
     description:
       "skills/ is flat (skills/<name>/). 'skills' maps each skill to its original folder under the repo's skills/; " +
       "'extras' are files outside any skill folder, stored under .aiskills/nested/ at those same paths " +
-      "(.gitignore/.npmignore renamed to _gitignore/_npmignore).",
+      "(.gitignore/.npmignore renamed to _gitignore/_npmignore). 'ignored' were left out by .skillsignore rules " +
+      "(folders end with '/').",
     skills: Object.fromEntries(Object.entries(skills).sort(([a], [b]) => a.localeCompare(b))),
     extras,
+    // Left out by .skillsignore rules (folders end with "/"); not shipped.
+    ignored,
   };
   mkdirSync(dirname(join(pkgDir, LAYOUT_REL)), { recursive: true });
   writeFileSync(join(pkgDir, LAYOUT_REL), JSON.stringify(layout, null, 2) + "\n");

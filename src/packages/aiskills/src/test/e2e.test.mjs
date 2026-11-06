@@ -59,8 +59,9 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
 
   test("--nested rebuilds the repo's skills/ folder exactly; --flat goes back", () => {
     assert.equal(aiskills("sync", "--nested").status, 0);
-    assert.deepEqual(listTree(join(root(), "skills")), [...copy.skills].map((p) => p.slice("skills/".length)).sort());
-    for (const rel of copy.skills) {
+    const shipped = copy.skills.filter((p) => !p.endsWith("/.skillsignore")); // no .skillsignore in the repo yet
+    assert.deepEqual(listTree(join(root(), "skills")), shipped.map((p) => p.slice("skills/".length)).sort());
+    for (const rel of shipped) {
       assert.ok(readFileSync(join(home, ".config", "sugatoray", "aiskills", rel)).equals(readFileSync(join(copy.repo, rel))), rel);
     }
     assert.equal(aiskills("sync", "--flat").status, 0);

@@ -2,7 +2,8 @@
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
 (scrolls, stata, personas, newsletters, diagrams, docs, development), packaged
-for npm. Every file under the repo's `skills/` folder ships. The skills are
+for npm. Every file under the repo's `skills/` folder ships, except what a
+[`.skillsignore`](#leaving-files-out-skillsignore) leaves out. The skills are
 flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
 nested layout can be rebuilt with `--nested` (see [Layouts](#layouts---flat-and---nested)).
 
@@ -60,7 +61,7 @@ shape differs.
 | Layout | `~/.config/sugatoray/aiskills/skills/` | Use it when |
 | --- | --- | --- |
 | **`--flat`** (default) | `skills/<skill-name>/...`, one folder per skill, as the npm package ships it | You just want the skills |
-| **`--nested`** | `skills/<group>/<skill-name>/...` plus the group-level files (READMEs, `.claude-plugin/plugin.json`, `meta/`, …): the repo's `skills/` folder, byte for byte | You browse or edit the skills, or a tool expects the repo's layout |
+| **`--nested`** | `skills/<group>/<skill-name>/...` plus the group-level files (READMEs, `.claude-plugin/plugin.json`, `meta/`, …): the repo's `skills/` folder, byte for byte (minus anything a `.skillsignore` left out) | You browse or edit the skills, or a tool expects the repo's layout |
 
 ```sh
 aiskills --nested                 # install, writing the nested layout
@@ -459,6 +460,7 @@ committed here. `prepack` (`src/scripts/vendor-skills.mjs`) runs right before
 - writes `.aiskills/layout.json` (each skill's original folder, plus the list
   of files outside any skill folder) and copies those files to
   `.aiskills/nested/` at their original paths;
+- leaves out whatever a `.skillsignore` excludes (see below);
 - copies `<repo>/.claude-plugin/marketplace.json` and `LICENSE`.
 
 It stops with an error if two skills share a name, a skill sits inside
@@ -474,6 +476,49 @@ npm version patch     # bump the version (patch/minor/major, see CHANGELOG.md)
 npm publish           # prepack re-vendors the skills automatically
 npm run clean         # remove the vendored copy
 ```
+
+### Leaving files out: `.skillsignore`
+
+Put a `.skillsignore` in the repo's `skills/` folder, or in any folder below
+it, to keep files out of the npm package (and so out of every install). It
+uses `.gitignore` syntax, and its rules apply to its own folder and below:
+
+```gitignore
+# skills/.skillsignore  (comments go on their own line, as in .gitignore)
+
+# every tests/ folder, at any depth
+**/tests/
+# a "/" in the middle anchors to this folder, so use **/ for any depth
+**/meta/MAINTAINERS.md
+# all .log files except keep.log
+*.log
+!keep.log
+# ignoring a skill's folder drops the whole skill
+scrolls/wip-skill/
+```
+
+| Syntax | Meaning |
+| --- | --- |
+| `# …` at the start of a line, blank line | Ignored; `\#` / `\!` for a literal leading `#` / `!`. A `#` later in a line is part of the pattern. |
+| `name` | A file or folder with that name, at any depth |
+| `/name`, `a/name` | A leading or middle `/` anchors to the `.skillsignore`'s folder |
+| `name/` | Folders only |
+| `*`, `?`, `[abc]`, `[!abc]` | Within one folder name |
+| `**` | Across folders: `**/x`, `x/**`, `a/**/b` |
+| `!pattern` | Re-include something an earlier rule excluded |
+
+- The last matching rule wins; rules in a deeper `.skillsignore` come after
+  the outer ones.
+- As in git, a file inside an ignored folder can't be re-included.
+- `.skillsignore` files themselves never ship.
+- Ignoring only a `SKILL.md` is refused (the skill would have no definition):
+  ignore the skill's folder instead.
+- What was left out is listed under `ignored` in the package's
+  `.aiskills/layout.json`, and `--nested` rebuilds the repo's `skills/` folder
+  without it.
+
+Check the result with `npm run vendor` (or `npm run pack:dry`), then
+`npm run clean`.
 
 ### Layout
 
@@ -491,6 +536,7 @@ src/packages/aiskills/
 │   │   ├── cli.mjs           # the `aiskills` command
 │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
 │   │   ├── postinstall.mjs   # npm postinstall hook
+│   │   ├── skillsignore.mjs  # .skillsignore rules (not published)
 │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
 │   └── test/                 # node:test suite (not published)
 ├── docs/meta/                # ARCHITECTURE, FEATURES, MAINTAINERS (not published)
@@ -511,7 +557,8 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
 | `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/cli.mjs` (the `aiskills` command) and `src/scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
-| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/`, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
+| `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
+| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
 | `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.

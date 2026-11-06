@@ -25,12 +25,14 @@ src/packages/aiskills/
     ├── cli.mjs               argument parsing and the commands
     ├── installer.mjs         all shared logic (no side effects on import)
     ├── postinstall.mjs       npm postinstall hook
+    ├── skillsignore.mjs      .skillsignore parser/matcher (pack time only; not published)
     └── vendor-skills.mjs     prepack: builds the shipped skills/ and .aiskills/
 ```
 
 | Module | Owns | Main functions |
 | --- | --- | --- |
 | `vendor-skills.mjs` | Turning the repo's nested `skills/` into the shipped layout | `vendor`, `clean`, `findRepoRoot` |
+| `skillsignore.mjs` | `.skillsignore` rules (`.gitignore` syntax) | `parseIgnore`, `isIgnored` |
 | `installer.mjs` – sync | The install folder and its layout | `syncSkills`, `resolveLayout`, `installRoot`, `packageLayout` |
 | `installer.mjs` – skills | Reading skill names and groups | `readSkillName`, `skillNamesIn`, `packageSkillNames`, `loadGroups` |
 | `installer.mjs` – selection | Turning `-s`/`-G`/`-a` into exact names | `globToRegExp`, `expandPatterns`, `skillsForGroups`, `selectedSkills`, `knownAgents`, `expandAgents` |
@@ -50,7 +52,7 @@ directly. `cli.mjs` runs `main()` on import, which is why the entry points in
 
 ```text
 skills/<skill-name>/...              flat: one folder per skill (named after SKILL.md name:)
-.aiskills/layout.json                { format, skills: { name: "group/.../name" }, extras: [paths] }
+.aiskills/layout.json                { format, skills: { name: "group/.../name" }, extras: [paths], ignored: [paths] }
 .aiskills/nested/<original paths>    files outside any skill folder (READMEs, plugin.json, meta/)
 .claude-plugin/marketplace.json      the repo's plugin marketplace file, used only for groups
 ```
@@ -85,8 +87,12 @@ aiskills.json                        { package, version, layout, installedAt, sk
 <repo>/.claude-plugin/marketplace.json, LICENSE ──▶ copied as is
 ```
 
-`vendor()` refuses a skill inside another skill, two skills with the same
-name, and names that aren't safe folder names.
+While walking `skills/`, `vendor()` loads each folder's `.skillsignore` (outer
+rules first) and skips matching files and folders; an ignored folder is never
+entered. It refuses a skill inside another skill, two skills with the same
+name, names that aren't safe folder names, and a `.skillsignore` that ignores
+a `SKILL.md` but not its folder. Skills are copied file by file from the
+filtered list.
 
 ### `aiskills install` (and `postinstall`)
 

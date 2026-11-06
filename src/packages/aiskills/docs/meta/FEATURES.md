@@ -63,7 +63,8 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | Skill groups | From `marketplace.json`; name or alias (minus `-skills`); `all` | README "Skill groups" | `unit.test.mjs`, `cli.test.mjs` |
 | Glob patterns | `*`, `?`, `[abc]`, `[a-z]`, `[!abc]` for `-s`, `-G`, `-a` | README "Patterns" | `unit.test.mjs`, `cli.test.mjs` |
 | External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule; pinned specs; any-source uninstall | README "`--route`" | `cli.test.mjs` |
-| Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte; remembered | README "Layouts" | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
+| `.skillsignore` | `.gitignore`-style rules under `skills/` keep files, folders or skills out of the package | README "Leaving files out" | `skillsignore.test.mjs`, `packaging.test.mjs` |
+| Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte (minus `.skillsignore`d files); remembered | README "Layouts" | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
 | Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | README "Install", "CLI" | `cli.test.mjs`, `e2e.test.mjs` |
 | Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md) | `cli.test.mjs`, `unit.test.mjs` |
 | `npx skills` passthrough | `aiskills skills <args>` with `:root` | README "Using `npx skills` directly" | `cli.test.mjs` |

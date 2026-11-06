@@ -5,7 +5,7 @@ What @sugatoray-ai/aiskills does, feature by feature. Add a section per feature 
 > **Release status:** everything below is implemented, tested by hand end to end, and pushed on branch `claude/focused-faraday-nqvduf` ([sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122), open). Version `0.1.0` has **not** been published to npm yet. Update this note when it is.
 
 ## Bundled skills in an npm package
-Every file under the repo's `skills/` folder ships, together with `.claude-plugin/marketplace.json` and `LICENSE`. At `npm pack`/`npm publish` time the skills are flattened to `skills/<skill-name>/`; `.aiskills/layout.json` records each skill's original folder and `.aiskills/nested/` holds the files outside any skill folder, so nothing is lost (mapped back, the shipped files equal `git ls-files skills` byte for byte). Never committed under the package folder. (`src/scripts/vendor-skills.mjs`)
+Every file under the repo's `skills/` folder ships, together with `.claude-plugin/marketplace.json` and `LICENSE`. At `npm pack`/`npm publish` time the skills are flattened to `skills/<skill-name>/`; `.aiskills/layout.json` records each skill's original folder and `.aiskills/nested/` holds the files outside any skill folder, so nothing is lost (mapped back, the shipped files equal `git ls-files skills` byte for byte, minus anything a `.skillsignore` excludes). Never committed under the package folder. (`src/scripts/vendor-skills.mjs`)
 
 ## Works with `npx skills experimental_sync`
 Because `skills/` is flat, a project that installs the package as a dependency can run `npx skills experimental_sync` to copy all its skills into the project, without `aiskills` or `~/.config`.
@@ -36,3 +36,6 @@ With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always w
 
 ## Safety checks
 `npx` always runs a pinned `skills@1.7.6` (override: `AISKILLS_SKILLS_VERSION`); `--route` ignores registry results with anything but letters, digits, `.`, `_`, `-`; on Windows no `cmd.exe` shell characters ever reach `npx`; `sync`/`install`/`uninstall --purge` refuse to replace or delete a folder that isn't an aiskills folder. See `SECURITY.md`.
+
+## `.skillsignore`
+A `.skillsignore` (`.gitignore` syntax) in the repo's `skills/` or any folder below leaves matching files, folders or whole skills out of the package, and so out of every install and the `--nested` rebuild. The ignore files never ship; ignoring only a `SKILL.md` is refused; what was left out is listed in `.aiskills/layout.json` (`ignored`).

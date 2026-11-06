@@ -31,6 +31,9 @@ First release. Not yet published to npm; this section gets its date when it is.
   package, flattened to one folder per skill (`skills/<skill-name>/`).
   `.aiskills/layout.json` and `.aiskills/nested/` keep the original nested
   layout and every file outside the skill folders, so nothing is lost.
+- **`.skillsignore`** (`.gitignore` syntax) anywhere under the repo's
+  `skills/` leaves files, folders or whole skills out of the package. What
+  was left out is listed in `.aiskills/layout.json` (`ignored`).
 - **Install on `npm install -g`.** A `postinstall` step saves the skills to
   `~/.config/sugatoray/aiskills/skills/` and runs `npx skills add` on that
   folder. It never fails the npm install. Opt-outs: `AISKILLS_SKIP_POSTINSTALL`,
@@ -62,7 +65,8 @@ First release. Not yet published to npm; this section gets its date when it is.
   skills from other sources.
 - **Layouts:** `--flat` (default) or `--nested` (or `AISKILLS_LAYOUT`) for
   `~/.config/sugatoray/aiskills/skills/`. Nested rebuilds the repo's `skills/`
-  folder byte for byte. The choice is remembered.
+  folder byte for byte (minus anything a `.skillsignore` left out). The choice
+  is remembered.
 - **Works with `npx skills experimental_sync`** when the package is a project
   dependency, thanks to the flat `skills/` folder.
 - **Test suite** (`npm test`, and `npm run test:e2e` with network) using the
