@@ -44,6 +44,25 @@ aiskills install -G scrolls -a claude-code
 - [Installation](getting-started/installation.md): install with npm, choose what the install step does, and check it worked.
 - [Quickstart](getting-started/quickstart.md): see the groups, install one for one agent, check it, and remove it.
 
+### Skills
+
+<!-- skills:start -->
+- [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
+- [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
+- [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
+- [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
+- [newsletter-ai](skills/newsletter-ai.md): Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes…
+- [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
+- [scrolls-help](skills/scrolls-help.md): Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,…
+- [scrolls-hide](skills/scrolls-hide.md): Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the…
+- [scrolls-remove](skills/scrolls-remove.md): Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup.
+- [scrolls-restore](skills/scrolls-restore.md): Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove.
+- [scrolls-setup](skills/scrolls-setup.md): Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,…
+- [scrolls-unhide](skills/scrolls-unhide.md): Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the…
+- [scrolls-update](skills/scrolls-update.md): Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any…
+- [stata-recipes](skills/stata-recipes.md): Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode.
+<!-- skills:end -->
+
 ### Tutorial
 
 - [1. Install a group](tutorial/01-install-a-group.md): list the groups and install one for one agent.
@@ -272,6 +291,868 @@ As the preview said, the skill files stay in `~/.config/sugatoray/aiskills/skill
 Next: the [Tutorial](../tutorial/01-install-a-group.md) covers patterns, projects, external skills and uninstalling in more depth.
 
 See also: [CLI reference](../reference/cli.md)
+
+<!-- source: skills/README.md -->
+# Bundled skills
+
+Every skill in this version of the package (13 skills in 6 groups), with what it does and how to install it.
+
+Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
+
+## scrolls-skills
+
+Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`scrolls-help`](scrolls-help.md) | 2.4.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
+| [`scrolls-hide`](scrolls-hide.md) | 2.4.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
+| [`scrolls-remove`](scrolls-remove.md) | 2.4.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
+| [`scrolls-restore`](scrolls-restore.md) | 2.4.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
+| [`scrolls-setup`](scrolls-setup.md) | 2.4.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
+| [`scrolls-unhide`](scrolls-unhide.md) | 2.4.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
+| [`scrolls-update`](scrolls-update.md) | 2.4.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
+
+## stata-skills
+
+Alias `stata`. Install the group with `aiskills install -G stata`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`stata-recipes`](stata-recipes.md) | 1.3.2 | Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode. |
+
+## repo-related-skills
+
+Alias `repo-related`. Install the group with `aiskills install -G repo-related`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`create-issues-update-pr`](create-issues-update-pr.md) | 1.3.0 | Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine… |
+
+## docs-skills
+
+Alias `docs`. Install the group with `aiskills install -G docs`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`create-lib-docs`](create-lib-docs.md) | 1.1.0 | Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,… |
+
+## diagrams-skills
+
+Alias `diagrams`. Install the group with `aiskills install -G diagrams`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`network-flow`](network-flow.md) | 1.0.0 | Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes. |
+
+## personas-skills
+
+Alias `personas`. Install the group with `aiskills install -G personas`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`prodigy`](prodigy.md) | 1.0.0 | Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and… |
+
+## Not in a group
+
+Install these by name (`-s`) or with `-G all`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`newsletter-ai`](newsletter-ai.md) | 1.5.3 | Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes… |
+
+This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
+
+See also: [Skill groups](../concepts/skill-groups.md) · [1. Install a group](../tutorial/01-install-a-group.md)
+
+<!-- source: skills/create-issues-update-pr.md -->
+# create-issues-update-pr
+
+Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine hierarchy — using GitHub's native parent/child issue relationship, not just labels — and then updates that pull request's title (kept short) and description so the description lists every issue in the exact format '- Closes #{{issue-number}} -- {{issue-title}}', indented to match parent-child nesting. Use this whenever the user asks to file issue(s) for a PR, 'add gh issues for this', 'track this as issues', link a PR to tracking issues, or update a PR's title/description to list the issues covering its changes — including when they invoke /create-issues-update-pr directly. Also trigger when a PR description is stale or generic relative to its actual current commits and the user wants it brought up to date alongside issue creation.
+
+| Property | Value |
+| --- | --- |
+| Group | `repo-related-skills` (alias `repo-related`) |
+| Version | 1.3.0 |
+| Starts | When you type `/create-issues-update-pr`, or your agent uses it when a task fits its description |
+| Needs | GitHub MCP server tools with write access to the target repository: issue_write, sub_issue_write, list_issue_types, search_issues/list_issues, pull_request_read, update_pull_request. Works against any GitHub repository the current session has push/write access to, not just this one. |
+| License | MIT |
+| Source | [skills/development/repo-related/create-issues-update-pr](https://github.com/sugatoray/aiskills/tree/master/skills/development/repo-related/create-issues-update-pr) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s create-issues-update-pr -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: create-issues-update-pr
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill create-issues-update-pr --agent claude-code --yes
+```
+
+Or the whole `repo-related-skills` group:
+
+```bash
+aiskills install -G repo-related -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s create-issues-update-pr
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/create-issues-update-pr/`:
+
+- `.claude-plugin/plugin.json`
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/claude-code.yaml`
+- `agents/openai.yaml`
+- `meta/MAINTAINERS.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/create-lib-docs.md -->
+# create-lib-docs
+
+Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI, Pydantic, DuckDB and Effect structure theirs: a landing page with a 30-second example, Getting Started, a progressive Tutorial with runnable steps, task-oriented How-to Guides, Concepts (explanations with diagrams), an exhaustive Reference (CLI flags, API, config, output schemas, one anchor per error with cause and fix), FAQ/troubleshooting, and llms.txt / llms-full.txt so AI agents can load the docs. Every fact is taken from the code, --help output and tests (never from memory), and every snippet is run before it is published. Use this whenever the user asks to write, create, restructure or overhaul documentation / docs / a user guide / a manual / API reference for a library, package, CLI or framework, wants docs 'like FastAPI's / Pydantic's / DuckDB's / Effect's', wants docs that help both humans and AI agents, or invokes /create-lib-docs.
+
+| Property | Value |
+| --- | --- |
+| Group | `docs-skills` (alias `docs`) |
+| Version | 1.1.0 |
+| Starts | When you ask for it: you type `/create-lib-docs` (your agent doesn't start it on its own) |
+| License | MIT |
+| Source | [skills/docs/create-lib-docs](https://github.com/sugatoray/aiskills/tree/master/skills/docs/create-lib-docs) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s create-lib-docs -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: create-lib-docs
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill create-lib-docs --agent claude-code --yes
+```
+
+Or the whole `docs-skills` group:
+
+```bash
+aiskills install -G docs -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s create-lib-docs
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/create-lib-docs/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `meta/MAINTAINERS.md`
+- `references/patterns.md`
+- `references/templates.md`
+- `scripts/build_llms_txt.py`
+- `scripts/check_docs.py`
+- `tests/test_scripts.py`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/network-flow.md -->
+# network-flow
+
+Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes. Use when the user invokes /network-flow or asks for live flowing diagrams, animated system architecture, request flows, RAG pipelines, or agent workflow visualizations. Accept descriptions, reference images, source material, or graph JSON. Deliver a self-contained HTML file with a working preview when supported; complete rendering, browser verification, and file delivery rather than stopping at a diagram description.
+
+| Property | Value |
+| --- | --- |
+| Group | `diagrams-skills` (alias `diagrams`) |
+| Version | 1.0.0 |
+| Starts | When you ask for it: you type `/network-flow` (your agent doesn't start it on its own) |
+| Needs | Python 3.9+ (stdlib only) for validation and HTML generation; modern browser with SVG and ResizeObserver for playback; optional Node.js and Playwright for browser checks |
+| License | MIT |
+| Source | [skills/diagrams/network-flow](https://github.com/sugatoray/aiskills/tree/master/skills/diagrams/network-flow) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s network-flow -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: network-flow
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill network-flow --agent claude-code --yes
+```
+
+Or the whole `diagrams-skills` group:
+
+```bash
+aiskills install -G diagrams -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s network-flow
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/network-flow/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/examples/rag/README.md`
+- `assets/examples/rag/generated/rag.html`
+- `assets/examples/rag/generated/rag.json`
+- `assets/examples/rag/original/rag_demo.html`
+- `assets/examples/rag/original/rag_prompt.md`
+- `assets/runtime/renderer.js`
+- `assets/runtime/style.css`
+- `assets/template.html`
+- `meta/MAINTAINERS.md`
+- `references/graph-schema.md`
+- `references/layout.md`
+- `references/telemetry.md`
+- `references/verification.md`
+- `scripts/network_flow.py`
+- `scripts/render.py`
+- `scripts/validate_graph.py`
+- `tests/check_browser.cjs`
+- `tests/test_graph.py`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/newsletter-ai.md -->
+# newsletter-ai
+
+Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document, and add -r/--report path/to/folder-or-report.html to render it straight into an interactive, light/dark, multi-tab HTML report (with per-tab References accordions, its source YAML fused in for single-file distribution, and a Download-data button) written next to a copy of the YAML. Use when the user runs /newsletter-ai (aliased as the shorthand /nltr-ai — treat both identically), or asks to draft, write, or update this week's AI newsletter/intelligence brief.
+
+| Property | Value |
+| --- | --- |
+| Group | None: install it with `-s` or `-G all` |
+| Version | 1.5.3 |
+| Starts | When you type `/newsletter-ai`, or your agent uses it when a task fits its description |
+| Also answers to | `/nltr-ai` (described in the skill; not a separate skill) |
+| License | MIT |
+| Source | [skills/newsletters/newsletter-ai](https://github.com/sugatoray/aiskills/tree/master/skills/newsletters/newsletter-ai) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s newsletter-ai -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: newsletter-ai
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill newsletter-ai --agent claude-code --yes
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s newsletter-ai
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/newsletter-ai/`:
+
+- `.gitignore`
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `assets/PROMPT.md`
+- `assets/images/report-citations-dark.png`
+- `assets/images/report-overview-light.png`
+- `assets/templates/icons.svg`
+- `assets/templates/report.html`
+- `assets/templates/sample-report.yaml`
+- `builder/build_report.py`
+- `builder/capture_screenshots.py`
+- `builder/fuse.py`
+- `builder/paths.py`
+- `builder/report_data.py`
+- `builder/requirements.txt`
+- `builder/screenshots.cjs`
+- `meta/FEATURES.md`
+- `meta/MAINTAINERS.md`
+- `meta/MARKDOWN_FORMATTING.md`
+- `pyproject.toml`
+- `tests/browser/check_download.cjs`
+- `tests/conftest.py`
+- `tests/fixtures/sample.yaml`
+- `tests/test_browser_download.py`
+- `tests/test_build_report.py`
+- `tests/test_capture_screenshots.py`
+- `tests/test_cli.py`
+- `tests/test_example_data.py`
+- `tests/test_fuse.py`
+- `tests/test_packaging.py`
+- `tests/test_paths.py`
+- `tests/test_report_data.py`
+- `uv.lock`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/newsletters/newsletter-ai/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/newsletters/newsletter-ai/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/prodigy.md -->
+# prodigy
+
+Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and success metrics; (2) how they design, break down and deliver a solution, including iteration, validation and communication; (3) the biggest pitfalls and how they avoid them; (4) a short set of operating principles and decision rules; (5) a practical learning plan with daily habits, projects and feedback loops for someone to level up. Use when the user invokes /prodigy, optionally with a role or field (e.g. /prodigy product manager, /prodigy SRE, /prodigy negotiation), or asks how the best person in a role thinks and works.
+
+| Property | Value |
+| --- | --- |
+| Group | `personas-skills` (alias `personas`) |
+| Version | 1.0.0 |
+| Starts | When you type `/prodigy`, or your agent uses it when a task fits its description |
+| License | MIT |
+| Source | [skills/personas/prodigy](https://github.com/sugatoray/aiskills/tree/master/skills/personas/prodigy) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s prodigy -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: prodigy
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill prodigy --agent claude-code --yes
+```
+
+Or the whole `personas-skills` group:
+
+```bash
+aiskills install -G personas -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s prodigy
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/prodigy/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-help.md -->
+# scrolls-help
+
+Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the six commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell).
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-help` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-help](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-help) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-help -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-help
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-help
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-help/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `meta/SECURITY.md`
+- `references/HELP.md`
+- `scripts/open_help.ps1`
+- `scripts/open_help.sh`
+- `scripts/serve_help.py`
+- `tests/test_open_help.ps1`
+- `tests/test_open_help.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-hide.md -->
+# scrolls-hide
+
+Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the path references inside it and in SCROLLS.md so nothing breaks. Use this whenever the user runs /scrolls-hide, or asks to hide, dot, or re-hide the scrolls folder, go back to hiding project memory / docs/.scrolls, or rename scrolls to .scrolls. This is the retrofit path for a project that was set up visible and now wants it hidden — for a brand-new project, /scrolls-setup's default (no -u/--unhide flag) already creates it hidden and this skill isn't needed. By default checks one exact location (docs/scrolls under the current directory); supports -r/--recurse to sweep an entire directory tree instead (e.g. every package in a monorepo in one run), repeatable -p/--path to target specific locations, -t/--reporoot to target the git repository's top level regardless of which subdirectory you're in, -l/--local to target the current directory explicitly, and the DEFAULT_SCROLLS_RELPATH environment variable to change the default location. Works on macOS, Linux, and Windows (bash or PowerShell). The opposite of /scrolls-unhide.
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-hide` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-hide](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-hide) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-hide -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-hide
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-hide --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-hide
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-hide/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `scripts/hide.ps1`
+- `scripts/hide.sh`
+- `tests/test_hide.ps1`
+- `tests/test_hide.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-hide/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-hide/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-remove.md -->
+# scrolls-remove
+
+Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. Deletes the scrolls folder, deletes SCROLLS.md, strips the scrolls pointer stub out of CLAUDE.md (and the dangling pointer out of AGENTS.md), deleting either file outright only when nothing else is left in it, and records the whole removal as ONE git commit whose message names the commit just before the removal, so it can always be undone. Use this whenever the user runs /scrolls-remove, or asks to remove, delete, uninstall, tear down, or get rid of the scrolls / project memory / docs/.scrolls. Supports -p/--path (repeatable), -t/--reporoot, -l/--local, -r/--recurse to find and remove every scrolls folder under a directory in one commit, -x/--purge [CLAUDE.md|AGENTS.md|SCROLLS.md|<other file>|all] to delete pointer files outright even when they hold other content, -n/--dry-run, -y/--yes to skip the confirmation, and --no-commit. Refuses to run when anything it would remove has uncommitted changes, since those could not be restored. Works on macOS, Linux, and Windows (bash or PowerShell).
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-remove` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-remove](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-remove) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-remove -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-remove
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-remove --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-remove
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-remove/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `scripts/remove.ps1`
+- `scripts/remove.py`
+- `scripts/remove.sh`
+- `tests/test_remove.ps1`
+- `tests/test_remove.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-remove/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-remove/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-restore.md -->
+# scrolls-restore
+
+Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. By default finds the newest /scrolls-remove checkpoint in HEAD's history and brings back exactly what it removed; or takes any COMMIT (a removal commit, or an ordinary commit containing a scrolls folder). Restores ONLY the agentic memory — the scrolls folders plus the SCROLLS.md/CLAUDE.md/AGENTS.md pointer stubs, re-inserted into those files as they are today — never rolling back anything else in the repository, and records it as one git commit. --onto REF mounts the memory onto another branch (or, with -b, a new branch at any commit) through a temporary worktree, without touching the current checkout. Use this whenever the user runs /scrolls-restore, or asks to restore, bring back, recover, undo the removal of, or re-mount the scrolls / project memory / docs/.scrolls. Supports -p/--path (repeatable), -t/--reporoot, -l/--local, -r/--recurse, --onto, -b/--branch, --full, -f/--force, --list [--all], -n/--dry-run, -y/--yes, and --no-commit. Works on macOS, Linux, and Windows (bash or PowerShell).
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-restore` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-restore](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-restore) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-restore -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-restore
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-restore --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-restore
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-restore/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `scripts/restore.ps1`
+- `scripts/restore.py`
+- `scripts/restore.sh`
+- `tests/test_restore.ps1`
+- `tests/test_restore.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-restore/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-restore/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-setup.md -->
+# scrolls-setup
+
+Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md) plus a SCROLLS.md file that points future sessions at STARTER.md, a short CLAUDE.md pointer to SCROLLS.md, and a matching AGENTS.md pointer to CLAUDE.md for other agent harnesses. Use this whenever the user runs /scrolls-setup, or asks to set up 'scrolls', a project-memory system, session handoff notes, a docs/.scrolls folder, or a CLAUDE.md/AGENTS.md/SCROLLS.md that points new sessions at persistent project docs. Trigger even if the project has no docs/ folder, no CLAUDE.md, no AGENTS.md, or no SCROLLS.md yet — creating them is part of the job. Supports -p/--path for a custom docs location, -t/--reporoot to pin everything to the git repository's top level regardless of which subdirectory you're in, -l/--local to pin it explicitly to the current directory, -r/--recurse to scan recursively for an existing scrolls folder before creating a new one (avoiding accidental duplicates), and -u/--unhide to name the folder scrolls instead of .scrolls. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently create a second, disconnected scrolls system. Works on macOS, Linux, and Windows (bash or PowerShell).
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-setup` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-setup](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-setup -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-setup
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-setup
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-setup/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `assets/templates/AGENTS_MD_BLOCK.md`
+- `assets/templates/CLAUDE_MD_BLOCK.md`
+- `assets/templates/GAP_ANALYSIS.md`
+- `assets/templates/GAP_CONTEXT.md`
+- `assets/templates/HANDOFF.md`
+- `assets/templates/PLAN.md`
+- `assets/templates/SCROLLS_MD_BLOCK.md`
+- `assets/templates/SPEC.md`
+- `assets/templates/STARTER.md`
+- `assets/templates/WISDOM.md`
+- `meta/MAINTAINERS.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-setup/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-setup/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-unhide.md -->
+# scrolls-unhide
+
+Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the path references inside it and in SCROLLS.md so nothing breaks. Use this whenever the user runs /scrolls-unhide, or asks to unhide, un-dot, or show the scrolls folder, stop hiding project memory / docs/.scrolls, or rename .scrolls to scrolls. This is the retrofit path for a project that was set up hidden and now wants it visible — for a brand-new project, /scrolls-setup's own -u/--unhide flag does this in one step and this skill isn't needed. By default checks one exact location (docs/.scrolls under the current directory); supports -r/--recurse to sweep an entire directory tree instead (e.g. every package in a monorepo in one run), repeatable -p/--path to target specific locations, -t/--reporoot to target the git repository's top level regardless of which subdirectory you're in, -l/--local to target the current directory explicitly, and the DEFAULT_SCROLLS_RELPATH environment variable to change the default location. Works on macOS, Linux, and Windows (bash or PowerShell). The opposite of /scrolls-hide.
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-unhide` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-unhide](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-unhide) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-unhide -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-unhide
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-unhide --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-unhide
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-unhide/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `scripts/unhide.ps1`
+- `scripts/unhide.sh`
+- `tests/test_unhide.ps1`
+- `tests/test_unhide.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-unhide/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-unhide/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/scrolls-update.md -->
+# scrolls-update
+
+Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any project-specific scrolls beyond that core set) to reflect what actually happened in the current session, following each file's own update rule instead of appending blindly. Also backfills SCROLLS.md/CLAUDE.md/AGENTS.md if the project predates them (idempotent — safe every run, never overwrites existing CLAUDE.md content). Use this whenever the user runs /scrolls-update, or asks to update the scrolls, refresh HANDOFF.md, write session handoff notes, record what was just done, close out or wrap up a session, log a new gap or trap, or update project memory / STARTER.md's docs. This is the counterpart to /scrolls-setup (which creates the system once) — use this one for every session afterward. Supports -p/--path for a custom docs location, -t/--reporoot to look under the git repository's top level regardless of which subdirectory you're in, -l/--local to look explicitly in the current directory, and -r/--recurse to search recursively for the scrolls folder if it isn't at the obvious exact location. Defaults to the current directory, but warns first if that differs from the repo root so a subdirectory invocation doesn't silently miss the real scrolls. Works on macOS, Linux, and Windows (bash or PowerShell). If no scrolls folder is found, say so and point at /scrolls-setup instead of inventing files here.
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.4.0 |
+| Starts | When you ask for it: you type `/scrolls-update` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-update](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-update) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-update -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-update --agent claude-code --yes
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-update
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-update/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `meta/MAINTAINERS.md`
+- `scripts/session_diff.ps1`
+- `scripts/session_diff.sh`
+- `tests/test_session_diff.ps1`
+- `tests/test_session_diff.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-update/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-update/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/stata-recipes.md -->
+# stata-recipes
+
+Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode. Use this whenever the user asks how to do something in Stata, wants a Stata command or .do file written or fixed, mentions Stata alongside a modeling task (regression, panel data, time series, ARDL, fixed effects, diff-in-diff, matching, etc.), or wants Stata and Python working together (running Python from inside a .do file, pulling Stata's dataset into pandas, or driving Stata from a Python script via pystata/stata_setup or batch mode). Also trigger when the user pastes Stata code that errors or gives wrong-looking results and wants it debugged, or asks 'is this good Stata style' / 'what's wrong with this command'. Covers a growing library of named recipes for common econometric workflows (ARDL modeling shipped now; more added over time) that produce a ready-to-run script, not just an explanation.
+
+| Property | Value |
+| --- | --- |
+| Group | `stata-skills` (alias `stata`) |
+| Version | 1.3.2 |
+| Starts | When you type `/stata-recipes`, or your agent uses it when a task fits its description |
+| Needs | Stata 16+ (Stata 17+ recommended — modern `ardl` command and built-in Python integration); optionally Python 3.9+ with the `pystata`/`stata_setup` package (bundled with Stata 17+) for Stata<->Python interop |
+| License | MIT |
+| Source | [skills/stata/stata-recipes](https://github.com/sugatoray/aiskills/tree/master/skills/stata/stata-recipes) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s stata-recipes -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: stata-recipes
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill stata-recipes --agent claude-code --yes
+```
+
+Or the whole `stata-skills` group:
+
+```bash
+aiskills install -G stata -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s stata-recipes
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/stata-recipes/`:
+
+- `.claude-plugin/plugin.json`
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/claude-code.yaml`
+- `agents/openai.yaml`
+- `meta/MAINTAINERS.md`
+- `references/good-bad-examples.md`
+- `references/python-interop.md`
+- `references/recipes/README.md`
+- `references/recipes/models/ardl.md`
+- `references/recipes/models/regression-panel.md`
+- `references/recipes/models/regression-timeseries.md`
+- `references/recipes/tests/test-dickey-fuller.md`
+- `references/recipes/tests/test-im-pesaran-shin.md`
+- `references/recipes/tests/test-unit-root.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/stata/stata-recipes/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/stata/stata-recipes/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
 <!-- source: tutorial/01-install-a-group.md -->
 # 1. Install a group

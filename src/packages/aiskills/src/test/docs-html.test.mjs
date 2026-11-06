@@ -49,7 +49,7 @@ describe("build-docs-html", () => {
       readdirSync(join(DOCS, "images")).filter((f) => f.endsWith(".svg")).map((f) => `images/${f}`).sort(),
     );
     for (const uri of Object.values(d.images)) assert.match(uri, /^data:image\/svg\+xml;base64,/);
-    assert.deepEqual(d.tabs.map((t) => t.id), ["home", "getting-started", "tutorial", "guides", "concepts", "reference", "faq"]);
+    assert.deepEqual(d.tabs.map((t) => t.id), ["home", "getting-started", "skills", "tutorial", "guides", "concepts", "reference", "faq"]);
     for (const p of d.pages) assert.equal(p.md, readFileSync(join(DOCS, p.path), "utf8"), `${p.path} changed in the bundle`);
   });
 
@@ -60,7 +60,7 @@ describe("build-docs-html", () => {
     assert.match(html, /<meta charset="utf-8">/);
     assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1">/);
     assert.ok(html.includes(`v${version}`), "version missing");
-    assert.ok(!html.includes("{{") && !html.includes("/*__DOCS_DATA__*/"), "a placeholder was left unfilled");
+    for (const ph of ["{{VERSION}}", "{{REPO}}", "/*__DOCS_DATA__*/"]) assert.ok(!html.includes(ph), `${ph} was left unfilled`);
     assert.equal(html.split("<script").length, html.split("</script>").length);
     assert.match(html, /<title>aiskills documentation<\/title>/);
   });

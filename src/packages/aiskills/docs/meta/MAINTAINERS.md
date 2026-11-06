@@ -126,12 +126,21 @@ code:
   repo's real skills and compares the output exactly; a line holding only
   `…` matches any number of lines. Output after an `aiskills`/`ais`/`aix`
   command without the marker fails the test.
-- **After editing any page**, regenerate the agent indexes and check links:
+- **After editing any page, or any skill**, regenerate everything that is
+  generated (the Skills pages, `llms.txt`, `llms-full.txt`, `index.html`) and
+  check links:
 
   ```sh
-  python3 ../../../skills/docs/create-lib-docs/scripts/build_llms_txt.py docs/docsite
+  npm run docs
   python3 ../../../skills/docs/create-lib-docs/scripts/check_docs.py docs/docsite
   ```
+
+- **The Skills section** (`docs/docsite/skills/`, and the list between
+  `<!-- skills:start -->` and `<!-- skills:end -->` on the landing page) is
+  generated from the skills' `SKILL.md` files by `npm run docs:skills`
+  (`src/scripts/build-skills-docs.mjs`). Don't edit it by hand; change the
+  skill and regenerate. `src/test/docs-skills.test.mjs` fails while it is
+  stale, for example after a skill's version or description changes.
 
 - **Rebuild the single-page HTML** (`docs/docsite/index.html`) with
   `npm run docs:html`. `src/test/docs-html.test.mjs` fails while it is stale,

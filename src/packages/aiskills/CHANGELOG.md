@@ -34,7 +34,8 @@ It includes everything listed under 0.1.0 below.
   and which network calls happen, and the protections below.
 - **User documentation** in the repo at
   [`src/packages/aiskills/docs/docsite/`](https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills/docs/docsite):
-  getting started, a tutorial, how-to guides, concepts, a full reference
+  getting started, a page for every bundled skill (generated from the
+  skills, `npm run docs:skills`), a tutorial, how-to guides, concepts, a full reference
   (commands, options, environment variables, files, errors), an FAQ, and
   `llms.txt` / `llms-full.txt` for AI agents, plus the same docs as one HTML
   page with tabs, search and a dark theme (`docs/docsite/index.html`,
