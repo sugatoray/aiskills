@@ -1,0 +1,11 @@
+{
+  "name": "personas-skills",
+  "version": "1.0.0",
+  "description": "Expert persona skills: /prodigy acts as the top performer in any role or field and shares their approach, pitfalls, operating principles, and a learning plan.",
+  "author": {"name": "Sugato Ray", "url": "https://github.com/sugatoray"},
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": ["personas", "prodigy", "expert", "career", "learning-plan"],
+  "skills": ["./prodigy"]
+}
