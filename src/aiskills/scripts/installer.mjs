@@ -50,7 +50,7 @@ export function syncSkills({ root = installRoot(), version } = {}) {
   writeFileSync(
     join(root, "aiskills.json"),
     JSON.stringify(
-      { package: "@sugatoray/aiskills", version, installedAt: new Date().toISOString(), skills: dest },
+      { package: "@sugatoray-ai/aiskills", version, installedAt: new Date().toISOString(), skills: dest },
       null,
       2,
     ) + "\n",

@@ -1,4 +1,4 @@
-# @sugatoray/aiskills
+# @sugatoray-ai/aiskills
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
 (scrolls, stata, personas, newsletters, diagrams, docs, development), packaged
@@ -7,7 +7,7 @@ for npm. The repo's `skills/` folder ships inside the package unchanged.
 ## Install
 
 ```sh
-npm install -g @sugatoray/aiskills
+npm install -g @sugatoray-ai/aiskills
 ```
 
 During install, the `postinstall` hook:
@@ -20,7 +20,7 @@ If step 2 fails (for example, offline or `--ignore-scripts`), the npm install
 still succeeds. Run step 2 again with:
 
 ```sh
-npx @sugatoray/aiskills install        # or: aiskills install
+npx @sugatoray-ai/aiskills install        # or: aiskills install
 ```
 
 ## CLI

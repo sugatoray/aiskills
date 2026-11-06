@@ -38,7 +38,7 @@ Installs every skill from this repo, saves them to
 folder. See [`src/aiskills`](src/aiskills/README.md).
 
 ```sh
-npm install -g @sugatoray/aiskills
+npm install -g @sugatoray-ai/aiskills
 ```
 
 </details>
