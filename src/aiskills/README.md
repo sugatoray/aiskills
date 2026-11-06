@@ -29,7 +29,7 @@ npx @sugatoray-ai/aiskills install        # or: aiskills install
 aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [-- <extra npx skills args>]
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
-aiskills groups [--json]     # skill groups and the skills in each
+aiskills groups [--json]     # skill groups (from marketplace.json) and their skills
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
 aiskills sync                # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
@@ -47,41 +47,93 @@ aiskills install --group scrolls --global --agent claude-code
 
 ## Skill groups
 
-The package bundles the repo's `.claude-plugin/marketplace.json` and saves it
-to `~/.config/sugatoray/aiskills/.claude-plugin/marketplace.json`, next to
-`skills/`. The CLI reads that file only to group the skills. Nothing is
-installed as a Claude Code plugin; installs still go through `npx skills add`.
+### Where the groups come from
 
-Each plugin entry in the file is a group. Its skills are the `SKILL.md` files
-under the entry's `source` folder.
+The package bundles the repo's `.claude-plugin/marketplace.json` (the Claude
+Code plugin marketplace file) and saves it next to the skills:
 
-```sh
-aiskills groups
+```text
+~/.config/sugatoray/aiskills/
+├── .claude-plugin/marketplace.json   <- read only to define groups
+└── skills/                           <- what `npx skills add` installs from
 ```
 
-| Group | Alias | Skills |
+The file is only used to group the skills. Nothing is installed as a Claude
+Code plugin, and installs still go through `npx skills add ... --skill <name>`.
+
+### How a group is built
+
+Each entry under `plugins` is one group:
+
+```jsonc
+{
+  "metadata": { "pluginRoot": "./skills" },
+  "plugins": [
+    {
+      "name": "scrolls-skills",   // -> group name: scrolls-skills (alias: scrolls)
+      "source": "./scrolls",      // -> group skills: every SKILL.md under skills/scrolls/
+      ...
+    }
+  ]
+}
+```
+
+| Part | Where it comes from |
+| --- | --- |
+| **Group name** | The entry's `name` field, used exactly as written in `marketplace.json`, e.g. `scrolls-skills`. |
+| **Skills in the group** | Every `SKILL.md` under the entry's `source` folder (relative to `metadata.pluginRoot`). A skill's name is the `name:` in its `SKILL.md` frontmatter. |
+| **Alias** | **Not in the file.** The CLI makes it by removing a trailing `-skills` from the group name, so `scrolls-skills` can also be written `scrolls`. A name that doesn't end in `-skills` has an alias equal to the name itself. |
+| **`all`** | **Not in the file.** A built-in group that means every skill in the package, including skills that belong to no group. |
+
+Entries whose `source` isn't a local folder (for example a git URL) are
+skipped, because those skills aren't in the package.
+
+### Current groups
+
+Run `aiskills groups` (or `aiskills groups --json`) to see the list for your
+installed version. At the time of writing:
+
+| Group name (from `marketplace.json`) | Alias (made by the CLI) | Skills |
 | --- | --- | --- |
-| `scrolls-skills` | `scrolls` | scrolls-setup, -update, -hide, -unhide, -remove, -restore, -help |
+| `scrolls-skills` | `scrolls` | scrolls-setup, scrolls-update, scrolls-hide, scrolls-unhide, scrolls-remove, scrolls-restore, scrolls-help |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
-| `all` | | every skill, including ones in no group (e.g. newsletter-ai) |
+| `all` (built in) | | every skill |
 
-You can give a group by its full name or its alias (the name without
-`-skills`), in any letter case. `-G/--group` takes a comma-separated list, can
-be repeated, and combines with `-s`:
+`newsletter-ai` isn't in any `marketplace.json` entry. It shows up in
+`aiskills groups` as ungrouped, and you can install it with
+`-s newsletter-ai` or `-G all`.
+
+### Choosing groups on the command line
+
+- `-G` / `--group` accepts the group name **or** its alias, in any letter case:
+  `scrolls-skills`, `scrolls`, and `Scrolls` all select the same group.
+- Give several groups as a comma-separated list (`-G scrolls,personas`) or
+  repeat the option (`-G scrolls -G personas`).
+- `-G` combines with `-s`. You get the union of the named skills and every
+  skill in the named groups.
+- An unknown group name fails before anything is installed and lists the valid
+  names.
 
 ```sh
-aiskills install --group scrolls --global --agent claude-code
+aiskills install --group scrolls-skills --global --agent claude-code   # full group name
+aiskills install --group scrolls --global --agent claude-code          # same, via alias
 aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
 aiskills install -G stata --project
-aiskills uninstall -G scrolls          # remove a whole group
+aiskills uninstall -G scrolls          # remove every installed skill in the group
 ```
 
-The groups update automatically whenever a new plugin entry is added to the
-repo's `marketplace.json` and the package is republished.
+At npm install time, `AISKILLS_GROUPS` does the same thing:
+`AISKILLS_GROUPS=scrolls,personas npm i -g @sugatoray-ai/aiskills`.
+
+### Adding a group
+
+Add a plugin entry to the repo's `.claude-plugin/marketplace.json` that points
+at a folder under `skills/`, then publish a new version of this package. The
+new group appears automatically; no CLI code needs to change.
 
 ## Uninstall
 
@@ -140,7 +192,7 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_SCOPE=project` | Install to the project npm was invoked from instead of globally |
 | `AISKILLS_AGENTS` | Comma-separated agent list passed as `--agent` |
 | `AISKILLS_SKILLS` | Comma-separated skill list passed as `--skill` (default: all) |
-| `AISKILLS_GROUPS` | Comma-separated skill groups (combined with `AISKILLS_SKILLS`) |
+| `AISKILLS_GROUPS` | Comma-separated group names or aliases (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
