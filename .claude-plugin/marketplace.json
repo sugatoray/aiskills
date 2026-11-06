@@ -77,6 +77,19 @@
         "network-flow",
         "visualization"
       ]
+    },
+    {
+      "name": "personas-skills",
+      "source": "./personas",
+      "description": "Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems, deliver, avoid pitfalls, decide, and how to level up.",
+      "category": "productivity",
+      "keywords": [
+        "personas",
+        "prodigy",
+        "expert",
+        "career",
+        "learning-plan"
+      ]
     }
   ]
 }

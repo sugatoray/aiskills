@@ -230,3 +230,39 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Diagrams](skills/diagrams/README.md) | `network-flow` | Turns a system description into an interactive, offline HTML architecture diagram with flowing packets, orthogonal connections, scenario playback, and selectable components. Flows are simulated; no telemetry is collected. See [usage](skills/diagrams/network-flow/README.md). |
+
+---
+
+### 🧠 Personas
+
+Skills that have the agent adopt an expert persona — how the best
+practitioners in a role think, work, and grow.
+
+**Installation**:
+
+Run one of the following, choose the skill by name: `prodigy` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install personas-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Personas README.md**](skills/personas/README.md).
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Personas](skills/personas/README.md) | `prodigy` | Acts as the top performer in a role or field (default: `response`) and returns a playbook: how they frame the problem, constraints, stakeholders and metrics; how they design and deliver; biggest pitfalls; operating principles and decision rules; and a learning plan with daily habits, projects and feedback loops. See [usage](skills/personas/prodigy/README.md). |
