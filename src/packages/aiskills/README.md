@@ -9,7 +9,9 @@ nested layout can be rebuilt with `--nested` (see [Layouts](#layouts---flat-and-
 
 **Full documentation:** [docs/docsite/](docs/docsite/README.md) (tutorial,
 how-to guides, concepts, and a complete CLI, environment and error reference).
-AI agents can load [docs/docsite/llms.txt](docs/docsite/llms.txt).
+The same docs as one page with tabs and search: open
+[docs/docsite/index.html](docs/docsite/index.html) in a browser. AI agents can
+load [docs/docsite/llms.txt](docs/docsite/llms.txt).
 
 ## Install
 
@@ -540,10 +542,11 @@ src/packages/aiskills/
 │   │   ├── cli.mjs           # the `aiskills` command
 │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
 │   │   ├── postinstall.mjs   # npm postinstall hook
+│   │   ├── build-docs-html.mjs, docs-template.html  # docs/docsite -> index.html (not published)
 │   │   ├── skillsignore.mjs  # .skillsignore rules (not published)
 │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
 │   └── test/                 # node:test suite (not published)
-├── docs/docsite/             # user documentation + llms.txt (not published)
+├── docs/docsite/             # user documentation, llms.txt, index.html (not published)
 ├── docs/meta/                # ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 ├── docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   # project memory (not published)
 └── skills/, .aiskills/, .claude-plugin/, LICENSE      # vendored at pack time (git-ignored)
@@ -565,6 +568,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |
+| `src/test/docs-html.test.mjs` | The single-page HTML docs (`docs/docsite/index.html`): it is up to date, holds every page and diagram in tabs that follow the landing page, and, when Playwright and cdnjs are available, every page renders in Chromium with every link going to a page and heading that exist. |
 | `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.

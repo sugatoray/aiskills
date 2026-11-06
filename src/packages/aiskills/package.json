@@ -43,6 +43,7 @@
   "scripts": {
     "vendor": "node src/scripts/vendor-skills.mjs",
     "clean": "node src/scripts/vendor-skills.mjs --clean",
+    "docs:html": "node src/scripts/build-docs-html.mjs docs/docsite --out docs/docsite/index.html",
     "prepack": "node src/scripts/vendor-skills.mjs",
     "postinstall": "node src/scripts/postinstall.mjs",
     "pack:dry": "npm pack --dry-run",

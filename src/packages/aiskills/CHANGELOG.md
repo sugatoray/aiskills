@@ -36,8 +36,11 @@ It includes everything listed under 0.1.0 below.
   [`src/packages/aiskills/docs/docsite/`](https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills/docs/docsite):
   getting started, a tutorial, how-to guides, concepts, a full reference
   (commands, options, environment variables, files, errors), an FAQ, and
-  `llms.txt` / `llms-full.txt` for AI agents. Not shipped in the package.
-  `npm test` checks it against the code and runs its examples.
+  `llms.txt` / `llms-full.txt` for AI agents, plus the same docs as one HTML
+  page with tabs, search and a dark theme (`docs/docsite/index.html`,
+  `npm run docs:html`). Not shipped in the package. `npm test` checks it
+  against the code, runs its examples, and opens every page of the HTML
+  in a browser.
 
 ### Fixed
 

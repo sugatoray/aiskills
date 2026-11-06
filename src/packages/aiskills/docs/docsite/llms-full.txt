@@ -2473,6 +2473,26 @@ two skills are both named '<name>': skills/<folder> and skills/<folder>
 
 **Fix:** give one of them another `name:`.
 
+## Docs build errors (maintainers)
+
+These come from `npm run docs:html`, which builds `docs/docsite/index.html`.
+
+### Page not in the landing page
+
+```text
+pages not linked from a section of README.md: <pages>
+```
+
+**Fix:** add each page to a `### Section` list in `docs/docsite/README.md` (`- [Title](path.md): summary`). The tabs are built from those lists.
+
+### Usage
+
+```text
+usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]
+```
+
+**Fix:** pass the docs folder and `--out`, or use `npm run docs:html`.
+
 See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md) · [FAQ and troubleshooting](../faq.md)
 
 <!-- source: faq.md -->

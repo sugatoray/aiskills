@@ -21,7 +21,7 @@ package.json, README.md, CHANGELOG.md, SECURITY.md
 bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
 src/scripts/                           cli.mjs, installer.mjs, postinstall.mjs, vendor-skills.mjs
 src/test/                              node:test suite
-docs/docsite/                          user documentation + llms.txt (not published)
+docs/docsite/                          user documentation, llms.txt, index.html (not published)
 docs/meta/                             ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   project memory (not published)
 skills/, .aiskills/, .claude-plugin/, LICENSE      vendored at pack time (git-ignored)
@@ -133,8 +133,15 @@ code:
   python3 ../../../skills/docs/create-lib-docs/scripts/check_docs.py docs/docsite
   ```
 
-- **A version bump** changes the `--version` and `--help` examples; the test
-  shows the new output to paste in.
+- **Rebuild the single-page HTML** (`docs/docsite/index.html`) with
+  `npm run docs:html`. `src/test/docs-html.test.mjs` fails while it is stale,
+  and opens every page in Chromium to check links and headings (skipped
+  without Playwright or access to cdnjs). The builder is
+  `src/scripts/build-docs-html.mjs` with `src/scripts/docs-template.html`,
+  ported from sugatoray/callai's `docs/site/`; tabs come from the landing
+  page's `### Section` lists, so a new page must be listed there.
+- **A version bump** changes the `--version` and `--help` examples and the
+  version in `index.html`; the tests show what to update.
 - Diagrams are hand-written SVG in `docs/docsite/images/`; render one to PNG
   and look at it after editing.
 
