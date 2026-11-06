@@ -31,6 +31,19 @@ npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
 ```
 
 <details>
+<summary><strong>Alternate: npm package</strong></summary>
+
+Installs every skill from this repo, saves them to
+`~/.config/sugatoray/aiskills/skills`, and runs `npx skills add` on that
+folder. See [`src/aiskills`](src/aiskills/README.md).
+
+```sh
+npm install -g @sugatoray/aiskills
+```
+
+</details>
+
+<details>
 <summary><strong>Alternate: Claude Code plugin</strong></summary>
 
 Installs the whole family as a managed, read-only bundle from this
