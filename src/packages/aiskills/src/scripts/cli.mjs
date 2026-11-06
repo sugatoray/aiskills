@@ -30,6 +30,8 @@ const ROOT = installRoot();
 const HELP = `aiskills ${version} — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
+       ais <command> [options]     (same as aiskills)
+       aix <command> [options]     (same as aiskills --route)
 
 Commands:
   install, i     Save skills to ${ROOT}/skills and run 'npx skills add' on it (default)
@@ -56,7 +58,8 @@ Scope/selection options (install, uninstall, installed):
   error. Quote patterns so your shell doesn't expand them: -s 'scrolls-*'.
 
 Routing (install, uninstall, installed; may also go before the command):
-      --route            Hand skills that are NOT bundled to 'npx skills':
+      --route            Hand skills that are NOT bundled to 'npx skills'.
+                         The 'aix' command is 'aiskills --route' (e.g. 'aix i -s pdf'):
                            install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
                                       -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
                            uninstall: -s <name|pattern>     -> also matches skills from other sources

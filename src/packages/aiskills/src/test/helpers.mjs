@@ -86,6 +86,7 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 /**
  * A fresh sandbox. Returns helpers:
  *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/cli.mjs), returns { status, out, calls }
+ *   aix(args, {env})       the same through bin/aix.mjs (= aiskills --route)
  *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
@@ -147,6 +148,7 @@ export function sandbox() {
     home,
     root,
     run: (args, { env } = {}) => exec(join(pkg, "bin", "aiskills.mjs"), args, env),
+    aix: (args, { env } = {}) => exec(join(pkg, "bin", "aix.mjs"), args, env),
     postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),

@@ -367,6 +367,38 @@ describe("aiskills install --route", posixOnly, () => {
   });
 });
 
+describe("aix (= aiskills --route)", posixOnly, () => {
+  test("install routes non-bundled names exactly like aiskills --route", () => {
+    sb.setFind("acme/tools@ext 1.2K installs\n");
+    const viaAix = sb.aix(["i", "-s", "a1,ext", "-a", "claude-code"]);
+    const viaFlag = sb.run(["--route", "install", "-s", "a1,ext", "-a", "claude-code"]);
+    assert.equal(viaAix.status, 0, viaAix.out);
+    assert.deepEqual(changes(viaAix.calls), changes(viaFlag.calls));
+    assert.deepEqual(changes(viaAix.calls), [
+      ["add", sb.root, "--global", "--skill", "a1", "--agent", "claude-code", "--yes"],
+      ["add", "acme/tools@ext", "--global", "--agent", "claude-code", "--yes"],
+    ]);
+  });
+
+  test("plain aiskills still rejects a non-bundled name", () => {
+    assert.equal(sb.run(["i", "-s", "ext"]).status, 1);
+  });
+
+  test("uninstall and installed also run in route mode", () => {
+    sb.run(["sync"]);
+    sb.setList([row("a1", sb.root), row("ext", "acme/tools", "github")]);
+    assert.deepEqual(changes(sb.aix(["r", "-s", "ext"]).calls), [["remove", "ext", "--global", "--yes"]]);
+    assert.match(sb.aix(["ls"]).out, /^ext\s+acme\/tools\s+-\s+Claude Code$/m);
+    // A full uninstall still only removes bundled skills.
+    assert.deepEqual(changes(sb.aix(["uninstall"]).calls), [["remove", "a1", "--global", "--yes"]]);
+  });
+
+  test("other commands work unchanged, and --help explains aix", () => {
+    assert.equal(sb.aix(["p"]).out.trim(), sb.root);
+    assert.match(sb.aix(["--help"]).out, /The 'aix' command is 'aiskills --route'/);
+  });
+});
+
 describe("aiskills uninstall", posixOnly, () => {
   // Installed: two bundled skills (source = install root) and one external.
   const installed = () => [row("a1", sb.root), row("beta-one", sb.root), row("ext", "acme/tools", "github")];

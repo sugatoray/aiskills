@@ -12,6 +12,17 @@ nested layout can be rebuilt with `--nested` (see [Layouts](#layouts---flat-and-
 npm install -g @sugatoray-ai/aiskills
 ```
 
+This adds three commands:
+
+| Command | Same as |
+| --- | --- |
+| `aiskills` | |
+| `ais` | `aiskills` (shorter to type) |
+| `aix` | `aiskills --route`: also handles skills that aren't bundled (see [`--route`](#bundled-and-external-skills---route)) |
+
+So `ais i -G scrolls` is `aiskills install -G scrolls`, and `aix i -s pdf` is
+`aiskills --route install -s pdf`. The rest of this README uses `aiskills`.
+
 During install, the `postinstall` hook:
 
 1. saves the skills to **`~/.config/sugatoray/aiskills/skills/`** and replaces any copy that's already there, and
@@ -278,7 +289,8 @@ Without `--route`, `aiskills` only manages the **bundled** skills, the ones in
 `~/.config/sugatoray/aiskills/skills/`. It rejects any other skill name and
 suggests adding `--route`.
 
-With `--route`, every `-s` entry that isn't bundled is handed to `npx skills`.
+With `--route`, every `-s` entry that isn't bundled is handed to `npx skills`. The `aix` command
+always works this way: `aix ...` is `aiskills --route ...`.
 That lets you manage bundled and external (registry / GitHub) skills from one
 CLI. `--route` can go before or after the command, or you can set
 `AISKILLS_ROUTE=1`.

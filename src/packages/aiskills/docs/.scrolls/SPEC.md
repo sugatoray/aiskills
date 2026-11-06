@@ -16,7 +16,7 @@ Because `skills/` is flat, a project that installs the package as a dependency c
 ## Install on `npm install -g`
 Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/scripts/postinstall.mjs`)
 
-## `aiskills` CLI
+## `aiskills` CLI (also `ais`, and `aix` for route mode)
 `install` (alias `i`), `uninstall` (`r`, `rm`, `remove`), `installed` (`ls`), `groups` (`g`), `find` (`f`), `sync`, `list`, `path` (`p`), `help` (`h`), and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/scripts/cli.mjs`, shared logic in `src/scripts/installer.mjs`)
 
 ## Choosing what to install: scope, agents, skills
@@ -32,4 +32,4 @@ Each plugin entry in the bundled `marketplace.json` is a group: its `name` is th
 `*`, `?`, `[abc]`, `[a-z]`, `[!abc]`; case-insensitive, whole-name, mixable with plain names, on both install and uninstall and in the matching env vars. Skills match the package's skills, groups match names and aliases, and agents match the list `npx skills` itself reports as valid. A pattern that matches nothing stops the command before anything changes.
 
 ## External skills via `--route`
-With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), `-s` entries that aren't bundled go to `npx skills`. A bare name is looked up with `npx skills find` and installed only on a unique exact-name match; `owner/repo[@skill]`, URLs and paths go straight to `npx skills add`. `uninstall --route` also matches skills from other sources, while a full uninstall stays bundled-only. `installed --route` lists every skill with its source. `aiskills find <query>` searches the registry.
+With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always when run as `aix`, `-s` entries that aren't bundled go to `npx skills`. A bare name is looked up with `npx skills find` and installed only on a unique exact-name match; `owner/repo[@skill]`, URLs and paths go straight to `npx skills add`. `uninstall --route` also matches skills from other sources, while a full uninstall stays bundled-only. `installed --route` lists every skill with its source. `aiskills find <query>` searches the registry.

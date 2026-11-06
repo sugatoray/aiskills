@@ -85,6 +85,20 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
     assert.deepEqual(readdirSync(join(proj, ".claude", "skills")).sort(), expected);
   });
 
+  test("the ais command is installed and is the same as aiskills", () => {
+    const ais = process.platform === "win32" ? join(prefix, "ais.cmd") : join(prefix, "bin", "ais");
+    const res = spawnSync(ais, ["installed"], { encoding: "utf8", env: { ...process.env, ...env() }, cwd: home });
+    assert.equal(res.status, 0, res.stderr);
+    assert.equal(res.stdout, aiskills("installed").out);
+  });
+
+  test("the aix command is installed and runs in --route mode", () => {
+    const aix = process.platform === "win32" ? join(prefix, "aix.cmd") : join(prefix, "bin", "aix");
+    const res = spawnSync(aix, ["installed"], { encoding: "utf8", env: { ...process.env, ...env() }, cwd: home });
+    assert.equal(res.status, 0, res.stderr);
+    assert.match(res.stdout, /^prodigy\s+bundled\s+personas-skills/m, "route mode shows the source column");
+  });
+
   test("uninstall --purge removes everything and the local folder", () => {
     assert.equal(aiskills("uninstall", "--purge").status, 0);
     assert.ok(!existsSync(root()));

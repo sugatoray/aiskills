@@ -23,7 +23,9 @@
   "author": "Sugato Ray (https://github.com/sugatoray)",
   "type": "module",
   "bin": {
-    "aiskills": "bin/aiskills.mjs"
+    "aiskills": "bin/aiskills.mjs",
+    "ais": "bin/aiskills.mjs",
+    "aix": "bin/aix.mjs"
   },
   "files": [
     "bin/",

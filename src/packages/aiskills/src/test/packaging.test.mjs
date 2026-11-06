@@ -96,6 +96,7 @@ describe("npm pack", () => {
       "README.md",
       "LICENSE",
       "bin/aiskills.mjs",
+      "bin/aix.mjs",
       "src/scripts/cli.mjs",
       "src/scripts/installer.mjs",
       "src/scripts/postinstall.mjs",
@@ -111,7 +112,12 @@ describe("npm pack", () => {
   test("ships only the bin/ entry point and the runtime files under src/scripts/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "src/scripts/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
+    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
+  });
+
+  test("package.json declares the aiskills, ais and aix commands", () => {
+    const { bin } = JSON.parse(readFileSync(join(copy?.pkg ?? ".", "package.json"), "utf8"));
+    assert.deepEqual(bin, { aiskills: "bin/aiskills.mjs", ais: "bin/aiskills.mjs", aix: "bin/aix.mjs" });
   });
 
   test("leaves out tests, dev scripts and the scrolls memory", (t) => {
