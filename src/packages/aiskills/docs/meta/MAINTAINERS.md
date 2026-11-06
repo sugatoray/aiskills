@@ -22,6 +22,7 @@ bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
 src/scripts/                           cli.mjs, installer.mjs, postinstall.mjs, vendor-skills.mjs
 src/test/                              node:test suite
 docs/docsite/                          user documentation, llms.txt, index.html (not published)
+docs/banner/                           banner: config.yaml, editor page, banner_2x.png (not published)
 docs/meta/                             ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   project memory (not published)
 skills/, .aiskills/, .claude-plugin/, LICENSE      vendored at pack time (git-ignored)
@@ -149,8 +150,15 @@ code:
   `src/scripts/build-docs-html.mjs` with `src/scripts/docs-template.html`,
   ported from sugatoray/callai's `docs/site/`; tabs come from the landing
   page's `### Section` lists, so a new page must be listed there.
-- **A version bump** changes the `--version` and `--help` examples and the
-  version in `index.html`; the tests show what to update.
+- **The banner** (`docs/banner/`, see its README) is built from
+  `docs/banner/config.yaml` and `src/scripts/banner-template.html` by
+  `npm run banner`; `npm run banner:png` also renders `banner_2x.png` for the
+  README (needs Playwright). `src/test/banner.test.mjs` fails while the page is
+  stale. The PNG isn't compared pixel by pixel, so re-run `npm run banner:png`
+  whenever the banner changes.
+- **A version bump** changes the `--version` and `--help` examples, the
+  banner and the version in `index.html`: run `npm run banner:png` and
+  `npm run docs`; the tests show what else to update.
 - Diagrams are hand-written SVG in `docs/docsite/images/`; render one to PNG
   and look at it after editing.
 

@@ -1,0 +1,598 @@
+<!doctype html>
+<!-- Built by src/scripts/create-banner.mjs from src/scripts/banner-template.html (the design) and docs/banner/config.yaml (the values). Change those, then run `npm run banner`; don't edit docs/banner/aiskills-banner.html by hand. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page_title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" crossorigin="anonymous"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;700;800&family=Public+Sans:wght@400;500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script>
+  // Export mode (?export[&bg=as-is|white|black|transparent][&ink=auto|light|dark]): only the banner, at
+  // its native 1280x640, for headless screenshots (create_banner.py --png).
+  if (new URLSearchParams(location.search).has('export')) document.documentElement.classList.add('bare');
+</script>
+<style>
+  /* ───────────── Page (editor chrome, not part of the banner) ───────────── */
+  :root {
+    --page-bg: #e9eff0;
+    --page-fg: #172225;
+    --page-muted: #56676b;
+    --panel: #ffffff;
+    --panel-line: #d6e0e1;
+    --btn: #0b6d77;
+    --btn-fg: #ffffff;
+    --checker-a: #dde5e6;
+    --checker-b: #f4f7f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page-bg: #0a1012; --page-fg: #e3ecec; --page-muted: #93a6a9;
+      --panel: #152023; --panel-line: #26373b; --btn: #5cc6cf; --btn-fg: #062326;
+      --checker-a: #1a2427; --checker-b: #11191b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #0a1012; --page-fg: #e3ecec; --page-muted: #93a6a9;
+    --panel: #152023; --panel-line: #26373b; --btn: #5cc6cf; --btn-fg: #062326;
+    --checker-a: #1a2427; --checker-b: #11191b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page-bg); color: var(--page-fg);
+    font: 14px/1.4 "Public Sans", system-ui, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 16px; gap: 16px; overflow-x: hidden;
+  }
+
+  .toolbar {
+    width: 100%; max-width: 1280px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 10px 12px;
+  }
+  .toolbar .title { font-weight: 600; margin-right: auto; }
+  .toolbar .title small { color: var(--page-muted); font-weight: 400; margin-left: 6px; }
+  .group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .group label { color: var(--page-muted); font-size: 12px; }
+  .seg { display: inline-flex; border: 1px solid var(--panel-line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-right: 1px solid var(--panel-line); background: transparent; color: var(--page-fg);
+                padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .seg button:last-child { border-right: 0; }
+  .seg button:disabled { opacity: .38; cursor: not-allowed; text-decoration: line-through; }
+  .seg button[aria-pressed="true"] { background: var(--btn); color: var(--btn-fg); }
+  .btn { border: 1px solid var(--btn); background: var(--btn); color: var(--btn-fg); border-radius: 8px;
+         padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--page-fg); border-color: var(--panel-line); font-weight: 500; }
+  .btn:disabled { opacity: .55; cursor: progress; }
+  .check { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--page-muted); }
+
+  .hint { width: 100%; max-width: 1280px; color: var(--page-muted); font-size: 12px; margin: -6px 0 0; }
+  .hint kbd { font-family: "JetBrains Mono", monospace; font-size: 11px; padding: 1px 5px;
+              border: 1px solid var(--panel-line); border-radius: 4px; }
+
+  /* Stage scales the fixed 1280×640 banner to fit the viewport. */
+  .stage {
+    width: 100%; max-width: 1280px; aspect-ratio: 2 / 1; position: relative; border-radius: 14px; overflow: hidden;
+    background-color: var(--checker-b);
+    background-image:
+      linear-gradient(45deg, var(--checker-a) 25%, transparent 25%, transparent 75%, var(--checker-a) 75%),
+      linear-gradient(45deg, var(--checker-a) 25%, transparent 25%, transparent 75%, var(--checker-a) 75%);
+    background-size: 20px 20px; background-position: 0 0, 10px 10px;
+  }
+  .scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
+
+  /* ───────────── Banner (exported) ───────────── */
+  /* banner:css:start (docs/site/build_docs_html.py copies everything up to banner:css:end) */
+  #banner {
+    --bg: #0d1517;
+    --fg: #e8f0f0;
+    --muted: #93a6a9;
+    --line: rgba(147, 166, 169, .22);
+    --teal: #5cc6cf;
+    --violet: #d39af5;
+    --blue: #8fb4ff;
+    --green: #9fd88a;
+    --amber: #f2b36b;
+    --coral: #ff8a7a;
+    --term-bg: #0a1113;
+    --term-fg: #dbe6e6;
+    --term-line: #26373b;
+
+    position: relative; width: 1280px; height: 640px; overflow: hidden;
+    color: var(--fg); font-family: "Public Sans", system-ui, sans-serif;
+    background: var(--bg);
+  }
+  /* Light ink, used when exporting on white (and in "Ink: dark" mode). */
+  #banner.ink-dark {
+    --fg: #122023; --muted: #4c5f63; --line: rgba(18, 32, 35, .16);
+    --teal: #0b6d77; --violet: #8a3ab9; --blue: #2557b8; --green: #2c7a2c; --amber: #9a6200; --coral: #b42318;
+  }
+  #banner .bg-layer { position: absolute; inset: 0; pointer-events: none; }
+  #banner .bg-glow {
+    background:
+      radial-gradient(620px 420px at 8% 0%, rgba(92, 198, 207, .22), transparent 70%),
+      radial-gradient(560px 460px at 100% 100%, rgba(211, 154, 245, .20), transparent 70%),
+      radial-gradient(420px 300px at 70% 10%, rgba(143, 180, 255, .10), transparent 70%);
+  }
+  #banner .bg-grid {
+    background-image: radial-gradient(rgba(147, 166, 169, .20) 1px, transparent 1.2px);
+    background-size: 24px 24px;
+    -webkit-mask-image: linear-gradient(115deg, transparent 10%, #000 55%, transparent 95%);
+            mask-image: linear-gradient(115deg, transparent 10%, #000 55%, transparent 95%);
+  }
+  /* Export background overrides */
+  #banner.bg-white { background: #ffffff; }
+  #banner.bg-black { background: #000000; }
+  #banner.bg-transparent { background: transparent; }
+  #banner.bg-white .bg-layer, #banner.bg-black .bg-layer, #banner.bg-transparent .bg-layer { display: none; }
+
+  #banner .content {
+    position: absolute; inset: 0; padding: 64px 72px 56px;
+    display: grid; grid-template-columns: 1fr 520px; grid-template-rows: 1fr auto; column-gap: 48px; row-gap: 36px;
+  }
+  #banner .left { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+
+  #banner .badges { display: flex; gap: 8px; margin-bottom: 26px; }
+  #banner .badge {
+    font: 500 13px/1 "JetBrains Mono", monospace; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; white-space: nowrap;
+  }
+  #banner .badge b { color: var(--teal); font-weight: 700; }
+
+  #banner .wordmark { display: flex; align-items: center; gap: 20px; }
+  #banner .mark {
+    width: 88px; height: 88px; border-radius: 22px; flex: none; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--teal), var(--violet));
+    box-shadow: 0 10px 30px rgba(92, 198, 207, .25);
+  }
+  #banner .mark span { font: 800 40px/1 "JetBrains Mono", monospace; color: #071a1d; letter-spacing: -2px; transform: translateY(-2px); }
+  #banner .name {
+    font: 800 108px/0.95 "JetBrains Mono", monospace; letter-spacing: -5px; margin: 0;
+    color: var(--fg);
+  }
+  #banner .name .grad {
+    background: linear-gradient(90deg, var(--teal), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  #banner .tagline {
+    font: 700 38px/1.12 "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.5px;
+    margin: 26px 0 0; max-width: 620px;
+  }
+  #banner .sub { font-size: 19px; line-height: 1.45; color: var(--muted); margin: 14px 0 0; max-width: 600px; }
+
+  #banner .install {
+    margin-top: 28px; align-self: flex-start; display: inline-flex; align-items: center; gap: 12px;
+    font: 500 19px/1 "JetBrains Mono", monospace; color: var(--term-fg); font-variant-ligatures: none;
+    background: var(--term-bg); border: 1px solid var(--term-line); border-radius: 12px; padding: 14px 18px;
+  }
+  #banner .install .dollar { color: #5cc6cf; }
+  /* Option A: one box, a line per command. Option B: a chip per command, stacked. */
+  #banner .install-box { flex-direction: column; align-items: flex-start; gap: 10px; }
+  #banner .install-box .line { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+  #banner .install-chips { margin-top: 28px; align-self: flex-start; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  #banner .install-chips .install { margin-top: 0; }
+
+  /* Terminal */
+  #banner .terminal {
+    align-self: center; background: var(--term-bg); border: 1px solid var(--term-line); border-radius: 16px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .02) inset; overflow: hidden;
+    font: 400 15.5px/1.7 "JetBrains Mono", monospace; color: var(--term-fg);
+  }
+  #banner .term-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--term-line); }
+  #banner .term-bar i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  #banner .term-bar .t { margin-left: 10px; color: #93a6a9; font-size: 13px; }
+  #banner .term-body { padding: 18px 20px 20px; white-space: pre; font-variant-ligatures: none; }
+  #banner .term-body .p { color: #5cc6cf; }
+  #banner .term-body .f { color: #d39af5; }
+  #banner .term-body .s { color: #9fd88a; }
+  #banner .term-body .c { color: #6f8386; }
+  #banner .term-body .h { color: #8fb4ff; font-weight: 700; }
+  #banner .term-body .ok { color: #9fd88a; }
+  #banner .term-body .cursor { display: inline-block; width: 9px; height: 18px; background: #5cc6cf; vertical-align: -3px; }
+
+  /* Harness row */
+  #banner .harnesses { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+  #banner .harnesses .label { font: 500 14px/1 "JetBrains Mono", monospace; color: var(--muted); margin-right: 4px; white-space: nowrap; }
+  #banner .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  #banner .pill {
+    display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
+    font: 500 16px/1 "JetBrains Mono", monospace; color: var(--fg);
+    border: 1px solid var(--line); border-radius: 999px; padding: 9px 15px 9px 12px;
+  }
+  #banner .pill::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--dot, var(--teal)); }
+  #banner .pill:nth-child(6n+1) { --dot: var(--teal); }
+  #banner .pill:nth-child(6n+2) { --dot: var(--violet); }
+  #banner .pill:nth-child(6n+3) { --dot: var(--blue); }
+  #banner .pill:nth-child(6n+4) { --dot: var(--green); }
+  #banner .pill:nth-child(6n+5) { --dot: var(--amber); }
+  #banner .pill:nth-child(6n+6) { --dot: var(--coral); }
+  #banner .harnesses .url { margin-left: auto; font: 500 15px/1 "JetBrains Mono", monospace; color: var(--muted); white-space: nowrap; }
+
+  #banner .term-body .o { color: #93a6a9; }
+  #banner .name { letter-spacing: -6px; }
+  #banner .pills { gap: 8px; }
+  #banner .pill { font-size: 15px; padding: 8px 13px 8px 11px; }
+
+  /* banner:css:end */
+
+  /* Edit mode affordances (stripped on export) */
+  #banner.editing [data-edit] { outline: 1.5px dashed rgba(92, 198, 207, .7); outline-offset: 4px; border-radius: 4px; cursor: text; }
+  #banner.editing [data-edit]:focus { outline: 2px solid #5cc6cf; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0;
+    background: var(--panel); color: var(--page-fg); border: 1px solid var(--panel-line); border-radius: 10px;
+    padding: 10px 16px; transition: .2s; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Export mode: nothing but the banner, unscaled, at the top-left corner. */
+  html.bare body { padding: 0; display: block; min-height: 0; background: transparent; overflow: hidden; }
+  html.bare .toolbar, html.bare .hint, html.bare .toast { display: none; }
+  html.bare .stage { width: 1280px; height: 640px; max-width: none; aspect-ratio: auto; border-radius: 0; background: none; }
+  html.bare .scaler { transform: none !important; }
+
+  @media (max-width: 720px) {
+    .toolbar .title { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar" role="toolbar" aria-label="Banner tools">
+  <div class="title">{{ page_title }} <small>1280 × 640</small></div>
+
+  <button class="btn" id="editToggle" aria-pressed="false">✎ Edit</button>
+
+  <div class="group">
+    <label>Background</label>
+    <div class="seg" id="bgSeg">
+      <button data-bg="as-is" aria-pressed="true">As is</button>
+      <button data-bg="white" aria-pressed="false">White</button>
+      <button data-bg="black" aria-pressed="false">Black</button>
+      <button data-bg="transparent" aria-pressed="false">Transparent</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <label>Ink</label>
+    <div class="seg" id="inkSeg">
+      <button data-ink="auto" aria-pressed="true" title="Dark text on white, light text otherwise">Auto</button>
+      <button data-ink="light" aria-pressed="false">Light</button>
+      <button data-ink="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <label>Install</label>
+    <div class="seg" id="installSeg">
+      <button data-install="box" aria-pressed="false" title="Option A: one box, a line per command">Box</button>
+      <button data-install="chips" aria-pressed="false" title="Option B: a chip per command">Chips</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <label>Scale</label>
+    <div class="seg" id="scaleSeg">
+      <button data-scale="1" aria-pressed="false">1x</button>
+      <button data-scale="2" aria-pressed="true">2x</button>
+      <button data-scale="4" aria-pressed="false">4x</button>
+    </div>
+  </div>
+
+  <button class="btn" id="exportBtn">⬇ Export PNG</button>
+  <button class="btn ghost" id="exportAllBtn" title="As is, white, black, and transparent with light and with dark ink, × 3 sizes">Export all 15</button>
+  <button class="btn ghost" id="saveHtmlBtn" title="Download this page with your edits baked in">Save HTML</button>
+  <button class="btn ghost" id="resetBtn" title="Discard saved edits">Reset</button>
+</div>
+<p class="hint">Click <b>Edit</b>, then click any outlined text to change it. Click <b>Save</b> to keep your edits in this browser; <b>Save HTML</b> downloads a copy with them built in. In the groups row, press <kbd>Enter</kbd> inside a pill to add one; empty a pill to remove it. Ink: light text is for dark pages and dark text for light ones; a transparent PNG is exported in either, named <kbd>-light-ink</kbd> or <kbd>-dark-ink</kbd>.</p>
+
+<div class="stage" id="stage">
+  <div class="scaler" id="scaler">
+    <!-- banner:html:start -->
+    <div id="banner">
+      <div class="bg-layer bg-glow"></div>
+      <div class="bg-layer bg-grid"></div>
+
+      <div class="content">
+        <div class="left">
+          <div class="badges">
+            <span class="badge" data-edit><b>{{ version_label }}</b> · {{ node_label }}</span>
+            <span class="badge" data-edit>{{ license_label }}</span>
+            <span class="badge" data-edit>{{ counts_label }}</span>
+          </div>
+
+          <div class="wordmark">
+            <div class="mark"><span data-edit>{{ mark_glyph }}</span></div>
+            <h1 class="name" data-edit><span class="grad">{{ wordmark_accent }}</span>{{ wordmark_plain }}</h1>
+          </div>
+
+          <p class="tagline" data-edit>{{ tagline }}</p>
+          <p class="sub" data-edit>{{ subtitle }}</p>
+
+{{ install_html }}
+        </div>
+
+        <div class="terminal">
+          <div class="term-bar">
+            <i style="background:#ff8a7a"></i><i style="background:#f2b36b"></i><i style="background:#9fd88a"></i>
+            <span class="t" data-edit>{{ terminal_title }}</span>
+          </div>
+<div class="term-body" data-edit>{{ terminal_html }}</div>
+        </div>
+
+        <div class="harnesses">
+          <span class="label" data-edit>{{ group_label }}</span>
+          <div class="pills" id="pills" data-edit>
+{{ pills_html }}
+          </div>
+          <span class="url" data-edit>{{ repo_label }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- banner:html:end -->
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const STORE_KEY = '{{ store_key }}';
+  const banner = document.getElementById('banner');
+  const scaler = document.getElementById('scaler');
+  const stage = document.getElementById('stage');
+  const editBtn = document.getElementById('editToggle');
+  const toastEl = document.getElementById('toast');
+  const W = 1280, H = 640;
+
+  const state = { bg: 'as-is', ink: 'auto', scale: 2, editing: false };
+
+  /* ── Fit banner to stage ── */
+  const bare = document.documentElement.classList.contains('bare');
+  const fit = () => { if (!bare) scaler.style.transform = `scale(${stage.clientWidth / W})`; };
+  new ResizeObserver(fit).observe(stage); fit();
+
+  /* ── Toast ── */
+  let toastTimer;
+  const toast = (msg) => {
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  };
+
+  /* ── Background / ink preview ── */
+  // Ink that can't be read on a background: light text on white, dark text on the dark ones.
+  // Transparent allows both, because it depends on the page the PNG ends up on.
+  const UNREADABLE = { 'as-is': 'dark', black: 'dark', white: 'light' };
+  const inkFor = (bg, ink) => (ink === 'dark' || (ink === 'auto' && bg === 'white') ? 'dark' : 'light');
+  const applyLook = (bg = state.bg, ink = state.ink) => {
+    banner.classList.remove('bg-white', 'bg-black', 'bg-transparent', 'ink-dark');
+    if (bg !== 'as-is') banner.classList.add('bg-' + bg);
+    if (inkFor(bg, ink) === 'dark') banner.classList.add('ink-dark');
+  };
+  const inkSeg = document.getElementById('inkSeg');
+  const syncInkSeg = () => {
+    inkSeg.querySelectorAll('button').forEach((b) => {
+      const off = UNREADABLE[state.bg] === b.dataset.ink;
+      b.disabled = off;
+      b.title = off ? `${b.textContent} ink can't be read on a ${state.bg === 'white' ? 'white' : 'dark'} background`
+        : b.dataset.ink === 'auto' ? 'Dark text on white, light text otherwise'
+        : b.dataset.ink === 'light' ? 'Light text, for dark pages' : 'Dark text, for light pages';
+    });
+    if (UNREADABLE[state.bg] === state.ink) {
+      state.ink = 'auto';
+      inkSeg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.ink === 'auto')));
+    }
+  };
+  const wireSeg = (id, attr, key, cast = (v) => v) => {
+    const seg = document.getElementById(id);
+    seg.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      state[key] = cast(b.dataset[attr]);
+      seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      syncInkSeg();
+      applyLook();
+    });
+  };
+  wireSeg('bgSeg', 'bg', 'bg');
+  wireSeg('inkSeg', 'ink', 'ink');
+  wireSeg('scaleSeg', 'scale', 'scale', Number);
+
+  /* ── Install commands: option A (box) ⇄ option B (chips), live ── */
+  const MAX_CHIPS = 2;  // keep in step with INSTALL_STYLES in create_banner.py
+  const installSeg = document.getElementById('installSeg');
+  const installArea = () => banner.querySelector('.install-box, .install-chips');
+  const installStyle = () => (installArea().classList.contains('install-box') ? 'box' : 'chips');
+  const syncInstallSeg = () => {
+    const style = installStyle(), count = installArea().querySelectorAll('[data-edit]').length;
+    installSeg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.install === style)));
+    const chips = installSeg.querySelector('[data-install="chips"]');
+    chips.disabled = style !== 'chips' && count > MAX_CHIPS;
+    chips.title = chips.disabled ? `Option B has room for ${MAX_CHIPS} commands` : 'Option B: a chip per command';
+  };
+  const setInstall = (style) => {
+    const area = installArea();
+    if (style === installStyle()) return;
+    const box = style === 'box';
+    const wrap = document.createElement('div');
+    wrap.className = box ? 'install install-box' : 'install-chips';
+    // Move the command spans themselves, so text, edits and edit mode carry over.
+    area.querySelectorAll('[data-edit]').forEach((cmd) => {
+      const row = document.createElement('div');
+      row.className = box ? 'line' : 'install';
+      row.innerHTML = '<span class="dollar">$</span>';
+      row.append(cmd);
+      wrap.append(row);
+    });
+    area.replaceWith(wrap);
+    syncInstallSeg();
+  };
+  installSeg.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (b && !b.disabled) setInstall(b.dataset.install);
+  });
+  const installParam = new URLSearchParams(location.search).get('install');  // export mode: ?export&install=chips
+  if (bare && ['box', 'chips'].includes(installParam)) setInstall(installParam);
+  syncInstallSeg();
+  if (bare) {
+    const q = new URLSearchParams(location.search);
+    if (['as-is', 'white', 'black', 'transparent'].includes(q.get('bg'))) state.bg = q.get('bg');
+    if (['auto', 'light', 'dark'].includes(q.get('ink'))) state.ink = q.get('ink');
+    applyLook();
+  }
+  syncInkSeg();
+
+  /* ── Persistence ── */
+  const editables = () => [...banner.querySelectorAll('[data-edit]')];
+  const original = editables().map((el) => el.innerHTML);
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch { return null; } },
+    set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); return true; } catch { return false; } },
+    clear() { try { localStorage.removeItem(STORE_KEY); } catch {} },
+  };
+  const saved = store.get();
+  if (Array.isArray(saved) && saved.length === original.length) {
+    editables().forEach((el, i) => { el.innerHTML = saved[i]; });
+  }
+
+  /* ── Pills: keep the harness row as clean <span class="pill"> items ── */
+  const pills = document.getElementById('pills');
+  const normalisePills = () => {
+    const names = [...pills.querySelectorAll('.pill')].map((p) => p.textContent.trim()).filter(Boolean);
+    // Pick up stray text typed outside a pill.
+    [...pills.childNodes].forEach((n) => {
+      if (n.nodeType === 3 && n.textContent.trim()) names.push(...n.textContent.trim().split(/\s*[,\s]\s*/));
+    });
+    pills.innerHTML = '\n' + names.map((n) => `            <span class="pill">${n.replace(/[<&>]/g, (c) => ({ '<': '&lt;', '&': '&amp;', '>': '&gt;' }[c]))}</span>`).join('\n') + '\n          ';
+  };
+  pills.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const sel = getSelection();
+    const cur = sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement).closest('.pill');
+    const pill = document.createElement('span');
+    pill.className = 'pill'; pill.textContent = 'new-group';
+    cur ? cur.after(pill) : pills.append(pill);
+    const r = document.createRange(); r.selectNodeContents(pill); sel.removeAllRanges(); sel.addRange(r);
+  });
+  // Single-line fields: Enter finishes editing instead of inserting a line break.
+  banner.addEventListener('keydown', (e) => {
+    const el = e.target.closest('[data-edit]');
+    if (!el || el === pills || el.classList.contains('term-body')) return;
+    if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+  });
+  // Paste as plain text so foreign styles don't leak into the banner.
+  banner.addEventListener('paste', (e) => {
+    if (!state.editing) return;
+    e.preventDefault();
+    document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
+  });
+
+  /* ── Edit / Save toggle ── */
+  const setEditing = (on) => {
+    state.editing = on;
+    banner.classList.toggle('editing', on);
+    editables().forEach((el) => { on ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    editBtn.textContent = on ? '✓ Save' : '✎ Edit';
+    editBtn.setAttribute('aria-pressed', String(on));
+    if (on) { editables()[0].focus(); }
+  };
+  editBtn.addEventListener('click', () => {
+    if (!state.editing) { setEditing(true); toast('Editing: click any outlined text'); return; }
+    normalisePills();
+    setEditing(false);
+    toast(store.set(editables().map((el) => el.innerHTML)) ? 'Saved in this browser' : 'Saved for this session (browser storage unavailable)');
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('Discard your edits and restore the original banner text?')) return;
+    store.clear();
+    editables().forEach((el, i) => { el.innerHTML = original[i]; });
+    toast('Restored original');
+  });
+
+  /* ── Save HTML with edits baked in ── */
+  const download = (href, name) => {
+    const a = document.createElement('a'); a.href = href; a.download = name;
+    document.body.append(a); a.click(); a.remove();
+  };
+  document.getElementById('saveHtmlBtn').addEventListener('click', () => {
+    if (state.editing) { normalisePills(); setEditing(false); }
+    const doc = document.documentElement.cloneNode(true);
+    const b = doc.querySelector('#banner');
+    b.className = '';
+    doc.querySelector('#scaler').removeAttribute('style');
+    doc.querySelector('#toast').className = 'toast';
+    doc.querySelector('#editToggle').textContent = '✎ Edit';
+    const html = '<!doctype html>\n' + doc.outerHTML;
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    download(url, 'aiskills-banner.html');
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    // The downloaded file has edits as its defaults, so local overrides aren't needed there.
+    toast('Downloaded aiskills-banner.html');
+  });
+
+  /* ── PNG export ── */
+  const render = async (bg, scale, ink = state.ink) => {
+    if (!window.htmlToImage) throw new Error('Export library failed to load (needs internet access).');
+    const wasEditing = state.editing;
+    if (wasEditing) { normalisePills(); setEditing(false); }
+    applyLook(bg, ink);
+    await document.fonts.ready;
+    const opts = { width: W, height: H, pixelRatio: scale, cacheBust: false };
+    // Explicit fill for solid backgrounds; transparent leaves alpha untouched.
+    if (bg === 'white') opts.backgroundColor = '#ffffff';
+    if (bg === 'black') opts.backgroundColor = '#000000';
+    try {
+      // First call warms font/image embedding (works around a known first-render blank in Safari).
+      await htmlToImage.toCanvas(banner, { ...opts, pixelRatio: 1 });
+      return await htmlToImage.toPng(banner, opts);
+    } finally {
+      applyLook();
+      if (wasEditing) setEditing(true);
+    }
+  };
+  // Transparent PNGs say which ink they carry: light ink is for dark pages, dark ink for light ones.
+  const fileName = (bg, scale, ink = state.ink) =>
+    `aiskills-banner-${bg}${bg === 'transparent' ? `-${inkFor(bg, ink)}-ink` : ''}@${scale}x.png`;
+
+  const exportBtn = document.getElementById('exportBtn');
+  const exportAllBtn = document.getElementById('exportAllBtn');
+  const busy = (on) => { exportBtn.disabled = on; exportAllBtn.disabled = on; };
+
+  exportBtn.addEventListener('click', async () => {
+    busy(true);
+    try {
+      const url = await render(state.bg, state.scale);
+      download(url, fileName(state.bg, state.scale));
+      toast(`Exported ${W * state.scale}×${H * state.scale} PNG`);
+    } catch (err) { console.error(err); toast('Export failed: ' + err.message); }
+    finally { busy(false); }
+  });
+
+  exportAllBtn.addEventListener('click', async () => {
+    busy(true);
+    try {
+      const looks = [['as-is', 'auto'], ['white', 'auto'], ['black', 'auto'], ['transparent', 'light'], ['transparent', 'dark']];
+      for (const [bg, ink] of looks) {
+        for (const scale of [1, 2, 4]) {
+          toast(`Rendering ${fileName(bg, scale, ink)}…`);
+          download(await render(bg, scale, ink), fileName(bg, scale, ink));
+          await new Promise((r) => setTimeout(r, 250));
+        }
+      }
+      toast(`Exported ${looks.length * 3} PNGs`);
+    } catch (err) { console.error(err); toast('Export failed: ' + err.message); }
+    finally { busy(false); }
+  });
+
+  // Exposed for scripted exports (e.g. headless browser).
+  window.aiskillsBanner = { render, fileName };
+})();
+</script>
+</body>
+</html>

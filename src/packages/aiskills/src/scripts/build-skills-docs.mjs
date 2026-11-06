@@ -67,7 +67,7 @@ function files(dir, rel = "") {
 const cell = (s) => s.replace(/\|/g, "\\|").replace(/\n/g, " ");
 
 /** Read what the package bundles: [{ name, path, fm, group, files }], plus the groups. */
-function bundled(repoRoot) {
+export function bundled(repoRoot) {
   const tmp = mkdtempSync(join(tmpdir(), "aiskills-docs-"));
   try {
     const pkgDir = join(tmp, "pkg");

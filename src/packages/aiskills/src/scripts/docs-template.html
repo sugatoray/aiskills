@@ -311,6 +311,13 @@ main { min-width: 0; padding-block: 28px 80px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 
+/* Landing-page banner: the static banner from docs/banner/aiskills-banner.html, drawn at its native
+   1280x640 and scaled to the column width by the script. */
+.hero { position: relative; max-width: 780px; aspect-ratio: 2 / 1; overflow: hidden; margin: 0 0 24px;
+        border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.hero[hidden] { display: none; }
+.hero-scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
+/*__BANNER_CSS__*/
 </style>
 </head>
 <body>
@@ -342,6 +349,7 @@ main { min-width: 0; padding-block: 28px 80px; }
   <aside class="side" id="side" aria-label="Pages"></aside>
   <main id="main">
     <div class="crumbs" id="crumbs"></div>
+    <div class="hero" id="hero" role="img" hidden></div>
     <details class="mobile-toc" id="mobile-toc" hidden><summary>On this page</summary><ol></ol></details>
     <article class="doc" id="doc"><p class="loading">Loading the documentation…</p></article>
     <nav class="pager" id="pager" aria-label="Previous and next page"></nav>
@@ -411,7 +419,17 @@ const DATA = /*__DOCS_DATA__*/null;
     caution: '<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5M12 16h.01"/>',
   };
 
+  // The banner (only on the landing page), scaled from 1280px to the column width
+  const hero = $("#hero");
+  if (DATA.banner) {
+    hero.innerHTML = `<div class="hero-scaler">${DATA.banner}</div>`;
+    hero.setAttribute("aria-label", DATA.bannerLabel);
+    const scaler = hero.firstElementChild;
+    new ResizeObserver(() => { scaler.style.transform = `scale(${hero.clientWidth / 1280})`; }).observe(hero);
+  }
+
   function render(page) {
+    hero.hidden = !(DATA.banner && page.id === "home");
     const doc = $("#doc");
     doc.innerHTML = marked.parse(page.md, { gfm: true });
 

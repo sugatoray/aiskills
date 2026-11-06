@@ -68,6 +68,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | README "Install", "CLI" | `cli.test.mjs`, `e2e.test.mjs` |
 | Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md) | `cli.test.mjs`, `unit.test.mjs` |
 | `npx skills` passthrough | `aiskills skills <args>` with `:root` | README "Using `npx skills` directly" | `cli.test.mjs` |
+| Banner | README image and docs landing-page banner from `docs/banner/config.yaml`, with an in-browser editor and PNG export (not published) | [docs/banner/README.md](../banner/README.md) | `banner.test.mjs`, `docs-html.test.mjs` |
 | User documentation | Tutorial, guides, concepts, full reference, FAQ, `llms.txt`, a generated page per bundled skill, and a single-page HTML (`index.html`), in `docs/docsite/` (not published) | [docs/docsite/](../docsite/README.md) | `docs.test.mjs`, `docs-skills.test.mjs`, `docs-html.test.mjs` |
 
 ## Not features (on purpose)

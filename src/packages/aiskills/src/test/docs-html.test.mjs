@@ -91,6 +91,42 @@ describe("build-docs-html", () => {
     }
   });
 
+  test("the landing page opens with the banner, without its editing features (as in callai)", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS);
+    const d = data(html);
+    const banner = d.banner;
+    assert.ok(banner && banner.trimStart().startsWith('<div id="banner">'), "banner markup missing");
+    assert.ok(banner.includes(`<b>v${version}</b>`), "banner shows the package version");
+    assert.ok(!/data-edit|contenteditable|id="pills"/.test(banner), "editing hooks left in the banner");
+    assert.ok(!banner.includes("<h1") && banner.includes('<div class="name">'), "the wordmark must not be a page heading");
+    assert.ok(html.includes("#banner .terminal"), "banner CSS missing");
+    assert.ok(!html.includes("#banner.editing") && !html.includes("html.bare"), "editor CSS leaked into the docs page");
+    assert.ok(d.bannerLabel.startsWith("aiskills: "), "banner label");
+    const home = d.pages.find((p) => p.id === "home");
+    assert.equal(home.md, readFileSync(join(DOCS, "README.md"), "utf8"), "the Markdown landing page is unchanged");
+  });
+
+  test("--no-banner leaves the banner out", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { banner: null });
+    assert.equal(data(html).banner, null);
+    assert.ok(!html.includes("#banner .terminal") && !html.includes("/*__BANNER_CSS__*/"));
+  });
+
+  test("a banner page without the markers is an error", async () => {
+    const { build } = await load();
+    const dir = tempDir();
+    try {
+      const plain = join(dir, "plain.html");
+      writeFileSync(plain, "<html><body><div id='banner'></div></body></html>");
+      assert.throws(() => build(DOCS, { banner: plain }), /banner:html:start/);
+      assert.throws(() => build(DOCS, { banner: join(dir, "missing.html") }), /banner page not found/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   test("the command-line entry point writes the file", async () => {
     const { main } = await load();
     const dir = tempDir();
@@ -168,6 +204,31 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       );
       assert.deepEqual(errors, [], "script errors");
       assert.deepEqual(problems, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the banner shows on the landing page only, scaled to the column", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+      await page.goto(pathToFileURL(OUT).href + "#home");
+      await page.waitForSelector("#doc h1");
+      const hero = await page.locator("#hero").boundingBox();
+      const doc = await page.locator("#doc").boundingBox();
+      assert.ok(hero && hero.width > 300 && hero.width <= doc.width + 1, `hero ${hero?.width} vs column ${doc.width}`);
+      assert.ok(Math.abs(hero.width / hero.height - 2) < 0.02, "2:1 banner");
+      const banner = await page.locator("#hero #banner").boundingBox();
+      const inner = await page.$eval("#hero", (el) => el.clientWidth); // inside its 1px border
+      assert.ok(Math.abs(banner.width - inner) < 1, `banner ${banner.width} scaled to the hero's inner width ${inner}`);
+      await page.evaluate(() => (location.hash = "reference-cli"));
+      await page.waitForFunction(() => document.title.startsWith("CLI reference"));
+      assert.equal(await page.locator("#hero").isVisible(), false, "banner hidden on other pages");
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(pathToFileURL(OUT).href + "#home");
+      await phone.waitForSelector("#doc h1");
+      assert.ok((await phone.evaluate(() => document.documentElement.scrollWidth)) <= 390, "no sideways scroll on a phone");
     } finally {
       await browser.close();
     }

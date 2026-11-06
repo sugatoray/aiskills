@@ -364,4 +364,85 @@ usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]
 
 **Fix:** pass the docs folder and `--out`, or use `npm run docs:html`.
 
+## Banner build errors (maintainers)
+
+These come from `npm run banner`, `banner:check` and `banner:png` (`src/scripts/create-banner.mjs`), and from `npm run docs:html`, which copies the banner onto the docs landing page.
+
+### Config value not quoted
+
+```text
+config line <n>: values must be double-quoted strings: <text>
+```
+
+**Fix:** in `docs/banner/config.yaml`, write every value as `key: "value"`, and list items as `  - "item"`.
+
+### Config line not understood
+
+```text
+config line <n>: expected 'key: "value"' or a '  - "item"' line
+config line <n>: a list item without a key above it
+```
+
+**Fix:** use only `key: "value"`, `key:` followed by `  - "item"` lines, blank lines and `#` comments.
+
+### Unknown `--set` key
+
+```text
+--set: unknown key: <key>
+```
+
+**Fix:** use a key that exists in `config.yaml`.
+
+### Install style or count
+
+```text
+install_style must be "box" or "chips", not "<value>"
+install_style "<style>" has room for 1 to <max> install commands, not <n>
+```
+
+**Fix:** `box` takes up to 3 commands and `chips` up to 2.
+
+### Demo group or skill
+
+```text
+demo_group "<name>" isn't a bundled group (<aliases>)
+route_skill "<name>" is bundled, so 'aix i -s <name>' wouldn't look it up
+```
+
+**Fix:** `demo_group` must be a bundled group; `route_skill` must be a skill the package does *not* bundle, or the terminal demo would show something `aiskills` doesn't do.
+
+### Template placeholder without a value
+
+```text
+template placeholder {{ <name> }} has no value
+```
+
+**Fix:** a placeholder was added to `src/scripts/banner-template.html` without a value in `render()`; add one.
+
+### PNG needs Playwright
+
+```text
+--png needs Playwright (npm install -g playwright, then npx playwright install chromium)
+--scale must be 1, 2 or 4
+```
+
+**Fix:** install Playwright and Chromium, and use scale 1, 2 or 4.
+
+### Page out of date
+
+```text
+<path>/aiskills-banner.html is out of date: run npm run banner
+```
+
+**Fix:** run `npm run banner` (and `npm run banner:png` for the README image), then `npm run docs:html`.
+
+### Banner page missing (docs build)
+
+```text
+banner page not found: <path> (run npm run banner, or pass --no-banner)
+<path>: no banner:html:start ... banner:html:end markers
+```
+
+**Fix:** build the banner page first, or build the docs with `--no-banner`. Keep the `banner:html` and `banner:css` marker comments in the template.
+
 See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md) · [FAQ and troubleshooting](../faq.md)
