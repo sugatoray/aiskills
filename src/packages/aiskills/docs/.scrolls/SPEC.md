@@ -5,13 +5,13 @@ What @sugatoray-ai/aiskills does, feature by feature. Add a section per feature 
 > **Release status:** everything below is implemented, tested by hand end to end, and pushed on branch `claude/focused-faraday-nqvduf` ([sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122), open). Version `0.1.0` has **not** been published to npm yet. Update this note when it is.
 
 ## Bundled skills in an npm package
-The repo's `skills/` folder ships inside the package unchanged (file-for-file identical to `git ls-files skills`), together with `.claude-plugin/marketplace.json` and `LICENSE`. They are copied in at `npm pack`/`npm publish` time and never committed under the package folder. (`scripts/vendor-skills.mjs`)
+The repo's `skills/` folder ships inside the package unchanged (file-for-file identical to `git ls-files skills`), together with `.claude-plugin/marketplace.json` and `LICENSE`. They are copied in at `npm pack`/`npm publish` time and never committed under the package folder. (`src/aiskills/vendor-skills.mjs`)
 
 ## Install on `npm install -g`
-Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`scripts/postinstall.mjs`)
+Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/aiskills/postinstall.mjs`)
 
 ## `aiskills` CLI
-`install`, `uninstall`, `installed`, `groups`, `find`, `sync`, `list`, `path`, and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`bin/aiskills.mjs`, shared logic in `scripts/installer.mjs`)
+`install`, `uninstall`, `installed`, `groups`, `find`, `sync`, `list`, `path`, and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/aiskills/cli.mjs`, shared logic in `src/aiskills/installer.mjs`)
 
 ## Choosing what to install: scope, agents, skills
 `-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable, which the npm postinstall step also reads.

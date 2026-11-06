@@ -2,7 +2,7 @@
 //
 // Nothing here touches the real $HOME, the real package folder, or the
 // network: every test gets its own temp folder holding
-//   pkg/    a copy of bin/, scripts/ and package.json plus a small fixture
+//   pkg/    a copy of src/aiskills/ (no tests) and package.json plus a small fixture
 //           skills/ tree and .claude-plugin/marketplace.json, laid out the
 //           way the published tarball is (incl. a renamed _gitignore)
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
@@ -11,10 +11,11 @@
 import { spawnSync } from "node:child_process";
 import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, dirname, join, resolve } from "node:path";
+import { delimiter, dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// This file lives at <package>/src/aiskills/test/helpers.mjs.
+export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 export const REPO_ROOT = resolve(PKG_SRC, "..", "..", "..");
 
 /** Fixture skills: two groups (alpha, beta), one ungrouped skill. */
@@ -77,15 +78,19 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 
 /**
  * A fresh sandbox. Returns helpers:
- *   run(args, {env})       run bin/aiskills.mjs, returns { status, out, calls }
- *   postinstall({env})     run scripts/postinstall.mjs the way npm would
+ *   run(args, {env})       run src/aiskills/cli.mjs, returns { status, out, calls }
+ *   postinstall({env})     run src/aiskills/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
  */
 export function sandbox() {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
-  for (const p of ["bin", "scripts", "package.json"]) cpSync(join(PKG_SRC, p), join(pkg, p), { recursive: true });
+  cpSync(join(PKG_SRC, "src", "aiskills"), join(pkg, "src", "aiskills"), {
+    recursive: true,
+    filter: (p) => !p.includes(`${sep}test`),
+  });
+  cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
   writeFixtureTree(pkg);
   const home = join(dir, "home");
   const root = join(home, ".config", "sugatoray", "aiskills");
@@ -134,8 +139,8 @@ export function sandbox() {
     pkg,
     home,
     root,
-    run: (args, { env } = {}) => exec(join(pkg, "bin", "aiskills.mjs"), args, env),
-    postinstall: ({ env } = {}) => exec(join(pkg, "scripts", "postinstall.mjs"), [], env),
+    run: (args, { env } = {}) => exec(join(pkg, "src", "aiskills", "cli.mjs"), args, env),
+    postinstall: ({ env } = {}) => exec(join(pkg, "src", "aiskills", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),
@@ -165,7 +170,7 @@ export function trackedFiles(dir) {
  * A throwaway copy of the repo shaped like the real one, so vendoring and
  * `npm pack` never write into the working tree:
  *   <tmp>/repo/{skills, .claude-plugin/marketplace.json, LICENSE}
- *   <tmp>/repo/src/packages/aiskills/{bin, scripts, package.json, README.md, .npmignore, .gitignore}
+ *   <tmp>/repo/src/packages/aiskills/{src, package.json, README.md, .npmignore, .gitignore}
  * Only git-tracked skill files are copied. Returns { dir, repo, pkg } or null.
  */
 export function repoCopy() {
@@ -179,7 +184,7 @@ export function repoCopy() {
     cpSync(join(REPO_ROOT, rel), dest);
   }
   const pkg = join(repo, "src", "packages", "aiskills");
-  for (const p of ["bin", "scripts", "package.json", "README.md", ".npmignore", ".gitignore"]) {
+  for (const p of ["src", "package.json", "README.md", ".npmignore", ".gitignore"]) {
     cpSync(join(PKG_SRC, p), join(pkg, p), { recursive: true });
   }
   return { dir, repo, pkg, skills };

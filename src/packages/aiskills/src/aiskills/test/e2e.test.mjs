@@ -35,6 +35,7 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
       env: { ...env(), AISKILLS_GROUPS: "personas", AISKILLS_AGENTS: "claude-code" },
     });
     assert.equal(install.status, 0, install.stderr);
+    // npm's own bin link inside the install prefix, not a folder in this package.
     cli = process.platform === "win32" ? join(prefix, "aiskills.cmd") : join(prefix, "bin", "aiskills");
   });
   after(() => copy && rmSync(copy.dir, { recursive: true, force: true }));

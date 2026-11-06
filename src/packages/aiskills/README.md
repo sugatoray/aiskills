@@ -354,7 +354,7 @@ aiskills skills update -g                       # npx skills update -g
 ## Maintainers: building & publishing
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
-committed here. `prepack` (`scripts/vendor-skills.mjs`) copies `<repo>/skills`,
+committed here. `prepack` (`src/aiskills/vendor-skills.mjs`) copies `<repo>/skills`,
 `<repo>/.claude-plugin/marketplace.json` and `LICENSE` into this folder right
 before `npm pack` / `npm publish`.
 
@@ -368,6 +368,22 @@ npm publish           # prepack re-vendors the skills automatically
 npm run clean         # remove the vendored copy
 ```
 
+### Layout
+
+```text
+src/packages/aiskills/
+├── package.json              # "bin": { "aiskills": "src/aiskills/cli.mjs" }
+├── README.md
+├── src/aiskills/             # all code
+│   ├── cli.mjs               # the `aiskills` command
+│   ├── installer.mjs         # shared logic (sync, npx skills calls, groups, patterns, --route)
+│   ├── postinstall.mjs       # npm postinstall hook
+│   ├── vendor-skills.mjs     # prepack: copies <repo>/skills in (not published)
+│   └── test/                 # node:test suite (not published)
+├── docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   # project memory (not published)
+└── skills/, .claude-plugin/, LICENSE                  # vendored at pack time (git-ignored)
+```
+
 ### Tests
 
 The suite uses the built-in `node:test` runner and has no dependencies.
@@ -379,10 +395,10 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 
 | File | What it covers |
 | --- | --- |
-| `test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
-| `test/cli.test.mjs` | `bin/aiskills.mjs` and `scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
-| `test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: every git-tracked file under `skills/` ships (with `.gitignore` files renamed), and `test/`, `docs/` and the scrolls files don't. |
-| `test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--purge`. |
+| `src/aiskills/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
+| `src/aiskills/test/cli.test.mjs` | `src/aiskills/cli.mjs` (the `aiskills` command) and `src/aiskills/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `src/aiskills/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: every git-tracked file under `skills/` ships (with `.gitignore` files renamed), and `src/aiskills/test/`, the vendor script, `docs/` and the scrolls files don't. |
+| `src/aiskills/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.
 
