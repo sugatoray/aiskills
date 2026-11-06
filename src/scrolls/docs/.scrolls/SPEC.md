@@ -22,11 +22,34 @@ Every one of the five `scrolls-*` skills now has its own `meta/MAINTAINERS.md` (
 
 ## Family version lockstep
 
-All five `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.1.0` everywhere.
+All `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.2.0` on `master` (six skills), `2.3.0` on the unmerged `claude/scrolls-restore` branch (seven skills).
 
 ## Idempotent `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill on `/scrolls-update`
 
 `/scrolls-setup` already scaffolds the pointer chain (previous entry) for a brand-new project, but until `2.1.0` only that one-time command did so — a project set up before `2.0.0` and never re-running `/scrolls-setup` by hand stayed stuck without `SCROLLS.md`/`AGENTS.md`. `/scrolls-update` (the command actually run every session) now backfills all three itself: creates `SCROLLS.md`/`AGENTS.md` if missing, and inserts the `CLAUDE.md` stub if it doesn't already reference `SCROLLS.md` — even against a `CLAUDE.md` that still has the old pre-`1.2.0` direct embed, additive only, never touching what's already there. Reads its pointer content from `scrolls-setup`'s own `assets/templates/` rather than duplicating it. The same tightened insertion rule was also applied back to `scrolls-setup` itself, fixing a related bug where a legacy direct-embed `CLAUDE.md` was being left alone forever instead of gaining the new stub.
+
+## `/scrolls-remove` (2.2.0)
+
+Removes the scrolls system from a git repository: the exact opposite of `/scrolls-setup`. It deletes the scrolls folder (and a `docs/` folder left empty) and `SCROLLS.md`, and strips the scrolls stub out of `CLAUDE.md` (and the dangling pointer out of `AGENTS.md`, once `CLAUDE.md` is gone). A pointer file is deleted only when nothing else is left in it. Everything lands as one `maint(memory): scrolls-removed` commit whose body names the previous commit (`- previous commit: #<sha>`), followed by human-readable `Notes:` and machine-readable `Scrolls-*` git trailers, so the removal can always be undone.
+
+- Shows the plan first and applies only with `-y`.
+- `-r` sweeps every scrolls folder under a directory into one commit.
+- `-x/--purge [SCROLLS.md|CLAUDE.md|AGENTS.md|<file>|all]` deletes pointer files outright, even when they hold other content.
+- Refuses when the removal couldn't be undone: uncommitted, untracked, or ignored content under the targets, or no commits yet. Also refuses when unrelated changes are staged.
+
+Merged via PR #110; tracked by issues #111 (with sub-issues #112, #113).
+
+## `/scrolls-restore` (2.3.0, on branch, not yet merged)
+
+The counterpart to `/scrolls-remove`. It brings back only the agentic memory, into the repository as it is now: folders are checked out from the source commit, and pointer stubs are re-inserted into today's `CLAUDE.md`/`AGENTS.md` instead of overwriting them. Nothing else is rolled back, which is the point compared with `git revert`.
+
+- The default source is the newest removal checkpoint in HEAD's history, read from its trailers. A checkpoint that was already restored is not restored again. With no checkpoint at all, it falls back to the commit before the last plain deletion of a scrolls folder.
+- Any `<COMMIT>` works as a source.
+- `--onto REF` (plus `-b NEW_BRANCH`) mounts the memory onto another branch through a temporary worktree, without touching the current checkout.
+- `--full` brings back the whole content of purged files, `-f` replaces an existing folder, and `--list [--all]` finds checkpoints.
+- Records the restore as one `maint(memory): scrolls-restored` commit with `Scrolls-*` trailers.
+
+Built and tested (88 assertions, end to end through the real `remove.sh`) on branch `claude/scrolls-restore`, commit `2a46fb5`. No PR yet.
 
 ## `src/scrolls/` install pointer
 

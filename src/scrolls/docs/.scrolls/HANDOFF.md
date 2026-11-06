@@ -4,21 +4,27 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## Current state
 
-All five `scrolls-*` skills (`scrolls-setup`, `scrolls-update`, `scrolls-hide`, `scrolls-unhide`, `scrolls-help`) are at version `2.1.0`, on branch `claude/snyk-scrolls-help-safety-ue9pkk`, tracked by open PR #7 (not yet merged) and GitHub issues #8–#24. `src/scrolls/docs/.scrolls/` (this scroll set) was scaffolded via `/scrolls-setup`, dogfooding the family's own convention — including `docs/.scrolls/` itself, `SCROLLS.md`, and the `CLAUDE.md`/`AGENTS.md` pointer chain.
+- **`master`:** six `scrolls-*` skills at `2.2.0`: setup, update, hide, unhide, help, and the new **remove**. PR #7 (2.1.0) and PR #110 (`/scrolls-remove`, 2.2.0) are both merged.
+- **Branch `claude/scrolls-restore`:** one commit (`2a46fb5`) on top of `master` adds **`/scrolls-restore`** and bumps the whole family to `2.3.0`. It's pushed, but **no PR has been opened yet**.
+- **Stale branch:** `claude/confident-maxwell-d6ws37` on the remote still points at the pre-squash `/scrolls-remove` commit (`d5f06d2`), whose content is already on `master` as `c692f5d`. Leave it or delete it; don't build on it.
 
 ## What just happened
 
-After the `2.1.0` idempotent-backfill work (previous snapshot), added a minimal `README.md` to each of the five `scrolls-*` skill directories in three incremental commits: the file itself with purpose/links, a `## Layout` section (a `tree`-style listing of that skill's actual files, verified against the real directory), and a `## Installing` section with five tested `npx skills add` forms (interactive selection, this-skill-only, unattended all-five, unattended this-skill-only, and from-a-local-clone — single-skill examples using that folder's own skill name, not a fixed example).
-
-Every install command form was run for real, in isolated scratch project/global directories against the actual `skills` CLI (`v1.5.23`), then fully cleaned up — including reading the CLI's own bundled source (`node_modules/skills/dist/cli.mjs`, cached by `npx` locally) to confirm and then verify empirically that omitting `--agent` (with `--yes`) auto-detects whichever agents are already set up on the machine, the same set the interactive picker pre-checks, rather than requiring an explicit agent list.
-
-Documentation-only throughout: no `metadata.version` bump (per the family's own rule — nothing about how a `/scrolls-*` command runs changed), recorded instead as a new dated, unversioned entry in `skills/scrolls/CHANGELOG.md` (which explicitly covers `README.md` updates). Opened issue #24 for this work and updated this scroll set (`SPEC.md`, `GAP_ANALYSIS.md`/`GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`) accordingly.
-
-PR #7's title/body and mapped-issues list have been refreshed to include #24.
+1. **`/scrolls-remove` designed and built.**
+   - The commit message contract is the user's own format: subject `maint(memory): scrolls-removed`, then `- previous commit: #<sha>`. The `Notes:` section and `Scrolls-*` trailers were added so a later restore can parse it.
+   - `-x/--purge` takes a target list (`CLAUDE.md`, `AGENTS.md`, `SCROLLS.md`, any file name, or `all`).
+   - Issues #111, #112 and #113 were filed for it, and PR #110 was retitled and its body given an Issues section.
+2. **`/scrolls-restore` designed and built.** The user decided:
+   - purged files come back as the stub only, with `--full` as the opt-in
+   - with no checkpoint, it falls back to the commit before the last plain deletion
+   - `--onto` works through a temporary worktree
+   - `--all` applies to `--list` only
+   - a checkpoint that was already restored is skipped
+3. **Shared design for both new skills:** all logic is in one stdlib Python file (`remove.py`/`restore.py`), with thin `.sh`/`.ps1` launchers.
+4. **Pushing the restore work.** After PR #110 merged, the branch was restarted from `master`. Pushing it there needed a force-push, which the permission classifier blocked, so with the user's OK the work went to the new branch `claude/scrolls-restore` instead.
 
 ## Known issues / open threads
 
-- PR #7 hasn't merged yet; issues #8–#24 stay open until it does.
-- `.ps1` script changes throughout this branch were hand-mirrored from verified `.sh` behavior — `pwsh` isn't available in this sandboxed environment, so none of the PowerShell paths have actually been executed here.
-- The backfill logic itself has no automated test (steps 2/4 in both skills are followed via Read/Write/Edit at invocation time, not a script) — correctness rests on the SKILL.md prose plus the manual dry-run from the previous session, not a regression suite.
-- The new README `## Installing` examples are verified against `skills` CLI `v1.5.23` specifically; a future CLI release could change flag behavior without this repo noticing — see `GAP_ANALYSIS.md`.
+- Open a PR for `claude/scrolls-restore`, then file its issues the same way as for #110.
+- `remove.ps1`, `restore.ps1` and their `tests/*.ps1` harnesses have never been run, because there's no `pwsh` here and downloading it was blocked.
+- Existing open threads that are still true: the `/scrolls-update` backfill has no automated test, and the README install examples are pinned to `skills` CLI `v1.5.23` behavior.

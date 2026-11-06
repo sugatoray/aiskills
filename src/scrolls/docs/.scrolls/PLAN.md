@@ -2,17 +2,14 @@
 
 The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ ]` → `[x]`) as work completes, and re-prioritize when new requests change the calculus — this file reflects what's next, not a permanent record (that's what git history is for).
 
-- [x] Implement the `scrolls-update` idempotent backfill: add `SCROLLS.md`/`CLAUDE.md`-stub/`AGENTS.md`-stub creation for existing projects that predate `2.0.0`, sourcing the shared pointer content from `scrolls-setup`'s `assets/templates/` (single source of truth, not duplicated).
-- [x] Make the equivalent guarantee explicit in `scrolls-setup`'s own `SKILL.md` (the mechanism already backfills correctly via step 4's unconditional walk, but say so plainly rather than leaving it implicit).
-- [x] Update `meta/MAINTAINERS.md` (both `scrolls-setup`'s and `scrolls-update`'s) to document the shared-template cross-reference.
-- [x] Bump all five `scrolls-*` skills together per the lockstep policy (minor bump: additive, not breaking) and update every `CHANGELOG.md`.
-- [x] Dry-run the new backfill logic against a simulated pre-`2.0.0` project fixture before calling it done.
-- [x] Commit, push, and note the change in PR #7 if it's still open.
-- [x] Add a minimal `README.md` (purpose, `## Layout` tree, `## Installing` examples) to each of the five `scrolls-*` skill directories; open issue #24 for it.
-- [x] Verify every `npx skills add` form in the new `README.md`s against the real `skills` CLI in isolated scratch dirs, including the no-`--agent` auto-detection behavior, before writing them down.
-- [x] Record the new README work in `skills/scrolls/CHANGELOG.md` (family-level, documentation-only) and in this scroll set.
-- [x] Update PR #7's description and mapped-issues list to include #24.
+- [x] Design and build `/scrolls-remove` (2.2.0), with tests, docs, and the family lockstep bump; merged as PR #110.
+- [x] File issues for PR #110: #111, with sub-issues #112 and #113. Retitle the PR and add an Issues section.
+- [x] Design `/scrolls-restore`'s interface with the user, then build it (2.3.0) with tests driven end to end through `remove.sh`.
+- [x] Push the restore work: `claude/scrolls-restore`, commit `2a46fb5`.
+- [ ] Open a PR from `claude/scrolls-restore` to `master`, then file its issues and update the PR with an Issues section, the same way as for #110.
+- [ ] Run `tests/test_remove.ps1` and `tests/test_restore.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
+- [ ] Optionally delete the stale remote branch `claude/confident-maxwell-d6ws37`. Its content is already on `master`; this is the user's call.
 
-Longer-horizon, not yet ticketed in detail (tracked instead as GitHub issues #8–#24 until/unless they need local scroll entries too):
-- [ ] Merge PR #7 once ready, and close out issues #8–#24 accordingly.
+Longer-horizon:
 - [ ] Consider CI for the repo (explicitly out of scope unless the repo owner asks).
+- [ ] Consider moving folders to a new path in `/scrolls-restore`, only if a real need shows up (see `GAP_CONTEXT.md`).
