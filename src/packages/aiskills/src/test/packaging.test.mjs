@@ -19,13 +19,43 @@ const walk = (dir, base = dir) =>
   );
 const unrename = (p) => p.replace(/(^|\/)_gitignore$/, "$1.gitignore").replace(/(^|\/)_npmignore$/, "$1.npmignore");
 
+/**
+ * Map shipped package paths back to the repo's nested skills/ paths using
+ * .aiskills/layout.json: skills/<name>/x -> skills/<original>/x and
+ * .aiskills/nested/x -> skills/x. Other paths are dropped.
+ */
+const toRepoPaths = (paths, layout) =>
+  paths.flatMap((p) => {
+    let m = /^skills\/([^/]+)\/(.+)$/.exec(p);
+    if (m) return [`skills/${layout.skills[m[1]]}/${unrename(m[2])}`];
+    m = /^\.aiskills\/nested\/(.+)$/.exec(p);
+    return m ? [`skills/${unrename(m[1])}`] : [];
+  });
+
 describe("vendor-skills.mjs", () => {
-  test("copies skills/ file-for-file, plus marketplace.json and LICENSE", (t) => {
+  test("flattens skills/ to one folder per skill, each with a SKILL.md", (t) => {
     if (!copy) return t.skip("git not available");
     const res = npm(["run", "-s", "vendor"], { cwd: copy.pkg });
     assert.equal(res.status, 0, res.stderr);
-    const vendored = walk(join(copy.pkg, "skills")).map((p) => "skills/" + unrename(p)).sort();
-    assert.deepEqual(vendored, [...copy.skills].sort());
+    const tops = readdirSync(join(copy.pkg, "skills"), { withFileTypes: true });
+    assert.ok(tops.every((e) => e.isDirectory()), "only folders at the top of skills/");
+    const expected = copy.skills.filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    assert.deepEqual(tops.map((e) => e.name).sort(), expected);
+    for (const e of tops) assert.ok(existsSync(join(copy.pkg, "skills", e.name, "SKILL.md")), e.name);
+  });
+
+  test("skills/ + .aiskills/nested/ hold every repo file, file-for-file, plus marketplace.json and LICENSE", (t) => {
+    if (!copy) return t.skip("git not available");
+    const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    const pkgPaths = [
+      ...walk(join(copy.pkg, "skills")).map((p) => "skills/" + p),
+      ...walk(join(copy.pkg, ".aiskills", "nested")).map((p) => ".aiskills/nested/" + p),
+    ];
+    const repoPaths = toRepoPaths(pkgPaths, layout);
+    assert.deepEqual([...repoPaths].sort(), [...copy.skills].sort());
+    pkgPaths.forEach((p, i) => {
+      assert.ok(readFileSync(join(copy.pkg, p)).equals(readFileSync(join(copy.repo, repoPaths[i]))), `${p} == ${repoPaths[i]}`);
+    });
     assert.deepEqual(
       JSON.parse(readFileSync(join(copy.pkg, ".claude-plugin", "marketplace.json"), "utf8")),
       JSON.parse(readFileSync(join(copy.repo, ".claude-plugin", "marketplace.json"), "utf8")),
@@ -35,7 +65,7 @@ describe("vendor-skills.mjs", () => {
 
   test("renames nested .gitignore/.npmignore so npm keeps them", (t) => {
     if (!copy) return t.skip("git not available");
-    const names = walk(join(copy.pkg, "skills"));
+    const names = [...walk(join(copy.pkg, "skills")), ...walk(join(copy.pkg, ".aiskills", "nested"))];
     assert.ok(!names.some((p) => /(^|\/)\.(git|npm)ignore$/.test(p)), "no raw ignore files left");
     const expected = copy.skills.filter((p) => /\/\.(git|npm)ignore$/.test(p)).length;
     assert.equal(names.filter((p) => /(^|\/)_(git|npm)ignore$/.test(p)).length, expected);
@@ -46,7 +76,7 @@ describe("vendor-skills.mjs", () => {
     npm(["run", "-s", "vendor"], { cwd: copy.pkg });
     const res = npm(["run", "-s", "clean"], { cwd: copy.pkg });
     assert.equal(res.status, 0, res.stderr);
-    for (const p of ["skills", ".claude-plugin", "LICENSE"]) assert.ok(!existsSync(join(copy.pkg, p)), p);
+    for (const p of ["skills", ".claude-plugin", ".aiskills", "LICENSE"]) assert.ok(!existsSync(join(copy.pkg, p)), p);
   });
 });
 
@@ -70,11 +100,12 @@ describe("npm pack", () => {
       "src/scripts/installer.mjs",
       "src/scripts/postinstall.mjs",
       ".claude-plugin/marketplace.json",
+      ".aiskills/layout.json",
     ]) {
       assert.ok(files.includes(p), p);
     }
-    const shipped = files.filter((p) => p.startsWith("skills/")).map(unrename).sort();
-    assert.deepEqual(shipped, [...copy.skills].sort());
+    const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    assert.deepEqual(toRepoPaths(files, layout).sort(), [...copy.skills].sort());
   });
 
   test("ships only the bin/ entry point and the runtime files under src/scripts/", (t) => {
@@ -110,15 +141,17 @@ describe(".npmignore", () => {
       for (const rel of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md"]) put(c.pkg, rel);
       // ... and a bundled skill that happens to use the same names (must ship).
       for (const rel of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md", "SKILL.md"]) {
-        put(c.repo, `skills/zz-fixture/demo/${rel}`);
+        put(c.repo, `skills/zz-fixture/demo/${rel}`); // ships flat as skills/demo/...
       }
+      put(c.repo, "skills/zz-fixture/CLAUDE.md"); // group-level file: ships under .aiskills/nested/
       const res = npm(["pack", "--dry-run", "--json"], { cwd: c.pkg });
       assert.equal(res.status, 0, res.stderr);
       const files = JSON.parse(res.stdout)[0].files.map((f) => f.path);
       for (const p of ["AGENTS.md", "CLAUDE.md", "SCROLLS.md", "docs/.scrolls/HANDOFF.md"]) {
         assert.ok(!files.includes(p), `root ${p} must not ship`);
-        assert.ok(files.includes(`skills/zz-fixture/demo/${p}`), `skills/.../${p} must ship`);
+        assert.ok(files.includes(`skills/demo/${p}`), `skills/demo/${p} must ship`);
       }
+      assert.ok(files.includes(".aiskills/nested/zz-fixture/CLAUDE.md"), "group-level CLAUDE.md must ship");
     } finally {
       rmSync(c.dir, { recursive: true, force: true });
     }

@@ -2,7 +2,9 @@
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
 (scrolls, stata, personas, newsletters, diagrams, docs, development), packaged
-for npm. The repo's `skills/` folder ships inside the package unchanged.
+for npm. Every file under the repo's `skills/` folder ships. The skills are
+flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
+nested layout can be rebuilt with `--nested` (see [Layouts](#layouts---flat-and---nested)).
 
 ## Install
 
@@ -23,11 +25,60 @@ still succeeds. Run step 2 again with:
 npx @sugatoray-ai/aiskills install        # or: aiskills install
 ```
 
+### As a project dependency, with `npx skills experimental_sync`
+
+Because the package ships its skills flat (`skills/<skill-name>/SKILL.md`), it
+also works with the `skills` CLI's own way of installing skills from a
+project's `node_modules`:
+
+```sh
+npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills
+npx skills experimental_sync --agent claude-code --yes   # copies all of its skills into the project
+```
+
+This doesn't use `aiskills` or `~/.config/sugatoray/aiskills` at all, and the
+skills are pinned to the version in your lockfile. `experimental_sync` is
+marked experimental by the `skills` CLI.
+
+## Layouts: `--flat` and `--nested`
+
+`~/.config/sugatoray/aiskills/skills/` can be written in one of two layouts.
+Either way, `npx skills add` installs exactly the same skills; only the folder
+shape differs.
+
+| Layout | `~/.config/sugatoray/aiskills/skills/` | Use it when |
+| --- | --- | --- |
+| **`--flat`** (default) | `skills/<skill-name>/...`, one folder per skill, as the npm package ships it | You just want the skills |
+| **`--nested`** | `skills/<group>/<skill-name>/...` plus the group-level files (READMEs, `.claude-plugin/plugin.json`, `meta/`, …): the repo's `skills/` folder, byte for byte | You browse or edit the skills, or a tool expects the repo's layout |
+
+```sh
+aiskills --nested                 # install, writing the nested layout
+aiskills install --nested -G scrolls
+aiskills sync --nested            # just rewrite the folder, no npx skills add
+aiskills sync --flat              # back to flat
+AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
+```
+
+- **Placement:** `--nested` / `--flat` go before the command or after
+  `install` / `sync`. `aiskills --nested` on its own means `install --nested`.
+- **The choice is remembered** in `~/.config/sugatoray/aiskills/aiskills.json`
+  and reused by later `install`, `sync`, `list` and `groups` runs until you
+  pass the other flag.
+- **Precedence:** a flag beats `AISKILLS_LAYOUT`, which beats the remembered
+  choice. With none of them, the layout is flat.
+- **How nesting is rebuilt:** the package carries
+  `.aiskills/layout.json`, which records each skill's original folder (e.g.
+  `scrolls-setup` → `scrolls/scrolls-setup`), and `.aiskills/nested/`, which
+  holds the files that sit outside any skill folder. Both are copied next to
+  `skills/`.
+- **Groups work the same in both layouts.** A group's skills are the ones
+  whose *original* folder is under the group's `source` in `marketplace.json`.
+
 ## CLI
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [-- <extra npx skills args>]
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--nested|--flat] [-- <extra npx skills args>]
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills
@@ -35,7 +86,7 @@ aiskills find <query>        # search the skills registry (= npx skills find)
 # --route (before or after the command) hands non-bundled skills to npx skills
 aiskills --route install|uninstall|installed ...
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
-aiskills sync                # only refresh ~/.config/sugatoray/aiskills/skills
+aiskills sync [--nested|--flat]   # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills
 ```
@@ -59,6 +110,7 @@ Code plugin marketplace file) and saves it next to the skills:
 ```text
 ~/.config/sugatoray/aiskills/
 ├── .claude-plugin/marketplace.json   <- read only to define groups
+├── .aiskills/layout.json             <- each skill's original nested folder
 └── skills/                           <- what `npx skills add` installs from
 ```
 
@@ -67,7 +119,9 @@ Code plugin, and installs still go through `npx skills add ... --skill <name>`.
 
 ### How a group is built
 
-Each entry under `plugins` is one group:
+Each entry under `plugins` is one group. Its `source` points into the repo's
+nested layout; `.aiskills/layout.json` maps that to the skills, so groups work
+whether `skills/` is [flat or nested](#layouts---flat-and---nested):
 
 ```jsonc
 {
@@ -347,6 +401,7 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_SKILLS` | Comma-separated skills or [patterns](#patterns-for--s--g-and--a), passed as `--skill` (default: all) |
 | `AISKILLS_GROUPS` | Comma-separated group names, aliases or [patterns](#patterns-for--s--g-and--a) (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
+| `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route`. Also lets the postinstall step route non-bundled names in `AISKILLS_SKILLS` |
 | `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
 | `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
@@ -354,9 +409,18 @@ aiskills skills update -g                       # npx skills update -g
 ## Maintainers: building & publishing
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
-committed here. `prepack` (`src/scripts/vendor-skills.mjs`) copies `<repo>/skills`,
-`<repo>/.claude-plugin/marketplace.json` and `LICENSE` into this folder right
-before `npm pack` / `npm publish`.
+committed here. `prepack` (`src/scripts/vendor-skills.mjs`) runs right before
+`npm pack` / `npm publish` and:
+
+- flattens `<repo>/skills/<group>/<skill>/` into `skills/<skill>/` (the folder
+  is named after the skill's `name:`);
+- writes `.aiskills/layout.json` (each skill's original folder, plus the list
+  of files outside any skill folder) and copies those files to
+  `.aiskills/nested/` at their original paths;
+- copies `<repo>/.claude-plugin/marketplace.json` and `LICENSE`.
+
+It stops with an error if two skills share a name, a skill sits inside
+another skill, or a name can't be used as a folder name.
 
 ```sh
 cd src/packages/aiskills
@@ -384,7 +448,7 @@ src/packages/aiskills/
 │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
 │   └── test/                 # node:test suite (not published)
 ├── docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   # project memory (not published)
-└── skills/, .claude-plugin/, LICENSE                  # vendored at pack time (git-ignored)
+└── skills/, .aiskills/, .claude-plugin/, LICENSE      # vendored at pack time (git-ignored)
 ```
 
 ### Tests
@@ -400,11 +464,12 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
 | `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/cli.mjs` (the `aiskills` command) and `src/scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
-| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: every git-tracked file under `skills/` ships (with `.gitignore` files renamed), and `src/test/`, the vendor script, `docs/` and the scrolls files don't. |
-| `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--purge`. |
+| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/`, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
+| `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.
 
 npm never ships files named `.gitignore`/`.npmignore`. To get around this, the
-vendor step renames them to `_gitignore`/`_npmignore`, and the installer
-renames them back when it writes to `~/.config/sugatoray/aiskills/skills`.
+vendor step renames them to `_gitignore`/`_npmignore` (in `skills/` and
+`.aiskills/nested/`), and the installer renames them back when it writes to
+`~/.config/sugatoray/aiskills/skills`.

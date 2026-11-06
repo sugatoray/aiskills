@@ -62,6 +62,12 @@ Routing (install, uninstall, installed; may also go before the command):
                            uninstall: -s <name|pattern>     -> also matches skills from other sources
                            installed: lists every installed skill with its source
 
+Layout of ${ROOT}/skills (install, sync; may also go before the command):
+      --flat             skills/<skill>/...          one folder per skill, as the npm package ships it
+      --nested           skills/<group>/<skill>/...  the repo's original layout, incl. group READMEs etc.
+                         The choice is remembered for later commands; default: flat. Either way,
+                         'npx skills add' installs the same skills.
+
 install only:
       --copy             Copy files into agent dirs instead of symlinking
 
@@ -85,6 +91,7 @@ Examples:
   aiskills install --route -s anthropics/skills@pdf -g              # external, pinned
   aiskills --route uninstall -s pdf                                 # remove an external skill
   aiskills --route installed                                        # bundled + external
+  aiskills --nested                                                 # install, keeping the repo's nested folders
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
@@ -96,6 +103,7 @@ Environment:
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
                          Defaults for the options above (also used by the npm postinstall)
   AISKILLS_ROUTE=1              Same as --route
+  AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
   AISKILLS_SKIP_POSTINSTALL=1   Skip the npm postinstall hook entirely
   AISKILLS_SKIP_SKILLS_ADD=1    Postinstall copies files but skips 'npx skills add'
 `;
@@ -127,6 +135,7 @@ function parse(argv, allowed) {
     else if ((a === "-G" || a === "--group" || a === "--groups") && ok("group")) add("groups", args[++i]);
     else if (a === "--json" && ok("json")) opts.json = true;
     else if (a === "--route" && ok("route")) opts.route = true;
+    else if ((a === "--nested" || a === "--flat") && ok("layout")) opts.layout = a.slice(2);
     else if (a === "--copy" && ok("copy")) opts.copy = true;
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
@@ -247,17 +256,20 @@ function groups(opts) {
 }
 
 function main() {
-  // '--route' may come before the command (aiskills --route install ...).
+  // '--route', '--nested' and '--flat' may come before the command
+  // (aiskills --route install ..., aiskills --nested).
   let argv = process.argv.slice(2);
-  while (argv[0] === "--route") {
-    process.env.AISKILLS_ROUTE = "1";
+  for (;;) {
+    if (argv[0] === "--route") process.env.AISKILLS_ROUTE = "1";
+    else if (argv[0] === "--nested" || argv[0] === "--flat") process.env.AISKILLS_LAYOUT = argv[0].slice(2);
+    else break;
     argv = argv.slice(1);
   }
   const [cmd = "install", ...rest] = argv;
   switch (cmd) {
     case "install": {
-      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route"]);
-      const root = syncSkills({ version });
+      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout"]);
+      const root = syncSkills({ version, layout: opts.layout });
       const picked = selectedSkills(opts, root);
       const external = picked?.unknown ?? [];
       if (external.length && !opts.route) {
@@ -298,7 +310,7 @@ function main() {
       // Piggyback on any 'npx skills' command; ':root' -> install root.
       return runSkills(rest.map((a) => (a === ":root" ? ROOT : a)));
     case "sync":
-      syncSkills({ version });
+      syncSkills({ version, layout: parse(rest, ["layout"]).layout });
       return 0;
     case "list":
       return skillsAdd(syncSkills({ version }), { list: true });

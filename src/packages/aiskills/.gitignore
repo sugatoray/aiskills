@@ -1,6 +1,7 @@
 # Vendored at pack/publish time from <repo>/skills by scripts/vendor-skills.mjs
 /skills/
 /.claude-plugin/
+/.aiskills/
 /LICENSE
 node_modules/
 *.tgz

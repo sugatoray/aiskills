@@ -34,8 +34,9 @@ npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
 <summary><strong>Alternate: npm package</strong></summary>
 
 Installs every skill from this repo, saves them to
-`~/.config/sugatoray/aiskills/skills`, and runs `npx skills add` on that
-folder. See [`src/packages/aiskills`](src/packages/aiskills/README.md).
+`~/.config/sugatoray/aiskills/skills` (flat, or the repo's nested layout with
+`--nested`), and runs `npx skills add` on that folder. As a project
+dependency it also works with `npx skills experimental_sync`. See [`src/packages/aiskills`](src/packages/aiskills/README.md).
 
 ```sh
 npm install -g @sugatoray-ai/aiskills

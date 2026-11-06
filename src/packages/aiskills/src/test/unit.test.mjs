@@ -1,6 +1,6 @@
 // Unit tests for the pure helpers in src/scripts/installer.mjs.
 import assert from "node:assert/strict";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
@@ -12,12 +12,16 @@ import {
   isSourceSpec,
   loadGroups,
   packageSkillNames,
+  readSkillName,
+  resolveLayout,
   selectedSkills,
+  syncSkills,
   skillNamesIn,
   skillsForGroups,
   specSkillName,
 } from "../scripts/installer.mjs";
-import { tempDir, writeFixtureTree } from "./helpers.mjs";
+import { listTree, tempDir, writeFixtureTree } from "./helpers.mjs";
+import { vendor } from "../scripts/vendor-skills.mjs";
 
 let root;
 before(() => {
@@ -239,7 +243,7 @@ describe("envOptions", () => {
   test("defaults: global, nothing selected, no copy, no route", () => {
     assert.deepEqual(
       withEnv({}, envOptions),
-      { global: true, agents: [], skills: [], groups: [], copy: false, route: false },
+      { global: true, agents: [], skills: [], groups: [], copy: false, route: false, layout: undefined },
     );
   });
 
@@ -262,6 +266,107 @@ describe("envOptions", () => {
       groups: ["alpha"],
       copy: true,
       route: true,
+      layout: undefined,
     });
+  });
+});
+
+describe("readSkillName", () => {
+  test("frontmatter name:, quoted or not; null when missing", () => {
+    assert.equal(readSkillName(join(root, "skills", "alpha", "a1", "SKILL.md")), "a1");
+    assert.equal(readSkillName(join(root, "skills", "alpha", "a2", "SKILL.md")), "a2");
+    assert.equal(readSkillName(join(root, "skills", "beta", "beta-two", "SKILL.md")), null);
+  });
+});
+
+describe("vendor() (flattening)", () => {
+  const withRepo = (files, fn) => {
+    const dir = tempDir();
+    try {
+      for (const [rel, body] of Object.entries(files)) {
+        mkdirSync(join(dir, "repo", rel, ".."), { recursive: true });
+        writeFileSync(join(dir, "repo", rel), body);
+      }
+      return fn({ repoRoot: join(dir, "repo"), pkgDir: join(dir, "pkg") });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  test("one folder per skill, original paths and extras recorded", () => {
+    const layout = withRepo(
+      {
+        "skills/g/one/SKILL.md": "---\nname: one\n---\n",
+        "skills/g/one/refs/x.md": "x",
+        "skills/g/README.md": "group",
+        "skills/two/SKILL.md": "---\nname: two\n---\n",
+      },
+      (o) => {
+        const l = vendor(o);
+        assert.deepEqual(listTree(join(o.pkgDir, "skills")), ["one/SKILL.md", "one/refs/x.md", "two/SKILL.md"]);
+        assert.deepEqual(listTree(join(o.pkgDir, ".aiskills", "nested")), ["g/README.md"]);
+        return l;
+      },
+    );
+    assert.deepEqual(layout.skills, { one: "g/one", two: "two" });
+    assert.deepEqual(layout.extras, ["g/README.md"]);
+  });
+
+  test("the folder is named after the skill's name:, not its old folder", () => {
+    withRepo({ "skills/g/old-folder/SKILL.md": "---\nname: new-name\n---\n" }, (o) => {
+      assert.deepEqual(vendor(o).skills, { "new-name": "g/old-folder" });
+      assert.ok(existsSync(join(o.pkgDir, "skills", "new-name", "SKILL.md")));
+    });
+  });
+
+  test("refuses duplicate names, skills inside skills, unsafe names and a top-level SKILL.md", () => {
+    const cases = [
+      [{ "skills/a/x/SKILL.md": "---\nname: x\n---\n", "skills/b/x/SKILL.md": "---\nname: x\n---\n" }, /two skills are both named 'x'/],
+      [{ "skills/x/SKILL.md": "---\nname: x\n---\n", "skills/x/inner/SKILL.md": "---\nname: y\n---\n" }, /skills inside other skills/],
+      [{ "skills/x/SKILL.md": "---\nname: ../evil\n---\n" }, /can't be used as a folder name/],
+      [{ "skills/SKILL.md": "---\nname: x\n---\n" }, /can't sit directly in skills/],
+    ];
+    for (const [files, msg] of cases) withRepo(files, (o) => assert.throws(() => vendor(o), msg));
+  });
+
+  test("syncSkills rebuilds the nested original from the flat package", () => {
+    withRepo(
+      {
+        "skills/g/one/SKILL.md": "---\nname: one\n---\n",
+        "skills/g/one/.gitignore": "tmp\n",
+        "skills/g/.claude-plugin/plugin.json": "{}",
+        "skills/two/SKILL.md": "---\nname: two\n---\n",
+      },
+      (o) => {
+        vendor(o);
+        const flat = join(o.pkgDir, "..", "flat");
+        const nested = join(o.pkgDir, "..", "nested");
+        syncSkills({ root: flat, pkgDir: o.pkgDir, layout: "flat", quiet: true });
+        syncSkills({ root: nested, pkgDir: o.pkgDir, layout: "nested", quiet: true });
+        assert.deepEqual(listTree(join(flat, "skills")), ["one/.gitignore", "one/SKILL.md", "two/SKILL.md"]);
+        assert.deepEqual(listTree(join(nested, "skills")), listTree(join(o.repoRoot, "skills")));
+      },
+    );
+  });
+});
+
+describe("resolveLayout", () => {
+  test("flag > AISKILLS_LAYOUT > last sync > flat", () => {
+    const dir = tempDir();
+    const saved = process.env.AISKILLS_LAYOUT;
+    try {
+      delete process.env.AISKILLS_LAYOUT;
+      assert.equal(resolveLayout(undefined, dir), "flat");
+      writeFileSync(join(dir, "aiskills.json"), JSON.stringify({ layout: "nested" }));
+      assert.equal(resolveLayout(undefined, dir), "nested");
+      process.env.AISKILLS_LAYOUT = "flat";
+      assert.equal(resolveLayout(undefined, dir), "flat");
+      assert.equal(resolveLayout("nested", dir), "nested");
+      assert.throws(() => resolveLayout("sideways", dir), /unknown layout/);
+    } finally {
+      if (saved === undefined) delete process.env.AISKILLS_LAYOUT;
+      else process.env.AISKILLS_LAYOUT = saved;
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

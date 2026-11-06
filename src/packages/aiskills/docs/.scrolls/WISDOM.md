@@ -7,6 +7,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 
 - The install folder is `~/.config/sugatoray/aiskills/` (skills in `skills/`, the marketplace file in `.claude-plugin/`), as the user specified. Only `AISKILLS_HOME` overrides it. Keep it even though the npm scope is `sugatoray-ai`.
 - Package name is `@sugatoray-ai/aiskills` (the user's npm org); the CLI command is `aiskills`.
+- The package ships `skills/` **flat**; `.aiskills/layout.json` + `.aiskills/nested/` must keep every other repo file so `--nested` can rebuild the repo's `skills/` byte for byte. Skill folder names come from `SKILL.md` `name:`, which must be unique and folder-safe (`vendor()` refuses otherwise).
 - `marketplace.json` is used **only** to define skill groups. Never install anything as a Claude Code plugin from it; all installs go through `npx skills add`.
 - Group name = the plugin entry's `name`, exactly. The alias (name minus `-skills`) and the `all` group are CLI inventions; the README must keep saying so.
 - npm never runs uninstall lifecycle scripts, so `aiskills uninstall` has to be run before `npm uninstall -g`.
@@ -52,4 +53,5 @@ Best practices worth reusing.
 - Do every lookup and validation before the first install, so a bad entry changes nothing.
 - **Prove a new test can fail.** Temporarily break the thing it guards (remove the line, change the condition), see the test go red, then restore. The first `.npmignore` test passed even with the entries broken, because `"files"` was doing the work; only the deliberate break showed it.
 - npm only needs `"bin"` to point at a file with a `#!/usr/bin/env node` first line; the `bin/` folder is just a convention. A thin `bin/` wrapper keeps the real CLI module free of the shebang and makes the command's entry point easy to find.
+- Group membership is computed from each skill's *original* folder in `layout.json`, never from where the skill sits now, so it's independent of the flat/nested choice. Without `layout.json` (an old package or the test fixtures used as an install root), it falls back to scanning `skills/` under each group's `source`.
 - **Shipping skills in npm packages** (checked in `skills` CLI 1.7.6): `npx skills experimental_sync` reads skills from a project's `node_modules` packages at `<pkg>/SKILL.md`, `<pkg>/skills/<name>/SKILL.md` or `<pkg>/dist/skills/<name>/SKILL.md`, one level only, and a project can list packages under `"skills": ["npm:<pkg>"]` in its own `package.json`. Usual practice: skills are data in a flat `skills/` folder, code in `src/`, a strict `files` list, and no side effects at install time (pnpm and bun skip install scripts unless allowed, `--ignore-scripts` skips them, and security scanners flag them).

@@ -8,13 +8,18 @@
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // This file lives at <package>/src/scripts/installer.mjs.
 export const PKG_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const PKG_SKILLS = join(PKG_DIR, "skills");
 export const MARKETPLACE_REL = join(".claude-plugin", "marketplace.json");
+// Written by vendor-skills.mjs: each skill's original nested folder + the
+// files that sit outside any skill folder (stored under NESTED_EXTRAS_REL).
+export const LAYOUT_REL = join(".aiskills", "layout.json");
+export const NESTED_EXTRAS_REL = join(".aiskills", "nested");
+export const LAYOUTS = ["flat", "nested"];
 
 /** ~/.config/sugatoray/aiskills (override with AISKILLS_HOME). */
 export function installRoot() {
@@ -36,37 +41,87 @@ function restoreDotfiles(dir) {
   }
 }
 
-/** Copy <package>/skills -> <installRoot>/skills, atomically-ish. */
-export function syncSkills({ root = installRoot(), version, quiet = false } = {}) {
-  if (!existsSync(PKG_SKILLS)) {
-    throw new Error(`no vendored skills folder at ${PKG_SKILLS}`);
+/** The `name:` from a SKILL.md frontmatter, or null. */
+export function readSkillName(file) {
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(file, "utf8"));
+  const m = fm && /^name:\s*["']?([^"'\r\n]+?)["']?\s*$/m.exec(fm[1]);
+  return m ? m[1].trim() : null;
+}
+
+const readJson = (file) => {
+  try {
+    return JSON.parse(readFileSync(file, "utf8"));
+  } catch {
+    return null;
   }
+};
+
+/** The package's .aiskills/layout.json, or null for an un-flattened package. */
+export const packageLayout = (pkgDir = PKG_DIR) => readJson(join(pkgDir, LAYOUT_REL));
+
+/**
+ * Which layout to write: an explicit --nested/--flat wins, then
+ * AISKILLS_LAYOUT, then whatever the last sync used, then "flat".
+ */
+export function resolveLayout(explicit, root = installRoot()) {
+  const pick = explicit ?? process.env.AISKILLS_LAYOUT?.toLowerCase() ?? readJson(join(root, "aiskills.json"))?.layout ?? "flat";
+  if (!LAYOUTS.includes(pick)) throw new Error(`unknown layout '${pick}' (use ${LAYOUTS.join(" or ")})`);
+  return pick;
+}
+
+/**
+ * Copy the package's skills to <root>/skills, replacing any older copy.
+ *   layout "flat":   <root>/skills/<name>/...      (as shipped)
+ *   layout "nested": <root>/skills/<group>/<name>/... plus the group-level
+ *                    files: exactly the repo's skills/ folder
+ * Also copies marketplace.json and layout.json next to it, and records the
+ * layout in <root>/aiskills.json so later commands keep using it.
+ */
+export function syncSkills({ root = installRoot(), version, quiet = false, layout, pkgDir = PKG_DIR } = {}) {
+  const pkgSkills = join(pkgDir, "skills");
+  if (!existsSync(pkgSkills)) {
+    throw new Error(`no vendored skills folder at ${pkgSkills}`);
+  }
+  const mode = resolveLayout(layout, root);
+  const map = packageLayout(pkgDir);
+  if (mode === "nested" && !map) throw new Error(`this package has no ${LAYOUT_REL}, so --nested can't rebuild the nested layout`);
+
   mkdirSync(root, { recursive: true });
   const dest = join(root, "skills");
   const staging = join(root, `.skills.tmp-${process.pid}`);
   rmSync(staging, { recursive: true, force: true });
-  cpSync(PKG_SKILLS, staging, { recursive: true });
+  if (mode === "nested") {
+    for (const [name, rel] of Object.entries(map.skills)) {
+      cpSync(join(pkgSkills, name), join(staging, rel), { recursive: true });
+    }
+    const extras = join(pkgDir, NESTED_EXTRAS_REL);
+    if (existsSync(extras)) cpSync(extras, staging, { recursive: true });
+  } else {
+    cpSync(pkgSkills, staging, { recursive: true });
+  }
   restoreDotfiles(staging);
   rmSync(dest, { recursive: true, force: true });
   renameSync(staging, dest);
-  // Keep the repo layout: <root>/.claude-plugin/marketplace.json next to
-  // <root>/skills. Only used for grouping (`--group`); `npx skills add`
-  // discovers the same skills with or without it.
-  const market = join(root, MARKETPLACE_REL);
-  rmSync(market, { force: true });
-  if (existsSync(join(PKG_DIR, MARKETPLACE_REL))) {
-    mkdirSync(dirname(market), { recursive: true });
-    cpSync(join(PKG_DIR, MARKETPLACE_REL), market);
+
+  // marketplace.json (groups) and layout.json (original paths) live next to
+  // skills/; `npx skills add` finds the same skills with or without them.
+  for (const rel of [MARKETPLACE_REL, LAYOUT_REL]) {
+    const target = join(root, rel);
+    rmSync(target, { force: true });
+    if (existsSync(join(pkgDir, rel))) {
+      mkdirSync(dirname(target), { recursive: true });
+      cpSync(join(pkgDir, rel), target);
+    }
   }
   writeFileSync(
     join(root, "aiskills.json"),
     JSON.stringify(
-      { package: "@sugatoray-ai/aiskills", version, installedAt: new Date().toISOString(), skills: dest },
+      { package: "@sugatoray-ai/aiskills", version, layout: mode, installedAt: new Date().toISOString(), skills: dest },
       null,
       2,
     ) + "\n",
   );
-  if (!quiet) log(`skills saved to ${dest}`);
+  if (!quiet) log(`skills saved to ${dest} (${mode} layout)`);
   return root;
 }
 
@@ -139,11 +194,7 @@ export function skillNamesIn(dir) {
       if (ent.name === "node_modules" || ent.name === ".git") continue;
       const p = join(d, ent.name);
       if (ent.isDirectory()) walk(p);
-      else if (ent.name === "SKILL.md") {
-        const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(p, "utf8"));
-        const m = fm && /^name:\s*["']?([^"'\r\n]+?)["']?\s*$/m.exec(fm[1]);
-        names.add(m ? m[1].trim() : basename(d));
-      }
+      else if (ent.name === "SKILL.md") names.add(readSkillName(p) ?? basename(d));
     }
   })(dir);
   return names;
@@ -168,16 +219,26 @@ export function loadGroups(root = installRoot()) {
   if (!existsSync(file)) return { groups: [], ungrouped: [...all].sort(), missing: true };
   const market = JSON.parse(readFileSync(file, "utf8"));
   const pluginRoot = resolve(root, market?.metadata?.pluginRoot ?? ".");
+  // With layout.json, membership comes from each skill's ORIGINAL nested
+  // folder, so groups work whether <root>/skills is flat or nested.
+  const map = readJson(join(root, LAYOUT_REL))?.skills;
+  const skillsRoot = join(root, "skills");
   const groups = [];
   for (const p of market.plugins ?? []) {
     if (!p?.name || typeof p.source !== "string") continue; // remote sources: not bundled
     const dir = resolve(pluginRoot, p.source);
+    const rel = relative(skillsRoot, dir).split(sep).join("/");
+    const skills = map
+      ? Object.entries(map)
+          .filter(([, orig]) => rel === "" || orig === rel || orig.startsWith(rel + "/"))
+          .map(([name]) => name)
+      : [...skillNamesIn(dir)];
     groups.push({
       name: p.name,
       alias: p.name.replace(/-skills$/, ""),
       description: p.description ?? "",
       source: dir,
-      skills: [...skillNamesIn(dir)].sort(),
+      skills: skills.sort(),
     });
   }
   const grouped = new Set(groups.flatMap((g) => g.skills));
@@ -485,5 +546,6 @@ export function envOptions() {
     groups: csv(e.AISKILLS_GROUPS),
     copy: /^(1|true|yes)$/i.test(e.AISKILLS_COPY || ""),
     route: /^(1|true|yes)$/i.test(e.AISKILLS_ROUTE || ""),
+    layout: undefined, // --nested / --flat; AISKILLS_LAYOUT is read by resolveLayout()
   };
 }

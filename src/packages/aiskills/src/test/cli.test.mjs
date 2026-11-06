@@ -4,11 +4,11 @@
 // stand-in `npx` first on PATH, then checks the exact `npx skills` commands
 // the CLI issued and what it wrote to disk. No network, no real $HOME.
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
-import { row, sandbox, skillsArgs } from "./helpers.mjs";
+import { FIXTURE_SKILLS, listTree, row, sandbox, skillsArgs } from "./helpers.mjs";
 
 const posixOnly = { skip: process.platform === "win32" && "stand-in npx is a POSIX script" };
 
@@ -57,16 +57,18 @@ describe("aiskills (basics)", posixOnly, () => {
 });
 
 describe("aiskills sync / install (bundled)", posixOnly, () => {
-  test("sync saves skills/ and marketplace.json, restores dotfiles, runs nothing", () => {
+  test("sync saves flat skills/, marketplace.json and layout.json, restores dotfiles, runs nothing", () => {
     const r = sb.run(["sync"]);
     assert.equal(r.status, 0);
     assert.deepEqual(r.calls, []);
-    assert.ok(existsSync(join(sb.root, "skills", "alpha", "a1", "SKILL.md")));
+    assert.ok(existsSync(join(sb.root, "skills", "a1", "SKILL.md")));
     assert.ok(existsSync(join(sb.root, ".claude-plugin", "marketplace.json")));
-    assert.ok(existsSync(join(sb.root, "skills", "loose", "lonely", ".gitignore")), "_gitignore renamed back");
-    assert.ok(!existsSync(join(sb.root, "skills", "loose", "lonely", "_gitignore")));
+    assert.ok(existsSync(join(sb.root, ".aiskills", "layout.json")));
+    assert.ok(existsSync(join(sb.root, "skills", "lonely", ".gitignore")), "_gitignore renamed back");
+    assert.ok(!existsSync(join(sb.root, "skills", "lonely", "_gitignore")));
     const meta = JSON.parse(readFileSync(join(sb.root, "aiskills.json"), "utf8"));
     assert.equal(meta.package, "@sugatoray-ai/aiskills");
+    assert.equal(meta.layout, "flat");
   });
 
   test("sync replaces an older copy instead of merging into it", () => {
@@ -117,6 +119,100 @@ describe("aiskills sync / install (bundled)", posixOnly, () => {
     assert.match(r.out, /not provided by this package: nope/);
     assert.match(r.out, /--route/);
     assert.deepEqual(changes(r.calls), []);
+  });
+});
+
+describe("layouts: --flat (default) and --nested", posixOnly, () => {
+  const FLAT = ["a1", "a2", "beta-one", "beta-two", "lonely"];
+  const top = () => listTree(join(sb.root, "skills")).map((p) => p.split("/")[0]).filter((v, i, a) => a.indexOf(v) === i);
+  const layoutOf = () => JSON.parse(readFileSync(join(sb.root, "aiskills.json"), "utf8")).layout;
+
+  test("the vendored package is flat, with layout.json and the extra files", () => {
+    assert.deepEqual(listTree(join(sb.pkg, "skills")).map((p) => p.split("/")[0]).filter((v, i, a) => a.indexOf(v) === i), FLAT);
+    const layout = JSON.parse(readFileSync(join(sb.pkg, ".aiskills", "layout.json"), "utf8"));
+    assert.deepEqual(layout.skills, {
+      a1: "alpha/a1",
+      a2: "alpha/a2",
+      "beta-one": "beta/beta-one",
+      "beta-two": "beta/beta-two",
+      lonely: "loose/lonely",
+    });
+    assert.deepEqual(layout.extras, ["alpha/.claude-plugin/plugin.json", "alpha/README.md", "beta/.gitignore"]);
+    assert.ok(existsSync(join(sb.pkg, ".aiskills", "nested", "beta", "_gitignore")));
+  });
+
+  test("--nested rebuilds the repo's skills/ folder exactly", () => {
+    const r = sb.run(["sync", "--nested"]);
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(listTree(join(sb.root, "skills")), Object.keys(FIXTURE_SKILLS).sort());
+    for (const [rel, body] of Object.entries(FIXTURE_SKILLS)) {
+      assert.equal(readFileSync(join(sb.root, "skills", rel), "utf8"), body, rel);
+    }
+    assert.equal(layoutOf(), "nested");
+  });
+
+  test("the layout is remembered; --flat switches back", () => {
+    sb.run(["sync", "--nested"]);
+    sb.run(["sync"]);
+    assert.deepEqual(top(), ["alpha", "beta", "loose"]);
+    assert.equal(layoutOf(), "nested");
+    sb.run(["sync", "--flat"]);
+    assert.deepEqual(top(), FLAT);
+    assert.equal(layoutOf(), "flat");
+  });
+
+  test("--nested before the command, bare 'aiskills --nested', and AISKILLS_LAYOUT", () => {
+    sb.run(["--nested", "sync"]);
+    assert.equal(layoutOf(), "nested");
+    sb.run(["--flat", "sync"]);
+    assert.equal(layoutOf(), "flat");
+
+    const bare = sb.run(["--nested"]);
+    assert.equal(bare.status, 0, bare.out);
+    assert.equal(layoutOf(), "nested");
+    assert.deepEqual(changes(bare.calls), [["add", sb.root, "--global", "--skill", "*", "--yes"]]);
+
+    sb.run(["sync", "--flat"]);
+    sb.run(["sync"], { env: { AISKILLS_LAYOUT: "nested" } });
+    assert.equal(layoutOf(), "nested");
+    sb.run(["sync", "--flat"], { env: { AISKILLS_LAYOUT: "nested" } });
+    assert.equal(layoutOf(), "flat", "the flag beats the env var");
+  });
+
+  test("groups and installs work the same in both layouts", () => {
+    for (const layout of ["--flat", "--nested"]) {
+      const r = sb.run(["install", layout, "-G", "alpha,beta"]);
+      assert.equal(r.status, 0, r.out);
+      assert.deepEqual(changes(r.calls), [
+        ["add", sb.root, "--global", "--skill", "a1", "--skill", "a2", "--skill", "beta-one", "--skill", "beta-two", "--yes"],
+      ], layout);
+      assert.deepEqual(JSON.parse(sb.run(["groups", "--json"]).out).ungrouped, ["lonely"], layout);
+    }
+  });
+
+  test("postinstall honours AISKILLS_LAYOUT", () => {
+    const r = sb.postinstall({ env: { AISKILLS_LAYOUT: "nested" } });
+    assert.equal(r.status, 0, r.out);
+    assert.ok(existsSync(join(sb.root, "skills", "alpha", "a1", "SKILL.md")));
+    assert.ok(existsSync(join(sb.root, "skills", "beta", ".gitignore")));
+  });
+
+  test("bad layouts are refused", () => {
+    const bad = sb.run(["sync"], { env: { AISKILLS_LAYOUT: "sideways" } });
+    assert.equal(bad.status, 1);
+    assert.match(bad.out, /unknown layout 'sideways'/);
+
+    rmSync(join(sb.pkg, ".aiskills", "layout.json"));
+    const old = sb.run(["sync", "--nested"]);
+    assert.equal(old.status, 1);
+    assert.match(old.out, /--nested can't rebuild/);
+    assert.equal(sb.run(["sync", "--flat"]).status, 0, "a package without layout.json still syncs flat");
+  });
+
+  test("--nested is only accepted where it makes sense", () => {
+    const r = sb.run(["uninstall", "--nested"]);
+    assert.equal(r.status, 1);
+    assert.match(r.out, /option --nested is not valid here/);
   });
 });
 
@@ -347,7 +443,7 @@ describe("postinstall", posixOnly, () => {
   test("saves the skills and installs everything globally", () => {
     const r = sb.postinstall();
     assert.equal(r.status, 0, r.out);
-    assert.ok(existsSync(join(sb.root, "skills", "alpha", "a1", "SKILL.md")));
+    assert.ok(existsSync(join(sb.root, "skills", "a1", "SKILL.md")));
     assert.deepEqual(changes(r.calls), [["add", sb.root, "--global", "--skill", "*", "--yes"]]);
     assert.equal(r.calls[0].cwd, sb.root);
   });

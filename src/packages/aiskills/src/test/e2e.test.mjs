@@ -5,11 +5,11 @@
 // AISKILLS_E2E=1 is set:   npm run test:e2e
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
-import { npm, repoCopy } from "./helpers.mjs";
+import { listTree, npm, repoCopy } from "./helpers.mjs";
 
 const enabled = process.env.AISKILLS_E2E === "1";
 
@@ -55,6 +55,34 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
     assert.equal(aiskills("uninstall", "-s", "scrolls-[hu]*").status, 0);
     assert.ok(!existsSync(join(home, ".claude", "skills", "scrolls-hide")));
     assert.ok(existsSync(join(home, ".claude", "skills", "scrolls-setup")));
+  });
+
+  test("--nested rebuilds the repo's skills/ folder exactly; --flat goes back", () => {
+    assert.equal(aiskills("sync", "--nested").status, 0);
+    assert.deepEqual(listTree(join(root(), "skills")), [...copy.skills].map((p) => p.slice("skills/".length)).sort());
+    for (const rel of copy.skills) {
+      assert.ok(readFileSync(join(home, ".config", "sugatoray", "aiskills", rel)).equals(readFileSync(join(copy.repo, rel))), rel);
+    }
+    assert.equal(aiskills("sync", "--flat").status, 0);
+    assert.ok(existsSync(join(root(), "skills", "prodigy", "SKILL.md")));
+  });
+
+  test("npx skills experimental_sync finds every skill in node_modules", () => {
+    const proj = join(copy.dir, "proj");
+    mkdirSync(join(proj, ".claude"), { recursive: true });
+    writeFileSync(join(proj, "package.json"), JSON.stringify({ name: "proj", private: true }));
+    const tgz = readdirSync(copy.dir).find((f) => f.endsWith(".tgz"));
+    const inst = npm(["install", "--ignore-scripts", join(copy.dir, tgz)], { cwd: proj, env: env() });
+    assert.equal(inst.status, 0, inst.stderr);
+    const res = spawnSync(process.platform === "win32" ? "npx.cmd" : "npx", ["-y", "skills", "experimental_sync", "--agent", "claude-code", "--yes"], {
+      cwd: proj,
+      encoding: "utf8",
+      shell: process.platform === "win32",
+      env: { ...process.env, ...env() },
+    });
+    assert.equal(res.status, 0, res.stdout + res.stderr);
+    const expected = copy.skills.filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    assert.deepEqual(readdirSync(join(proj, ".claude", "skills")).sort(), expected);
   });
 
   test("uninstall --purge removes everything and the local folder", () => {

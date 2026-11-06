@@ -2,19 +2,22 @@
 //
 // Nothing here touches the real $HOME, the real package folder, or the
 // network: every test gets its own temp folder holding
-//   pkg/    a copy of bin/, src/scripts/ and package.json plus a small fixture
-//           skills/ tree and .claude-plugin/marketplace.json, laid out the
-//           way the published tarball is (incl. a renamed _gitignore)
+//   repo/   a small fixture repo: nested skills/ + .claude-plugin/marketplace.json
+//   pkg/    a copy of bin/, src/scripts/ and package.json, vendored from repo/
+//           by the real vendor() -- i.e. laid out like the published tarball
+//           (flat skills/, .aiskills/layout.json, .aiskills/nested/, _gitignore)
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
 //   bin/npx a stand-in for npx that logs every call and returns canned output
 
 import { spawnSync } from "node:child_process";
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // This file lives at <package>/src/test/helpers.mjs.
+import { vendor } from "../scripts/vendor-skills.mjs";
+
 export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const REPO_ROOT = resolve(PKG_SRC, "..", "..", "..");
 
@@ -26,8 +29,12 @@ export const FIXTURE_SKILLS = {
   // No name: in frontmatter -> the folder name is used.
   "beta/beta-two/SKILL.md": "---\ndescription: unnamed\n---\n",
   "loose/lonely/SKILL.md": "---\nname: lonely\n---\n",
-  // Renamed by vendor-skills.mjs; the installer must restore it.
-  "loose/lonely/_gitignore": "__pycache__/\n",
+  // npm drops these; vendor-skills.mjs renames them and sync restores them.
+  "loose/lonely/.gitignore": "__pycache__/\n",
+  // Files outside any skill folder: kept for --nested under .aiskills/nested/.
+  "alpha/README.md": "# Alpha group\n",
+  "alpha/.claude-plugin/plugin.json": '{"name":"alpha-skills"}\n',
+  "beta/.gitignore": "*.tmp\n",
 };
 
 export const FIXTURE_MARKETPLACE = {
@@ -89,7 +96,8 @@ export function sandbox() {
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
-  writeFixtureTree(pkg);
+  const repo = writeFixtureTree(join(dir, "repo"));
+  vendor({ repoRoot: repo, pkgDir: pkg });
   const home = join(dir, "home");
   const root = join(home, ".config", "sugatoray", "aiskills");
   mkdirSync(home, { recursive: true });
@@ -134,6 +142,7 @@ export function sandbox() {
 
   return {
     dir,
+    repo,
     pkg,
     home,
     root,
@@ -197,4 +206,16 @@ export function npm(args, opts = {}) {
     env: { ...process.env, npm_config_update_notifier: "false", ...(opts.env ?? {}) },
   });
   return { status: res.status, stdout: res.stdout ?? "", stderr: res.stderr ?? "" };
+}
+
+/** Every file under <dir>, as sorted posix paths relative to it. */
+export function listTree(dir) {
+  const out = [];
+  (function walk(d, rel) {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      if (e.isDirectory()) walk(join(d, e.name), rel + e.name + "/");
+      else out.push(rel + e.name);
+    }
+  })(dir, "");
+  return out.sort();
 }
