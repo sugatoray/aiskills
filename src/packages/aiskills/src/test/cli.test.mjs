@@ -42,6 +42,25 @@ describe("aiskills (basics)", posixOnly, () => {
     assert.equal(sb.run(["--version"]).out.trim(), version);
   });
 
+  test("single-letter and short aliases run the same command as the full name", () => {
+    sb.run(["sync"]);
+    sb.setList([row("a1", sb.root)]);
+    for (const [alias, full, args] of [
+      ["ls", "installed", []],
+      ["g", "groups", ["--json"]],
+      ["p", "path", []],
+      ["h", "help", []],
+      ["f", "find", ["pdf"]],
+    ]) {
+      const a = sb.run([alias, ...args]);
+      const b = sb.run([full, ...args]);
+      assert.equal(a.status, 0, `${alias}: ${a.out}`);
+      assert.equal(a.out, b.out, alias);
+      assert.deepEqual(a.calls.map(skillsArgs), b.calls.map(skillsArgs), alias);
+    }
+    assert.deepEqual(changes(sb.run(["r", "-s", "a1"]).calls), [["remove", "a1", "--global", "--yes"]]);
+  });
+
   test("i is install, rm and remove are uninstall", () => {
     const long = sb.run(["install", "-G", "alpha", "-a", "codex"]);
     const short = sb.run(["i", "-G", "alpha", "-a", "codex"]);

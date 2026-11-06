@@ -33,15 +33,15 @@ Usage: aiskills <command> [options]
 
 Commands:
   install, i     Save skills to ${ROOT}/skills and run 'npx skills add' on it (default)
-  uninstall, rm  Remove skills installed from ${ROOT} via 'npx skills remove' (also: remove)
-  installed      Show skills currently installed from ${ROOT}
-  groups         List skill groups (from .claude-plugin/marketplace.json) and their skills
+  uninstall, r   Remove skills installed from ${ROOT} via 'npx skills remove' (also: rm, remove)
+  installed, ls  Show skills currently installed from ${ROOT}
+  groups, g      List skill groups (from .claude-plugin/marketplace.json) and their skills
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
-  path           Print the folder that holds skills/
-  find <query>   Search the skills registry (= npx skills find <query>)
+  path, p        Print the folder that holds skills/
+  find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ${ROOT}
-  help           Show this help
+  help, h        Show this help
 
 Scope/selection options (install, uninstall, installed):
   -g, --global           User-level (default)
@@ -300,12 +300,16 @@ function main() {
     case "uninstall":
     case "remove":
     case "rm":
+    case "r":
       return uninstall(parse(rest, ["scope", "agent", "skill", "group", "purge", "force", "dryRun", "route"]));
     case "installed":
+    case "ls":
       return installed(parse(rest, ["scope", "route"]));
     case "find":
+    case "f":
       return runSkills(["find", ...rest]);
     case "groups":
+    case "g":
       return groups(parse(rest, ["json"]));
     case "skills":
       // Piggyback on any 'npx skills' command; ':root' -> install root.
@@ -316,9 +320,11 @@ function main() {
     case "list":
       return skillsAdd(syncSkills({ version }), { list: true });
     case "path":
+    case "p":
       console.log(ROOT);
       return 0;
     case "help":
+    case "h":
     case "-h":
     case "--help":
       console.log(HELP);

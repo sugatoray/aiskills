@@ -79,21 +79,34 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
 aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--nested|--flat] [-- <extra npx skills args>]   # alias: i
-aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]   # aliases: rm, remove
-aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills
-aiskills groups [--json]     # skill groups (from marketplace.json) and their skills
-aiskills find <query>        # search the skills registry (= npx skills find)
+aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
+aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills   (alias: ls)
+aiskills groups [--json]     # skill groups (from marketplace.json) and their skills   (alias: g)
+aiskills find <query>        # search the skills registry (= npx skills find)   (alias: f)
 # --route (before or after the command) hands non-bundled skills to npx skills
 aiskills --route install|uninstall|installed ...
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
 aiskills sync [--nested|--flat]   # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
-aiskills path                # print ~/.config/sugatoray/aiskills
+aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
 ```
 
-`aiskills i` is short for `aiskills install` (as in `npm i`), and `aiskills rm`
-or `aiskills remove` for `aiskills uninstall`. Options work the same way:
-`aiskills i -G scrolls -a claude-code`.
+Short aliases, mostly following `npm`'s own:
+
+| Alias | Command | Like |
+| --- | --- | --- |
+| `i` | `install` | `npm i` |
+| `r` (also `rm`, `remove`) | `uninstall` | `npm r` |
+| `ls` | `installed` | `npm ls` |
+| `g` | `groups` | |
+| `f` | `find` | |
+| `p` | `path` | |
+| `h` (also `-h`, `--help`) | `help` | |
+
+Options work the same with an alias: `aiskills i -G scrolls -a claude-code`.
+`sync`, `skills` and `list` have no single-letter alias on purpose: `s` would
+be ambiguous between `sync` and `skills`, and `l` too easily confused with
+`ls` (= `installed`).
 
 Install examples:
 
