@@ -68,6 +68,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | README "Install", "CLI" | `cli.test.mjs`, `e2e.test.mjs` |
 | Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md) | `cli.test.mjs`, `unit.test.mjs` |
 | `npx skills` passthrough | `aiskills skills <args>` with `:root` | README "Using `npx skills` directly" | `cli.test.mjs` |
+| User documentation | Tutorial, guides, concepts, full reference, FAQ, `llms.txt`, in `docs/docsite/` (not published) | [docs/docsite/](../docsite/README.md) | `docs.test.mjs` |
 
 ## Not features (on purpose)
 

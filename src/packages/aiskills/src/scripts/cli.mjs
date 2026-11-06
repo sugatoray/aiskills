@@ -20,6 +20,7 @@ import {
   runSkills,
   selectedSkills,
   skillsAdd,
+  skillsPackageSpec,
   skillsRemove,
   syncSkills,
   warn,
@@ -208,7 +209,7 @@ function uninstall(opts) {
     log(picked ? `nothing to remove (${scope}).` : `no ${scope} skills installed from ${ROOT}.`);
   } else if (opts.dryRun) {
     log(`[dry-run] would remove (${scope}): ${names.join(", ")}`);
-    log(`[dry-run] npx -y skills remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
+    log(`[dry-run] npx -y ${skillsPackageSpec()} remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
       `${agents.map((a) => ` --agent '${a}'`).join("")} --yes ${opts.extra.join(" ")}`.trimEnd());
   } else {
     const status = skillsRemove(names, { ...opts, agents, cwd });

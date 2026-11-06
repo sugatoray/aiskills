@@ -514,8 +514,15 @@ describe("aiskills uninstall", posixOnly, () => {
     sb.setList(installed());
     const r = sb.run(["uninstall", "-n"]);
     assert.equal(r.status, 0);
-    assert.match(r.out, /\[dry-run\] npx -y skills remove a1 beta-one --global --yes/);
+    assert.match(r.out, /\[dry-run\] npx -y skills@1\.7\.6 remove a1 beta-one --global --yes/);
     assert.deepEqual(changes(r.calls), []);
+  });
+
+  test("--dry-run shows the skills version that would really run", () => {
+    sb.setList(installed());
+    const r = sb.run(["uninstall", "-n"], { env: { AISKILLS_SKILLS_VERSION: "latest" } });
+    assert.equal(r.status, 0);
+    assert.match(r.out, /\[dry-run\] npx -y skills@latest remove a1 beta-one --global --yes/);
   });
 
   test("--purge with -s is refused", () => {

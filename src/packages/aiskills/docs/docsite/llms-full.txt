@@ -1,0 +1,2559 @@
+<!-- source: README.md -->
+# @sugatoray-ai/aiskills
+
+`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, newsletters, diagrams, docs, development) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+
+The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskills/skills/`, and are registered with your agents by `npx skills add`. The `aiskills` command then installs, lists and removes them by name, by group or by pattern, and with `--route` it manages skills from other sources too.
+
+```bash
+npm install -g @sugatoray-ai/aiskills
+```
+
+That is all most people need: the install step registers every skill with the agents it finds. To choose a group and an agent yourself:
+
+<!-- verify -->
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+```
+
+`npx skills` then prints its own progress and installs the seven skills for Claude Code.
+
+## Features
+
+- **Every skill in one package**: 13 skills in 6 groups, at the version you installed.
+- **Install on `npm install -g`**: a `postinstall` step saves and registers the skills, and never fails the npm install.
+- **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
+- **Global or per project**: `-g` (default) or `-p`.
+- **Clean uninstall**: full, partial, per agent or per project, with `--dry-run` and `--purge`.
+- **External skills too**: `--route` (or the `aix` command) looks up and installs skills that aren't bundled.
+- **Two layouts**: flat (one folder per skill) or `--nested` (the repo's own folders).
+- **Short commands**: `ais` is `aiskills`; `aix` is `aiskills --route`; `i`, `r`, `ls`, `g`, `f`, `p`, `h` are aliases.
+- **Safe by default**: a pinned `skills` CLI, checked registry results, and no runtime dependencies.
+
+## Documentation
+
+### Getting started
+
+- [Why aiskills](getting-started/why-aiskills.md): what the package adds on top of `npx skills`, and when you don't need it.
+- [Installation](getting-started/installation.md): install with npm, choose what the install step does, and check it worked.
+- [Quickstart](getting-started/quickstart.md): see the groups, install one for one agent, check it, and remove it.
+
+### Tutorial
+
+- [1. Install a group](tutorial/01-install-a-group.md): list the groups and install one for one agent.
+- [2. Pick skills and agents](tutorial/02-pick-skills-and-agents.md): choose skills by name and pattern, and send them to several agents.
+- [3. Install into a project](tutorial/03-install-into-a-project.md): install skills for one project instead of for your user.
+- [4. Add external skills](tutorial/04-add-external-skills.md): install skills that aren't bundled with `--route` and `aix`.
+- [5. Uninstall](tutorial/05-uninstall.md): preview and remove some or all of the skills.
+
+### How-to guides
+
+- [Configure the npm install step](guides/configure-npm-install.md): choose skills, agents and scope with `AISKILLS_*` variables, or turn the step off.
+- [Use the package with `npx skills experimental_sync`](guides/use-experimental-sync.md): install the skills from a project's `node_modules`, pinned by your lockfile.
+- [Keep the repo's nested layout](guides/keep-the-nested-layout.md): browse or edit the skills in the folders they have in the repo.
+- [Run any `npx skills` command](guides/run-npx-skills-directly.md): pass arguments straight to `npx skills`, with `:root` for the install folder.
+- [Remove everything](guides/remove-everything.md): uninstall the skills, the folder and the npm package, in the right order.
+- [Use aiskills from an AI agent or a script](guides/use-from-an-agent.md): run it non-interactively, read its output and exit codes, and handle failures.
+- [Choose the `skills` CLI version](guides/choose-the-skills-cli-version.md): run a different `skills` release than the pinned one.
+- [Leave files out of the package](guides/leave-files-out.md): for maintainers: keep files or whole skills out with `.skillsignore`.
+
+### Concepts
+
+- [How aiskills works](concepts/how-it-works.md): the package, the install folder and `npx skills`, and who owns what.
+- [Skill groups](concepts/skill-groups.md): where groups and their aliases come from, and how membership is worked out.
+- [Layouts: flat and nested](concepts/layouts.md): the two shapes of the install folder and how the choice is made.
+- [Bundled and external skills](concepts/bundled-and-external.md): what `--route` changes for install, uninstall and listing.
+- [Security model](concepts/security.md): what the package touches, and the protections that are tested.
+
+### Reference
+
+- [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
+- [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
+- [Environment variables](reference/environment.md): every variable `aiskills` and its install step read.
+- [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
+- [`.skillsignore`](reference/skillsignore.md): the rule syntax for leaving files out of the package.
+- [Errors and exit codes](reference/errors.md): every error and warning, with its cause and fix.
+
+### Help
+
+- [FAQ and troubleshooting](faq.md): answers to common questions and fixes for common problems.
+
+Also see the package [CHANGELOG](../../CHANGELOG.md) and [SECURITY.md](../../SECURITY.md). Agents can load [`llms.txt`](llms.txt) or [`llms-full.txt`](llms-full.txt).
+
+<!-- source: getting-started/why-aiskills.md -->
+# Why aiskills
+
+`aiskills` gives you Sugato Ray's skills as one versioned npm package, and lets you install them by group or pattern instead of one by one.
+
+The [`skills`](https://www.npmjs.com/package/skills) CLI (`npx skills`) already installs agent skills from GitHub, URLs and local folders into Claude Code, Codex, Cursor and many other agents. `aiskills` doesn't replace it. It sits on top of it and adds what `npx skills` doesn't know about this collection of skills.
+
+## What it adds
+
+| You want to | With `npx skills` alone | With `aiskills` |
+| --- | --- | --- |
+| Get all the skills | `npx skills add sugatoray/aiskills --global` (latest `master`) | `npm install -g @sugatoray-ai/aiskills` (a released, versioned set) |
+| Install a related set | List each skill with `--skill` | `-G scrolls` (groups come from the repo's `marketplace.json`) |
+| Pick by pattern | Not supported | `-s 'scrolls-*'`, `-a 'claude*'` |
+| Remove only these skills | Name each one; same-named skills from other sources go too | `aiskills uninstall` removes exactly what it installed |
+| Work offline after install | Needs GitHub for each add | Skills are already on disk in `~/.config/sugatoray/aiskills` |
+| Install other people's skills too | Yes | Yes, with `--route` or `aix` |
+
+## When you don't need it
+
+- You want only one or two skills and don't mind naming them: `npx skills add sugatoray/aiskills --skill <name> --global` is enough.
+- You want skills that track the repo's `master` branch, not releases.
+- You install skills only per project from `node_modules`: then you need the package, but not the `aiskills` command. See [Use the package with `npx skills experimental_sync`](../guides/use-experimental-sync.md).
+
+## What it doesn't do
+
+- It doesn't copy skills into agent folders itself. `npx skills` does that, and keeps its own record of what is installed.
+- It doesn't install Claude Code plugins. It reads the repo's `.claude-plugin/marketplace.json` only to group the skills.
+- It doesn't update skills by itself. Install a newer package version (`npm install -g @sugatoray-ai/aiskills@latest`) to get newer skills.
+
+See also: [How aiskills works](../concepts/how-it-works.md) · [Installation](installation.md)
+
+<!-- source: getting-started/installation.md -->
+# Installation
+
+Install the package globally with npm; its install step saves the skills and registers them with your agents.
+
+**You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
+
+## Install
+
+```bash
+npm install -g @sugatoray-ai/aiskills
+```
+
+npm runs the package's `postinstall` step, which:
+
+1. saves the skills to `~/.config/sugatoray/aiskills/skills/`, replacing any older copy, and
+2. runs `npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, which installs every skill for every agent `npx skills` detects.
+
+npm 7 and later hide the output of install steps, so you won't see this happen. If step 2 fails (offline, behind a proxy, or with `--ignore-scripts`), the npm install still succeeds. Run it again with `aiskills install`.
+
+> [!NOTE]
+> pnpm and bun don't run install steps by default. After `pnpm add -g` or `bun add -g`, run `aiskills install` once.
+
+## Choose what the install step does
+
+The install step reads `AISKILLS_*` environment variables. For example, only the scrolls group, only for Claude Code:
+
+```bash
+AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
+```
+
+To save the files but not register them, set `AISKILLS_SKIP_SKILLS_ADD=1`. To skip the step entirely, set `AISKILLS_SKIP_POSTINSTALL=1`. All the variables are in [Configure the npm install step](../guides/configure-npm-install.md).
+
+## Check it worked
+
+The package adds three commands: `aiskills`, `ais` (the same, shorter) and `aix` (the same as `aiskills --route`).
+
+<!-- verify -->
+```bash
+aiskills --version
+aiskills path
+```
+
+```text
+0.2.0
+~/.config/sugatoray/aiskills
+```
+
+`aiskills installed` lists the skills that `npx skills` has recorded as installed from that folder. See [Quickstart](quickstart.md).
+
+## Without a global install
+
+`npx` runs the package's `aiskills` command without a global install:
+
+```bash
+npx @sugatoray-ai/aiskills install -G scrolls
+```
+
+## Update
+
+Install the newer version the same way. The install step replaces `~/.config/sugatoray/aiskills/skills/` with the new skills and runs `npx skills add` again:
+
+```bash
+npm install -g @sugatoray-ai/aiskills@latest
+```
+
+If you had chosen particular skills, agents or flags, run that `aiskills install ...` command again afterwards (or set the same `AISKILLS_*` variables for the npm install).
+
+## Remove
+
+npm doesn't run any step on uninstall, so remove the skills first:
+
+```bash
+aiskills uninstall --purge
+npm uninstall -g @sugatoray-ai/aiskills
+```
+
+See [Remove everything](../guides/remove-everything.md).
+
+See also: [Quickstart](quickstart.md) · [Environment variables](../reference/environment.md)
+
+<!-- source: getting-started/quickstart.md -->
+# Quickstart
+
+In five commands: see what's in the package, install a group for one agent, check it, and remove it.
+
+**You'll need:** the package installed ([Installation](installation.md)).
+
+## 1. See the groups
+
+```bash
+aiskills groups
+```
+
+Each group lists its alias and its skills. The full output is in [Tutorial step 1](../tutorial/01-install-a-group.md).
+
+## 2. Install a group for one agent
+
+<!-- verify -->
+```bash
+aiskills install -G personas -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: prodigy
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill prodigy --agent claude-code --yes
+```
+
+`npx skills` then prints its own progress. In Claude Code, the skill is now available as `/prodigy`.
+
+## 3. Check what's installed
+
+<!-- verify: list=prodigy -->
+```bash
+aiskills installed
+```
+
+```text
+prodigy                    personas-skills        Claude Code
+```
+
+The columns are the skill, its group, and the agents it is installed for.
+
+## 4. Preview the removal
+
+<!-- verify: list=prodigy -->
+```bash
+aiskills uninstall -n
+```
+
+```text
+[aiskills] [dry-run] would remove (global): prodigy
+[aiskills] [dry-run] npx -y skills@1.7.6 remove prodigy --global --yes
+[aiskills] skill files kept in ~/.config/sugatoray/aiskills/skills (re-add with 'aiskills install'; delete with --purge).
+```
+
+## 5. Remove it
+
+```bash
+aiskills uninstall
+```
+
+As the preview said, the skill files stay in `~/.config/sugatoray/aiskills/skills/`, so `aiskills install` can add them back offline.
+
+## Recap
+
+- `aiskills groups` shows what you can install.
+- `aiskills install -G <group> -a <agent>` installs a group for an agent.
+- `aiskills installed` and `aiskills uninstall -n` show what is there and what would go.
+
+Next: the [Tutorial](../tutorial/01-install-a-group.md) covers patterns, projects, external skills and uninstalling in more depth.
+
+See also: [CLI reference](../reference/cli.md)
+
+<!-- source: tutorial/01-install-a-group.md -->
+# 1. Install a group
+
+After this step you can find a group of skills and install it for one agent.
+
+**You'll need:** the package installed ([Installation](../getting-started/installation.md)), and at least one agent that `npx skills` supports, such as Claude Code.
+
+## See the groups
+
+<!-- verify -->
+```bash
+aiskills groups
+```
+
+```text
+scrolls-skills  (alias: scrolls)
+  Scrolls: a git-native markdown system for agentic memory that persists project state across sessions and ag...
+  skills: scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+
+stata-skills  (alias: stata)
+  Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-b...
+  skills: stata-recipes
+
+repo-related-skills  (alias: repo-related)
+  Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and simila...
+  skills: create-issues-update-pr
+
+docs-skills  (alias: docs)
+  Docs skills: writes verified user documentation for a library, CLI or framework, structured like FastAPI, P...
+  skills: create-lib-docs
+
+diagrams-skills  (alias: diagrams)
+  Animated architecture and network diagrams with flowing packets, orthogonal routing, selectable nodes, and ...
+  skills: network-flow
+
+personas-skills  (alias: personas)
+  Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems,...
+  skills: prodigy
+
+(ungrouped; use -s or -G all)
+  skills: newsletter-ai
+
+Install a group:  aiskills install --group <name|alias> --global --agent <agent>
+```
+
+Each group has a name (`scrolls-skills`) and a shorter alias (`scrolls`, the name without `-skills`). Either works. `newsletter-ai` belongs to no group; you install it by name, or with the built-in group `all`.
+
+## Install one group for one agent
+
+<!-- verify -->
+```bash
+aiskills install --group scrolls --agent claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+```
+
+What happened, in order:
+
+1. `aiskills` refreshed the skill files in `~/.config/sugatoray/aiskills/skills/` from the package.
+2. It turned the group into its seven skills (`bundled: ...`).
+3. It ran `npx skills add` on that folder with one `--skill` per skill and your agent. `--global` is the default scope, and `--yes` skips `npx skills`' prompts.
+
+`npx skills` prints its own progress after that line, and the skills appear in Claude Code as `/scrolls-setup`, `/scrolls-update` and so on.
+
+> [!TIP]
+> The same command, shorter: `ais i -G scrolls -a claude-code`. `ais` is `aiskills`, `i` is `install`, and `-G`/`-a` are the short forms of `--group`/`--agent`.
+
+## Install several groups
+
+Separate groups with commas, or repeat `-G`:
+
+```bash
+aiskills install -G scrolls,personas -a claude-code
+aiskills install -G scrolls -G personas -a claude-code
+```
+
+## Recap
+
+- `aiskills groups` lists groups, their aliases and their skills.
+- `aiskills install -G <group> -a <agent>` installs a group for one agent; `-G` takes the name or the alias.
+- `aiskills` always refreshes the saved skills, then hands the install to `npx skills add`.
+
+Reference: [`install`](../reference/cli.md#install) · [`-G`, `--group`](../reference/cli.md#-g---group---groups) · [Skill groups](../concepts/skill-groups.md)
+
+Next: [2. Pick skills and agents](02-pick-skills-and-agents.md)
+
+<!-- source: tutorial/02-pick-skills-and-agents.md -->
+# 2. Pick skills and agents
+
+After this step you can choose skills by name or pattern and install them for several agents at once.
+
+**You'll need:** the previous step.
+
+## Name the skills
+
+`-s` (`--skill`) takes skill names, separated by commas:
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-setup,scrolls-update -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-setup, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --skill scrolls-update --agent claude-code --yes
+```
+
+## Use a pattern
+
+`-s`, `-G` and `-a` accept glob patterns: `*` for any text, `?` for one character, `[abc]` for one of a set. Quote them so your shell leaves them alone:
+
+<!-- verify -->
+```bash
+aiskills install -s 'scrolls-[hu]*' -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-help, scrolls-hide, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --skill scrolls-hide --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+```
+
+The `bundled:` line shows what the pattern matched, before anything is installed. A pattern that matches nothing stops the command:
+
+<!-- verify -->
+```bash
+aiskills install -s 'scroll-*'
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] no skill matches: scroll-*
+  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+```
+
+## Mix skills and groups
+
+`-s` and `-G` add up. This installs the personas group plus one skill:
+
+<!-- verify -->
+```bash
+aiskills install -G personas -s newsletter-ai -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: newsletter-ai, prodigy
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill newsletter-ai --skill prodigy --agent claude-code --yes
+```
+
+## Several agents
+
+`-a` takes several agents, and patterns too. Plain agent names are passed to `npx skills`, which checks them. A pattern is expanded against the agent list that `npx skills` itself reports, and the result is printed:
+
+```bash
+aiskills install -G stata -a claude-code,codex
+aiskills install -G stata -a 'claude*,codex'
+```
+
+Leave out `-a` and `npx skills` installs for every agent it detects on your machine.
+
+## Recap
+
+- `-s` picks skills, `-G` picks groups, and they combine.
+- Patterns work in `-s`, `-G` and `-a`; quote them.
+- The `bundled:` line shows exactly what will be installed.
+
+Reference: [`-s`, `--skill`](../reference/cli.md#-s---skill) · [`-a`, `--agent`](../reference/cli.md#-a---agent) · [Patterns](../reference/patterns.md)
+
+Next: [3. Install into a project](03-install-into-a-project.md) · Previous: [1. Install a group](01-install-a-group.md)
+
+<!-- source: tutorial/03-install-into-a-project.md -->
+# 3. Install into a project
+
+After this step you can install skills for one project only, so they travel with that project instead of applying to every project you open.
+
+**You'll need:** the previous steps, and a project folder.
+
+## Install with `-p`
+
+Run the command from the project's folder and add `-p` (`--project`):
+
+<!-- verify -->
+```bash
+aiskills install -p -G stata -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: stata-recipes
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --skill stata-recipes --agent claude-code --yes
+```
+
+Compare it with the global install in step 1: the command has no `--global`, and `aiskills` runs it from your current folder. `npx skills` then installs the skill into that project's agent folders (for Claude Code, `.claude/skills/`) and records it there.
+
+The skill's source is still `~/.config/sugatoray/aiskills`, so `aiskills` can recognise it later.
+
+## List and remove project skills
+
+`installed` and `uninstall` take `-p` too, and look at the current folder:
+
+```bash
+aiskills installed -p
+aiskills uninstall -p -G stata
+```
+
+Global and project installs are separate. A skill can be installed in both, and removing one leaves the other.
+
+## Set it at npm install time
+
+To make the npm install step install into a project, set `AISKILLS_SCOPE=project` and run `npm install` in that project. The install step uses the folder npm was started from (`INIT_CWD`):
+
+```bash
+AISKILLS_SCOPE=project AISKILLS_GROUPS=stata npm install --save-dev @sugatoray-ai/aiskills
+```
+
+For a project dependency, [`npx skills experimental_sync`](../guides/use-experimental-sync.md) is another way to install the skills, pinned by your lockfile.
+
+## Recap
+
+- `-p` installs, lists and removes skills in the current project.
+- The default, `-g`, is for your user, in every project.
+- `AISKILLS_SCOPE=project` does the same for the npm install step.
+
+Reference: [`-p`, `--project`](../reference/cli.md#-p---project) · [`AISKILLS_SCOPE`](../reference/environment.md#aiskills_scope)
+
+Next: [4. Add external skills](04-add-external-skills.md) · Previous: [2. Pick skills and agents](02-pick-skills-and-agents.md)
+
+<!-- source: tutorial/04-add-external-skills.md -->
+# 4. Add external skills
+
+After this step you can install skills that aren't in this package, from the skills registry or GitHub, with the same command.
+
+**You'll need:** the previous steps, and network access to `skills.sh` and GitHub.
+
+## Without `--route`, only bundled skills
+
+`aiskills` refuses a skill name it doesn't bundle, before it installs anything:
+
+<!-- verify -->
+```bash
+aiskills install -s pdf
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] not provided by this package: pdf
+  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  add --route to look them up with 'npx skills' instead
+```
+
+## Look it up with `--route`
+
+With `--route`, a bare name that isn't bundled is looked up with `npx skills find`. If exactly one result has exactly that name, it is installed:
+
+<!-- verify: find=anthropics/skills@pdf -->
+```bash
+aiskills --route install -s pdf -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] 'pdf' is not bundled; looking it up with 'npx skills find pdf' ...
+[aiskills] found anthropics/skills@pdf
+[aiskills] external: anthropics/skills@pdf
+[aiskills] running: npx -y skills@1.7.6 add anthropics/skills@pdf --global --agent claude-code --yes
+```
+
+The example output above was produced with a stand-in registry that returns one result, `anthropics/skills@pdf`; the real registry may return other results. If several results share the exact name, `aiskills` stops and lists them, and you pick one. It never chooses for you.
+
+`aix` is a shorter way to write `aiskills --route`:
+
+```bash
+aix i -s pdf -a claude-code
+```
+
+## Name the source yourself
+
+An `owner/repo@skill` (or `owner/repo`, a git URL, or a local path) skips the lookup and goes straight to `npx skills add`:
+
+<!-- verify -->
+```bash
+aix install -s anthropics/skills@docx
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] external: anthropics/skills@docx
+[aiskills] running: npx -y skills@1.7.6 add anthropics/skills@docx --global --yes
+```
+
+This is the safer choice for third-party skills: you decide exactly which source is used.
+
+## Bundled and external together
+
+`-s` can mix both, and `-G` still selects bundled groups. Every lookup runs before anything is installed, so a failed lookup changes nothing:
+
+```bash
+aix install -G scrolls -s pdf -a claude-code
+```
+
+## See both kinds
+
+`installed --route` lists every installed skill with its source: `bundled` for this package's skills, otherwise the source `npx skills` recorded.
+
+<!-- verify: list=scrolls-setup,anthropics/skills@docx -->
+```bash
+aix installed
+```
+
+```text
+docx                       anthropics/skills              -                      Claude Code
+scrolls-setup              bundled                        scrolls-skills         Claude Code
+```
+
+## Recap
+
+- Without `--route`, `aiskills` only manages bundled skills.
+- With `--route` (or `aix`), a bare name is looked up and installed only on a unique exact match; `owner/repo@skill` is used as given.
+- External skills are installed from their source; they are never copied into `~/.config/sugatoray/aiskills`.
+
+Reference: [`--route`](../reference/cli.md#--route) · [Bundled and external skills](../concepts/bundled-and-external.md)
+
+Next: [5. Uninstall](05-uninstall.md) · Previous: [3. Install into a project](03-install-into-a-project.md)
+
+<!-- source: tutorial/05-uninstall.md -->
+# 5. Uninstall
+
+After this step you can remove some or all of the skills, and preview a removal first.
+
+**You'll need:** the previous steps.
+
+## Preview with `-n`
+
+`-n` (`--dry-run`) prints what would be removed and the exact command, and changes nothing. Suppose `npx skills` has `scrolls-setup` and `prodigy` installed from this package, and `docx` from elsewhere:
+
+<!-- verify: list=scrolls-setup,prodigy,anthropics/skills@docx -->
+```bash
+aiskills uninstall -n
+```
+
+```text
+[aiskills] [dry-run] would remove (global): prodigy, scrolls-setup
+[aiskills] [dry-run] npx -y skills@1.7.6 remove prodigy scrolls-setup --global --yes
+[aiskills] skill files kept in ~/.config/sugatoray/aiskills/skills (re-add with 'aiskills install'; delete with --purge).
+```
+
+A full uninstall removes only what `npx skills` recorded as installed from `~/.config/sugatoray/aiskills`. `docx` isn't touched.
+
+## Remove some skills
+
+`-s` and `-G` work as they do for install, patterns included. With a pattern or a group, only skills that are actually installed are removed:
+
+<!-- verify: list=scrolls-help,scrolls-hide,scrolls-setup -->
+```bash
+aiskills uninstall -s 'scrolls-[hu]*' -n
+```
+
+```text
+[aiskills] [dry-run] would remove (global): scrolls-help, scrolls-hide
+[aiskills] [dry-run] npx -y skills@1.7.6 remove scrolls-help scrolls-hide --global --yes
+```
+
+Drop `-n` to remove them:
+
+```bash
+aiskills uninstall -s 'scrolls-[hu]*'
+```
+
+## Remove from one agent
+
+`-a` unlinks the skills from those agents only:
+
+```bash
+aiskills uninstall -a codex
+```
+
+## Remove an external skill
+
+Without `--route`, `uninstall` refuses names this package doesn't provide. With it, names also match skills from other sources:
+
+```bash
+aix uninstall -s docx
+```
+
+## Remove everything, files included
+
+`--purge` runs a full uninstall and then deletes `~/.config/sugatoray/aiskills`:
+
+<!-- verify: list=scrolls-setup -->
+```bash
+aiskills uninstall --purge -n
+```
+
+```text
+[aiskills] [dry-run] would remove (global): scrolls-setup
+[aiskills] [dry-run] npx -y skills@1.7.6 remove scrolls-setup --global --yes
+[aiskills] [dry-run] would delete ~/.config/sugatoray/aiskills
+```
+
+## Recap
+
+- `-n` previews any uninstall.
+- No `-s`/`-G` removes exactly what this package installed; `-s`/`-G`/`-a` narrow it.
+- `--route` (or `aix`) lets names match skills from other sources.
+- `--purge` also deletes the install folder.
+
+Reference: [`uninstall`](../reference/cli.md#uninstall) · [Remove everything](../guides/remove-everything.md)
+
+Previous: [4. Add external skills](04-add-external-skills.md) · Back to the [docs home](../README.md)
+
+<!-- source: guides/configure-npm-install.md -->
+# How to configure the npm install step
+
+Use `AISKILLS_*` environment variables when you want `npm install` itself to install a particular set of skills, or nothing at all.
+
+The package's `postinstall` step reads the same choices as `aiskills install`, but from the environment, because npm passes no arguments to it.
+
+## Steps
+
+1. Pick the variables for what you want:
+
+   | You want | Set |
+   | --- | --- |
+   | Some groups | `AISKILLS_GROUPS=scrolls,personas` |
+   | Some skills | `AISKILLS_SKILLS='scrolls-*,prodigy'` |
+   | Some agents | `AISKILLS_AGENTS=claude-code,codex` |
+   | The current project, not your user | `AISKILLS_SCOPE=project` |
+   | Copies instead of symlinks | `AISKILLS_COPY=1` |
+   | The repo's folder layout | `AISKILLS_LAYOUT=nested` |
+   | Also external skills in `AISKILLS_SKILLS` | `AISKILLS_ROUTE=1` |
+
+2. Set them on the npm command:
+
+   ```bash
+   AISKILLS_GROUPS=scrolls AISKILLS_AGENTS='claude*' npm install -g @sugatoray-ai/aiskills
+   ```
+
+3. Check the result, since npm hides the step's output:
+
+   ```bash
+   aiskills installed
+   ```
+
+## Variations
+
+### Save the files but don't register them
+
+```bash
+AISKILLS_SKIP_SKILLS_ADD=1 npm install -g @sugatoray-ai/aiskills
+```
+
+The skills are saved to `~/.config/sugatoray/aiskills/skills/`; run `aiskills install ...` later. The step also skips registering when `CI` is set.
+
+### Skip the step entirely
+
+```bash
+AISKILLS_SKIP_POSTINSTALL=1 npm install -g @sugatoray-ai/aiskills
+```
+
+Or `npm install --ignore-scripts`. Nothing is written until you run `aiskills install` or `aiskills sync`.
+
+### Make the choices the defaults for the CLI too
+
+`aiskills install`, `uninstall` and `installed` read the same variables as defaults; options on the command line replace them. Put them in your shell profile to use them everywhere:
+
+```bash
+export AISKILLS_AGENTS=claude-code,codex
+```
+
+## Troubleshooting
+
+- **No skills appeared after `npm install`**: the step never fails the npm install, so look for a reason by running the same choice with the CLI, e.g. `aiskills install -G scrolls`. It prints the error.
+- **pnpm or bun**: they skip install steps by default; run `aiskills install` once.
+- **An unknown name in `AISKILLS_SKILLS`** stops the step with `unknown skill(s) in AISKILLS_SKILLS`. Fix the name, or set `AISKILLS_ROUTE=1` to look it up.
+
+See also: [Environment variables](../reference/environment.md) · [Installation](../getting-started/installation.md)
+
+<!-- source: guides/use-experimental-sync.md -->
+# How to use the package with `npx skills experimental_sync`
+
+Use this when you want a project's skills pinned by its lockfile, installed from `node_modules`, without the `aiskills` command or `~/.config/sugatoray/aiskills`.
+
+The `skills` CLI has an `experimental_sync` command that installs skills found in a project's `node_modules`. It looks for `<package>/skills/<name>/SKILL.md`, one level deep. This package ships its skills exactly that way.
+
+## Steps
+
+1. Add the package as a dev dependency, without its install step:
+
+   ```bash
+   npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills
+   ```
+
+2. Install its skills into the project:
+
+   ```bash
+   npx skills experimental_sync --agent claude-code --yes
+   ```
+
+3. Commit the lockfile. Everyone who runs steps 1–2 gets the same skills.
+
+## Variations
+
+### Update
+
+```bash
+npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills@latest
+npx skills experimental_sync --agent claude-code --yes
+```
+
+## Troubleshooting
+
+- **Nothing is installed**: check that `node_modules/@sugatoray-ai/aiskills/skills/` exists. It is created by `npm pack`, so it's there in the published package but not in a git checkout of the repo.
+- **The command changed**: `experimental_sync` is marked experimental by the `skills` CLI and may change. `aiskills install -p` is the stable alternative.
+
+See also: [Layouts: flat and nested](../concepts/layouts.md) · [3. Install into a project](../tutorial/03-install-into-a-project.md)
+
+<!-- source: guides/keep-the-nested-layout.md -->
+# How to keep the repo's nested layout
+
+Use `--nested` when you want `~/.config/sugatoray/aiskills/skills/` to look exactly like the repo's `skills/` folder, for browsing or editing.
+
+## Steps
+
+1. Rewrite the folder in the nested layout:
+
+   <!-- verify -->
+   ```bash
+   aiskills sync --nested
+   ```
+
+   ```text
+   [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (nested layout)
+   ```
+
+2. Browse it: skills are now under their group folders, e.g. `skills/scrolls/scrolls-setup/`, with the groups' `README.md` and `.claude-plugin/plugin.json` files next to them.
+
+The choice is saved in `~/.config/sugatoray/aiskills/aiskills.json`, so later `install`, `sync`, `list` and `groups` keep using it.
+
+## Variations
+
+### Install and nest in one go
+
+```bash
+aiskills --nested
+aiskills install --nested -G scrolls
+```
+
+`aiskills --nested` on its own means `aiskills install --nested`.
+
+### Go back to flat
+
+<!-- verify -->
+```bash
+aiskills sync --flat
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+```
+
+### Nested from the npm install step
+
+```bash
+AISKILLS_LAYOUT=nested npm install -g @sugatoray-ai/aiskills
+```
+
+## Troubleshooting
+
+- **My edits disappeared**: every sync replaces `skills/`. Edit a copy elsewhere, or contribute the change to the repo.
+- **Skills behave differently**: they don't; `npx skills add` finds the same skills in either layout.
+
+See also: [Layouts: flat and nested](../concepts/layouts.md) · [`--nested`](../reference/cli.md#--nested)
+
+<!-- source: guides/run-npx-skills-directly.md -->
+# How to run any `npx skills` command
+
+Use `aiskills skills <args>` when you need a `skills` command or flag that `aiskills` doesn't wrap, such as `update`, `use` or `init`.
+
+It passes the arguments to `npx skills` unchanged, with two extras: the pinned `skills` version, and `:root` replaced by the install folder.
+
+## Steps
+
+1. Write the `npx skills` command you want, and put `aiskills skills` in front instead of `npx skills`:
+
+   <!-- verify -->
+   ```bash
+   aiskills skills list -g
+   ```
+
+   ```text
+   [aiskills] running: npx -y skills@1.7.6 list -g
+   ```
+
+   The `npx skills` output follows that line.
+
+2. Use `:root` where you need the install folder:
+
+   <!-- verify -->
+   ```bash
+   aiskills skills add :root -s prodigy -g -y
+   ```
+
+   ```text
+   [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills -s prodigy -g -y
+   ```
+
+## Variations
+
+### Extra flags on `install` and `uninstall`
+
+Anything after `--` is added to the end of the `npx skills` command. For example, `--json` makes `npx skills add` print its result as JSON:
+
+<!-- verify -->
+```bash
+aiskills install -G stata -a claude-code -- --json
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: stata-recipes
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill stata-recipes --agent claude-code --yes --json
+```
+
+### Search the registry
+
+`aiskills find <query>` is `npx skills find <query>`:
+
+<!-- verify -->
+```bash
+aiskills find pdf
+```
+
+```text
+[aiskills] running: npx -y skills@1.7.6 find pdf
+…
+```
+
+See also: [`skills`](../reference/cli.md#skills) · [Choose the `skills` CLI version](choose-the-skills-cli-version.md)
+
+<!-- source: guides/remove-everything.md -->
+# How to remove everything
+
+Use this to take the skills, the install folder and the npm package off your machine.
+
+npm runs nothing when a package is uninstalled, so remove the skills **before** the package.
+
+## Steps
+
+1. Preview:
+
+   ```bash
+   aiskills uninstall --purge -n
+   ```
+
+2. Remove every skill this package installed, then delete `~/.config/sugatoray/aiskills`:
+
+   ```bash
+   aiskills uninstall --purge
+   ```
+
+3. If you installed into projects, repeat in each project:
+
+   ```bash
+   aiskills uninstall -p
+   ```
+
+4. Remove the package:
+
+   ```bash
+   npm uninstall -g @sugatoray-ai/aiskills
+   ```
+
+## Variations
+
+### The package is already gone
+
+Run the CLI once through `npx`:
+
+```bash
+npx @sugatoray-ai/aiskills uninstall --purge
+```
+
+Or do it by hand with `npx skills`:
+
+```bash
+npx skills list -g
+npx skills remove <skill...> --global --yes
+rm -rf ~/.config/sugatoray/aiskills
+```
+
+### External skills too
+
+A full uninstall never removes skills from other sources, even with `--route`. Name them:
+
+```bash
+aix uninstall -s pdf,docx
+```
+
+## Troubleshooting
+
+- **`--purge only applies to a full uninstall`**: drop `-s`/`-G`.
+- **`... is not an aiskills folder ...`**: `AISKILLS_HOME` points at a folder that `aiskills` didn't create, so it refuses to delete it. See [Errors](../reference/errors.md#not-an-aiskills-folder).
+
+See also: [5. Uninstall](../tutorial/05-uninstall.md) · [`--purge`](../reference/cli.md#--purge)
+
+<!-- source: guides/use-from-an-agent.md -->
+# How to use aiskills from an AI agent or a script
+
+Use this page when a program, not a person, runs `aiskills`: an AI coding agent, a setup script, or CI.
+
+## Steps
+
+1. **Never wait for input.** `aiskills` never prompts, and it passes `--yes` to every `npx skills add` and `npx skills remove`. `npx -y` also skips npx's own download prompt.
+
+2. **Check before you change.** Read the groups as JSON, and preview removals with `-n`:
+
+   <!-- verify -->
+   ```bash
+   aiskills groups --json
+   ```
+
+   ```text
+   {
+     "groups": [
+       {
+         "name": "scrolls-skills",
+         "alias": "scrolls",
+   …
+     "ungrouped": [
+       "newsletter-ai"
+     ]
+   }
+   ```
+
+   The shape is `{ "groups": [{ "name", "alias", "description", "skills": [string] }], "ungrouped": [string] }`. See [Files and schemas](../reference/files.md#aiskills-groups---json).
+
+3. **Install with explicit choices.** Name the skills or groups, the agents and the scope, so the result doesn't depend on what happens to be detected:
+
+   ```bash
+   aiskills install -g -G scrolls -a claude-code
+   ```
+
+4. **Branch on the exit code**, not on the text:
+
+   | Exit code | Meaning |
+   | --- | --- |
+   | `0` | Success. For `uninstall`, also when there was nothing to remove. |
+   | `1` | `aiskills` refused or failed: a bad option, an unknown name, a pattern that matched nothing, a failed lookup, an unsafe folder. No skill was installed or removed (the saved copy in `~/.config/sugatoray/aiskills/skills/` may have been refreshed). The message is on stderr and starts with `[aiskills]`. |
+   | other | The exit code of `npx skills`, passed through. |
+
+   <!-- verify -->
+   ```bash
+   aiskills install -G nope
+   ```
+
+   ```text
+   [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+   [aiskills] no group matches: nope
+     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), all
+     see 'aiskills groups'
+   ```
+
+   Every error is listed, with its cause and fix, in [Errors and exit codes](../reference/errors.md).
+
+5. **Read what's installed as JSON** with the passthrough. `aiskills` prints one `[aiskills] running: ...` line before the JSON, so parse from the first `[` of the JSON array, or call `npx -y skills@1.7.6 list --json -g` yourself:
+
+   <!-- verify -->
+   ```bash
+   aiskills skills list --json -g
+   ```
+
+   ```text
+   [aiskills] running: npx -y skills@1.7.6 list --json -g
+   []
+   ```
+
+   Each row has `name`, `source`, `sourceType`, `scope` and `agents`. A row with `sourceType` `local` and `source` equal to `aiskills path` was installed by `aiskills`. See [Files and schemas](../reference/files.md#npx-skills-list---json-rows).
+
+## Variations
+
+### Unattended install from npm
+
+Set the choices as environment variables, so a single `npm install` does everything:
+
+```bash
+AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
+aiskills installed
+```
+
+The npm install step never fails `npm install`, so check the result afterwards with `aiskills installed`.
+
+### No telemetry
+
+`npx skills` sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. `aiskills` passes both through:
+
+```bash
+DO_NOT_TRACK=1 aiskills install -G scrolls -a claude-code
+```
+
+### External skills
+
+Prefer `owner/repo@skill` over a bare name with `--route`. A bare name fails when the registry has several exact matches, and the registry can change between runs.
+
+## Troubleshooting
+
+- **Exit code 1 with `could not read the agent list from 'npx skills'`**: an `-a` pattern needs `npx skills`. Pass plain agent names instead of patterns.
+- **The output has `npx skills` progress mixed in**: `npx skills` writes to the same terminal. Use the exit code, and `aiskills installed` afterwards.
+
+See also: [CLI reference](../reference/cli.md) · [Errors and exit codes](../reference/errors.md) · [`llms.txt`](../llms.txt)
+
+<!-- source: guides/choose-the-skills-cli-version.md -->
+# How to choose the `skills` CLI version
+
+Use this when you need a newer or different release of the `skills` CLI than the one `aiskills` pins.
+
+Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_VERSION` overrides it.
+
+## Steps
+
+1. Set the version for one command:
+
+   <!-- verify -->
+   ```bash
+   AISKILLS_SKILLS_VERSION=latest aiskills skills --version
+   ```
+
+   ```text
+   [aiskills] running: npx -y skills@latest --version
+   ```
+
+2. Or for every command, in your shell profile:
+
+   ```bash
+   export AISKILLS_SKILLS_VERSION=1.7.6
+   ```
+
+## Variations
+
+Accepted values are an exact version (`1.7.6`, `1.8.0-beta.1`), `latest` or `next`. Anything else is refused before `npx` runs, so a typo can't turn into a different package:
+
+<!-- verify -->
+```bash
+AISKILLS_SKILLS_VERSION='^1' aiskills find pdf
+```
+
+```text
+[aiskills] AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '^1'
+```
+
+## Troubleshooting
+
+- **`-a` patterns or `--route` stop working on a newer version**: `aiskills` reads two pieces of `npx skills` text output (the "Valid agents:" list and `find` results). If a release changes them, go back to the pinned version and report it.
+
+> [!WARNING]
+> `latest` gives up the protection of the pinned version. Use it to try a release, not as a permanent setting.
+
+See also: [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) · [Security model](../concepts/security.md)
+
+<!-- source: guides/leave-files-out.md -->
+# How to leave files out of the package
+
+This guide is for maintainers of the [sugatoray/aiskills](https://github.com/sugatoray/aiskills) repo: use a `.skillsignore` to keep files, folders or whole skills out of the npm package.
+
+The package is built from the repo's `skills/` folder when it is packed. A `.skillsignore` file, in `skills/` or any folder below it, lists what to leave out, in `.gitignore` syntax.
+
+## Steps
+
+1. Create or edit a `.skillsignore`, for example `skills/.skillsignore`:
+
+   ```gitignore
+   # every tests/ folder, at any depth
+   **/tests/
+   # all .log files except keep.log
+   *.log
+   !keep.log
+   # ignoring a skill's folder drops the whole skill
+   scrolls/wip-skill/
+   ```
+
+2. Build the package contents and look at them:
+
+   ```bash
+   cd src/packages/aiskills
+   npm run vendor
+   ```
+
+   What was left out is listed under `ignored` in `.aiskills/layout.json`.
+
+3. Run the tests, which compare the package with every git-tracked file under `skills/` that no `.skillsignore` excludes, then clean up:
+
+   ```bash
+   npm test
+   npm run clean
+   ```
+
+## Variations
+
+### Rules for one folder
+
+A `.skillsignore` deeper down applies to its own folder and below, after the outer rules. Its `!` rules can re-include files an outer rule left out.
+
+## Troubleshooting
+
+- **`.skillsignore ignores <group>/<skill>/SKILL.md; to drop a skill, ignore the folder (<group>/<skill>/) instead`**: ignoring only a `SKILL.md` would leave a skill without a definition. Ignore the folder.
+- **A pattern with a `/` in the middle doesn't match deeper files**: like `.gitignore`, a `/` in the middle anchors the pattern to the `.skillsignore`'s folder. Write `**/meta/MAINTAINERS.md` for any depth.
+- **A `#` after a pattern**: is part of the pattern. Put comments on their own lines.
+
+See also: [`.skillsignore` reference](../reference/skillsignore.md) · [Files and schemas](../reference/files.md#aiskillslayoutjson)
+
+<!-- source: concepts/how-it-works.md -->
+# How aiskills works
+
+`aiskills` saves the bundled skills to one folder on your machine and asks `npx skills` to install them from there; it never writes into agent folders itself.
+
+![Architecture: the npm package syncs its skills to ~/.config/sugatoray/aiskills (1), aiskills runs npx skills add on that folder (2), and npx skills installs into the agents' skill folders (3); with --route, npx skills also finds and adds skills from the skills.sh registry and GitHub](../images/architecture.svg)
+
+The same, as steps:
+
+1. **Sync.** The npm package carries the skills (one folder per skill), a map of their original folders (`.aiskills/layout.json`) and the repo's `marketplace.json`. `aiskills` copies them to the **install folder**, `~/.config/sugatoray/aiskills` (or `AISKILLS_HOME`), replacing `skills/` each time.
+2. **Add.** It runs `npx -y skills@1.7.6 add <install folder>` with your skills, agents and scope.
+3. **Install.** `npx skills` installs the skills into each agent's folder (`~/.claude/skills/`, `~/.agents/skills/`, or the project's folders with `-p`) and records where each one came from.
+
+With `--route`, step 2 also runs `npx skills find` and `npx skills add <owner/repo@skill>` for skills that aren't bundled.
+
+## Who owns what
+
+| Thing | Owner | `aiskills` |
+| --- | --- | --- |
+| The skills in the package | The package version you installed | Reads |
+| `~/.config/sugatoray/aiskills/` | `aiskills` | Writes; `skills/` is replaced on every sync |
+| Agents' skill folders | `npx skills` | Never touches |
+| The record of installed skills | `npx skills` (`npx skills list --json`) | Reads, to know what it installed |
+
+A skill counts as installed **by `aiskills`** when `npx skills list --json` reports it with `sourceType` `local` and `source` equal to the install folder. That is how a full `aiskills uninstall` removes exactly its own skills and leaves same-named skills from other sources alone.
+
+## What a command does
+
+![Install flow: parse options, sync the install folder, select skills, expand agent patterns, look up external skills (with --route), then npx skills add; a problem in parsing, selection, agents or lookup stops with exit code 1 before anything is installed](../images/install-flow.svg)
+
+`aiskills install`, step by step:
+
+1. Parse the options. `AISKILLS_*` variables give the defaults; options replace them.
+2. Sync the install folder.
+3. Turn `-s` and `-G` (names, aliases, patterns) into exact skill names.
+4. Expand `-a` patterns against the agent list `npx skills` reports.
+5. With `--route`, look up every external name.
+6. Run `npx skills add` for the bundled skills, then once per external skill.
+
+Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stops the command with exit code 1 and installs nothing.
+
+`uninstall` reads `npx skills list --json`, keeps the rows from the install folder (or any source with `--route`), matches `-s`/`-G` against them, and runs `npx skills remove`. The npm install step runs the install steps with no options, only `AISKILLS_*` variables.
+
+## Why it works this way
+
+- **One tool owns the agent folders.** `npx skills` already knows every agent's folder layout and keeps a record. Delegating to it keeps `aiskills` small and gives it new agents for free.
+- **A local folder works offline.** After the npm install, `aiskills install` needs no network except to fetch the `skills` CLI the first time.
+- **No runtime dependencies.** The package is plain Node.js.
+
+## Trade-offs and limits
+
+- **`npx skills` output is mixed in.** `aiskills` lets `npx skills` print to your terminal. Use exit codes and `aiskills installed` to check results.
+- **Two pieces of `npx skills` text are parsed**: the "Valid agents:" list (for `-a` patterns) and `find` results (for `--route`). A new `skills` release could change them, which is one reason the version is pinned.
+- **Updates come with the package.** Skills change when you install a newer `@sugatoray-ai/aiskills`.
+
+See also: [Layouts](layouts.md) · [Security model](security.md) · [Files and schemas](../reference/files.md)
+
+<!-- source: concepts/skill-groups.md -->
+# Skill groups
+
+A skill group is a named set of related skills, taken from the repo's `.claude-plugin/marketplace.json`; `-G` installs or removes a whole group at once.
+
+## Where groups come from
+
+The package bundles the repo's `.claude-plugin/marketplace.json` (the Claude Code plugin marketplace file) and saves it to the install folder. `aiskills` reads it only to group the skills. Nothing is installed as a Claude Code plugin.
+
+| Part | Where it comes from |
+| --- | --- |
+| **Group name** | An entry's `name` under `plugins`, exactly as written, e.g. `scrolls-skills`. |
+| **Skills in the group** | Every skill whose original folder in the repo is under the entry's `source` (relative to `metadata.pluginRoot`, `./skills`). |
+| **Alias** | Not in the file. `aiskills` removes a trailing `-skills`: `scrolls-skills` → `scrolls`. A name without `-skills` is its own alias. |
+| **`all`** | Not in the file. A built-in group with every bundled skill, grouped or not. `-G '*'` is the same. |
+
+Entries whose `source` isn't a local folder (a git URL, say) are skipped, because their skills aren't in the package.
+
+## The groups in this version
+
+| Group | Alias | Skills |
+| --- | --- | --- |
+| `scrolls-skills` | `scrolls` | scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
+| `stata-skills` | `stata` | stata-recipes |
+| `repo-related-skills` | `repo-related` | create-issues-update-pr |
+| `docs-skills` | `docs` | create-lib-docs |
+| `diagrams-skills` | `diagrams` | network-flow |
+| `personas-skills` | `personas` | prodigy |
+| `all` (built in) | | all 13 skills |
+
+`newsletter-ai` is in no group. Install it with `-s newsletter-ai` or `-G all`. `aiskills groups` always shows the list for the version you have.
+
+## How names are matched
+
+- Name or alias, in any letter case: `scrolls-skills`, `scrolls` and `Scrolls` are the same group.
+- Patterns match both the name and the alias: `-G 'd*'` selects `docs-skills` and `diagrams-skills`.
+- A name or pattern that matches no group stops the command and lists the valid ones.
+- `-G` and `-s` add up: you get the union.
+
+## Why membership uses the original folders
+
+The install folder can be [flat or nested](layouts.md). Group membership is worked out from each skill's original folder, recorded in `.aiskills/layout.json`, so a group has the same skills in either layout.
+
+## Adding a group
+
+For maintainers: add a `plugins` entry to the repo's `.claude-plugin/marketplace.json` whose `source` is a folder under `skills/`, and publish a new package version. No code changes.
+
+See also: [`groups`](../reference/cli.md#groups) · [`-G`, `--group`](../reference/cli.md#-g---group---groups) · [1. Install a group](../tutorial/01-install-a-group.md)
+
+<!-- source: concepts/layouts.md -->
+# Layouts: flat and nested
+
+The install folder's `skills/` can be written flat (one folder per skill, the default) or nested (the repo's own folders); agents get the same skills either way.
+
+![Two layouts: --flat writes skills/<skill>/ for every skill; --nested writes the repo's skills/<group>/<skill>/ folders, with group files such as README.md](../images/layouts.svg)
+
+| Layout | `skills/` looks like | Use it when |
+| --- | --- | --- |
+| `flat` (default) | `skills/scrolls-setup/SKILL.md`, `skills/prodigy/SKILL.md`, … | You just want the skills |
+| `nested` | `skills/scrolls/scrolls-setup/SKILL.md`, `skills/scrolls/README.md`, `skills/personas/prodigy/SKILL.md`, … | You browse or edit the skills, or a tool expects the repo's layout |
+
+## How the choice is made
+
+The first of these that is set wins:
+
+1. `--flat` or `--nested` on the command line;
+2. `AISKILLS_LAYOUT` (`flat` or `nested`);
+3. the layout of the last sync, saved as `layout` in `aiskills.json`;
+4. `flat`.
+
+So a choice is remembered until you pass the other flag.
+
+## Why the package ships flat
+
+- `npx skills experimental_sync` finds skills in a `node_modules` package only one level deep, at `skills/<name>/SKILL.md`. Shipping flat makes the package work with it. See [the guide](../guides/use-experimental-sync.md).
+- Each folder is named after the skill's `name:`, so names are unique and easy to find.
+
+## How nested is rebuilt
+
+The package also carries `.aiskills/layout.json` (each skill's original folder, e.g. `scrolls-setup` → `scrolls/scrolls-setup`) and `.aiskills/nested/` (every file outside a skill folder, such as group READMEs and `plugin.json` files). `--nested` puts the skills back in their original folders and adds those files, which gives the repo's `skills/` folder byte for byte, minus anything a `.skillsignore` left out.
+
+npm drops files named `.gitignore` and `.npmignore` from packages, so the package stores them as `_gitignore` and `_npmignore`, and every sync renames them back.
+
+## Trade-offs and limits
+
+- Every sync replaces `skills/` completely. Don't keep your own files there.
+- The layout changes only the install folder. Agent folders get the same skills, named the same way.
+
+See also: [Keep the repo's nested layout](../guides/keep-the-nested-layout.md) · [`--nested`](../reference/cli.md#--nested) · [`AISKILLS_LAYOUT`](../reference/environment.md#aiskills_layout)
+
+<!-- source: concepts/bundled-and-external.md -->
+# Bundled and external skills
+
+Bundled skills ship in this package; external skills come from anywhere else, and `aiskills` manages them only when you add `--route` (or use `aix`).
+
+## The difference
+
+| | Bundled | External |
+| --- | --- | --- |
+| Where it comes from | This package, via `~/.config/sugatoray/aiskills` | The skills.sh registry, GitHub, a URL or a path |
+| Installed by | `npx skills add <install folder> --skill <name>` | `npx skills add <owner/repo@skill>` |
+| Needs `--route` | No | Yes |
+| Shown by `installed` | Yes | Only with `--route` |
+| Removed by a full `uninstall` | Yes | Never; name it with `--route` |
+
+## What `--route` changes
+
+**install.** Each `-s` entry that isn't bundled is handed to `npx skills`:
+
+| `-s` entry | What happens |
+| --- | --- |
+| A bundled name or a pattern | Installed from the install folder, as without `--route`. Patterns only match bundled skills. |
+| A bare name that isn't bundled, e.g. `pdf` | `npx skills find pdf`; installed only if exactly one result is named exactly `pdf`. |
+| `owner/repo@skill` | `npx skills add owner/repo@skill`, no lookup. |
+| `owner/repo`, a URL or a path | `npx skills add <spec>`, which installs the skills found there. |
+
+**uninstall.** Names and patterns also match skills from other sources. `owner/repo@skill` is reduced to `skill`; a bare `owner/repo` is refused because it names no skill. Names that aren't installed are skipped with a warning. A full uninstall still removes only bundled skills.
+
+**installed.** Lists every skill in the scope, with a source column: `bundled`, or the source `npx skills` recorded.
+
+## Why a bare name needs exactly one match
+
+The registry is shared and changes. If two repositories both publish a skill called `pdf`, picking one would be a guess about which code you trust. `aiskills` stops and lists the candidates so you can choose with `owner/repo@skill`. It also ignores results whose `owner/repo@skill` contains anything but letters, digits, `.`, `_` and `-`.
+
+## Trade-offs and limits
+
+- `npx skills remove` removes by name, so `--route uninstall -s pdf` removes `pdf` whichever source it came from.
+- External skills aren't copied into the install folder, and `--purge` doesn't remove them.
+- Lookups need network access to `skills.sh`.
+
+See also: [4. Add external skills](../tutorial/04-add-external-skills.md) · [`--route`](../reference/cli.md#--route) · [Security model](security.md)
+
+<!-- source: concepts/security.md -->
+# Security model
+
+`aiskills` writes only to its install folder, starts only a pinned `npx skills`, and checks anything from the registry before using it; the skills themselves are code your agent may run.
+
+The full policy, including how to report a vulnerability, is in the package's [SECURITY.md](../../../SECURITY.md). This page explains the model.
+
+## What it touches
+
+| What | When |
+| --- | --- |
+| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by the npm install step, `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
+| Agents' skill folders | Only through `npx skills add` / `remove`. |
+| An empty temporary folder | While reading the agent list for `-a` patterns; deleted straight after. |
+| The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub. |
+
+## Protections
+
+Each one is covered by the test suite.
+
+- **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it, and only accepts an exact version, `latest` or `next`.
+- **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
+- **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
+- **Only its own folders are replaced or deleted.** `sync`, `install` and `uninstall --purge` refuse a folder that has other files but no `aiskills.json`. This guards against an `AISKILLS_HOME` pointed at the wrong place.
+- **npm's own variables are removed** before `npx` runs (registry, proxy and certificate settings are kept).
+- **No runtime dependencies.**
+
+## Skills are code
+
+Agent skills contain instructions, and sometimes scripts, that your agent may run with your permissions. Bundled skills come from the [sugatoray/aiskills](https://github.com/sugatoray/aiskills) repo at the version you installed; you can read them in `~/.config/sugatoray/aiskills/skills/`. External skills are third-party code: prefer `owner/repo@skill` from sources you trust.
+
+## Telemetry
+
+`aiskills` sends nothing. The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set; `aiskills` passes both through.
+
+See also: [Errors and exit codes](../reference/errors.md) · [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md)
+
+<!-- source: reference/cli.md -->
+# CLI reference
+
+Every command, alias and option of `aiskills`, `ais` and `aix`; this page is exhaustive.
+
+```text
+aiskills <command> [options] [-- <extra npx skills arguments>]
+```
+
+- **`aiskills`** and **`ais`** are the same command.
+- **`aix`** is `aiskills --route`: `aix i -s pdf` = `aiskills --route install -s pdf`.
+- With no command, `aiskills` runs `install`.
+- `--route`, `--nested` and `--flat` can also go **before** the command: `aiskills --route installed`, `aiskills --nested` (= `install --nested`).
+- Options are checked per command. An option a command doesn't take fails with `option <x> is not valid here`.
+
+## Commands
+
+| Command | Aliases | Does |
+| --- | --- | --- |
+| [`install`](#install) | `i` | Save the skills and run `npx skills add` on them (the default command) |
+| [`uninstall`](#uninstall) | `r`, `rm`, `remove` | Remove skills with `npx skills remove` |
+| [`installed`](#installed) | `ls` | Show installed skills |
+| [`groups`](#groups) | `g` | List the skill groups |
+| [`find`](#find) | `f` | Search the skills registry |
+| [`sync`](#sync) | | Only save or refresh the skills folder |
+| [`list`](#list) | | List the skills in the saved folder, via `npx skills` |
+| [`path`](#path) | `p` | Print the install folder |
+| [`skills`](#skills) | | Pass arguments to `npx skills` |
+| [`help`](#help) | `h`, `-h`, `--help` | Show the help |
+| [`-v`, `--version`](#-v---version) | | Print the version |
+
+`sync`, `skills` and `list` have no one-letter alias on purpose: `s` would be ambiguous, and `l` looks like `ls`.
+
+### `install`
+
+Save the skills to the install folder (see [`sync`](#sync)), then run `npx skills add <install folder>` with the selected skills and agents.
+
+```text
+aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [--nested|--flat] [-- <extra>]
+```
+
+| | |
+| --- | --- |
+| Alias | `i` |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
+| Default | Every skill, `--global`, agents detected by `npx skills` |
+| Exit code | `1` if a name, pattern or lookup fails (nothing is installed); otherwise the exit code of `npx skills add` |
+
+<!-- verify -->
+```bash
+aiskills install
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes
+```
+
+With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up and installed after the bundled ones (`external: <spec>`).
+
+See: [1. Install a group](../tutorial/01-install-a-group.md) · [2. Pick skills and agents](../tutorial/02-pick-skills-and-agents.md)
+
+### `uninstall`
+
+Remove skills with `npx skills remove <names> --yes`.
+
+```text
+aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--route] [--purge] [-f] [-n] [-- <extra>]
+```
+
+| | |
+| --- | --- |
+| Aliases | `r`, `rm`, `remove` |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--route`](#--route), [`--purge`](#--purge), [`-f`](#-f---force), [`-n`](#-n---dry-run), [`--`](#--) |
+| Default | A **full uninstall**: every skill `npx skills list --json` reports as installed from the install folder |
+| Exit code | `1` on a refused name or option; otherwise the exit code of `npx skills remove` (`0` if there was nothing to remove) |
+
+- **Full** (no `-s`/`-G`): removes exactly the skills recorded as installed from the install folder, even with `--route`. If `npx skills list` can't be read, it falls back to every skill in the folder, with a warning.
+- **Partial** (`-s`/`-G`): names this package doesn't provide are refused, unless `--route` or `-f`. Skills reached through a pattern or group are removed only if installed.
+- **`-a`** removes the skills from those agents only.
+- The skill files stay in the install folder unless `--purge`.
+
+<!-- verify: list=prodigy,stata-recipes -->
+```bash
+aiskills uninstall -G stata -n
+```
+
+```text
+[aiskills] [dry-run] would remove (global): stata-recipes
+[aiskills] [dry-run] npx -y skills@1.7.6 remove stata-recipes --global --yes
+```
+
+See: [5. Uninstall](../tutorial/05-uninstall.md) · [Remove everything](../guides/remove-everything.md)
+
+### `installed`
+
+List the skills `npx skills` reports as installed from the install folder, one per line: name, group, agents.
+
+```text
+aiskills installed [-g|-p] [--route]
+```
+
+| | |
+| --- | --- |
+| Alias | `ls` |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`--route`](#--route) (all skills, with a source column) |
+| Exit code | `1` if `npx skills list` can't be read |
+
+<!-- verify: list=scrolls-setup,newsletter-ai -->
+```bash
+aiskills ls
+```
+
+```text
+newsletter-ai              -                      Claude Code
+scrolls-setup              scrolls-skills         Claude Code
+```
+
+A `-` in the group column means the skill belongs to no group.
+
+### `groups`
+
+List the skill groups from the bundled `marketplace.json`, with their aliases and skills, and the skills in no group. Syncs the install folder first, quietly.
+
+```text
+aiskills groups [--json]
+```
+
+| | |
+| --- | --- |
+| Alias | `g` |
+| Options | [`--json`](#--json) |
+
+Output: see [1. Install a group](../tutorial/01-install-a-group.md#see-the-groups); JSON shape: [Files and schemas](files.md#aiskills-groups---json).
+
+### `find`
+
+Search the skills registry: `aiskills find <query>` runs `npx skills find <query>`. Every argument is passed on.
+
+| | |
+| --- | --- |
+| Alias | `f` |
+| Exit code | The exit code of `npx skills find` |
+
+### `sync`
+
+Save or refresh `<install folder>/skills/` from the package, without running `npx skills add`. Also writes `marketplace.json`, `layout.json` and `aiskills.json` next to it.
+
+```text
+aiskills sync [--nested|--flat]
+```
+
+| | |
+| --- | --- |
+| Options | [`--nested`](#--nested), [`--flat`](#--flat) |
+
+<!-- verify -->
+```bash
+aiskills sync
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+```
+
+### `list`
+
+Sync, then run `npx skills add <install folder> --list`, which lists the skills there without installing them. Takes no options.
+
+<!-- verify -->
+```bash
+aiskills list
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --list
+```
+
+### `path`
+
+Print the install folder: `~/.config/sugatoray/aiskills`, or `AISKILLS_HOME` if set. Changes nothing.
+
+| | |
+| --- | --- |
+| Alias | `p` |
+
+<!-- verify -->
+```bash
+aiskills p
+```
+
+```text
+~/.config/sugatoray/aiskills
+```
+
+### `skills`
+
+Run `npx -y skills@<pinned version> <args>` with every argument unchanged, except that `:root` is replaced by the install folder. Exit code: that of `npx skills`.
+
+<!-- verify -->
+```bash
+aiskills skills remove prodigy -a codex -g -y
+```
+
+```text
+[aiskills] running: npx -y skills@1.7.6 remove prodigy -a codex -g -y
+```
+
+See: [Run any `npx skills` command](../guides/run-npx-skills-directly.md)
+
+### `help`
+
+Print the help to stdout. Aliases: `h`, `-h`, `--help`. An unknown command prints `unknown command: <name>` and the help to stderr, and exits with `1`.
+
+<!-- verify -->
+```bash
+aiskills --help
+```
+
+```text
+aiskills 0.2.0 — Sugato Ray's agent skills
+
+Usage: aiskills <command> [options]
+       ais <command> [options]     (same as aiskills)
+       aix <command> [options]     (same as aiskills --route)
+
+Commands:
+  install, i     Save skills to ~/.config/sugatoray/aiskills/skills and run 'npx skills add' on it (default)
+  uninstall, r   Remove skills installed from ~/.config/sugatoray/aiskills via 'npx skills remove' (also: rm, remove)
+  installed, ls  Show skills currently installed from ~/.config/sugatoray/aiskills
+  groups, g      List skill groups (from .claude-plugin/marketplace.json) and their skills
+  sync           Only save/refresh the skills folder; do not run 'npx skills add'
+  list           List the skills available in the saved folder
+  path, p        Print the folder that holds skills/
+  find, f <q>    Search the skills registry (= npx skills find <query>)
+  skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ~/.config/sugatoray/aiskills
+  help, h        Show this help
+
+Scope/selection options (install, uninstall, installed):
+  -g, --global           User-level (default)
+  -p, --project          Current project instead of user-level
+  -a, --agent <names>    Comma-separated agents (e.g. claude-code,codex); default: auto-detect
+  -s, --skill <names>    Comma-separated skill names; default: all skills from this package
+  -G, --group <names>    Comma-separated skill groups (e.g. scrolls-skills or just scrolls;
+                         'all' = everything). Combines with -s. See 'aiskills groups'.
+  -s/-G/-a may be repeated; values accumulate.
+  -s/-G/-a accept glob patterns: * (any text), ? (one character), [abc] / [a-z] / [!a]
+  (one of / range / not). Matching ignores case. A pattern that matches nothing is an
+  error. Quote patterns so your shell doesn't expand them: -s 'scrolls-*'.
+
+Routing (install, uninstall, installed; may also go before the command):
+      --route            Hand skills that are NOT bundled to 'npx skills'.
+                         The 'aix' command is 'aiskills --route' (e.g. 'aix i -s pdf'):
+                           install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
+                                      -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
+                           uninstall: -s <name|pattern>     -> also matches skills from other sources
+                           installed: lists every installed skill with its source
+
+Layout of ~/.config/sugatoray/aiskills/skills (install, sync; may also go before the command):
+      --flat             skills/<skill>/...          one folder per skill, as the npm package ships it
+      --nested           skills/<group>/<skill>/...  the repo's original layout, incl. group READMEs etc.
+                         The choice is remembered for later commands; default: flat. Either way,
+                         'npx skills add' installs the same skills.
+
+install only:
+      --copy             Copy files into agent dirs instead of symlinking
+
+uninstall only:
+      --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
+  -f, --force            Allow -s names that this package does not provide
+  -n, --dry-run          Print what would run; change nothing
+
+Anything after '--' is appended to the underlying 'npx skills' command.
+
+Examples:
+  aiskills groups                             # what groups exist
+  aiskills install --group scrolls --global --agent claude-code
+  aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+  aiskills uninstall                          # remove every skill this package installed
+  aiskills uninstall -G stata                 # remove one group
+  aiskills install -G 'scroll*,d*' -a 'claude*,codex'
+  aiskills install -s 'scrolls-*' -a 'cursor,qoder*'
+  aiskills uninstall -s 'scrolls-[hu]*'       # scrolls-hide, -unhide, -update
+  aiskills --route install -s scrolls-setup,pdf -a claude-code      # bundled + registry lookup
+  aiskills install --route -s anthropics/skills@pdf -g              # external, pinned
+  aiskills --route uninstall -s pdf                                 # remove an external skill
+  aiskills --route installed                                        # bundled + external
+  aiskills --nested                                                 # install, keeping the repo's nested folders
+  aiskills uninstall -s scrolls-hide,prodigy  # remove just these
+  aiskills uninstall -a codex                 # unlink from Codex only
+  aiskills uninstall --purge                  # remove all, then delete ~/.config/sugatoray/aiskills
+  aiskills skills list -g                     # = npx skills list -g
+  aiskills skills add :root -s prodigy -g -y  # = npx skills add ~/.config/sugatoray/aiskills -s prodigy -g -y
+
+Environment:
+  AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
+  AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
+                         Defaults for the options above (also used by the npm postinstall)
+  AISKILLS_ROUTE=1              Same as --route
+  AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_SKIP_POSTINSTALL=1   Skip the npm postinstall hook entirely
+  AISKILLS_SKIP_SKILLS_ADD=1    Postinstall copies files but skips 'npx skills add'
+```
+
+### `-v`, `--version`
+
+Print the package version.
+
+<!-- verify -->
+```bash
+ais -v
+```
+
+```text
+0.2.0
+```
+
+## Options
+
+Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patterns.md), and accumulate when the option is repeated: `-s a,b` = `-s a -s b`. Options on the command line replace the matching [`AISKILLS_*`](environment.md) default.
+
+| Option | install | uninstall | installed | groups | sync |
+| --- | --- | --- | --- | --- | --- |
+| `-g`, `-p` | ✓ | ✓ | ✓ | | |
+| `-a`, `-s`, `-G` | ✓ | ✓ | | | |
+| `--route` | ✓ | ✓ | ✓ | | |
+| `--nested`, `--flat` | ✓ | | | | ✓ |
+| `--copy` | ✓ | | | | |
+| `--purge`, `-f`, `-n` | | ✓ | | | |
+| `--json` | | | | ✓ | |
+| `--` | ✓ | ✓ | | | |
+
+### `-g`, `--global`
+
+User-level scope: skills apply in every project. The default. Env: [`AISKILLS_SCOPE`](environment.md#aiskills_scope).
+
+### `-p`, `--project`
+
+Project scope: install, list or remove in the current folder. `npx skills` runs from the current folder without `--global`. Env: `AISKILLS_SCOPE=project`. See [3. Install into a project](../tutorial/03-install-into-a-project.md).
+
+### `-a`, `--agent`
+
+Agents to install to or remove from, e.g. `claude-code,codex`. Default: the agents `npx skills` detects (install) or every agent (uninstall). Plain names are passed to `npx skills`, which checks them. Patterns (`'claude*'`) are expanded against the agent list `npx skills` reports, and the result is printed as `agents: ...`. `-a '*'` is passed on as is, meaning all agents. Env: [`AISKILLS_AGENTS`](environment.md#aiskills_agents).
+
+### `-s`, `--skill`
+
+Skills, by name or pattern. Default: every skill. `-s '*'` is the same as no `-s`. Install matches against the bundled skills; uninstall also against the skills installed from the install folder. A name that isn't bundled is refused unless [`--route`](#--route) (or `-f` on uninstall). With `--route`, `-s` also takes `owner/repo@skill`, `owner/repo`, URLs and paths. Env: [`AISKILLS_SKILLS`](environment.md#aiskills_skills).
+
+### `-G`, `--group`, `--groups`
+
+Skill groups, by name (`scrolls-skills`), alias (`scrolls`), pattern, or `all`. Combines with `-s` (union). See [Skill groups](../concepts/skill-groups.md). Env: [`AISKILLS_GROUPS`](environment.md#aiskills_groups).
+
+### `--route`
+
+Hand skills that aren't bundled to `npx skills`: look up bare names with `npx skills find` (install only on a unique exact match), pass `owner/repo@skill` and other sources to `npx skills add`, let uninstall match any source, and make `installed` list every skill with its source. The `aix` command always sets it. Env: [`AISKILLS_ROUTE`](environment.md#aiskills_route). See [Bundled and external skills](../concepts/bundled-and-external.md).
+
+### `--nested`
+
+Write `<install folder>/skills/` in the repo's nested layout. Remembered for later commands. Env: [`AISKILLS_LAYOUT`](environment.md#aiskills_layout). See [Layouts](../concepts/layouts.md).
+
+### `--flat`
+
+Write `<install folder>/skills/` flat, one folder per skill (the default). Remembered for later commands.
+
+### `--copy`
+
+Pass `--copy` to `npx skills add`: copy the files into agent folders instead of symlinking them. Env: [`AISKILLS_COPY`](environment.md#aiskills_copy).
+
+### `--purge`
+
+After a full uninstall, delete the install folder. Refused with `-s`/`-G`, and refused for a folder that isn't an aiskills folder (checked before anything is removed).
+
+### `-f`, `--force`
+
+On uninstall, pass `-s` names to `npx skills remove` even if this package doesn't provide them.
+
+### `-n`, `--dry-run`
+
+On uninstall, print what would be removed and the exact `npx skills` command, and change nothing.
+
+### `--json`
+
+On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json).
+
+### `--`
+
+Everything after `--` is appended to the `npx skills add` (install) or `npx skills remove` (uninstall) command. See [Run any `npx skills` command](../guides/run-npx-skills-directly.md#extra-flags-on-install-and-uninstall).
+
+See also: [Environment variables](environment.md) · [Errors and exit codes](errors.md) · [Patterns](patterns.md)
+
+<!-- source: reference/patterns.md -->
+# Patterns reference
+
+The glob syntax that `-s`, `-G` and `-a` accept (and `AISKILLS_SKILLS`, `AISKILLS_GROUPS`, `AISKILLS_AGENTS`), on install and uninstall; this page is exhaustive.
+
+## Syntax
+
+| Pattern | Matches | Example |
+| --- | --- | --- |
+| `*` | Any text, including none | `scrolls-*` |
+| `?` | Exactly one character | `?????-recipes` |
+| `[abc]` | One of the listed characters | `scrolls-[hu]*` → scrolls-help, -hide, -unhide, -update |
+| `[a-z]` | One character in the range | `scrolls-[r-u]*` |
+| `[!abc]`, `[^abc]` | One character **not** listed | `scrolls-[!hu]*` → scrolls-remove, -restore, -setup |
+
+Any other character matches itself. An entry with none of `*`, `?` or `[` is a plain name.
+
+## Rules
+
+- **Case is ignored**, for patterns and plain names alike.
+- **The whole name must match.** `scroll*` matches `scrolls-skills`; `croll` matches nothing.
+- **Mix freely.** One comma-separated list can hold names and patterns: `-s 'scrolls-*,prodigy'`.
+- **A pattern that matches nothing is an error**, before anything changes. The message lists what is available.
+- **Quote patterns** (`'scrolls-*'`), or your shell may expand them into file names.
+
+<!-- verify -->
+```bash
+aiskills install -s '?????-recipes' -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: stata-recipes
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill stata-recipes --agent claude-code --yes
+```
+
+## What each option matches against
+
+| Option | Matched against |
+| --- | --- |
+| `-s`, `--skill` | **install:** the bundled skills. **uninstall:** the bundled skills plus the skills installed from the install folder; with `--route`, every installed skill. |
+| `-G`, `--group` | Group names **and** aliases. `all` and `*` mean every bundled skill. |
+| `-a`, `--agent` | The agent ids `npx skills` accepts (`claude-code`, `codex`, `cursor`, …), read from `npx skills` itself. |
+
+## Special cases
+
+### `-s '*'`
+
+Every skill, the same as no `-s`.
+
+### `-a '*'`
+
+Passed to `npx skills` unchanged; it means all agents.
+
+### Plain agent names
+
+Not checked by `aiskills`; `npx skills` checks them. Only patterns are expanded, and the expansion is printed as `[aiskills] agents: ...`.
+
+### Uninstall with a pattern or a group
+
+Only skills that are actually installed are removed. Plain names are always passed on with `-f`.
+
+### `--route` and patterns
+
+Patterns match only bundled (or, on uninstall, installed) skills. The registry can't be searched by pattern: use `aiskills find <query>`.
+
+See also: [CLI reference](cli.md) · [2. Pick skills and agents](../tutorial/02-pick-skills-and-agents.md)
+
+<!-- source: reference/environment.md -->
+# Environment variables reference
+
+Every environment variable `aiskills` and its npm install step read; this page is exhaustive.
+
+Variables give defaults. An option on the command line replaces the matching variable. The npm install step (`postinstall`) takes no options, so it reads only these. Values that are lists are comma-separated, and accept [patterns](patterns.md). "Truthy" means `1`, `true` or `yes`, in any case.
+
+<!-- verify -->
+```bash
+AISKILLS_LAYOUT=nested aiskills sync
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (nested layout)
+```
+
+## Choosing skills and agents
+
+### `AISKILLS_SKILLS`
+
+Default for `-s`: skill names or patterns. Unset: every skill. In the install step, a name that isn't bundled is an error unless [`AISKILLS_ROUTE`](#aiskills_route) is truthy.
+
+### `AISKILLS_GROUPS`
+
+Default for `-G`: group names, aliases or patterns. Combined with `AISKILLS_SKILLS` (union).
+
+### `AISKILLS_AGENTS`
+
+Default for `-a`: agent names or patterns. Unset: the agents `npx skills` detects.
+
+### `AISKILLS_SCOPE`
+
+`project` = `-p`; anything else, or unset, = `-g` (global).
+
+### `AISKILLS_COPY`
+
+Truthy = `--copy`.
+
+### `AISKILLS_ROUTE`
+
+Truthy = `--route`. The `aix` command sets it. In the install step, lets names in `AISKILLS_SKILLS` that aren't bundled be looked up.
+
+### `AISKILLS_LAYOUT`
+
+`flat` or `nested`, the same as `--flat` / `--nested`. A command-line flag wins over it; it wins over the remembered layout. Any other value fails with `unknown layout`.
+
+## Where things go
+
+### `AISKILLS_HOME`
+
+The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is resolved from the current folder. If the folder exists, it must be empty or an aiskills folder (it has `aiskills.json`); otherwise `aiskills` refuses to replace or delete it.
+
+### `AISKILLS_SKILLS_VERSION`
+
+The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest` or `next`; anything else is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
+
+## The npm install step
+
+### `AISKILLS_SKIP_POSTINSTALL`
+
+Truthy: the install step does nothing. Same effect as `npm install --ignore-scripts` for this package.
+
+### `AISKILLS_SKIP_SKILLS_ADD`
+
+Truthy: the install step saves the skills to the install folder but doesn't run `npx skills add`.
+
+### `CI`
+
+Truthy (most CI systems set `CI=true`): same as `AISKILLS_SKIP_SKILLS_ADD`. Only the install step reads it; `aiskills install` in CI still installs.
+
+### `INIT_CWD`
+
+Set by npm to the folder `npm install` was run from. With `AISKILLS_SCOPE=project`, the install step installs into that folder.
+
+## Read by `npx skills`, passed through
+
+`aiskills` passes every variable to `npx` except npm's own `npm_*` variables (registry, proxy and certificate settings among them are kept). These are worth knowing:
+
+| Variable | Effect in `npx skills` |
+| --- | --- |
+| `DISABLE_TELEMETRY`, `DO_NOT_TRACK` | Turn off its anonymous usage data to `skills.sh` |
+
+See also: [Configure the npm install step](../guides/configure-npm-install.md) · [CLI reference](cli.md)
+
+<!-- source: reference/files.md -->
+# Files and schemas reference
+
+What `aiskills` writes and where, and the exact fields of every file and JSON output it produces or reads; this page is exhaustive.
+
+## The install folder
+
+`~/.config/sugatoray/aiskills/` (or [`AISKILLS_HOME`](environment.md#aiskills_home)), written by every sync (`install`, `sync`, `list`, `groups` and the npm install step):
+
+```text
+~/.config/sugatoray/aiskills/
+├── aiskills.json                     marks the folder as an aiskills folder; last sync
+├── skills/                           the skills, flat or nested; replaced on every sync
+├── .aiskills/layout.json             each skill's original folder
+└── .claude-plugin/marketplace.json   the repo's marketplace file, used for groups
+```
+
+`skills/` is built in a temporary `.skills.tmp-<pid>` folder next to it, then swapped in.
+
+## `aiskills.json`
+
+```json
+{
+  "package": "@sugatoray-ai/aiskills",
+  "version": "0.2.0",
+  "layout": "flat",
+  "installedAt": "2026-11-06T10:26:01.152Z",
+  "skills": "/home/me/.config/sugatoray/aiskills/skills"
+}
+```
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `package` | string | Always `@sugatoray-ai/aiskills`. Its presence is what makes a folder safe for `aiskills` to replace or delete. |
+| `version` | string | The package version that wrote the folder. |
+| `layout` | `"flat"` \| `"nested"` | The layout of `skills/`, reused by the next sync unless overridden. |
+| `installedAt` | string (ISO 8601) | When the folder was last synced. |
+| `skills` | string (absolute path) | The `skills/` folder. |
+
+## `.aiskills/layout.json`
+
+Written when the package is built, and copied to the install folder.
+
+```json
+{
+  "format": 1,
+  "description": "skills/ is flat (skills/<name>/). …",
+  "skills": {
+    "create-lib-docs": "docs/create-lib-docs",
+    "scrolls-setup": "scrolls/scrolls-setup"
+  },
+  "extras": ["scrolls/README.md", "scrolls/.claude-plugin/plugin.json"],
+  "ignored": []
+}
+```
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `format` | number | Version of this file's shape; currently `1`. |
+| `description` | string | A note for people reading the file. |
+| `skills` | object: skill name → string | Each skill's original folder, relative to the repo's `skills/`. Used for `--nested` and for groups. |
+| `extras` | string[] | Files outside any skill folder (READMEs, `plugin.json`, `meta/`), stored in the package under `.aiskills/nested/` at these paths. |
+| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. |
+
+## The package
+
+```text
+@sugatoray-ai/aiskills/
+├── bin/aiskills.mjs, bin/aix.mjs     the commands (aiskills and ais share one file)
+├── src/scripts/                      cli.mjs, installer.mjs, postinstall.mjs
+├── skills/<skill>/                   the skills, flat
+├── .aiskills/layout.json, .aiskills/nested/
+├── .claude-plugin/marketplace.json
+└── README.md, CHANGELOG.md, SECURITY.md, LICENSE, package.json
+```
+
+Files named `.gitignore` and `.npmignore` inside the skills are stored as `_gitignore` and `_npmignore`, because npm drops the real names; every sync renames them back. The package has no JavaScript API: only the commands are public.
+
+## `aiskills groups --json`
+
+```json
+{
+  "groups": [
+    {
+      "name": "scrolls-skills",
+      "alias": "scrolls",
+      "description": "Scrolls: a git-native markdown system …",
+      "skills": ["scrolls-help", "scrolls-hide", "…"]
+    }
+  ],
+  "ungrouped": ["newsletter-ai"]
+}
+```
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `groups[].name` | string | The group name from `marketplace.json`. |
+| `groups[].alias` | string | The name without a trailing `-skills`. |
+| `groups[].description` | string | From `marketplace.json`; may be empty. |
+| `groups[].skills` | string[] | Skill names, sorted. |
+| `ungrouped` | string[] | Bundled skills in no group, sorted. |
+
+## `npx skills list --json` rows
+
+`aiskills` reads these (from `npx skills list --json [--global]`) to know what is installed. It never writes them. Fields as reported by `skills@1.7.6`:
+
+| Field | Type | Used for |
+| --- | --- | --- |
+| `name` | string | The skill name. |
+| `source` | string | Where it was installed from: a folder path, or `owner/repo`. |
+| `sourceType` | string | `local` for a folder, `github` for GitHub. |
+| `scope` | string | `global` or `project`. |
+| `agents` | string[] | Agents it's installed for, as display names such as `Claude Code` (shown by `installed`). |
+| `path`, `sourceUrl`, `status` | string | Also present in `skills@1.7.6`; not used by `aiskills`. |
+
+A row is **from this package** when `sourceType` is `local` and `source` is the install folder.
+
+## Written by `npx skills`
+
+The agents' skill folders (`~/.claude/skills/`, `~/.agents/skills/`, …, or the project's with `-p`) and `npx skills`' own records, such as a project's `skills-lock.json`. `aiskills` doesn't touch them directly.
+
+See also: [How aiskills works](../concepts/how-it-works.md) · [Layouts](../concepts/layouts.md)
+
+<!-- source: reference/skillsignore.md -->
+# `.skillsignore` reference
+
+The rule syntax of `.skillsignore` files, which leave files, folders or whole skills out of the package when it is built; this page is exhaustive.
+
+A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users.
+
+## Syntax
+
+The syntax is a subset of `.gitignore`:
+
+| Line | Meaning |
+| --- | --- |
+| blank, or starting with `#` | Skipped. A `#` later in a line is part of the pattern. |
+| `\#name`, `\!name` | A literal leading `#` or `!`. |
+| `name` | A file or folder with that name, at any depth. |
+| `/name`, `a/name` | A leading or middle `/` anchors the pattern to the `.skillsignore`'s folder. |
+| `name/` | Folders only. |
+| `*`, `?`, `[abc]`, `[!abc]` | Within one path segment. |
+| `**` | Across segments: `**/x`, `x/**`, `a/**/b`. |
+| `!pattern` | Re-include something an earlier rule excluded. |
+
+## Rules
+
+- **The last matching rule wins.** Rules in a deeper `.skillsignore` come after the outer ones.
+- **An ignored folder is never entered**, so a file inside it can't be re-included (as in git).
+- **`.skillsignore` files never ship.**
+- **Ignoring only a `SKILL.md` is refused.** Ignore the skill's folder to drop the skill.
+- **What was left out** is listed under `ignored` in [`.aiskills/layout.json`](files.md#aiskillslayoutjson).
+
+## Example
+
+```gitignore
+# every tests/ folder, at any depth
+**/tests/
+# a "/" in the middle anchors to this folder, so use **/ for any depth
+**/meta/MAINTAINERS.md
+# all .log files except keep.log
+*.log
+!keep.log
+# ignoring a skill's folder drops the whole skill
+scrolls/wip-skill/
+```
+
+See also: [Leave files out of the package](../guides/leave-files-out.md) · [Errors](errors.md#packaging-errors-maintainers)
+
+<!-- source: reference/errors.md -->
+# Errors and exit codes reference
+
+Every error and warning `aiskills` prints, with its cause and fix, and what each exit code means; this page is exhaustive.
+
+Errors and warnings go to stderr and start with `[aiskills]`. Parts in `<angle brackets>` vary.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success. `uninstall` also exits `0` when there was nothing to remove. |
+| `1` | `aiskills` stopped with one of the errors below, or `installed` couldn't read `npx skills list`. No skill was installed or removed. |
+| any other | The exit code of the `npx skills` command it ran, passed through. |
+
+The npm install step always exits `0`, so that `npm install` never fails because of it. Its problems are printed as [warnings](#install-step-warnings).
+
+<!-- verify -->
+```bash
+aiskills install --purge
+```
+
+```text
+[aiskills] option --purge is not valid here
+```
+
+## Options and commands
+
+### Option not valid here
+
+```text
+[aiskills] option <option> is not valid here
+```
+
+**Cause:** the option exists, but not for this command, e.g. `--purge` on `install`. **Fix:** see which options each command takes in the [CLI reference](cli.md#options).
+
+### Unknown option
+
+```text
+[aiskills] unknown option: <option>
+```
+
+**Cause:** a typo, or an option of `npx skills` given directly. **Fix:** check `aiskills --help`; pass `npx skills` options after `--`.
+
+### Option needs a value
+
+```text
+[aiskills] <option> needs a value
+```
+
+**Cause:** `-a`, `-s` or `-G` is the last argument. **Fix:** add the value: `-s scrolls-setup`.
+
+### Unknown command
+
+```text
+unknown command: <name>
+```
+
+**Cause:** not one of the [commands](cli.md#commands). The help follows on stderr. **Fix:** check the spelling; `aiskills help` lists them.
+
+## Choosing skills, groups and agents
+
+### Not provided by this package
+
+```text
+[aiskills] not provided by this package: <names>
+  available: <bundled skills>
+  add --route to look them up with 'npx skills' instead
+```
+
+**Cause:** `install -s` names a skill that isn't bundled. **Fix:** check the spelling against `available`, or add `--route` (or use `aix`) for an external skill. On `uninstall` the last line reads `use --route to also match skills installed from other sources, or -f/--force`.
+
+### No skill matches
+
+```text
+[aiskills] no skill matches: <patterns>
+  available: <skills>
+```
+
+**Cause:** an `-s` pattern matched no skill. **Fix:** adjust the pattern; patterns match the whole name, ignoring case.
+
+### No group matches
+
+```text
+[aiskills] no group matches: <names>
+  available: <group (alias), …>, all
+  see 'aiskills groups'
+```
+
+**Cause:** a `-G` name, alias or pattern matched no group. **Fix:** pick one from `available`.
+
+### The selected groups contain no skills
+
+```text
+[aiskills] the selected group(s) contain no skills
+```
+
+**Cause:** the `-G` groups exist but have no bundled skills. **Fix:** choose other groups; `aiskills groups` shows each group's skills.
+
+### No marketplace.json
+
+```text
+[aiskills] no .claude-plugin/marketplace.json in <install folder>; run 'aiskills sync' first
+```
+
+**Cause:** `-G` was used but the install folder has no `marketplace.json`, e.g. it was synced by an older version. **Fix:** `aiskills sync`.
+
+### No agent matches
+
+```text
+[aiskills] no agent matches: <patterns>
+  valid agents: <agents>
+```
+
+**Cause:** an `-a` pattern matched none of the agents `npx skills` supports. **Fix:** adjust the pattern, or use names from `valid agents`.
+
+### Could not read the agent list
+
+```text
+[aiskills] could not read the agent list from 'npx skills'
+```
+
+**Cause:** an `-a` pattern needs the agent list, and `npx skills` didn't print it (no network for the first download, or a `skills` version that words it differently). **Fix:** pass plain agent names instead of a pattern, or go back to the pinned `skills` version.
+
+## Uninstall
+
+### Purge only with a full uninstall
+
+```text
+[aiskills] --purge only applies to a full uninstall (drop -s/-G)
+```
+
+**Cause:** `--purge` with `-s` or `-G`. **Fix:** remove the skills first, then run `aiskills uninstall --purge` on its own.
+
+### Names a source, not a skill
+
+```text
+[aiskills] '<entry>' names a source, not a skill; use -s <skill> or <owner/repo@skill>
+```
+
+**Cause:** `--route uninstall -s owner/repo`: a repository isn't a skill name. **Fix:** name the skill, `-s pdf` or `-s owner/repo@pdf`.
+
+### Not installed, skipping
+
+```text
+[aiskills] not installed (<scope>), skipping: <names>
+```
+
+**Warning.** **Cause:** with `--route`, these names aren't installed in this scope. **Fix:** none needed; check `-g`/`-p` if you expected them.
+
+### Could not read `npx skills list` (uninstall)
+
+```text
+[aiskills] could not read 'npx skills list'; falling back to the skills found in <install folder>
+```
+
+**Warning.** **Cause:** `npx skills list --json` failed during a full uninstall, so `aiskills` removes every skill name in its folder instead. **Fix:** usually none; check network access if it repeats.
+
+### Could not read `npx skills list` (installed)
+
+```text
+[aiskills] could not read 'npx skills list'
+```
+
+**Cause:** `installed` couldn't run or parse `npx skills list --json`; exit code `1`. **Fix:** run `aiskills skills list -g` to see the underlying error.
+
+## External skills (`--route`)
+
+### Matches several skills
+
+```text
+[aiskills] '<name>' matches several skills; pick one with -s <owner/repo@skill>:
+    <owner/repo@name>  (<installs>)
+    …
+```
+
+**Cause:** more than one registry result has exactly this name. `aiskills` never picks. **Fix:** choose one and pass it as `-s owner/repo@name`.
+
+### No skill named exactly
+
+```text
+[aiskills] no skill named exactly '<name>'; closest results:
+    <owner/repo@skill>  (<installs>)
+```
+
+**Cause:** the registry has similar skills but none with this exact name. **Fix:** use one of the listed names, or `aiskills find <query>` to search.
+
+### No skill found
+
+```text
+[aiskills] no skill named '<name>' found by 'npx skills find'
+```
+
+**Cause:** the registry returned nothing (or there's no network access to `skills.sh`). **Fix:** check the name and network, or give the source as `owner/repo@skill`.
+
+### Unsafe registry results ignored
+
+```text
+[aiskills] ignored <n> registry result(s) with unsafe characters: "<spec>", …
+```
+
+**Warning.** **Cause:** results whose `owner/repo@skill` has characters other than letters, digits, `.`, `_` and `-` are never used. **Fix:** none needed. If the skill you want was among them, check its source and pass it yourself.
+
+## Files and folders
+
+### Not an aiskills folder
+
+```text
+[aiskills] <folder> is not an aiskills folder (it has other files but no aiskills.json), so it won't be replaced or deleted.
+  Point AISKILLS_HOME at a new or empty folder instead.
+```
+
+**Cause:** the install folder (usually from `AISKILLS_HOME`) already holds files that `aiskills` didn't write. **Fix:** point `AISKILLS_HOME` at a new or empty folder, or unset it.
+
+### Unknown layout
+
+```text
+[aiskills] unknown layout '<value>' (use flat or nested)
+```
+
+**Cause:** `AISKILLS_LAYOUT`, or the `layout` in `aiskills.json`, isn't `flat` or `nested`. **Fix:** set `AISKILLS_LAYOUT=flat` or `nested`, or run `aiskills sync --flat`.
+
+### No vendored skills folder
+
+```text
+[aiskills] no vendored skills folder at <package>/skills
+```
+
+**Cause:** the package has no `skills/`, which happens when running from a git checkout of the repo. **Fix:** install the published package, or run `npm run vendor` in the checkout.
+
+### Nested layout unavailable
+
+```text
+[aiskills] this package has no .aiskills/layout.json, so --nested can't rebuild the nested layout
+```
+
+**Cause:** the package was built without `layout.json`. **Fix:** use `--flat`, or reinstall the published package.
+
+## Running `npx skills`
+
+### Bad `AISKILLS_SKILLS_VERSION`
+
+```text
+[aiskills] AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '<value>'
+```
+
+**Cause:** ranges, tags other than `latest`/`next`, and other text are refused. **Fix:** use an exact version, or unset it for the pinned one.
+
+### Shell characters on Windows
+
+```text
+[aiskills] refusing to pass shell characters to cmd.exe: <arguments>
+```
+
+**Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. **Fix:** remove those characters; skill names and specs never need them.
+
+## Install step warnings
+
+The npm install step prints these and still lets `npm install` succeed.
+
+### Unknown skills in `AISKILLS_SKILLS`
+
+```text
+[aiskills] postinstall did not complete: unknown skill(s) in AISKILLS_SKILLS: <names> (set AISKILLS_ROUTE=1 to look them up)
+[aiskills] run 'npx aiskills install' to retry.
+```
+
+**Cause:** a name in `AISKILLS_SKILLS` isn't bundled. **Fix:** fix the name, or set `AISKILLS_ROUTE=1`.
+
+### Install step didn't complete
+
+```text
+[aiskills] postinstall did not complete: <error>
+[aiskills] run 'npx aiskills install' to retry.
+```
+
+**Cause:** any of the errors on this page, raised during the install step. **Fix:** run `aiskills install` with the same choices to see and fix it.
+
+### `npx skills add` failed
+
+```text
+[aiskills] 'npx skills add' exited with <code>. Skills are saved in <install folder>/skills;
+[aiskills] register them later with:  npx skills add <install folder> --global
+```
+
+**Cause:** `npx skills add` failed (often no network access). The skills are on disk. **Fix:** run `aiskills install` when it can reach the registry.
+
+## Packaging errors (maintainers)
+
+These come from `npm pack` / `npm run vendor`, when the package is built from the repo.
+
+### Repo not found
+
+```text
+no ancestor of <folder> contains skills/ and .claude-plugin/marketplace.json
+```
+
+**Fix:** build from inside the repo, where `skills/` and `.claude-plugin/marketplace.json` are above the package folder.
+
+### `skills/` not found
+
+```text
+<repo>/skills not found
+```
+
+**Fix:** the repo's `skills/` folder is missing; restore it.
+
+### SKILL.md ignored
+
+```text
+.skillsignore ignores <group>/<skill>/SKILL.md; to drop a skill, ignore the folder (<group>/<skill>/) instead
+```
+
+**Fix:** ignore the skill's folder, not only its `SKILL.md`. See [`.skillsignore`](skillsignore.md).
+
+### Skill directly in `skills/`
+
+```text
+<repo>/skills/SKILL.md: a skill can't sit directly in skills/
+```
+
+**Fix:** move the skill into its own folder.
+
+### Skill inside a skill
+
+```text
+skills inside other skills aren't supported: <folders>
+```
+
+**Fix:** move the inner skill out to its own folder.
+
+### Unsafe skill name
+
+```text
+skills/<folder>: skill name '<name>' can't be used as a folder name
+```
+
+**Fix:** use only letters, digits, `.`, `_` and `-` in the `name:`.
+
+### Duplicate skill name
+
+```text
+two skills are both named '<name>': skills/<folder> and skills/<folder>
+```
+
+**Fix:** give one of them another `name:`.
+
+See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md) · [FAQ and troubleshooting](../faq.md)
+
+<!-- source: faq.md -->
+# FAQ and troubleshooting
+
+Answers to the questions people ask most, and fixes for the problems they hit.
+
+## Questions
+
+### Which agents are supported?
+
+Every agent the `skills` CLI supports: Claude Code, Codex, Cursor, Qoder and many more. `aiskills` reads the list from `npx skills`, so a newer `skills` version brings new agents with no change here. Pass agent ids to `-a` (`claude-code`, `codex`, `cursor`, …).
+
+### Where are the skills on my machine?
+
+The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` prints the folder). `npx skills` installs them into each agent's own folder, such as `~/.claude/skills/`, or the project's folders with `-p`.
+
+### What's the difference between `aiskills`, `ais` and `aix`?
+
+`ais` is `aiskills`. `aix` is `aiskills --route`, which also manages skills that aren't bundled. See [Bundled and external skills](concepts/bundled-and-external.md).
+
+### How do I update the skills?
+
+Install a newer package: `npm install -g @sugatoray-ai/aiskills@latest`. The install step saves the new skills and registers them again. If you had picked particular skills or agents, run that `aiskills install ...` command again.
+
+### Does it install Claude Code plugins?
+
+No. It reads the repo's `.claude-plugin/marketplace.json` only to group the skills. Everything is installed as skills through `npx skills`.
+
+### Can I edit the saved skills?
+
+Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill elsewhere to change it, or contribute the change to [the repo](https://github.com/sugatoray/aiskills).
+
+### Does aiskills send any data?
+
+No. The `skills` CLI it runs sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. See [Security model](concepts/security.md#telemetry).
+
+### Is there a JavaScript API?
+
+No. Only the commands are public; the files under `src/scripts/` can change in any release.
+
+### What is a skill group, and why is `newsletter-ai` "ungrouped"?
+
+Groups come from the plugin entries in the repo's `marketplace.json`. `newsletter-ai` isn't in any entry, so install it by name or with `-G all`. See [Skill groups](concepts/skill-groups.md).
+
+## Troubleshooting
+
+### Nothing was installed by `npm install -g`
+
+- **Symptom:** `aiskills installed` shows nothing after the npm install.
+- **Cause:** the install step hides its output and never fails. It may have been skipped (`--ignore-scripts`, pnpm, bun, `CI` set) or `npx skills add` may have failed (offline, proxy).
+- **Fix:** run `aiskills install`. It prints what goes wrong.
+
+### `skills: not found` during the npm install
+
+- **Cause:** an npm setting reached the nested `npx`. `aiskills` removes npm's own variables before running `npx`, so this means a new one got through.
+- **Fix:** run `aiskills install` after the npm install, and please [report it](https://github.com/sugatoray/aiskills/issues).
+
+### A pattern does nothing, or matches files
+
+- **Cause:** the shell expanded an unquoted pattern, such as `-s scrolls-*`, into file names.
+- **Fix:** quote it: `-s 'scrolls-*'`.
+
+### A skill's `.gitignore` is missing in the package
+
+- **Cause:** npm drops files named `.gitignore`. The package stores them as `_gitignore`.
+- **Fix:** none needed: every sync renames them back in `~/.config/sugatoray/aiskills/skills/`.
+
+### `--route` can't find a skill I know exists
+
+- **Cause:** the name isn't an exact match, several skills share it, or there's no network access to `skills.sh`.
+- **Fix:** run `aiskills find <name>` and pass the exact `owner/repo@skill`. See [Errors](reference/errors.md#external-skills---route).
+
+### `... is not an aiskills folder ...`
+
+- **Cause:** `AISKILLS_HOME` points at a folder with other files in it, which `aiskills` refuses to replace or delete.
+- **Fix:** point it at a new or empty folder. See [Errors](reference/errors.md#not-an-aiskills-folder).
+
+### `aiskills` is gone, but the skills are still installed
+
+- **Cause:** npm ran no step on `npm uninstall -g`.
+- **Fix:** `npx @sugatoray-ai/aiskills uninstall --purge`. See [Remove everything](guides/remove-everything.md).
+
+See also: [Errors and exit codes](reference/errors.md) · [Docs home](README.md)

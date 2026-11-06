@@ -32,6 +32,17 @@ It includes everything listed under 0.1.0 below.
   was left out is listed in `.aiskills/layout.json` (`ignored`).
 - **`SECURITY.md`**: how to report a vulnerability, what the package writes
   and which network calls happen, and the protections below.
+- **User documentation** in the repo at
+  [`src/packages/aiskills/docs/docsite/`](https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills/docs/docsite):
+  getting started, a tutorial, how-to guides, concepts, a full reference
+  (commands, options, environment variables, files, errors), an FAQ, and
+  `llms.txt` / `llms-full.txt` for AI agents. Not shipped in the package.
+  `npm test` checks it against the code and runs its examples.
+
+### Fixed
+
+- `uninstall -n` now prints the `npx` command that would really run,
+  including the pinned `skills` version (`npx -y skills@1.7.6 remove ...`).
 
 ### Security
 

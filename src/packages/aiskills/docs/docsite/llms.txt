@@ -1,0 +1,49 @@
+# @sugatoray-ai/aiskills
+
+> `@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, newsletters, diagrams, docs, development) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+
+## Getting started
+
+- [Why aiskills](getting-started/why-aiskills.md): what the package adds on top of `npx skills`, and when you don't need it.
+- [Installation](getting-started/installation.md): install with npm, choose what the install step does, and check it worked.
+- [Quickstart](getting-started/quickstart.md): see the groups, install one for one agent, check it, and remove it.
+
+## Tutorial
+
+- [1. Install a group](tutorial/01-install-a-group.md): list the groups and install one for one agent.
+- [2. Pick skills and agents](tutorial/02-pick-skills-and-agents.md): choose skills by name and pattern, and send them to several agents.
+- [3. Install into a project](tutorial/03-install-into-a-project.md): install skills for one project instead of for your user.
+- [4. Add external skills](tutorial/04-add-external-skills.md): install skills that aren't bundled with `--route` and `aix`.
+- [5. Uninstall](tutorial/05-uninstall.md): preview and remove some or all of the skills.
+
+## How-to guides
+
+- [Configure the npm install step](guides/configure-npm-install.md): choose skills, agents and scope with `AISKILLS_*` variables, or turn the step off.
+- [Use the package with `npx skills experimental_sync`](guides/use-experimental-sync.md): install the skills from a project's `node_modules`, pinned by your lockfile.
+- [Keep the repo's nested layout](guides/keep-the-nested-layout.md): browse or edit the skills in the folders they have in the repo.
+- [Run any `npx skills` command](guides/run-npx-skills-directly.md): pass arguments straight to `npx skills`, with `:root` for the install folder.
+- [Remove everything](guides/remove-everything.md): uninstall the skills, the folder and the npm package, in the right order.
+- [Use aiskills from an AI agent or a script](guides/use-from-an-agent.md): run it non-interactively, read its output and exit codes, and handle failures.
+- [Choose the `skills` CLI version](guides/choose-the-skills-cli-version.md): run a different `skills` release than the pinned one.
+- [Leave files out of the package](guides/leave-files-out.md): for maintainers: keep files or whole skills out with `.skillsignore`.
+
+## Concepts
+
+- [How aiskills works](concepts/how-it-works.md): the package, the install folder and `npx skills`, and who owns what.
+- [Skill groups](concepts/skill-groups.md): where groups and their aliases come from, and how membership is worked out.
+- [Layouts: flat and nested](concepts/layouts.md): the two shapes of the install folder and how the choice is made.
+- [Bundled and external skills](concepts/bundled-and-external.md): what `--route` changes for install, uninstall and listing.
+- [Security model](concepts/security.md): what the package touches, and the protections that are tested.
+
+## Reference
+
+- [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
+- [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
+- [Environment variables](reference/environment.md): every variable `aiskills` and its install step read.
+- [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
+- [`.skillsignore`](reference/skillsignore.md): the rule syntax for leaving files out of the package.
+- [Errors and exit codes](reference/errors.md): every error and warning, with its cause and fix.
+
+## Help
+
+- [FAQ and troubleshooting](faq.md): answers to common questions and fixes for common problems.

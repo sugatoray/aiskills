@@ -21,6 +21,7 @@ package.json, README.md, CHANGELOG.md, SECURITY.md
 bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
 src/scripts/                           cli.mjs, installer.mjs, postinstall.mjs, vendor-skills.mjs
 src/test/                              node:test suite
+docs/docsite/                          user documentation + llms.txt (not published)
 docs/meta/                             ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   project memory (not published)
 skills/, .aiskills/, .claude-plugin/, LICENSE      vendored at pack time (git-ignored)
@@ -61,13 +62,15 @@ Set `HOME` per command, not with `export`: an exported `HOME` breaks the next
      arguments with `skillsArgs()`.
    - Pure logic: `src/test/unit.test.mjs`.
    - What ships: `src/test/packaging.test.mjs` (uses `repoCopy()`).
+   - User docs: `src/test/docs.test.mjs` (see "Updating the user docs").
 2. **Make it pass**, then run `npm test` (and `npm run test:e2e` if it touches
    installs, packaging or `npx skills`).
 3. **Prove the new test can fail:** break the code it guards on purpose, see
    it go red, restore. Don't commit while a file is deliberately broken.
 4. **Update the docs** that the change affects: the README, `--help` in
-   `cli.mjs`, [FEATURES.md](FEATURES.md), and [ARCHITECTURE.md](ARCHITECTURE.md)
-   if the structure changed.
+   `cli.mjs`, the user docs in [`docs/docsite/`](../docsite/README.md),
+   [FEATURES.md](FEATURES.md), and [ARCHITECTURE.md](ARCHITECTURE.md) if the
+   structure changed.
 5. **Add a line under `## [Unreleased]` in `CHANGELOG.md`** for anything a
    user would notice.
 
@@ -107,6 +110,33 @@ picks them up at the next `npm pack`.
 - Run `npm test` here afterwards: the packaging tests compare the package
   with every git-tracked file under `skills/` that no `.skillsignore`
   excludes.
+
+## Updating the user docs
+
+The user docs in `docs/docsite/` follow the repo's `/create-lib-docs` skill
+(`skills/docs/create-lib-docs/`). `npm test` fails when they drift from the
+code:
+
+- **A new command, option, `AISKILLS_*` variable or error message** must get
+  an entry in `reference/cli.md`, `reference/environment.md` or
+  `reference/errors.md`.
+- **Examples with output** must be marked `<!-- verify -->` (optionally
+  `<!-- verify: list=<names> find=<owner/repo@skill> -->` to set what the
+  stand-in `npx skills list` / `find` return). The test runs them against the
+  repo's real skills and compares the output exactly; a line holding only
+  `…` matches any number of lines. Output after an `aiskills`/`ais`/`aix`
+  command without the marker fails the test.
+- **After editing any page**, regenerate the agent indexes and check links:
+
+  ```sh
+  python3 ../../../skills/docs/create-lib-docs/scripts/build_llms_txt.py docs/docsite
+  python3 ../../../skills/docs/create-lib-docs/scripts/check_docs.py docs/docsite
+  ```
+
+- **A version bump** changes the `--version` and `--help` examples; the test
+  shows the new output to paste in.
+- Diagrams are hand-written SVG in `docs/docsite/images/`; render one to PNG
+  and look at it after editing.
 
 ## Updating the pinned `skills` CLI
 

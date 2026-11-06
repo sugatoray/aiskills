@@ -85,20 +85,22 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
 `;
 
 /**
- * A fresh sandbox. Returns helpers:
+ * A fresh sandbox, built from the fixture skills, or from the repo's real
+ * (git-tracked) skills and marketplace.json with { realSkills: true }.
+ * Returns helpers:
  *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/cli.mjs), returns { status, out, calls }
  *   aix(args, {env})       the same through bin/aix.mjs (= aiskills --route)
  *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
  */
-export function sandbox() {
+export function sandbox({ realSkills = false } = {}) {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
-  const repo = writeFixtureTree(join(dir, "repo"));
+  const repo = realSkills ? copyRealSkills(join(dir, "repo")) : writeFixtureTree(join(dir, "repo"));
   vendor({ repoRoot: repo, pkgDir: pkg });
   const home = join(dir, "home");
   const root = join(home, ".config", "sugatoray", "aiskills");
@@ -174,6 +176,17 @@ export const row = (name, source, sourceType = "local") => ({
   source,
   sourceType,
 });
+
+/** Copy the repo's git-tracked skills/ and its marketplace.json under <dir>. */
+function copyRealSkills(dir) {
+  const files = trackedFiles("skills");
+  if (!files) throw new Error("git is needed to list the repo's skills");
+  for (const rel of [...files, ".claude-plugin/marketplace.json"]) {
+    mkdirSync(dirname(join(dir, rel)), { recursive: true });
+    cpSync(join(REPO_ROOT, rel), join(dir, rel));
+  }
+  return dir;
+}
 
 /** git-tracked files under <REPO_ROOT>/<dir>, or null when git isn't usable. */
 export function trackedFiles(dir) {
