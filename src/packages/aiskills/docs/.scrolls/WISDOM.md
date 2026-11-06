@@ -6,7 +6,7 @@ Hard-won lessons for this project. Read this LAST, right before editing code, so
 Things you must respect or conform to (external requirements, API contracts, platform limits).
 
 - The install folder is `~/.config/sugatoray/aiskills/` (skills in `skills/`, the marketplace file in `.claude-plugin/`), as the user specified. Only `AISKILLS_HOME` overrides it. Keep it even though the npm scope is `sugatoray-ai`.
-- Package name is `@sugatoray-ai/aiskills` (the user's npm org); the CLI command is `aiskills`.
+- Package name is `@sugatoray-ai/aiskills` (the user's npm org). Commands: `aiskills`, `ais` (same) and `aix` (= `aiskills --route`). Don't add or rename commands unasked: each is a public name users script against. `ask` is taken by Amazon's Alexa Skills Kit CLI.
 - The package ships `skills/` **flat**; `.aiskills/layout.json` + `.aiskills/nested/` must keep every other repo file so `--nested` can rebuild the repo's `skills/` byte for byte. Skill folder names come from `SKILL.md` `name:`, which must be unique and folder-safe (`vendor()` refuses otherwise).
 - `marketplace.json` is used **only** to define skill groups. Never install anything as a Claude Code plugin from it; all installs go through `npx skills add`.
 - Group name = the plugin entry's `name`, exactly. The alias (name minus `-skills`) and the `all` group are CLI inventions; the README must keep saying so.
@@ -26,6 +26,8 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **An env default of `skills: ['*']` meant "everything"** and silently overrode `-G`. The default is now `[]`; "everything" is `null` from `selectedSkills`.
 - **A blanket find-and-replace of paths also rewrites history.** Replacing `src/aiskills/` → `src/scripts/` across the scrolls changed a `HANDOFF.md` line about the earlier `src/aiskills/` → `src/packages/aiskills/` move. Replace paths file by file and re-read history lines.
 - **`sed` with `|` as its delimiter can't use `\|` alternation**: `s|^/\(A\|B\)|...|` silently changes nothing. Use another delimiter or Python for regex edits, and check the edit actually happened before trusting a test result that depends on it.
+- **A static `import` runs before the code above it.** `bin/aix.mjs` must set `AISKILLS_ROUTE` and then `await import(...)` the CLI; with `import "..."` the CLI would read its options before the variable exists.
+- **Don't commit while a background check has a file deliberately broken.** A mutation check that edits a source file and restores it afterwards leaves the tree wrong until it ends; wait for it (e.g. the Stop hook asked for a commit mid-run) before `git add`.
 - **Hardcoded repo-root depth** broke when the package moved. `vendor-skills.mjs` walks up to the first folder with `skills/` and `.claude-plugin/marketplace.json`.
 - **`export HOME=<tmp>` in a test shell** also breaks the next `git commit` (no identity). Set `HOME` per command, not with `export`.
 
