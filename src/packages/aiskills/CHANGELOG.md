@@ -20,9 +20,34 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
-## [0.1.0] - Unreleased
+## [0.2.0] - Unreleased
 
-First release. Not yet published to npm; this section gets its date when it is.
+First release to be published to npm; this section gets its date when it is.
+It includes everything listed under 0.1.0 below.
+
+### Added
+
+- **`.skillsignore`** (`.gitignore` syntax) anywhere under the repo's
+  `skills/` leaves files, folders or whole skills out of the package. What
+  was left out is listed in `.aiskills/layout.json` (`ignored`).
+- **`SECURITY.md`**: how to report a vulnerability, what the package writes
+  and which network calls happen, and the protections below.
+
+### Security
+
+- `npx` always runs a pinned, tested `skills` CLI (`skills@1.7.6`);
+  `AISKILLS_SKILLS_VERSION` overrides it.
+- `--route` / `aix` ignore `npx skills find` results whose
+  `owner/repo@skill` contains anything but letters, digits, `.`, `_` and `-`.
+- On Windows, `npx` is never started with arguments containing `cmd.exe`
+  shell characters; arguments with spaces are quoted.
+- `sync`, `install` and `uninstall --purge` refuse to replace or delete an
+  existing folder that isn't an aiskills folder (no `aiskills.json`).
+
+## [0.1.0] - Never published
+
+The first version of the package. It was superseded by 0.2.0 before it was
+published to npm, so it can't be installed on its own.
 
 ### Added
 
@@ -31,9 +56,6 @@ First release. Not yet published to npm; this section gets its date when it is.
   package, flattened to one folder per skill (`skills/<skill-name>/`).
   `.aiskills/layout.json` and `.aiskills/nested/` keep the original nested
   layout and every file outside the skill folders, so nothing is lost.
-- **`.skillsignore`** (`.gitignore` syntax) anywhere under the repo's
-  `skills/` leaves files, folders or whole skills out of the package. What
-  was left out is listed in `.aiskills/layout.json` (`ignored`).
 - **Install on `npm install -g`.** A `postinstall` step saves the skills to
   `~/.config/sugatoray/aiskills/skills/` and runs `npx skills add` on that
   folder. It never fails the npm install. Opt-outs: `AISKILLS_SKIP_POSTINSTALL`,
@@ -65,25 +87,11 @@ First release. Not yet published to npm; this section gets its date when it is.
   skills from other sources.
 - **Layouts:** `--flat` (default) or `--nested` (or `AISKILLS_LAYOUT`) for
   `~/.config/sugatoray/aiskills/skills/`. Nested rebuilds the repo's `skills/`
-  folder byte for byte (minus anything a `.skillsignore` left out). The choice
-  is remembered.
+  folder byte for byte. The choice is remembered.
 - **Works with `npx skills experimental_sync`** when the package is a project
   dependency, thanks to the flat `skills/` folder.
 - **Test suite** (`npm test`, and `npm run test:e2e` with network) using the
   built-in `node:test` runner.
-- **`SECURITY.md`**: how to report a vulnerability, what the package writes
-  and which network calls happen, and the protections below.
-
-### Security
-
-- `npx` always runs a pinned, tested `skills` CLI (`skills@1.7.6`);
-  `AISKILLS_SKILLS_VERSION` overrides it.
-- `--route` / `aix` ignore `npx skills find` results whose
-  `owner/repo@skill` contains anything but letters, digits, `.`, `_` and `-`.
-- On Windows, `npx` is never started with arguments containing `cmd.exe`
-  shell characters; arguments with spaces are quoted.
-- `sync`, `install` and `uninstall --purge` refuse to replace or delete an
-  existing folder that isn't an aiskills folder (no `aiskills.json`).
-
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.2.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122

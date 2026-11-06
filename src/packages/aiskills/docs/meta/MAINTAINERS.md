@@ -134,7 +134,8 @@ every `npx` call runs. To move to a newer one:
 6. `npm run clean`, then update the release note in
    `docs/.scrolls/SPEC.md` and run `/scrolls-update`.
 
-The first release (`0.1.0`) is ticket AIS-1 in `docs/.scrolls/PLAN.md`.
+The first published release (`0.2.0`; `0.1.0` was never published) is
+ticket AIS-1 in `docs/.scrolls/PLAN.md`.
 
 ## Troubleshooting
 

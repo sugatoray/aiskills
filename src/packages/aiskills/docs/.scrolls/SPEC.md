@@ -2,7 +2,7 @@
 
 What @sugatoray-ai/aiskills does, feature by feature. Add a section per feature when it ships — describe *what* it does and *why* it matters to a user, not the implementation detail (that belongs in code comments or `WISDOM.md`).
 
-> **Release status:** everything below is implemented, tested by hand end to end, and pushed on branch `claude/focused-faraday-nqvduf` ([sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122), open). Version `0.1.0` has **not** been published to npm yet. Update this note when it is.
+> **Release status:** everything below is implemented, tested by hand end to end, and pushed on branch `claude/focused-faraday-nqvduf` ([sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122), open). Version `0.2.0` has **not** been published to npm yet (`0.1.0` never was). Update this note when it is.
 
 ## Bundled skills in an npm package
 Every file under the repo's `skills/` folder ships, together with `.claude-plugin/marketplace.json` and `LICENSE`. At `npm pack`/`npm publish` time the skills are flattened to `skills/<skill-name>/`; `.aiskills/layout.json` records each skill's original folder and `.aiskills/nested/` holds the files outside any skill folder, so nothing is lost (mapped back, the shipped files equal `git ls-files skills` byte for byte, minus anything a `.skillsignore` excludes). Never committed under the package folder. (`src/scripts/vendor-skills.mjs`)
