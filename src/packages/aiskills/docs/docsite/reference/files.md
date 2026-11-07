@@ -73,6 +73,8 @@ Written when the package is built, and copied to the install folder.
 └── README.md, CHANGELOG.md, SECURITY.md, LICENSE, package.json
 ```
 
+That is everything the package contains. What builds it stays in the repo: `src/scripts/pack/` (copies the skills in at `npm pack`), `src/scripts/docs/` (builds these docs and the banner), `src/test/` and `docs/`.
+
 Files named `.gitignore` and `.npmignore` inside the skills are stored as `_gitignore` and `_npmignore`, because npm drops the real names; every sync renames them back. The package has no JavaScript API: only the commands are public.
 
 ## `aiskills groups --json`

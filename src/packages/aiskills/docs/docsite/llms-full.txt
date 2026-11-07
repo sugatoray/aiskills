@@ -103,7 +103,13 @@ aiskills install -G scrolls -a claude-code
 
 - [FAQ and troubleshooting](faq.md): answers to common questions and fixes for common problems.
 
-Also see the package [CHANGELOG](../../CHANGELOG.md) and [SECURITY.md](../../SECURITY.md). Agents can load [`llms.txt`](llms.txt) or [`llms-full.txt`](llms-full.txt).
+## Ways to read these docs
+
+- **These Markdown pages**, on GitHub or in your editor.
+- **One web page** with tabs, search and 11 colour themes: open `docs/docsite/index.html` (in the repo, next to this page) in a browser. The gear at its top right picks a theme (Lights Out by default), and the moon/sun button switches light and dark.
+- **For AI agents:** [`llms.txt`](llms.txt) (an index of every page) or [`llms-full.txt`](llms-full.txt) (every page in one file).
+
+Also see the package [CHANGELOG](../../CHANGELOG.md) and [SECURITY.md](../../SECURITY.md).
 
 <!-- source: getting-started/why-aiskills.md -->
 # Why aiskills
@@ -2913,6 +2919,8 @@ Written when the package is built, and copied to the install folder.
 ├── .claude-plugin/marketplace.json
 └── README.md, CHANGELOG.md, SECURITY.md, LICENSE, package.json
 ```
+
+That is everything the package contains. What builds it stays in the repo: `src/scripts/pack/` (copies the skills in at `npm pack`), `src/scripts/docs/` (builds these docs and the banner), `src/test/` and `docs/`.
 
 Files named `.gitignore` and `.npmignore` inside the skills are stored as `_gitignore` and `_npmignore`, because npm drops the real names; every sync renames them back. The package has no JavaScript API: only the commands are public.
 

@@ -102,4 +102,10 @@ aiskills install -G scrolls -a claude-code
 
 - [FAQ and troubleshooting](faq.md): answers to common questions and fixes for common problems.
 
-Also see the package [CHANGELOG](../../CHANGELOG.md) and [SECURITY.md](../../SECURITY.md). Agents can load [`llms.txt`](llms.txt) or [`llms-full.txt`](llms-full.txt).
+## Ways to read these docs
+
+- **These Markdown pages**, on GitHub or in your editor.
+- **One web page** with tabs, search and 11 colour themes: open `docs/docsite/index.html` (in the repo, next to this page) in a browser. The gear at its top right picks a theme (Lights Out by default), and the moon/sun button switches light and dark.
+- **For AI agents:** [`llms.txt`](llms.txt) (an index of every page) or [`llms-full.txt`](llms-full.txt) (every page in one file).
+
+Also see the package [CHANGELOG](../../CHANGELOG.md) and [SECURITY.md](../../SECURITY.md).
