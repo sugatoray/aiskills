@@ -1,8 +1,8 @@
 # Features
 
 Every feature of `@sugatoray-ai/aiskills`, in one place, with where it's
-documented and tested. The user guide is the package
-[README](../../README.md); release history is in
+documented and tested. The user guide is [`docs/docsite/`](../docsite/README.md)
+(the package [README](../../README.md) is the overview); release history is in
 [CHANGELOG.md](../../CHANGELOG.md).
 
 ## Commands
@@ -55,22 +55,23 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 
 | Feature | Summary | User docs | Tests |
 | --- | --- | --- | --- |
-| Bundled skills | All repo skills ship flat, with `.aiskills/layout.json` + `nested/` keeping the original layout | README intro, Maintainers | `packaging.test.mjs` |
-| Install on `npm install -g` | `postinstall` saves the skills and runs `npx skills add`; never fails the install | README "Install" | `cli.test.mjs` → postinstall |
-| Project dependency + `experimental_sync` | Flat `skills/` lets `npx skills experimental_sync` install from `node_modules` | README "As a project dependency" | `e2e.test.mjs` |
-| Scope, agents, skills | `-g`/`-p`, `-a`, `-s`, `--copy`, `--` passthrough | README "CLI" | `cli.test.mjs` |
-| Uninstall | Full / partial / per agent / per project, `--purge`, `--dry-run`, `--force` | README "Uninstall" | `cli.test.mjs`, `e2e.test.mjs` |
-| Skill groups | From `marketplace.json`; name or alias (minus `-skills`); `all` | README "Skill groups" | `unit.test.mjs`, `cli.test.mjs` |
-| Glob patterns | `*`, `?`, `[abc]`, `[a-z]`, `[!abc]` for `-s`, `-G`, `-a` | README "Patterns" | `unit.test.mjs`, `cli.test.mjs` |
-| External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule; pinned specs; any-source uninstall | README "`--route`" | `cli.test.mjs` |
-| `.skillsignore` | `.gitignore`-style rules under `skills/` keep files, folders or skills out of the package | README "Leaving files out" | `skillsignore.test.mjs`, `packaging.test.mjs` |
-| Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte (minus `.skillsignore`d files); remembered | README "Layouts" | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
-| Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | README "Install", "CLI" | `cli.test.mjs`, `e2e.test.mjs` |
-| Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md) | `cli.test.mjs`, `unit.test.mjs` |
-| `npx skills` passthrough | `aiskills skills <args>` with `:root` | README "Using `npx skills` directly" | `cli.test.mjs` |
-| Themes | 11 themes (light and dark) for the docs page and the banner, chosen with a gear menu; default Lights Out; one list in `src/scripts/docs/themes.mjs` | [docs/banner/README.md](../banner/README.md), FAQ | `themes.test.mjs`, `docs-html.test.mjs`, `banner.test.mjs` |
-| Banner | README image and docs landing-page banner from `docs/banner/config.yaml`, with an in-browser editor and PNG export (not published) | [docs/banner/README.md](../banner/README.md) | `banner.test.mjs`, `docs-html.test.mjs` |
+| Bundled skills | All repo skills ship flat, with `.aiskills/layout.json` + `nested/` keeping the original layout | [How it works](../docsite/concepts/how-it-works.md), [Layouts](../docsite/concepts/layouts.md) | `packaging.test.mjs` |
+| Install on `npm install -g` | `postinstall` saves the skills and runs `npx skills add`; never fails the install | [Installation](../docsite/getting-started/installation.md), [Configure the npm install step](../docsite/guides/configure-npm-install.md) | `cli.test.mjs` → postinstall |
+| Project dependency + `experimental_sync` | Flat `skills/` lets `npx skills experimental_sync` install from `node_modules` | [Use with `experimental_sync`](../docsite/guides/use-experimental-sync.md) | `e2e.test.mjs` |
+| Scope, agents, skills | `-g`/`-p`, `-a`, `-s`, `--copy`, `--` passthrough | [CLI reference](../docsite/reference/cli.md#options), [Tutorial 2–3](../docsite/tutorial/02-pick-skills-and-agents.md) | `cli.test.mjs` |
+| Uninstall | Full / partial / per agent / per project, `--purge`, `--dry-run`, `--force` | [Tutorial 5](../docsite/tutorial/05-uninstall.md), [Remove everything](../docsite/guides/remove-everything.md) | `cli.test.mjs`, `e2e.test.mjs` |
+| Skill groups | From `marketplace.json`; name or alias (minus `-skills`); `all` | [Skill groups](../docsite/concepts/skill-groups.md), [Bundled skills](../docsite/skills/README.md) | `unit.test.mjs`, `cli.test.mjs` |
+| Glob patterns | `*`, `?`, `[abc]`, `[a-z]`, `[!abc]` for `-s`, `-G`, `-a` | [Patterns reference](../docsite/reference/patterns.md) | `unit.test.mjs`, `cli.test.mjs` |
+| External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule; pinned specs; any-source uninstall | [Bundled and external skills](../docsite/concepts/bundled-and-external.md), [Tutorial 4](../docsite/tutorial/04-add-external-skills.md) | `cli.test.mjs` |
+| `.skillsignore` | `.gitignore`-style rules under `skills/` keep files, folders or skills out of the package | [`.skillsignore` reference](../docsite/reference/skillsignore.md), [Leave files out](../docsite/guides/leave-files-out.md) | `skillsignore.test.mjs`, `packaging.test.mjs` |
+| Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte (minus `.skillsignore`d files); remembered | [Layouts](../docsite/concepts/layouts.md), [Keep the nested layout](../docsite/guides/keep-the-nested-layout.md) | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
+| Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | [CLI reference](../docsite/reference/cli.md#commands) | `cli.test.mjs`, `e2e.test.mjs` |
+| Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md), [Security model](../docsite/concepts/security.md) | `cli.test.mjs`, `unit.test.mjs` |
+| `npx skills` passthrough | `aiskills skills <args>` with `:root` | [Run any `npx skills` command](../docsite/guides/run-npx-skills-directly.md) | `cli.test.mjs` |
+| Themes | 11 themes (light and dark) for the docs page and the banner, chosen with a gear menu and remembered per browser; default Lights Out; one list in `src/scripts/docs/themes.mjs` | [FAQ](../docsite/faq.md#how-do-i-change-how-these-docs-look), [docs/banner/README.md](../banner/README.md#themes) | `themes.test.mjs`, `docs-html.test.mjs`, `banner.test.mjs` |
+| Banner | README image and docs landing-page banner from `docs/banner/config.yaml`, with an in-browser editor and PNG export; the PNG is fingerprinted so a stale one fails the tests (not published) | [docs/banner/README.md](../banner/README.md) | `banner.test.mjs`, `docs-html.test.mjs` |
 | User documentation | Tutorial, guides, concepts, full reference, FAQ, `llms.txt`, a generated page per bundled skill, and a single-page HTML (`index.html`), in `docs/docsite/` (not published) | [docs/docsite/](../docsite/README.md) | `docs.test.mjs`, `docs-skills.test.mjs`, `docs-html.test.mjs` |
+| Code layout | `src/scripts/core/` (published), `pack/` (`npm pack`), `docs/` (docs and banner), imports pointing down only | [src/scripts/README.md](../../src/scripts/README.md) | `packaging.test.mjs` |
 
 ## Not features (on purpose)
 

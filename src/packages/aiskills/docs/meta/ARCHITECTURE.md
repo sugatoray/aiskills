@@ -39,8 +39,8 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 
 | Module | Owns | Main functions |
 | --- | --- | --- |
-| `vendor-skills.mjs` | Turning the repo's nested `skills/` into the shipped layout | `vendor`, `clean`, `findRepoRoot` |
-| `skillsignore.mjs` | `.skillsignore` rules (`.gitignore` syntax) | `parseIgnore`, `isIgnored` |
+| `pack/vendor-skills.mjs` | Turning the repo's nested `skills/` into the shipped layout | `vendor`, `clean`, `findRepoRoot` |
+| `pack/skillsignore.mjs` | `.skillsignore` rules (`.gitignore` syntax) | `parseIgnore`, `isIgnored` |
 | `installer.mjs` – sync | The install folder and its layout | `syncSkills`, `resolveLayout`, `installRoot`, `packageLayout` |
 | `installer.mjs` – skills | Reading skill names and groups | `readSkillName`, `skillNamesIn`, `packageSkillNames`, `loadGroups` |
 | `installer.mjs` – selection | Turning `-s`/`-G`/`-a` into exact names | `globToRegExp`, `expandPatterns`, `skillsForGroups`, `selectedSkills`, `knownAgents`, `expandAgents` |
@@ -49,6 +49,14 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 | `installer.mjs` – guards | Not damaging what isn't ours | `assertInstallFolder` (used by `syncSkills`, `purgeRoot`, and `uninstall --purge` up front) |
 | `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups` |
 | `postinstall.mjs` | What `npm install` does | `main` (reads only `AISKILLS_*` env) |
+| `docs/build-skills-docs.mjs` | The Skills pages, from what the package really ships | `bundled` (vendors into a temp folder), `render`, `frontmatter` |
+| `docs/build-docs-html.mjs` | `docs/docsite/index.html` | `collect` (tabs from the landing page's `### Section` lists), `bannerParts`, `skinMenuHtml`, `build` |
+| `docs/create-banner.mjs` | The banner page and `banner_2x.png` | `parseConfig`, `resolveValues` ("auto" values), `render`, `renderPng`, `addPngText` |
+| `docs/themes.mjs` | The 11 themes (default first) | `THEMES`, `DEFAULT_THEME`, `pageSkinCss`, `bannerSkinCss`, `fontsHref` |
+
+The `installer.mjs`, `cli.mjs` and `postinstall.mjs` rows are `core/`. All
+`docs/` builders write only under `docs/`; `src/scripts/README.md` has the
+same map in short.
 
 `installer.mjs` has no side effects when imported, so the tests import it
 directly. `cli.mjs` runs `main()` on import, which is why the entry points in
@@ -130,6 +138,21 @@ collects the skills whose **original** folder in `layout.json` is under it.
 This is why groups give the same result whether `skills/` is flat or nested.
 Without `layout.json` it falls back to scanning `skills/` under the source.
 
+### Docs and banner (`npm run docs`)
+
+```text
+docs/banner/config.yaml + templates/banner-template.html + themes.mjs
+        ──create-banner──▶ docs/banner/aiskills-banner.html  (──banner:png──▶ banner_2x.png, with theme + page SHA-256 in tEXt)
+<repo>/skills (vendored to a temp folder)
+        ──build-skills-docs──▶ docs/docsite/skills/*.md + the landing page's Skills list
+docs/docsite/*.md  ──build_llms_txt.py (create-lib-docs)──▶ llms.txt, llms-full.txt
+docs/docsite/*.md + images/*.svg + templates/docs-template.html + themes.mjs + the banner's markup/CSS
+        ──build-docs-html──▶ docs/docsite/index.html
+```
+
+Every output is committed and generated: the tests rebuild each one in memory
+(or check the PNG's fingerprint) and fail when the committed copy is stale.
+
 ### Layout choice
 
 `resolveLayout()`: `--nested`/`--flat` > `AISKILLS_LAYOUT` > the `layout` in
@@ -152,5 +175,10 @@ folder next to it, then swaps it in.
 | Pin the `skills` CLI version | A new `skills` release must be tested before users get it. |
 | Treat registry text as untrusted | `npx skills find` output decides what gets installed and, on Windows, passes through `cmd.exe`. |
 | Refuse to replace or delete a non-aiskills folder | `AISKILLS_HOME` can point anywhere; `aiskills.json` marks folders we own. |
+| Code folders by when it runs: `core/`, `pack/`, `docs/` | Only `core/` ships; imports point down (`docs/` → `pack/` → `core/`), so nothing published can depend on build tooling. Tested. |
+| `"files"` lists exact paths, root docs with a leading `/` | A plain `README.md` matches at any depth and would publish `src/scripts/README.md`; `.npmignore` can't undo a `"files"` match. |
+| Docs generated from the code and the skills, and tested against them | Reference pages, examples, Skills pages and `index.html` can't drift: `npm test` fails first. |
+| One themes list for the docs page and the banner | Both gear menus, the page CSS and the banner CSS come from `themes.mjs`; contrast is tested from its values. |
+| Fingerprint `banner_2x.png` instead of comparing pixels | Rendering varies across machines; the theme and source-page SHA-256 in PNG `tEXt` chunks make staleness exact. |
 
 See [`../../SECURITY.md`](../../SECURITY.md) for the security side of these.
