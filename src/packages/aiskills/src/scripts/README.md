@@ -42,7 +42,7 @@ Builds what lives under the package's `docs/` folder. None of it ships.
 | File | What it does | Run with |
 | --- | --- | --- |
 | `build-skills-docs.mjs` | The Skills pages in `docs/docsite/skills/` and the landing page's Skills list, from the skills the package really ships. | `npm run docs:skills` |
-| `build-docs-html.mjs` | `docs/docsite/index.html`: every Markdown page in one page with tabs, search, the banner and the theme menu. | `npm run docs:html` |
+| `build-docs-html.mjs` | `docs/docsite/index.html`: every Markdown page in one page with tabs, search, the banner and the theme menu. | `npm run docs:html`; `npm run docs:site` builds the same page into `site/` for GitHub Pages |
 | `create-banner.mjs` | The banner: `docs/banner/aiskills-banner.html` (editor page) from `docs/banner/config.yaml`, and `banner_2x.png`. | `npm run banner`, `banner:png` |
 | `themes.mjs` | The 11 themes behind both gear menus (default Lights Out), and the CSS made from them. | (used by the two above) |
 | `templates/` | `docs-template.html` (the docs page) and `banner-template.html` (the banner editor). Edit these, never the generated pages. | |

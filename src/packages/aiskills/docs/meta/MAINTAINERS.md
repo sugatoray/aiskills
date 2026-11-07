@@ -174,6 +174,16 @@ code:
   `src/scripts/docs/build-docs-html.mjs` with `src/scripts/docs/templates/docs-template.html`,
   ported from sugatoray/callai's `docs/site/`; tabs come from the landing
   page's `### Section` lists, so a new page must be listed there.
+- **The published site** (<https://sugatoray.github.io/aiskills/>) is built and deployed by
+  `.github/workflows/aiskills-docs.yml` (at the repo root) on every push to
+  `master` that touches `docs/docsite/`, `docs/banner/`, `src/scripts/docs/`,
+  `package.json` or the workflow, the same way as sugatoray/callai's
+  `docs.yml`. It runs `npm run docs:site -- --ref <branch>`, which writes
+  `site/index.html` (git-ignored) from the Markdown, so the site never depends
+  on the committed `index.html` being current. Run it by hand from the
+  Actions tab ("Run workflow"; untick *deploy* to only build). One-time setup:
+  Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+  `src/test/docs-workflow.test.mjs` keeps the workflow pointing at real paths.
 - **Themes** live in `src/scripts/docs/themes.mjs`, one list for the docs page's
   gear menu and the banner editor's. `teal` is the base design of the two
   templates; every other theme sets the page variables for light and dark, and

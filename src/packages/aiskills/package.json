@@ -45,6 +45,7 @@
     "clean": "node src/scripts/pack/vendor-skills.mjs --clean",
     "docs:skills": "node src/scripts/docs/build-skills-docs.mjs",
     "docs:html": "node src/scripts/docs/build-docs-html.mjs docs/docsite --out docs/docsite/index.html",
+    "docs:site": "node src/scripts/docs/build-docs-html.mjs docs/docsite --out site/index.html",
     "banner": "node src/scripts/docs/create-banner.mjs",
     "banner:check": "node src/scripts/docs/create-banner.mjs --check",
     "banner:png": "node src/scripts/docs/create-banner.mjs --png",

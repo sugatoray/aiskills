@@ -25,6 +25,14 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 First release to be published to npm; this section gets its date when it is.
 It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
 
+### Added
+
+- **The docs are published on GitHub Pages** at <https://sugatoray.github.io/aiskills/>. A GitHub Actions
+  workflow (`.github/workflows/aiskills-docs.yml`, modelled on
+  sugatoray/callai's) builds the single-page docs with the new
+  `npm run docs:site` on every push to `master` that changes them, and
+  deploys them with `actions/deploy-pages`. It can also be run by hand.
+
 ### Changed
 
 - **The code is organized by when it runs.** The three files that ship

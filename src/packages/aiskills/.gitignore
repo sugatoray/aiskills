@@ -5,3 +5,5 @@
 /LICENSE
 node_modules/
 *.tgz
+# Built by `npm run docs:site` (the GitHub Pages workflow); never committed
+site/

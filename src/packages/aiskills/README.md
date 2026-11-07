@@ -11,8 +11,8 @@ nested layout can be rebuilt with `--nested` (see [Layouts](#layouts---flat-and-
 
 **Full documentation:** [docs/docsite/](docs/docsite/README.md) (tutorial,
 how-to guides, concepts, and a complete CLI, environment and error reference).
-The same docs as one page with tabs and search: open
-[docs/docsite/index.html](docs/docsite/index.html) in a browser. AI agents can
+The same docs as one page with tabs and search: **<https://sugatoray.github.io/aiskills/>**
+(or open [docs/docsite/index.html](docs/docsite/index.html) in a browser). AI agents can
 load [docs/docsite/llms.txt](docs/docsite/llms.txt).
 
 ## Install
@@ -584,6 +584,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | `src/test/themes.test.mjs` | The shared themes (`src/scripts/docs/themes.mjs`): 11 themes, Lights Out the default, every token for light and dark, text/link/button contrast of at least 4.5:1 in every theme and mode, Google Fonts links, and generated CSS (banner rules never reach outside the banner). |
 | `src/test/banner.test.mjs` | The banner (`docs/banner/`): `config.yaml` parsing, "auto" values from `package.json` and the bundled skills, the generated page is up to date (`npm run banner:check`), the README opens with `banner_2x.png` (2560 × 1280), and, with Playwright, the editor: saved edits, Reset, unreadable ink disabled, text contrast ≥ 4.5:1 on every allowed background, and PNG export sizes. |
 | `src/test/docs-html.test.mjs` | The single-page HTML docs (`docs/docsite/index.html`): it is up to date, holds every page and diagram in tabs that follow the landing page, and, when Playwright and cdnjs are available, every page renders in Chromium with every link going to a page and heading that exist. |
+| `src/test/docs-workflow.test.mjs` | The GitHub Pages workflow (`.github/workflows/aiskills-docs.yml` at the repo root): it runs on `master` and by hand, watches paths that exist, builds with `npm run docs:site` on the branch being built, uploads `site/` and deploys it with `actions/deploy-pages`; `site/` is git-ignored and not published. |
 | `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.
