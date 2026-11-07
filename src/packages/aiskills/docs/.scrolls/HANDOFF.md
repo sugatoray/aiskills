@@ -21,12 +21,12 @@ src/scripts/README.md   what each scripts folder is for, the import rule (docs/ 
 src/scripts/core/       cli.mjs, installer.mjs, postinstall.mjs (published)
 src/scripts/pack/       vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/       build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs, templates/ (build time only)
-                        create-banner.mjs + banner-template.html, themes.mjs (build time only)
 src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs
 (vendored, git-ignored) skills/<name>/ (flat), .aiskills/{layout.json,nested/}, .claude-plugin/, LICENSE
 ```
 
 ## What just happened
+- **CHANGELOG caught up**: `## [0.4.0]` → Changed now also lists the user-docs refresh ("Ways to read these docs", the files reference) and the `docs/meta/` update, so every change on this branch since 0.3.0 is in the CHANGELOG. 261 offline tests pass.
 - **`docs/meta/` brought up to date** after a full read against the code: ARCHITECTURE (module table with the `pack/` and `docs/` modules, a "Docs and banner" flow, five new design decisions), FEATURES (user-docs column now links `docs/docsite/` pages; new "Code layout" row), MAINTAINERS (Python/Playwright requirements, docs/banner commands, the current release flow, new troubleshooting rows). All links and anchors resolve; every function named in the module table exists.
 - **Version bumped to `0.4.0`** (`0.3.0` marked "Never published", like `0.2.0` and `0.1.0`). CHANGELOG `## [0.4.0] - Unreleased` holds the `src/scripts/` reorganization and the anchored `"files"` fix; `[0.3.0]` keeps the docs, banner, themes and the `uninstall -n` fix. The package README's tests row and maintainer links were brought up to date. 261 offline + 7 e2e tests pass; `npm pack` builds `sugatoray-ai-aiskills-0.4.0.tgz`.
 - **Docs refreshed with `/create-lib-docs --update`**: the reference, examples, Skills pages and links still matched the code; a read-through added "Ways to read these docs" to the landing page (Markdown, `index.html` with search and the 11-theme gear menu, `llms.txt`) and a note in `reference/files.md` on what stays out of the npm package.
