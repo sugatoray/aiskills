@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="360" viewBox="0 0 820 360" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13">
+  <title>The two layouts of the install folder's skills/ directory: flat (default) and nested (the repo's own folders)</title>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="20" y="20" width="370" height="290" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="205" y="46" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#14532d">--flat (default)</text>
+  <text x="40" y="80" fill="#0f172a">skills/</text>
+  <text x="40" y="102" fill="#0f172a">├── create-lib-docs/SKILL.md</text>
+  <text x="40" y="124" fill="#0f172a">├── prodigy/SKILL.md</text>
+  <text x="40" y="146" fill="#0f172a">├── scrolls-help/SKILL.md</text>
+  <text x="40" y="168" fill="#0f172a">├── scrolls-setup/SKILL.md</text>
+  <text x="40" y="190" fill="#0f172a">├── stata-recipes/SKILL.md</text>
+  <text x="40" y="212" fill="#0f172a">└── …</text>
+  <text x="40" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#14532d">One folder per skill, named after</text>
+  <text x="40" y="270" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#14532d">its name:, as the package ships it.</text>
+  <rect x="430" y="20" width="370" height="290" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="615" y="46" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1e3a8a">--nested</text>
+  <text x="450" y="80" fill="#0f172a">skills/</text>
+  <text x="450" y="102" fill="#0f172a">├── docs/create-lib-docs/SKILL.md</text>
+  <text x="450" y="124" fill="#0f172a">├── personas/prodigy/SKILL.md</text>
+  <text x="450" y="146" fill="#0f172a">├── scrolls/</text>
+  <text x="450" y="168" fill="#0f172a">│   ├── README.md</text>
+  <text x="450" y="190" fill="#0f172a">│   ├── scrolls-help/SKILL.md</text>
+  <text x="450" y="212" fill="#0f172a">│   └── …</text>
+  <text x="450" y="234" fill="#0f172a">└── stata/stata-recipes/SKILL.md</text>
+  <text x="450" y="270" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1e3a8a">The repo's skills/ folder, with group files.</text>
+  <text x="20" y="340" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#475569">npx skills add finds the same 13 skills in either layout. Choose with --flat / --nested or AISKILLS_LAYOUT.</text>
+</svg>
