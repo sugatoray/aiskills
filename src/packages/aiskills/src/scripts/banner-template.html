@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Built by src/scripts/create-banner.mjs from src/scripts/banner-template.html (the design) and docs/banner/config.yaml (the values). Change those, then run `npm run banner`; don't edit docs/banner/aiskills-banner.html by hand. -->
-<html lang="en">
+<html lang="en" data-skin="{{ theme }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +10,15 @@
 <link rel="stylesheet" crossorigin="anonymous"
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;700;800&family=Public+Sans:wght@400;500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script>
+  // Theme (gear menu): ?export&skin=<id> for scripted exports, else the one saved in this browser, else config.yaml's.
+  (function () {
+    var IDS = {{ theme_ids_json }}, q = new URLSearchParams(location.search), s = null;
+    if (q.has('export')) s = q.get('skin');
+    else { try { s = localStorage.getItem('aiskills-banner-skin'); } catch (e) {} }
+    if (IDS.indexOf(s) >= 0) document.documentElement.setAttribute('data-skin', s);
+  })();
+</script>
 <script>
   // Export mode (?export[&bg=as-is|white|black|transparent][&ink=auto|light|dark]): only the banner, at
   // its native 1280x640, for headless screenshots (create_banner.py --png).
@@ -67,6 +76,22 @@
          padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
   .btn.ghost { background: transparent; color: var(--page-fg); border-color: var(--panel-line); font-weight: 500; }
   .btn:disabled { opacity: .55; cursor: progress; }
+  .skin-wrap { position: relative; }
+  .skin-menu { position: absolute; left: 0; top: calc(100% + 6px); z-index: 20; width: 320px; max-width: calc(100vw - 32px);
+               max-height: min(70vh, 560px); overflow-y: auto; background: var(--panel); color: var(--page-fg);
+               border: 1px solid var(--panel-line); border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,.2); padding: 6px; display: grid; gap: 2px; }
+  .skin-menu[hidden] { display: none; }
+  .skin-item { display: grid; grid-template-columns: auto 1fr auto; gap: 1px 10px; align-items: center; width: 100%; text-align: left;
+               background: none; border: 0; border-radius: 8px; padding: 8px 10px; font: inherit; color: inherit; cursor: pointer; }
+  .skin-item:hover, .skin-item:focus-visible { background: color-mix(in srgb, var(--page-fg) 8%, transparent); outline: none; }
+  .skin-item:focus-visible { box-shadow: inset 0 0 0 2px var(--btn); }
+  .skin-item .sw { grid-row: span 2; display: flex; }
+  .skin-item .sw i { display: block; width: 9px; height: 26px; }
+  .skin-item .sw i:first-child { border-radius: 5px 0 0 5px; } .skin-item .sw i:last-child { border-radius: 0 5px 5px 0; }
+  .skin-item .nm { font-weight: 600; }
+  .skin-item .ds { grid-column: 2 / 4; font-size: 12px; color: var(--page-muted); }
+  .skin-item .ck { visibility: hidden; color: var(--btn); }
+  .skin-item[aria-checked="true"] .ck { visibility: visible; }
   .check { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--page-muted); }
 
   .hint { width: 100%; max-width: 1280px; color: var(--page-muted); font-size: 12px; margin: -6px 0 0; }
@@ -85,7 +110,7 @@
   .scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
 
   /* ───────────── Banner (exported) ───────────── */
-  /* banner:css:start (docs/site/build_docs_html.py copies everything up to banner:css:end) */
+  /* banner:css:start (src/scripts/build-docs-html.mjs copies the banner CSS from here to the end marker) */
   #banner {
     --bg: #0d1517;
     --fg: #e8f0f0;
@@ -217,6 +242,8 @@
   #banner .pills { gap: 8px; }
   #banner .pill { font-size: 15px; padding: 8px 13px 8px 11px; }
 
+{{ skins_css }}
+
   /* banner:css:end */
 
   /* Edit mode affordances (stripped on export) */
@@ -247,6 +274,13 @@
   <div class="title">{{ page_title }} <small>1280 × 640</small></div>
 
   <button class="btn" id="editToggle" aria-pressed="false">✎ Edit</button>
+
+  <div class="skin-wrap">
+    <button class="btn ghost skin-btn" id="skinBtn" aria-haspopup="menu" aria-controls="skinMenu" aria-expanded="false" title="Colour theme (src/scripts/themes.mjs)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Theme</button>
+    <div class="skin-menu" id="skinMenu" role="menu" aria-label="Themes" hidden>
+{{ skin_menu_html }}
+    </div>
+  </div>
 
   <div class="group">
     <label>Background</label>
@@ -591,6 +625,31 @@
   });
 
   // Exposed for scripted exports (e.g. headless browser).
+  /* ── Theme menu (gear) ── */
+  (() => {
+    const root = document.documentElement, btn = document.getElementById('skinBtn'), menu = document.getElementById('skinMenu');
+    const items = () => [...menu.querySelectorAll('[role="menuitemradio"]')];
+    const sync = () => items().forEach((i) => i.setAttribute('aria-checked', String(i.dataset.skin === root.getAttribute('data-skin'))));
+    const open = () => { sync(); menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); (items().find((i) => i.getAttribute('aria-checked') === 'true') || items()[0]).focus(); };
+    const close = (refocus) => { if (menu.hidden) return; menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); if (refocus) btn.focus(); };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden ? open() : close(true); });
+    menu.addEventListener('click', (e) => {
+      const i = e.target.closest('[role="menuitemradio"]'); if (!i) return;
+      root.setAttribute('data-skin', i.dataset.skin);
+      try { localStorage.setItem('aiskills-banner-skin', i.dataset.skin); } catch {}
+      sync(); close(true); toast(`Theme: ${i.querySelector('.nm').textContent}`);
+    });
+    menu.addEventListener('keydown', (e) => {
+      const list = items(), at = list.indexOf(document.activeElement);
+      const go = (n) => { e.preventDefault(); list[(n + list.length) % list.length].focus(); };
+      if (e.key === 'ArrowDown') go(at + 1); else if (e.key === 'ArrowUp') go(at - 1);
+      else if (e.key === 'Home') go(0); else if (e.key === 'End') go(list.length - 1);
+      else if (e.key === 'Escape') { e.preventDefault(); close(true); } else if (e.key === 'Tab') close(false);
+    });
+    document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) close(false); });
+    sync();
+  })();
+
   window.aiskillsBanner = { render, fileName };
 })();
 </script>

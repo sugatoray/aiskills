@@ -24,6 +24,9 @@ groups: "auto"
 
 # ── Page ──
 page_title: "aiskills banner"
+# The colour theme (src/scripts/themes.mjs): lightsout (default), teal, paper, phosphor, grimoire,
+# signal, frost, dusk, blueprint, matcha or rose. The editor's gear menu previews the others.
+theme: "lightsout"
 
 # ── Badges ──
 version_label: "v{package_version}"

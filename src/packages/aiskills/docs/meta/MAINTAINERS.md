@@ -150,12 +150,20 @@ code:
   `src/scripts/build-docs-html.mjs` with `src/scripts/docs-template.html`,
   ported from sugatoray/callai's `docs/site/`; tabs come from the landing
   page's `### Section` lists, so a new page must be listed there.
+- **Themes** live in `src/scripts/themes.mjs`, one list for the docs page's
+  gear menu and the banner editor's. `teal` is the base design of the two
+  templates; every other theme sets the page variables for light and dark, and
+  the banner's colours (including dark-ink accents for white backgrounds).
+  `DEFAULT_THEME` (Lights Out) is what the docs page opens in; the banner's
+  theme is `theme` in `docs/banner/config.yaml`. After changing a theme, run
+  `npm run banner:png` and `npm run docs`; `themes.test.mjs` checks contrast
+  from the values, and the browser tests check it on the rendered banner.
 - **The banner** (`docs/banner/`, see its README) is built from
   `docs/banner/config.yaml` and `src/scripts/banner-template.html` by
   `npm run banner`; `npm run banner:png` also renders `banner_2x.png` for the
-  README (needs Playwright). `src/test/banner.test.mjs` fails while the page is
-  stale. The PNG isn't compared pixel by pixel, so re-run `npm run banner:png`
-  whenever the banner changes.
+  README (needs Playwright). The PNG carries the theme and the SHA-256 of the
+  page it was rendered from (PNG `tEXt` chunks), so `src/test/banner.test.mjs`
+  fails while either the page or the PNG is stale.
 - **A version bump** changes the `--version` and `--help` examples, the
   banner and the version in `index.html`: run `npm run banner:png` and
   `npm run docs`; the tests show what else to update.

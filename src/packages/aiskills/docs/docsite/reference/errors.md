@@ -402,6 +402,14 @@ install_style "<style>" has room for 1 to <max> install commands, not <n>
 
 **Fix:** `box` takes up to 3 commands and `chips` up to 2.
 
+### Unknown theme
+
+```text
+unknown theme: <name> (use one of teal, paper, phosphor, …, lightsout)
+```
+
+**Fix:** set `theme` in `docs/banner/config.yaml` (or `--set theme=…`) to one of the themes in `src/scripts/themes.mjs`. The default is `lightsout`.
+
 ### Demo group or skill
 
 ```text

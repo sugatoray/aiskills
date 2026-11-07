@@ -28,6 +28,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { bundled } from "./build-skills-docs.mjs";
 import { SKILLS_CLI_VERSION } from "./installer.mjs";
 import { findRepoRoot } from "./vendor-skills.mjs";
+import { THEMES, bannerSkinCss, themeById } from "./themes.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = resolve(HERE, "..", "..");
@@ -115,6 +116,7 @@ export function resolveValues(config, { packageVersion, set = {}, repoRoot = fin
     v[k] = Array.isArray(val) ? val.map(expand) : expand(val);
   }
   v.repo_label = v.repo_label.replace(/^https?:\/\//, "");
+  if (!themeById(v.theme)) throw new Error(`unknown theme: ${v.theme} (use one of ${THEMES.map((t) => t.id).join(", ")})`);
   return v;
 }
 
@@ -182,6 +184,15 @@ export function render(v, template = readFileSync(DEFAULT_TEMPLATE, "utf8")) {
     group_label: esc(v.group_label),
     pills_html: v.groups.map((g) => `            <span class="pill">${esc(g)}</span>`).join("\n"),
     repo_label: esc(v.repo_label),
+    theme: esc(v.theme),
+    theme_ids_json: JSON.stringify(THEMES.map((t) => t.id)),
+    skins_css: bannerSkinCss(),
+    skin_menu_html: THEMES.map(
+      (t) =>
+        `      <button class="skin-item" type="button" role="menuitemradio" data-skin="${t.id}" aria-checked="${t.id === v.theme}">` +
+        `<span class="sw" aria-hidden="true">${t.swatch.map((c) => `<i style="background:${c}"></i>`).join("")}</span>` +
+        `<span class="nm">${esc(t.name)}</span><span class="ck" aria-hidden="true">✓</span><span class="ds">${esc(t.blurb)}</span></button>`,
+    ).join("\n"),
     store_key: "",
   };
   const put = (t) =>
@@ -194,8 +205,37 @@ export function render(v, template = readFileSync(DEFAULT_TEMPLATE, "utf8")) {
   return put(template);
 }
 
-/** Render the banner page to a PNG with headless Chromium (Playwright). */
-export async function renderPng(page, out, { scale = 2, background = "as-is", ink = "auto" } = {}) {
+/** CRC-32 of a buffer (the PNG chunk checksum). */
+function crc32(buf) {
+  let c = ~0;
+  for (const byte of buf) {
+    c ^= byte;
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+  }
+  return ~c >>> 0;
+}
+
+/** <png> with tEXt chunks for <entries> added right after IHDR. */
+export function addPngText(png, entries) {
+  const ihdrEnd = 8 + 12 + png.readUInt32BE(8);
+  const chunks = Object.entries(entries).map(([k, v]) => {
+    const data = Buffer.concat([Buffer.from(k, "latin1"), Buffer.from([0]), Buffer.from(String(v), "latin1")]);
+    const head = Buffer.alloc(8);
+    head.writeUInt32BE(data.length, 0);
+    head.write("tEXt", 4, "ascii");
+    const crc = Buffer.alloc(4);
+    crc.writeUInt32BE(crc32(Buffer.concat([head.subarray(4), data])), 0);
+    return Buffer.concat([head, data, crc]);
+  });
+  return Buffer.concat([png.subarray(0, ihdrEnd), ...chunks, png.subarray(ihdrEnd)]);
+}
+
+/**
+ * Render the banner page to a PNG with headless Chromium (Playwright). The PNG
+ * records the theme and the SHA-256 of the page it came from, so a test can
+ * tell when it is out of date.
+ */
+export async function renderPng(page, out, { scale = 2, background = "as-is", ink = "auto", theme } = {}) {
   let playwright;
   try {
     playwright = createRequire(import.meta.url)("playwright");
@@ -205,10 +245,12 @@ export async function renderPng(page, out, { scale = 2, background = "as-is", in
   const browser = await playwright.chromium.launch();
   try {
     const p = await browser.newPage({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: Number(scale) });
-    await p.goto(`${pathToFileURL(page).href}?export&bg=${background}&ink=${ink}`, { waitUntil: "networkidle" });
+    await p.goto(`${pathToFileURL(page).href}?export&bg=${background}&ink=${ink}&skin=${theme ?? ""}`, { waitUntil: "networkidle" });
     await p.evaluate(() => document.fonts.ready);
     mkdirSync(dirname(resolve(out)), { recursive: true });
-    await p.locator("#banner").screenshot({ path: out, omitBackground: background === "transparent" });
+    const png = await p.locator("#banner").screenshot({ omitBackground: background === "transparent" });
+    const sha = createHash("sha256").update(readFileSync(page)).digest("hex");
+    writeFileSync(out, addPngText(png, { "aiskills:theme": theme ?? "", "aiskills:page-sha256": sha }));
   } finally {
     await browser.close();
   }
@@ -241,7 +283,8 @@ function parseArgs(argv) {
 export async function main(argv = process.argv.slice(2)) {
   const o = parseArgs(argv);
   const out = o.out ?? DEFAULT_OUTPUT;
-  const html = render(resolveValues(readConfig(), { packageVersion: o.packageVersion, set: o.set }));
+  const values = resolveValues(readConfig(), { packageVersion: o.packageVersion, set: o.set });
+  const html = render(values);
   if (o.check) {
     if (!existsSync(out) || readFileSync(out, "utf8") !== html) {
       console.error(`${out} is out of date: run npm run banner`);
@@ -254,7 +297,7 @@ export async function main(argv = process.argv.slice(2)) {
   writeFileSync(out, html);
   console.error(`wrote ${out}`);
   if (o.png) {
-    await renderPng(out, o.png, o);
+    await renderPng(out, o.png, { ...o, theme: values.theme });
     console.error(`wrote ${o.png}`);
   }
   return 0;

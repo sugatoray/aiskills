@@ -15,6 +15,24 @@ import { pathToFileURL } from "node:url";
 
 import { PKG_SRC, REPO_ROOT, tempDir } from "./helpers.mjs";
 import { SKILLS_CLI_VERSION } from "../scripts/installer.mjs";
+import { createHash } from "node:crypto";
+import { THEMES, DEFAULT_THEME, bannerSkinCss } from "../scripts/themes.mjs";
+
+/** The tEXt chunks of a PNG, as { keyword: text }. */
+function pngText(buf) {
+  const out = {};
+  for (let i = 8; i < buf.length; ) {
+    const len = buf.readUInt32BE(i);
+    const type = buf.toString("ascii", i + 4, i + 8);
+    if (type === "tEXt") {
+      const body = buf.subarray(i + 8, i + 8 + len);
+      const nul = body.indexOf(0);
+      out[body.toString("latin1", 0, nul)] = body.toString("latin1", nul + 1);
+    }
+    i += 12 + len;
+  }
+  return out;
+}
 
 const BUILDER = join(PKG_SRC, "src", "scripts", "create-banner.mjs");
 const BANNER_DIR = join(PKG_SRC, "docs", "banner");
@@ -59,6 +77,14 @@ describe("values", () => {
     assert.equal(v.counts_label, `13 skills · ${local.length} groups`);
   });
 
+  test("the banner's theme is Lights Out by default, and must be a known theme", async () => {
+    const { resolveValues, readConfig } = await load();
+    assert.equal(readConfig().theme, DEFAULT_THEME);
+    assert.equal(resolveValues(readConfig()).theme, "lightsout");
+    assert.equal(resolveValues(readConfig(), { set: { theme: "paper" } }).theme, "paper");
+    assert.throws(() => resolveValues(readConfig(), { set: { theme: "nope" } }), /unknown theme: nope/);
+  });
+
   test("--package-version and --set override the config", async () => {
     const { resolveValues, readConfig } = await load();
     const v = resolveValues(readConfig(), { packageVersion: "9.9.9", set: { tagline: "Hello", groups: "a,b" } });
@@ -95,6 +121,20 @@ describe("render", () => {
     assert.ok(banner.includes("github.com/sugatoray/aiskills"));
   });
 
+  test("the page opens in the configured theme, with a gear menu of every theme in its toolbar", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const html = render(resolveValues(readConfig()));
+    assert.match(html, /<html lang="en" data-skin="lightsout">/);
+    const toolbar = html.slice(html.indexOf('<div class="toolbar"'), html.indexOf('<p class="hint">'));
+    assert.match(toolbar, /<button class="btn ghost skin-btn" id="skinBtn"[^>]*aria-haspopup="menu"[^>]*>/);
+    const items = [...html.matchAll(/role="menuitemradio" data-skin="([a-z]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(items, THEMES.map((t) => t.id));
+    const css = html.split("banner:css:start")[1].split("banner:css:end")[0];
+    assert.ok(css.includes(bannerSkinCss().trim()), "theme CSS sits between the banner:css markers, so the docs page gets it");
+    const other = render(resolveValues(readConfig(), { set: { theme: "paper" } }));
+    assert.match(other, /<html lang="en" data-skin="paper">/);
+  });
+
   test("docs/banner/aiskills-banner.html is up to date (run: npm run banner)", async () => {
     const res = spawnSync(process.execPath, [BUILDER, "--check"], { encoding: "utf8" });
     assert.equal(res.status, 0, res.stdout + res.stderr);
@@ -122,6 +162,13 @@ describe("where the banner is used", () => {
     assert.ok(m[1].startsWith("aiskills: "), "alt text");
     assert.ok(existsSync(join(REPO_ROOT, m[3])), `${m[3]} doesn't exist in the repo`);
     assert.equal(join(REPO_ROOT, m[3]), PNG);
+  });
+
+  test("banner_2x.png records the theme and the page it was rendered from (run: npm run banner:png)", () => {
+    const text = pngText(readFileSync(PNG));
+    assert.equal(text["aiskills:theme"], DEFAULT_THEME);
+    const sha = createHash("sha256").update(readFileSync(PAGE)).digest("hex");
+    assert.equal(text["aiskills:page-sha256"], sha, "banner_2x.png is older than aiskills-banner.html: run npm run banner:png");
   });
 
   test("banner_2x.png is a 2560x1280 PNG", () => {
@@ -220,6 +267,56 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
         }, { bg, ink, under });
         assert.ok(low >= 4.5, `${bg} + ${ink} ink: ${low.toFixed(2)}:1 (${what})`);
       }
+    }));
+
+  test("the gear menu switches the banner's theme, and ?export&skin= picks one", async () => {
+    await open(async (p) => {
+      const bg = () => p.$eval("#banner", (el) => getComputedStyle(el).getPropertyValue("--bg").trim());
+      assert.equal(await p.getAttribute("html", "data-skin"), "lightsout");
+      assert.equal(await bg(), "#000000");
+      assert.equal(await p.isVisible("#skinMenu"), false);
+      await p.click("#skinBtn");
+      assert.equal(await p.isVisible("#skinMenu"), true);
+      await p.click('#skinMenu [data-skin="paper"]');
+      assert.equal(await p.getAttribute("html", "data-skin"), "paper");
+      assert.equal(await bg(), "#17120e");
+      assert.equal(await p.isVisible("#skinMenu"), false);
+      await p.reload({ waitUntil: "networkidle" });
+      assert.equal(await p.getAttribute("html", "data-skin"), "paper", "the choice is remembered");
+    });
+    await open(async (p) => {
+      assert.equal(await p.getAttribute("html", "data-skin"), "blueprint");
+    }, "?export&skin=blueprint");
+  });
+
+  test("every theme keeps banner text at 4.5:1 or more on each allowed background", () =>
+    open(async (p) => {
+      const low = [];
+      for (const t of THEMES) {
+        for (const [bg, ink, under] of [["as-is", "light", null], ["white", "dark", "rgb(255,255,255)"], ["black", "light", "rgb(0,0,0)"], ["transparent", "dark", "rgb(255,255,255)"]]) {
+          const r = await p.evaluate(({ skin, bg, ink, under }) => {
+            document.documentElement.setAttribute("data-skin", skin);
+            const banner = document.getElementById("banner");
+            banner.classList.remove("bg-white", "bg-black", "bg-transparent", "ink-dark");
+            if (bg !== "as-is") banner.classList.add("bg-" + bg);
+            if (ink === "dark") banner.classList.add("ink-dark");
+            const parse = (c) => { const m = c.match(/[\d.]+/g).map(Number); return { r: m[0], g: m[1], b: m[2], a: m[3] ?? 1 }; };
+            const lum = ({ r, g, b }) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+            const ratio = (x, y) => { const [h, l] = [lum(x), lum(y)].sort((m, n) => n - m); return (h + 0.05) / (l + 0.05); };
+            const base = under ?? getComputedStyle(banner).backgroundColor;
+            const bgOf = (el) => { for (let e = el; e && e !== banner.parentElement; e = e.parentElement) { const c = parse(getComputedStyle(e).backgroundColor); if (c.a > 0.5) return c; } return parse(base); };
+            let low = 99, what = "";
+            for (const el of banner.querySelectorAll("*")) {
+              if (!el.offsetParent || el.closest(".mark, .grad") || ![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+              const v = ratio(parse(getComputedStyle(el).color), bgOf(el));
+              if (v < low) { low = v; what = el.className || el.tagName; }
+            }
+            return [low, what];
+          }, { skin: t.id, bg, ink, under });
+          if (r[0] < 4.5) low.push(`${t.id} ${bg}/${ink}: ${r[0].toFixed(2)} (${r[1]})`);
+        }
+      }
+      assert.deepEqual(low, []);
     }));
 
   test("PNG export renders at the chosen size, transparent files say their ink", () =>

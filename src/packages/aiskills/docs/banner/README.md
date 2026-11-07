@@ -32,6 +32,7 @@ Options, after `--` (e.g. `npm run banner -- --set tagline="Hello"`):
 | `--out PATH` | The page to write or check. |
 | `--png [PATH]` | Also render a PNG (default `banner_2x.png`). |
 | `--scale 1\|2\|4`, `--background as-is\|white\|black\|transparent`, `--ink auto\|light\|dark` | The PNG's size, background and text colour. |
+| `--set theme=<id>` | Render in another theme (see [Themes](#themes)). |
 
 ## What's "auto"
 
@@ -49,6 +50,12 @@ The terminal demo's output lines are made from the bundled skills too (the `scro
 Open `aiskills-banner.html` and click **Edit**; every outlined piece of text becomes editable. In the groups row, press Enter inside a pill to add one, or empty a pill to remove it. **Save** keeps your edits in this browser, **Save HTML** downloads a copy with them built in, and **Reset** restores the original. Edits made this way don't change `config.yaml`: put lasting changes there.
 
 **Background** and **Ink** preview the banner on a dark, white, black or transparent background. Ink that can't be read on a background is disabled (light text on white, dark text on dark). A transparent PNG can end up on any page, so **Export all 15** exports it twice: `-light-ink` for dark pages and `-dark-ink` for light ones. `?export` shows only the banner, for scripted screenshots.
+
+## Themes
+
+The banner uses the same 11 themes as the docs page (`src/scripts/themes.mjs`). `theme` in `config.yaml` sets the one the page opens in and that `banner_2x.png` is rendered in (default `lightsout`). The **⚙ Theme** menu in the toolbar previews the others and remembers your pick in this browser; `?export&skin=<id>` picks one for scripted exports. Each theme also has dark-ink accents, so white and transparent-for-light-pages exports stay readable.
+
+`banner_2x.png` records its theme and the SHA-256 of the page it was rendered from in its PNG metadata, so the tests catch a PNG that wasn't re-rendered after a change.
 
 ## Where it's used
 

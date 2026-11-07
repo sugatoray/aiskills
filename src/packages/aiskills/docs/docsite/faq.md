@@ -32,6 +32,10 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 
 No. The `skills` CLI it runs sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. See [Security model](concepts/security.md#telemetry).
 
+### How do I change how these docs look?
+
+In the single-page HTML version of these docs (`index.html`), click the gear at the top right and pick one of 11 themes; the moon/sun button next to it switches light and dark. Your choice is remembered in your browser. The default is Lights Out.
+
 ### Is there a JavaScript API?
 
 No. Only the commands are public; the files under `src/scripts/` can change in any release.

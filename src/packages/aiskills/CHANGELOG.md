@@ -43,6 +43,11 @@ It includes everything listed under 0.1.0 below.
   against the code, runs its examples, and opens every page of the HTML
   in a browser.
 
+- **Themes for the docs page and the banner**: a gear menu at the top right
+  of `docs/docsite/index.html`, and in the banner editor's toolbar, switches
+  between 11 themes (light and dark each), remembered per browser. The
+  default is **Lights Out**; the banner's theme is `theme` in
+  `docs/banner/config.yaml`. One list, `src/scripts/themes.mjs`, feeds both.
 - **A banner** at the top of the README and of the docs' landing page,
   built from `docs/banner/config.yaml` by `npm run banner` /
   `npm run banner:png`, with an in-browser editor and PNG export

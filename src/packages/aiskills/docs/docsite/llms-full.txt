@@ -3412,6 +3412,14 @@ install_style "<style>" has room for 1 to <max> install commands, not <n>
 
 **Fix:** `box` takes up to 3 commands and `chips` up to 2.
 
+### Unknown theme
+
+```text
+unknown theme: <name> (use one of teal, paper, phosphor, …, lightsout)
+```
+
+**Fix:** set `theme` in `docs/banner/config.yaml` (or `--set theme=…`) to one of the themes in `src/scripts/themes.mjs`. The default is `lightsout`.
+
 ### Demo group or skill
 
 ```text
@@ -3491,6 +3499,10 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 ### Does aiskills send any data?
 
 No. The `skills` CLI it runs sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. See [Security model](concepts/security.md#telemetry).
+
+### How do I change how these docs look?
+
+In the single-page HTML version of these docs (`index.html`), click the gear at the top right and pick one of 11 themes; the moon/sun button next to it switches light and dark. Your choice is remembered in your browser. The default is Lights Out.
 
 ### Is there a JavaScript API?
 

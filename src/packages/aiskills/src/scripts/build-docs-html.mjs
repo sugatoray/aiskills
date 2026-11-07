@@ -20,6 +20,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DEFAULT_THEME, THEMES, fontsHref, pageSkinCss, themeById } from "./themes.mjs";
+
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = resolve(HERE, "..", "..");
 const TEMPLATE = join(HERE, "docs-template.html");
@@ -99,6 +101,19 @@ export function collect(docs) {
 /** The package version, from package.json. */
 const version = () => JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8")).version;
 
+const escAttr = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+/** The gear menu's items: one menuitemradio per theme, in THEMES order. */
+export function skinMenuHtml() {
+  const check = '<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  return THEMES.map(
+    (t) =>
+      `      <button class="skin-item" type="button" role="menuitemradio" data-skin="${t.id}" aria-checked="${t.id === DEFAULT_THEME}">` +
+      `<span class="sw" aria-hidden="true">${t.swatch.map((c) => `<i style="background:${c}"></i>`).join("")}</span>` +
+      `<span class="nm">${escAttr(t.name)}${t.id === DEFAULT_THEME ? " (default)" : ""}</span>${check}<span class="ds">${escAttr(t.blurb)}</span></button>`,
+  ).join("\n");
+}
+
 /** Fill the template with the docs' pages, images and version. Returns { html, count }. */
 export function build(docs, { ref = "master", banner = BANNER } = {}) {
   const { tabs, pages } = collect(docs);
@@ -125,6 +140,13 @@ export function build(docs, { ref = "master", banner = BANNER } = {}) {
   const html = readFileSync(TEMPLATE, "utf8")
     .replaceAll("{{VERSION}}", version())
     .replaceAll("{{REPO}}", REPO)
+    .replaceAll("{{SKIN}}", DEFAULT_THEME)
+    .replace("{{SKIN_DEFAULT_FONTS}}", () => `<link rel="stylesheet" href="${fontsHref(themeById(DEFAULT_THEME))}">`)
+    .replace("{{SKIN_FONTS_JSON}}", () =>
+      // Teal's and the default theme's fonts are linked up front; the rest load when chosen.
+      JSON.stringify(Object.fromEntries(THEMES.map((t) => [t.id, t.id === "teal" || t.id === DEFAULT_THEME ? "" : fontsHref(t)]))))
+    .replace("{{SKIN_MENU}}", () => skinMenuHtml())
+    .replace("/*__SKIN_CSS__*/", () => pageSkinCss())
     .replace("/*__BANNER_CSS__*/", () => bannerCss)
     .replace("/*__DOCS_DATA__*/null", () => blob);
   return { html, count: pages.length };

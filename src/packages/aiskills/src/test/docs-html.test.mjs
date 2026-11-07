@@ -56,7 +56,7 @@ describe("build-docs-html", () => {
   test("the page is a complete HTML document with the version filled in", async () => {
     const { build } = await load();
     const { html } = build(DOCS);
-    assert.match(html, /^<!doctype html>\n<html lang="en">/);
+    assert.match(html, /^<!doctype html>\n<html lang="en" data-skin="[a-z]+">/);
     assert.match(html, /<meta charset="utf-8">/);
     assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1">/);
     assert.ok(html.includes(`v${version}`), "version missing");
@@ -105,6 +105,25 @@ describe("build-docs-html", () => {
     assert.ok(d.bannerLabel.startsWith("aiskills: "), "banner label");
     const home = d.pages.find((p) => p.id === "home");
     assert.equal(home.md, readFileSync(join(DOCS, "README.md"), "utf8"), "the Markdown landing page is unchanged");
+  });
+
+  test("the page opens in the default theme and has a gear menu with every theme (top right)", async () => {
+    const { build } = await load();
+    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
+    const { html } = build(DOCS);
+    assert.match(html, new RegExp(`<html lang="en" data-skin="${DEFAULT_THEME}">`));
+    const header = html.slice(html.indexOf('<header class="top">'), html.indexOf("</header>"));
+    const gear = /<button class="icon-btn skin-btn" id="skin-btn"[^>]*>/.exec(header)?.[0] ?? "";
+    assert.ok(gear, "gear button missing from the header");
+    for (const attr of ['aria-label="Choose a theme"', 'aria-haspopup="menu"', 'aria-controls="skin-menu"', 'aria-expanded="false"']) assert.ok(gear.includes(attr), attr);
+    assert.ok(header.indexOf('id="skin-btn"') < header.indexOf('id="theme-btn"'), "gear sits before the light/dark button");
+    const menu = html.slice(html.indexOf('id="skin-menu"'), html.indexOf("</div>", html.indexOf('id="skin-menu"')) + 400);
+    const items = [...html.matchAll(/role="menuitemradio" data-skin="([a-z]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(items, THEMES.map((t) => t.id));
+    assert.ok(menu.includes('role="menu"'));
+    assert.ok(html.includes(fontsHref(themeById(DEFAULT_THEME))), "the default theme's fonts load up front");
+    assert.ok(html.indexOf("aiskills-docs-skin") < html.indexOf("</head>"), "the saved theme is applied in <head>, before the page paints");
+    for (const t of THEMES.filter((x) => x.id !== "teal")) assert.ok(html.includes(`:root[data-skin="${t.id}"]`), `${t.id} CSS missing`);
   });
 
   test("--no-banner leaves the banner out", async () => {
@@ -229,6 +248,65 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       await phone.goto(pathToFileURL(OUT).href + "#home");
       await phone.waitForSelector("#doc h1");
       assert.ok((await phone.evaluate(() => document.documentElement.scrollWidth)) <= 390, "no sideways scroll on a phone");
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the gear menu switches themes, remembers the choice, and loads the theme's fonts", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage({ viewport: { width: 1400, height: 900 }, colorScheme: "dark" });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(OUT).href + "#home");
+      await page.waitForSelector("#doc h1");
+      const vars = () => page.evaluate(() => ({
+        skin: document.documentElement.getAttribute("data-skin"),
+        bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim(),
+        font: getComputedStyle(document.querySelector(".doc h1")).fontFamily.split(",")[0].replace(/"/g, ""),
+      }));
+      assert.deepEqual(await vars(), { skin: "lightsout", bg: "#000000", font: "Geist" }, "Lights Out by default");
+      assert.equal(await page.isVisible("#skin-menu"), false);
+      await page.click("#skin-btn");
+      assert.equal(await page.isVisible("#skin-menu"), true);
+      assert.equal(await page.getAttribute("#skin-btn", "aria-expanded"), "true");
+      assert.equal(await page.getAttribute('#skin-menu [data-skin="lightsout"]', "aria-checked"), "true");
+      await page.click('#skin-menu [data-skin="grimoire"]');
+      assert.equal(await page.isVisible("#skin-menu"), false, "choosing closes the menu");
+      assert.equal(await page.evaluate(() => document.activeElement.id), "skin-btn", "focus returns to the gear");
+      assert.equal((await vars()).skin, "grimoire");
+      assert.equal(await page.locator('link[data-skin-fonts="grimoire"]').count(), 1, "Grimoire's fonts are loaded on demand");
+      await page.waitForFunction(() => document.fonts.check('16px "Space Grotesk"'), null, { timeout: 15000 });
+      await page.reload();
+      await page.waitForSelector("#doc h1");
+      assert.equal((await vars()).skin, "grimoire", "the choice is remembered");
+      // Keyboard: Escape closes, arrows move between themes.
+      await page.focus("#skin-btn");
+      await page.keyboard.press("Enter");
+      assert.equal(await page.evaluate(() => document.activeElement.dataset.skin), "grimoire", "focus starts on the current theme");
+      await page.keyboard.press("ArrowDown");
+      assert.equal(await page.evaluate(() => document.activeElement.dataset.skin), "signal");
+      await page.keyboard.press("Escape");
+      assert.equal(await page.isVisible("#skin-menu"), false);
+      // A click outside closes it too.
+      await page.click("#skin-btn");
+      await page.mouse.click(700, 600);
+      assert.equal(await page.isVisible("#skin-menu"), false);
+      // A saved name that isn't a theme falls back to the default.
+      await page.evaluate(() => localStorage.setItem("aiskills-docs-skin", "bogus"));
+      await page.reload();
+      await page.waitForSelector("#doc h1");
+      assert.equal((await vars()).skin, "lightsout");
+      assert.deepEqual(errors, []);
+      // On a phone the menu stays on screen.
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(pathToFileURL(OUT).href + "#home");
+      await phone.waitForSelector("#doc h1");
+      await phone.click("#skin-btn");
+      const box = await phone.locator("#skin-menu").boundingBox();
+      assert.ok(box.x >= 0 && box.x + box.width <= 390, `menu ${box.x}..${box.x + box.width} on a 390px screen`);
+      assert.ok((await phone.evaluate(() => document.documentElement.scrollWidth)) <= 390);
     } finally {
       await browser.close();
     }

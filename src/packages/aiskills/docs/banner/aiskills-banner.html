@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Built by src/scripts/create-banner.mjs from src/scripts/banner-template.html (the design) and docs/banner/config.yaml (the values). Change those, then run `npm run banner`; don't edit docs/banner/aiskills-banner.html by hand. -->
-<html lang="en">
+<html lang="en" data-skin="lightsout">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +10,15 @@
 <link rel="stylesheet" crossorigin="anonymous"
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;700;800&family=Public+Sans:wght@400;500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script>
+  // Theme (gear menu): ?export&skin=<id> for scripted exports, else the one saved in this browser, else config.yaml's.
+  (function () {
+    var IDS = ["teal","paper","phosphor","grimoire","signal","frost","dusk","blueprint","matcha","rose","lightsout"], q = new URLSearchParams(location.search), s = null;
+    if (q.has('export')) s = q.get('skin');
+    else { try { s = localStorage.getItem('aiskills-banner-skin'); } catch (e) {} }
+    if (IDS.indexOf(s) >= 0) document.documentElement.setAttribute('data-skin', s);
+  })();
+</script>
 <script>
   // Export mode (?export[&bg=as-is|white|black|transparent][&ink=auto|light|dark]): only the banner, at
   // its native 1280x640, for headless screenshots (create_banner.py --png).
@@ -67,6 +76,22 @@
          padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
   .btn.ghost { background: transparent; color: var(--page-fg); border-color: var(--panel-line); font-weight: 500; }
   .btn:disabled { opacity: .55; cursor: progress; }
+  .skin-wrap { position: relative; }
+  .skin-menu { position: absolute; left: 0; top: calc(100% + 6px); z-index: 20; width: 320px; max-width: calc(100vw - 32px);
+               max-height: min(70vh, 560px); overflow-y: auto; background: var(--panel); color: var(--page-fg);
+               border: 1px solid var(--panel-line); border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,.2); padding: 6px; display: grid; gap: 2px; }
+  .skin-menu[hidden] { display: none; }
+  .skin-item { display: grid; grid-template-columns: auto 1fr auto; gap: 1px 10px; align-items: center; width: 100%; text-align: left;
+               background: none; border: 0; border-radius: 8px; padding: 8px 10px; font: inherit; color: inherit; cursor: pointer; }
+  .skin-item:hover, .skin-item:focus-visible { background: color-mix(in srgb, var(--page-fg) 8%, transparent); outline: none; }
+  .skin-item:focus-visible { box-shadow: inset 0 0 0 2px var(--btn); }
+  .skin-item .sw { grid-row: span 2; display: flex; }
+  .skin-item .sw i { display: block; width: 9px; height: 26px; }
+  .skin-item .sw i:first-child { border-radius: 5px 0 0 5px; } .skin-item .sw i:last-child { border-radius: 0 5px 5px 0; }
+  .skin-item .nm { font-weight: 600; }
+  .skin-item .ds { grid-column: 2 / 4; font-size: 12px; color: var(--page-muted); }
+  .skin-item .ck { visibility: hidden; color: var(--btn); }
+  .skin-item[aria-checked="true"] .ck { visibility: visible; }
   .check { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--page-muted); }
 
   .hint { width: 100%; max-width: 1280px; color: var(--page-muted); font-size: 12px; margin: -6px 0 0; }
@@ -85,7 +110,7 @@
   .scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
 
   /* ───────────── Banner (exported) ───────────── */
-  /* banner:css:start (docs/site/build_docs_html.py copies everything up to banner:css:end) */
+  /* banner:css:start (src/scripts/build-docs-html.mjs copies the banner CSS from here to the end marker) */
   #banner {
     --bg: #0d1517;
     --fg: #e8f0f0;
@@ -217,6 +242,78 @@
   #banner .pills { gap: 8px; }
   #banner .pill { font-size: 15px; padding: 8px 13px 8px 11px; }
 
+/* Banner themes (src/scripts/themes.mjs). */
+:root[data-skin="paper"] #banner { --bg: #17120e; --term-bg: #100c09; --term-line: #342a20; }
+:root[data-skin="paper"] #banner:not(.ink-dark) { --teal: #f0915f; --violet: #e8c27a; }
+:root[data-skin="paper"] #banner.ink-dark { --teal: #a8401b; --violet: #8a3a6b; }
+:root[data-skin="paper"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(240,145,95, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(232,194,122, .20), transparent 70%); }
+:root[data-skin="paper"] #banner .term-body .p, :root[data-skin="paper"] #banner .install .dollar { color: #f0915f; }
+:root[data-skin="paper"] #banner .term-body .cursor { background: #f0915f; }
+:root[data-skin="paper"] #banner .mark { box-shadow: 0 10px 30px rgba(240,145,95, .25); }
+:root[data-skin="phosphor"] #banner { --bg: #070b08; --term-bg: #050806; --term-line: #1c2b20; }
+:root[data-skin="phosphor"] #banner:not(.ink-dark) { --teal: #6be38a; --violet: #62d6c8; }
+:root[data-skin="phosphor"] #banner.ink-dark { --teal: #1a6f2e; --violet: #7a3fa8; }
+:root[data-skin="phosphor"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(107,227,138, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(98,214,200, .20), transparent 70%); }
+:root[data-skin="phosphor"] #banner .term-body .p, :root[data-skin="phosphor"] #banner .install .dollar { color: #6be38a; }
+:root[data-skin="phosphor"] #banner .term-body .cursor { background: #6be38a; }
+:root[data-skin="phosphor"] #banner .mark { box-shadow: 0 10px 30px rgba(107,227,138, .25); }
+:root[data-skin="grimoire"] #banner { --bg: #100c1b; --term-bg: #0b0815; --term-line: #2a2342; }
+:root[data-skin="grimoire"] #banner:not(.ink-dark) { --teal: #b9a0ff; --violet: #ff8fcf; }
+:root[data-skin="grimoire"] #banner.ink-dark { --teal: #5b2bc4; --violet: #b0287a; }
+:root[data-skin="grimoire"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(185,160,255, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(255,143,207, .20), transparent 70%); }
+:root[data-skin="grimoire"] #banner .term-body .p, :root[data-skin="grimoire"] #banner .install .dollar { color: #b9a0ff; }
+:root[data-skin="grimoire"] #banner .term-body .cursor { background: #b9a0ff; }
+:root[data-skin="grimoire"] #banner .mark { box-shadow: 0 10px 30px rgba(185,160,255, .25); }
+:root[data-skin="signal"] #banner { --bg: #0b0b0b; --term-bg: #060606; --term-line: #262626; }
+:root[data-skin="signal"] #banner:not(.ink-dark) { --teal: #ff6a5c; --violet: #ffb199; }
+:root[data-skin="signal"] #banner.ink-dark { --teal: #c8261b; --violet: #c8261b; }
+:root[data-skin="signal"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(255,106,92, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(255,177,153, .20), transparent 70%); }
+:root[data-skin="signal"] #banner .term-body .p, :root[data-skin="signal"] #banner .install .dollar { color: #ff6a5c; }
+:root[data-skin="signal"] #banner .term-body .cursor { background: #ff6a5c; }
+:root[data-skin="signal"] #banner .mark { box-shadow: 0 10px 30px rgba(255,106,92, .25); }
+:root[data-skin="frost"] #banner { --bg: #1a1f2b; --term-bg: #10131b; --term-line: #2e3546; }
+:root[data-skin="frost"] #banner:not(.ink-dark) { --teal: #88c0d0; --violet: #b48ead; }
+:root[data-skin="frost"] #banner.ink-dark { --teal: #2f5f9e; --violet: #8a4f9e; }
+:root[data-skin="frost"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(136,192,208, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(180,142,173, .20), transparent 70%); }
+:root[data-skin="frost"] #banner .term-body .p, :root[data-skin="frost"] #banner .install .dollar { color: #88c0d0; }
+:root[data-skin="frost"] #banner .term-body .cursor { background: #88c0d0; }
+:root[data-skin="frost"] #banner .mark { box-shadow: 0 10px 30px rgba(136,192,208, .25); }
+:root[data-skin="dusk"] #banner { --bg: #1a0f15; --term-bg: #12090e; --term-line: #3a2430; }
+:root[data-skin="dusk"] #banner:not(.ink-dark) { --teal: #ff8a7a; --violet: #ff9ec0; }
+:root[data-skin="dusk"] #banner.ink-dark { --teal: #b3204f; --violet: #7a35a8; }
+:root[data-skin="dusk"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(255,138,122, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(255,158,192, .20), transparent 70%); }
+:root[data-skin="dusk"] #banner .term-body .p, :root[data-skin="dusk"] #banner .install .dollar { color: #ff8a7a; }
+:root[data-skin="dusk"] #banner .term-body .cursor { background: #ff8a7a; }
+:root[data-skin="dusk"] #banner .mark { box-shadow: 0 10px 30px rgba(255,138,122, .25); }
+:root[data-skin="blueprint"] #banner { --bg: #0a1230; --term-bg: #070d24; --term-line: #1f2d58; }
+:root[data-skin="blueprint"] #banner:not(.ink-dark) { --teal: #7aa2ff; --violet: #6ee7f0; }
+:root[data-skin="blueprint"] #banner.ink-dark { --teal: #1f4fc4; --violet: #8a3ab9; }
+:root[data-skin="blueprint"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(122,162,255, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(110,231,240, .20), transparent 70%); }
+:root[data-skin="blueprint"] #banner .term-body .p, :root[data-skin="blueprint"] #banner .install .dollar { color: #7aa2ff; }
+:root[data-skin="blueprint"] #banner .term-body .cursor { background: #7aa2ff; }
+:root[data-skin="blueprint"] #banner .mark { box-shadow: 0 10px 30px rgba(122,162,255, .25); }
+:root[data-skin="matcha"] #banner { --bg: #121811; --term-bg: #0c110b; --term-line: #2a3527; }
+:root[data-skin="matcha"] #banner:not(.ink-dark) { --teal: #a8d08d; --violet: #e8d48a; }
+:root[data-skin="matcha"] #banner.ink-dark { --teal: #3f6a2e; --violet: #7a4a8a; }
+:root[data-skin="matcha"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(168,208,141, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(232,212,138, .20), transparent 70%); }
+:root[data-skin="matcha"] #banner .term-body .p, :root[data-skin="matcha"] #banner .install .dollar { color: #a8d08d; }
+:root[data-skin="matcha"] #banner .term-body .cursor { background: #a8d08d; }
+:root[data-skin="matcha"] #banner .mark { box-shadow: 0 10px 30px rgba(168,208,141, .25); }
+:root[data-skin="rose"] #banner { --bg: #17151f; --term-bg: #110f18; --term-line: #2c2840; }
+:root[data-skin="rose"] #banner:not(.ink-dark) { --teal: #ebbcba; --violet: #c4a7e7; }
+:root[data-skin="rose"] #banner.ink-dark { --teal: #934460; --violet: #7a4a9e; }
+:root[data-skin="rose"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(235,188,186, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(196,167,231, .20), transparent 70%); }
+:root[data-skin="rose"] #banner .term-body .p, :root[data-skin="rose"] #banner .install .dollar { color: #ebbcba; }
+:root[data-skin="rose"] #banner .term-body .cursor { background: #ebbcba; }
+:root[data-skin="rose"] #banner .mark { box-shadow: 0 10px 30px rgba(235,188,186, .25); }
+:root[data-skin="lightsout"] #banner { --bg: #000000; --term-bg: #0a0a0b; --term-line: #2f3336; }
+:root[data-skin="lightsout"] #banner:not(.ink-dark) { --teal: #1d9bf0; --violet: #e7e9ea; }
+:root[data-skin="lightsout"] #banner.ink-dark { --teal: #0f6cbd; --violet: #a626a4; }
+:root[data-skin="lightsout"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(29,155,240, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(120,86,255, .20), transparent 70%); }
+:root[data-skin="lightsout"] #banner .term-body .p, :root[data-skin="lightsout"] #banner .install .dollar { color: #1d9bf0; }
+:root[data-skin="lightsout"] #banner .term-body .cursor { background: #1d9bf0; }
+:root[data-skin="lightsout"] #banner .mark { box-shadow: 0 10px 30px rgba(29,155,240, .25); }
+
   /* banner:css:end */
 
   /* Edit mode affordances (stripped on export) */
@@ -247,6 +344,23 @@
   <div class="title">aiskills banner <small>1280 × 640</small></div>
 
   <button class="btn" id="editToggle" aria-pressed="false">✎ Edit</button>
+
+  <div class="skin-wrap">
+    <button class="btn ghost skin-btn" id="skinBtn" aria-haspopup="menu" aria-controls="skinMenu" aria-expanded="false" title="Colour theme (src/scripts/themes.mjs)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Theme</button>
+    <div class="skin-menu" id="skinMenu" role="menu" aria-label="Themes" hidden>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="teal" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#0b6d77"></i><i style="background:#d39af5"></i><i style="background:#0f1719"></i></span><span class="nm">Teal (current)</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Borrowed from callai: cool teal and violet, Bricolage + Public Sans.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="paper" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#a8401b"></i><i style="background:#e8c27a"></i><i style="background:#17130f"></i></span><span class="nm">Ink &amp; Paper</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Warm, editorial: cream paper, ink text, rust accent. Fraunces headings, Plex Sans body.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="phosphor" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#1a6f2e"></i><i style="background:#6be38a"></i><i style="background:#0a0f0b"></i></span><span class="nm">Phosphor</span><span class="ck" aria-hidden="true">✓</span><span class="ds">A terminal at night: green phosphor on near-black, mono headings. Plex Mono + Plex Sans.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="grimoire" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#5b2bc4"></i><i style="background:#ff8fcf"></i><i style="background:#110e1c"></i></span><span class="nm">Grimoire</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Skills as spells: deep indigo, violet and rose. Space Grotesk headings, Manrope body.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="signal" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#c8261b"></i><i style="background:#0b0b0b"></i><i style="background:#ffffff"></i></span><span class="nm">Signal</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Swiss and high-contrast: white and black, one signal red. Archivo throughout.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="frost" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#2f5f9e"></i><i style="background:#88c0d0"></i><i style="background:#1d2230"></i></span><span class="nm">Frost</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Cool and calm: arctic blue-grey with ice blue and heather. Sora headings, Source Sans body.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="dusk" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#b3204f"></i><i style="background:#ff8a7a"></i><i style="background:#1a1015"></i></span><span class="nm">Dusk</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Warm evening light: coral and rose on blush or plum. Outfit headings, DM Sans body.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="blueprint" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#1f4fc4"></i><i style="background:#6ee7f0"></i><i style="background:#0b1430"></i></span><span class="nm">Blueprint</span><span class="ck" aria-hidden="true">✓</span><span class="ds">An engineering drawing: blueprint blue and cyan, condensed headings. Barlow + Fira Code.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="matcha" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#3f6a2e"></i><i style="background:#e8d48a"></i><i style="background:#141913"></i></span><span class="nm">Matcha</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Soft and unhurried: sage green and warm cream. Lexend throughout, made for easy reading.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="rose" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#934460"></i><i style="background:#c4a7e7"></i><i style="background:#191724"></i></span><span class="nm">Rosé</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Muted pastels: rose, iris and gold on aubergine, or on parchment by day. Young Serif + Nunito Sans.</span></button>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="lightsout" aria-checked="true"><span class="sw" aria-hidden="true"><i style="background:#1d9bf0"></i><i style="background:#e7e9ea"></i><i style="background:#000000"></i></span><span class="nm">Lights Out</span><span class="ck" aria-hidden="true">✓</span><span class="ds">X-style pure black with shadcn zinc: frosted header, pill tabs, hairline borders, one blue. Geist throughout.</span></button>
+    </div>
+  </div>
 
   <div class="group">
     <label>Background</label>
@@ -360,7 +474,7 @@
 
 <script>
 (() => {
-  const STORE_KEY = 'aiskills-banner:eda20a7f742a';
+  const STORE_KEY = 'aiskills-banner:66b0285c3b81';
   const banner = document.getElementById('banner');
   const scaler = document.getElementById('scaler');
   const stage = document.getElementById('stage');
@@ -609,6 +723,31 @@
   });
 
   // Exposed for scripted exports (e.g. headless browser).
+  /* ── Theme menu (gear) ── */
+  (() => {
+    const root = document.documentElement, btn = document.getElementById('skinBtn'), menu = document.getElementById('skinMenu');
+    const items = () => [...menu.querySelectorAll('[role="menuitemradio"]')];
+    const sync = () => items().forEach((i) => i.setAttribute('aria-checked', String(i.dataset.skin === root.getAttribute('data-skin'))));
+    const open = () => { sync(); menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); (items().find((i) => i.getAttribute('aria-checked') === 'true') || items()[0]).focus(); };
+    const close = (refocus) => { if (menu.hidden) return; menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); if (refocus) btn.focus(); };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden ? open() : close(true); });
+    menu.addEventListener('click', (e) => {
+      const i = e.target.closest('[role="menuitemradio"]'); if (!i) return;
+      root.setAttribute('data-skin', i.dataset.skin);
+      try { localStorage.setItem('aiskills-banner-skin', i.dataset.skin); } catch {}
+      sync(); close(true); toast(`Theme: ${i.querySelector('.nm').textContent}`);
+    });
+    menu.addEventListener('keydown', (e) => {
+      const list = items(), at = list.indexOf(document.activeElement);
+      const go = (n) => { e.preventDefault(); list[(n + list.length) % list.length].focus(); };
+      if (e.key === 'ArrowDown') go(at + 1); else if (e.key === 'ArrowUp') go(at - 1);
+      else if (e.key === 'Home') go(0); else if (e.key === 'End') go(list.length - 1);
+      else if (e.key === 'Escape') { e.preventDefault(); close(true); } else if (e.key === 'Tab') close(false);
+    });
+    document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) close(false); });
+    sync();
+  })();
+
   window.aiskillsBanner = { render, fileName };
 })();
 </script>
