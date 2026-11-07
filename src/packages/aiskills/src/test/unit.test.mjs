@@ -23,9 +23,9 @@ import {
   skillNamesIn,
   skillsForGroups,
   specSkillName,
-} from "../scripts/installer.mjs";
+} from "../scripts/core/installer.mjs";
 import { listTree, tempDir, writeFixtureTree } from "./helpers.mjs";
-import { vendor } from "../scripts/vendor-skills.mjs";
+import { vendor } from "../scripts/core/vendor-skills.mjs";
 
 let root;
 before(() => {

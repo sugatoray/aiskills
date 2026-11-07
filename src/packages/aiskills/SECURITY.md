@@ -30,7 +30,7 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 
 ### When it runs
 
-- **`npm install`** runs the `postinstall` step (`src/scripts/postinstall.mjs`),
+- **`npm install`** runs the `postinstall` step (`src/scripts/core/postinstall.mjs`),
   unless install scripts are disabled (`--ignore-scripts`, pnpm and bun by
   default) or `AISKILLS_SKIP_POSTINSTALL=1` is set.
 - **The `aiskills`, `ais` and `aix` commands** run only when you call them.
@@ -103,7 +103,7 @@ your agent may run **with your permissions**.
 Each of these has tests in `src/test/` (`npm test`).
 
 - **The `skills` CLI version is pinned.** Every call runs
-  `npx -y skills@1.7.6` (`SKILLS_CLI_VERSION` in `src/scripts/installer.mjs`),
+  `npx -y skills@1.7.6` (`SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs`),
   so a new or compromised `skills` release is never used silently. The
   maintainers bump it after testing. `AISKILLS_SKILLS_VERSION` overrides it
   (an exact version, `latest` or `next`; anything else is refused).

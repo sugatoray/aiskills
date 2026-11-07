@@ -5,9 +5,9 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { join } from "node:path";
 import { describe, test } from "node:test";
 
-import { isIgnored, parseIgnore } from "../scripts/skillsignore.mjs";
-import { vendor } from "../scripts/vendor-skills.mjs";
-import { syncSkills } from "../scripts/installer.mjs";
+import { isIgnored, parseIgnore } from "../scripts/core/skillsignore.mjs";
+import { vendor } from "../scripts/core/vendor-skills.mjs";
+import { syncSkills } from "../scripts/core/installer.mjs";
 import { listTree, tempDir } from "./helpers.mjs";
 
 /** Is <path> ignored by a single .skillsignore with <text> at the top? */

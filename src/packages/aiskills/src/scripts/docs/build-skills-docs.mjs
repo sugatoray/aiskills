@@ -4,7 +4,7 @@
 //   docs/docsite/skills/<name>.md     one page per skill
 //   docs/docsite/README.md            the list between <!-- skills:start --> and <!-- skills:end -->
 //
-// Usage: node src/scripts/build-skills-docs.mjs   (npm run docs:skills)
+// Usage: node src/scripts/docs/build-skills-docs.mjs   (npm run docs:skills)
 //
 // "Bundled" means what the npm package really ships: the repo's skills/ is
 // vendored into a temporary folder exactly as `npm pack` does (so
@@ -16,11 +16,11 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { SKILLS_CLI_VERSION, loadGroups, syncSkills } from "./installer.mjs";
-import { findRepoRoot, vendor } from "./vendor-skills.mjs";
+import { SKILLS_CLI_VERSION, loadGroups, syncSkills } from "../core/installer.mjs";
+import { findRepoRoot, vendor } from "../core/vendor-skills.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const PKG_DIR = resolve(HERE, "..", "..");
+const PKG_DIR = resolve(HERE, "..", "..", "..");
 const DOCS = join(PKG_DIR, "docs", "docsite");
 const TREE = "https://github.com/sugatoray/aiskills/tree/master/skills/";
 const BLOB = "https://github.com/sugatoray/aiskills/blob/master/skills/";

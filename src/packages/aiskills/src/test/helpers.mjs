@@ -16,7 +16,7 @@ import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // This file lives at <package>/src/test/helpers.mjs.
-import { vendor } from "../scripts/vendor-skills.mjs";
+import { vendor } from "../scripts/core/vendor-skills.mjs";
 
 export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const REPO_ROOT = resolve(PKG_SRC, "..", "..", "..");
@@ -88,9 +88,9 @@ process.exit(Number(process.env.FAKE_EXIT || 0));
  * A fresh sandbox, built from the fixture skills, or from the repo's real
  * (git-tracked) skills and marketplace.json with { realSkills: true }.
  * Returns helpers:
- *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/cli.mjs), returns { status, out, calls }
+ *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/core/cli.mjs), returns { status, out, calls }
  *   aix(args, {env})       the same through bin/aix.mjs (= aiskills --route)
- *   postinstall({env})     run src/scripts/postinstall.mjs the way npm would
+ *   postinstall({env})     run src/scripts/core/postinstall.mjs the way npm would
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
  */
@@ -152,7 +152,7 @@ export function sandbox({ realSkills = false } = {}) {
     root,
     run: (args, { env } = {}) => exec(join(pkg, "bin", "aiskills.mjs"), args, env),
     aix: (args, { env } = {}) => exec(join(pkg, "bin", "aix.mjs"), args, env),
-    postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "postinstall.mjs"), [], env),
+    postinstall: ({ env } = {}) => exec(join(pkg, "src", "scripts", "core", "postinstall.mjs"), [], env),
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),

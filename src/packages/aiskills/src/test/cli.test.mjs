@@ -1,4 +1,4 @@
-// CLI tests for bin/aiskills.mjs (-> src/scripts/cli.mjs) and src/scripts/postinstall.mjs.
+// CLI tests for bin/aiskills.mjs (-> src/scripts/core/cli.mjs) and src/scripts/core/postinstall.mjs.
 //
 // Each test runs the real CLI in a throwaway sandbox (see helpers.mjs) with a
 // stand-in `npx` first on PATH, then checks the exact `npx skills` commands

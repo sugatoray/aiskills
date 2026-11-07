@@ -366,7 +366,7 @@ usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]
 
 ## Banner build errors (maintainers)
 
-These come from `npm run banner`, `banner:check` and `banner:png` (`src/scripts/create-banner.mjs`), and from `npm run docs:html`, which copies the banner onto the docs landing page.
+These come from `npm run banner`, `banner:check` and `banner:png` (`src/scripts/docs/create-banner.mjs`), and from `npm run docs:html`, which copies the banner onto the docs landing page.
 
 ### Config value not quoted
 
@@ -408,7 +408,7 @@ install_style "<style>" has room for 1 to <max> install commands, not <n>
 unknown theme: <name> (use one of teal, paper, phosphor, …, lightsout)
 ```
 
-**Fix:** set `theme` in `docs/banner/config.yaml` (or `--set theme=…`) to one of the themes in `src/scripts/themes.mjs`. The default is `lightsout`.
+**Fix:** set `theme` in `docs/banner/config.yaml` (or `--set theme=…`) to one of the themes in `src/scripts/docs/themes.mjs`. The default is `lightsout`.
 
 ### Demo group or skill
 
@@ -425,7 +425,7 @@ route_skill "<name>" is bundled, so 'aix i -s <name>' wouldn't look it up
 template placeholder {{ <name> }} has no value
 ```
 
-**Fix:** a placeholder was added to `src/scripts/banner-template.html` without a value in `render()`; add one.
+**Fix:** a placeholder was added to `src/scripts/docs/templates/banner-template.html` without a value in `render()`; add one.
 
 ### PNG needs Playwright
 

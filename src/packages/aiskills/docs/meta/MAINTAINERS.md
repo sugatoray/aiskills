@@ -19,7 +19,8 @@ How to work on, test and release `@sugatoray-ai/aiskills`. How it's built is in
 ```text
 package.json, README.md, CHANGELOG.md, SECURITY.md
 bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
-src/scripts/                           cli.mjs, installer.mjs, postinstall.mjs, vendor-skills.mjs
+src/scripts/core/                      cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs
+src/scripts/docs/                      docs and banner builders, themes.mjs, templates/ (never published)
 src/test/                              node:test suite
 docs/docsite/                          user documentation, llms.txt, index.html (not published)
 docs/banner/                           banner: config.yaml, editor page, banner_2x.png (not published)
@@ -139,7 +140,7 @@ code:
 - **The Skills section** (`docs/docsite/skills/`, and the list between
   `<!-- skills:start -->` and `<!-- skills:end -->` on the landing page) is
   generated from the skills' `SKILL.md` files by `npm run docs:skills`
-  (`src/scripts/build-skills-docs.mjs`). Don't edit it by hand; change the
+  (`src/scripts/docs/build-skills-docs.mjs`). Don't edit it by hand; change the
   skill and regenerate. `src/test/docs-skills.test.mjs` fails while it is
   stale, for example after a skill's version or description changes.
 
@@ -147,10 +148,10 @@ code:
   `npm run docs:html`. `src/test/docs-html.test.mjs` fails while it is stale,
   and opens every page in Chromium to check links and headings (skipped
   without Playwright or access to cdnjs). The builder is
-  `src/scripts/build-docs-html.mjs` with `src/scripts/docs-template.html`,
+  `src/scripts/docs/build-docs-html.mjs` with `src/scripts/docs/templates/docs-template.html`,
   ported from sugatoray/callai's `docs/site/`; tabs come from the landing
   page's `### Section` lists, so a new page must be listed there.
-- **Themes** live in `src/scripts/themes.mjs`, one list for the docs page's
+- **Themes** live in `src/scripts/docs/themes.mjs`, one list for the docs page's
   gear menu and the banner editor's. `teal` is the base design of the two
   templates; every other theme sets the page variables for light and dark, and
   the banner's colours (including dark-ink accents for white backgrounds).
@@ -159,7 +160,7 @@ code:
   `npm run banner:png` and `npm run docs`; `themes.test.mjs` checks contrast
   from the values, and the browser tests check it on the rendered banner.
 - **The banner** (`docs/banner/`, see its README) is built from
-  `docs/banner/config.yaml` and `src/scripts/banner-template.html` by
+  `docs/banner/config.yaml` and `src/scripts/docs/templates/banner-template.html` by
   `npm run banner`; `npm run banner:png` also renders `banner_2x.png` for the
   README (needs Playwright). The PNG carries the theme and the SHA-256 of the
   page it was rendered from (PNG `tEXt` chunks), so `src/test/banner.test.mjs`
@@ -172,7 +173,7 @@ code:
 
 ## Updating the pinned `skills` CLI
 
-`SKILLS_CLI_VERSION` in `src/scripts/installer.mjs` is the `skills` version
+`SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs` is the `skills` version
 every `npx` call runs. To move to a newer one:
 
 1. `AISKILLS_SKILLS_VERSION=<new> npm run test:e2e` to try it.

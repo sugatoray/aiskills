@@ -22,11 +22,15 @@ src/packages/aiskills/
 ├── bin/aiskills.mjs          entry point for `aiskills` and `ais`
 ├── bin/aix.mjs               entry point for `aix`: sets AISKILLS_ROUTE=1, then loads the CLI
 └── src/scripts/
-    ├── cli.mjs               argument parsing and the commands
-    ├── installer.mjs         all shared logic (no side effects on import)
-    ├── postinstall.mjs       npm postinstall hook
-    ├── skillsignore.mjs      .skillsignore parser/matcher (pack time only; not published)
-    └── vendor-skills.mjs     prepack: builds the shipped skills/ and .aiskills/
+    ├── core/                 the package and its packaging
+    │   ├── cli.mjs           argument parsing and the commands
+    │   ├── installer.mjs     all shared logic (no side effects on import)
+    │   ├── postinstall.mjs   npm postinstall hook
+    │   ├── skillsignore.mjs  .skillsignore parser/matcher (pack time only; not published)
+    │   └── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
+    └── docs/                 docs and banner builders (not published); they use core/, never the reverse
+        ├── build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs
+        └── templates/        docs-template.html, banner-template.html
 ```
 
 | Module | Owns | Main functions |

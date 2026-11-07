@@ -1,12 +1,12 @@
 # Data for the aiskills banner. `npm run banner` reads this file and
-# src/scripts/banner-template.html and writes docs/banner/aiskills-banner.html.
+# src/scripts/docs/templates/banner-template.html and writes docs/banner/aiskills-banner.html.
 # `npm run banner:png` also renders docs/banner/banner_2x.png (the README image).
 #
 # Rules: every value is a double-quoted string, or a list of double-quoted strings.
 # "auto" means read the value from the package and the repository:
 #   package_name, package_version, node_requires, license, repo_url -> package.json
 #   skills_count, groups_count, groups                               -> the bundled skills and marketplace.json
-#   skills_cli_version                                               -> SKILLS_CLI_VERSION in src/scripts/installer.mjs
+#   skills_cli_version                                               -> SKILLS_CLI_VERSION in src/scripts/core/installer.mjs
 # Text values can use {package_name}, {package_version}, {node_requires}, {license}, {repo_url},
 # {skills_count}, {groups_count} and {skills_cli_version}.
 # Command-line flags (--package-version, --set KEY=VALUE) override this file.
@@ -24,7 +24,7 @@ groups: "auto"
 
 # ── Page ──
 page_title: "aiskills banner"
-# The colour theme (src/scripts/themes.mjs): lightsout (default), teal, paper, phosphor, grimoire,
+# The colour theme (src/scripts/docs/themes.mjs): lightsout (default), teal, paper, phosphor, grimoire,
 # signal, frost, dusk, blueprint, matcha or rose. The editor's gear menu previews the others.
 theme: "lightsout"
 

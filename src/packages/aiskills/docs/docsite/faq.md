@@ -38,7 +38,7 @@ In the single-page HTML version of these docs (`index.html`), click the gear at 
 
 ### Is there a JavaScript API?
 
-No. Only the commands are public; the files under `src/scripts/` can change in any release.
+No. Only the commands are public; the files under `src/scripts/core/` can change in any release.
 
 ### What is a skill group, and why is `newsletter-ai` "ungrouped"?
 

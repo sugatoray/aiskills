@@ -14,7 +14,7 @@ import { PKG_SRC, tempDir } from "./helpers.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const OUT = join(DOCS, "index.html");
-const BUILDER = join(PKG_SRC, "src", "scripts", "build-docs-html.mjs");
+const BUILDER = join(PKG_SRC, "src", "scripts", "docs", "build-docs-html.mjs");
 const { version } = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8"));
 
 const load = () => import(pathToFileURL(BUILDER).href);
@@ -109,7 +109,7 @@ describe("build-docs-html", () => {
 
   test("the page opens in the default theme and has a gear menu with every theme (top right)", async () => {
     const { build } = await load();
-    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
+    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "docs", "themes.mjs")).href);
     const { html } = build(DOCS);
     assert.match(html, new RegExp(`<html lang="en" data-skin="${DEFAULT_THEME}">`));
     const header = html.slice(html.indexOf('<header class="top">'), html.indexOf("</header>"));
@@ -128,7 +128,7 @@ describe("build-docs-html", () => {
 
   test("only the default theme's fonts load up front; every other theme's (Teal's too) load when chosen", async () => {
     const { build } = await load();
-    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
+    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "docs", "themes.mjs")).href);
     const { html } = build(DOCS);
     const head = html.slice(0, html.indexOf("</head>"));
     const sheets = [...head.matchAll(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com\/[^"]+)"/g)].map((m) => m[1].replaceAll("&amp;", "&"));

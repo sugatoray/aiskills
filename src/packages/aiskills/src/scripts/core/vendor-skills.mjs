@@ -19,8 +19,8 @@
 // groups from marketplace.json keep working in both layouts. LICENSE and
 // .claude-plugin/marketplace.json are copied too.
 //
-//   node src/scripts/vendor-skills.mjs          # (re)vendor    (npm run vendor)
-//   node src/scripts/vendor-skills.mjs --clean  # remove copies (npm run clean)
+//   node src/scripts/core/vendor-skills.mjs          # (re)vendor    (npm run vendor)
+//   node src/scripts/core/vendor-skills.mjs --clean  # remove copies (npm run clean)
 
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
@@ -173,7 +173,7 @@ export function vendor({ repoRoot, pkgDir }) {
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
 if (isMain) {
   // This file lives at <package>/src/scripts/vendor-skills.mjs.
-  const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
   try {
     if (process.argv.includes("--clean")) {
       clean(pkgDir);

@@ -5,7 +5,7 @@ What @sugatoray-ai/aiskills does, feature by feature. Add a section per feature 
 > **Release status:** everything below is implemented, tested by hand end to end, and pushed on branch `claude/focused-faraday-nqvduf` ([sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122), open). Version `0.3.0` has **not** been published to npm yet (`0.2.0` and `0.1.0` never were). Update this note when it is.
 
 ## Bundled skills in an npm package
-Every file under the repo's `skills/` folder ships, together with `.claude-plugin/marketplace.json` and `LICENSE`. At `npm pack`/`npm publish` time the skills are flattened to `skills/<skill-name>/`; `.aiskills/layout.json` records each skill's original folder and `.aiskills/nested/` holds the files outside any skill folder, so nothing is lost (mapped back, the shipped files equal `git ls-files skills` byte for byte, minus anything a `.skillsignore` excludes). Never committed under the package folder. (`src/scripts/vendor-skills.mjs`)
+Every file under the repo's `skills/` folder ships, together with `.claude-plugin/marketplace.json` and `LICENSE`. At `npm pack`/`npm publish` time the skills are flattened to `skills/<skill-name>/`; `.aiskills/layout.json` records each skill's original folder and `.aiskills/nested/` holds the files outside any skill folder, so nothing is lost (mapped back, the shipped files equal `git ls-files skills` byte for byte, minus anything a `.skillsignore` excludes). Never committed under the package folder. (`src/scripts/core/vendor-skills.mjs`)
 
 ## Works with `npx skills experimental_sync`
 Because `skills/` is flat, a project that installs the package as a dependency can run `npx skills experimental_sync` to copy all its skills into the project, without `aiskills` or `~/.config`.
@@ -14,10 +14,10 @@ Because `skills/` is flat, a project that installs the package as a dependency c
 `~/.config/sugatoray/aiskills/skills/` is flat by default; `--nested` (before the command, or on `install`/`sync`; also `AISKILLS_LAYOUT=nested`) rebuilds the repo's exact nested layout, including group READMEs, `plugin.json` and `meta/`. The choice is remembered until `--flat`. Groups and installs behave the same in both.
 
 ## Install on `npm install -g`
-Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/scripts/postinstall.mjs`)
+Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/scripts/core/postinstall.mjs`)
 
 ## `aiskills` CLI (also `ais`, and `aix` for route mode)
-`install` (alias `i`), `uninstall` (`r`, `rm`, `remove`), `installed` (`ls`), `groups` (`g`), `find` (`f`), `sync`, `list`, `path` (`p`), `help` (`h`), and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/scripts/cli.mjs`, shared logic in `src/scripts/installer.mjs`)
+`install` (alias `i`), `uninstall` (`r`, `rm`, `remove`), `installed` (`ls`), `groups` (`g`), `find` (`f`), `sync`, `list`, `path` (`p`), `help` (`h`), and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/scripts/core/cli.mjs`, shared logic in `src/scripts/core/installer.mjs`)
 
 ## Choosing what to install: scope, agents, skills
 `-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable, which the npm postinstall step also reads.

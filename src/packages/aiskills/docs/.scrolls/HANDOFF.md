@@ -15,17 +15,17 @@ docs/docsite/           user docs (not published): 43 Markdown pages, images/*.s
 docs/docsite/skills/    GENERATED: one page per bundled skill + overview (npm run docs:skills)
 docs/banner/            banner: config.yaml, GENERATED aiskills-banner.html (editor page), banner_2x.png, README (not published)
 docs/meta/              ARCHITECTURE, FEATURES, MAINTAINERS (not published)
-bin/aiskills.mjs        thin entry point: imports ../src/scripts/cli.mjs
+bin/aiskills.mjs        thin entry point: imports ../src/scripts/core/cli.mjs
 bin/aix.mjs             sets AISKILLS_ROUTE=1, then imports the same CLI (aix = aiskills --route)
-src/scripts/            cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs,
-                        build-skills-docs.mjs, build-docs-html.mjs + docs-template.html,
+src/scripts/core/       cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs (pack time)
+src/scripts/docs/       build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs, templates/ (build time only)
                         create-banner.mjs + banner-template.html, themes.mjs (build time only)
 src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs
 (vendored, git-ignored) skills/<name>/ (flat), .aiskills/{layout.json,nested/}, .claude-plugin/, LICENSE
 ```
 
 ## What just happened
-- **Themes** (chosen from a mockup of 11; the user picked **Lights Out**: X-style pure black + shadcn zinc + Geist): `src/scripts/themes.mjs` is one list (Lights Out first, `DEFAULT_THEME = "lightsout"`), feeding a **gear menu** at the top right of `docs/docsite/index.html` and a **⚙ Theme** menu in the banner editor. Choices are remembered per browser (docs: applied in `<head>` before paint; unknown names fall back to the default); only the default's fonts load up front, the rest on demand. The banner's theme is `theme` in `docs/banner/config.yaml` (default `lightsout`), and its theme CSS sits inside the `banner:css` markers so the docs landing banner follows the page's theme.
+- **Themes** (chosen from a mockup of 11; the user picked **Lights Out**: X-style pure black + shadcn zinc + Geist): `src/scripts/docs/themes.mjs` is one list (Lights Out first, `DEFAULT_THEME = "lightsout"`), feeding a **gear menu** at the top right of `docs/docsite/index.html` and a **⚙ Theme** menu in the banner editor. Choices are remembered per browser (docs: applied in `<head>` before paint; unknown names fall back to the default); only the default's fonts load up front, the rest on demand. The banner's theme is `theme` in `docs/banner/config.yaml` (default `lightsout`), and its theme CSS sits inside the `banner:css` markers so the docs landing banner follows the page's theme.
 - **`banner_2x.png` is now checked**: it carries PNG `tEXt` chunks with its theme and the SHA-256 of the page it was rendered from, so a stale PNG fails `banner.test.mjs`.
 - **Finishing pass**: default listed first in both menus, Teal's fonts no longer always downloaded, banner hint explains the Theme menu; generated pages rebuilt.
 - **Version bumped to `0.3.0`** (`0.2.0` marked "Never published", like `0.1.0`); CHANGELOG `## [0.3.0] - Unreleased` holds the docs, banner, themes and the `uninstall -n` fix. `npm test` (259) and `npm run test:e2e` (7) pass.

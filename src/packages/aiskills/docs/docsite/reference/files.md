@@ -66,7 +66,7 @@ Written when the package is built, and copied to the install folder.
 ```text
 @sugatoray-ai/aiskills/
 ├── bin/aiskills.mjs, bin/aix.mjs     the commands (aiskills and ais share one file)
-├── src/scripts/                      cli.mjs, installer.mjs, postinstall.mjs
+├── src/scripts/core/                 cli.mjs, installer.mjs, postinstall.mjs
 ├── skills/<skill>/                   the skills, flat
 ├── .aiskills/layout.json, .aiskills/nested/
 ├── .claude-plugin/marketplace.json

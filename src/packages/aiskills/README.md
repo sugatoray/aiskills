@@ -460,7 +460,7 @@ built) and [docs/meta/FEATURES.md](docs/meta/FEATURES.md) (every feature, with
 where it's documented and tested).
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
-committed here. `prepack` (`src/scripts/vendor-skills.mjs`) runs right before
+committed here. `prepack` (`src/scripts/core/vendor-skills.mjs`) runs right before
 `npm pack` / `npm publish` and:
 
 - flattens `<repo>/skills/<group>/<skill>/` into `skills/<skill>/` (the folder
@@ -537,19 +537,22 @@ src/packages/aiskills/
 ├── CHANGELOG.md              # Keep a Changelog + SemVer
 ├── SECURITY.md               # reporting + what the package touches
 ├── bin/
-│   ├── aiskills.mjs          # thin entry point: imports src/scripts/cli.mjs
+│   ├── aiskills.mjs          # thin entry point: imports src/scripts/core/cli.mjs
 │   └── aix.mjs               # the same, in --route mode
 ├── src/
-│   ├── scripts/              # the code
-│   │   ├── cli.mjs           # the `aiskills` command
-│   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
-│   │   ├── postinstall.mjs   # npm postinstall hook
-│   │   ├── build-skills-docs.mjs # docs/docsite/skills/ from the bundled skills (not published)
-│   │   ├── build-docs-html.mjs, docs-template.html  # docs/docsite -> index.html (not published)
-│   │   ├── create-banner.mjs, banner-template.html  # docs/banner/ (not published)
-│   │   ├── themes.mjs        # the 11 docs/banner themes; default Lights Out (not published)
-│   │   ├── skillsignore.mjs  # .skillsignore rules (not published)
-│   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
+│   ├── scripts/
+│   │   ├── core/             # the package and its packaging
+│   │   │   ├── cli.mjs           # the `aiskills` command
+│   │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
+│   │   │   ├── postinstall.mjs   # npm postinstall hook
+│   │   │   ├── skillsignore.mjs  # .skillsignore rules (not published)
+│   │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
+│   │   └── docs/             # docs and banner (not published)
+│   │       ├── build-skills-docs.mjs  # docs/docsite/skills/ from the bundled skills
+│   │       ├── build-docs-html.mjs    # docs/docsite -> index.html
+│   │       ├── create-banner.mjs      # docs/banner/ page and PNG
+│   │       ├── themes.mjs             # the 11 docs/banner themes; default Lights Out
+│   │       └── templates/             # docs-template.html, banner-template.html
 │   └── test/                 # node:test suite (not published)
 ├── docs/docsite/             # user documentation, llms.txt, index.html (not published)
 ├── docs/banner/              # banner: config.yaml, editor page, banner_2x.png (not published)
@@ -570,12 +573,12 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | File | What it covers |
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
-| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/cli.mjs` (the `aiskills` command) and `src/scripts/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command) and `src/scripts/core/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |
 | `src/test/docs-skills.test.mjs` | The Skills section of the docs (`docs/docsite/skills/`): one page per skill the package really ships, up to date with each `SKILL.md` (description, version, group, how it starts, requirements, source link, shipped files), and a Skills list on the landing page right after Getting started. |
-| `src/test/themes.test.mjs` | The shared themes (`src/scripts/themes.mjs`): 11 themes, Lights Out the default, every token for light and dark, text/link/button contrast of at least 4.5:1 in every theme and mode, Google Fonts links, and generated CSS (banner rules never reach outside the banner). |
+| `src/test/themes.test.mjs` | The shared themes (`src/scripts/docs/themes.mjs`): 11 themes, Lights Out the default, every token for light and dark, text/link/button contrast of at least 4.5:1 in every theme and mode, Google Fonts links, and generated CSS (banner rules never reach outside the banner). |
 | `src/test/banner.test.mjs` | The banner (`docs/banner/`): `config.yaml` parsing, "auto" values from `package.json` and the bundled skills, the generated page is up to date (`npm run banner:check`), the README opens with `banner_2x.png` (2560 × 1280), and, with Playwright, the editor: saved edits, Reset, unreadable ink disabled, text contrast ≥ 4.5:1 on every allowed background, and PNG export sizes. |
 | `src/test/docs-html.test.mjs` | The single-page HTML docs (`docs/docsite/index.html`): it is up to date, holds every page and diagram in tabs that follow the landing page, and, when Playwright and cdnjs are available, every page renders in Chromium with every link going to a page and heading that exist. |
 | `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |

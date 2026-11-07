@@ -13,11 +13,11 @@ import { after, before, describe, test } from "node:test";
 import { pathToFileURL } from "node:url";
 
 import { PKG_SRC, REPO_ROOT, listTree, sandbox } from "./helpers.mjs";
-import { SKILLS_CLI_VERSION, loadGroups, packageLayout } from "../scripts/installer.mjs";
+import { SKILLS_CLI_VERSION, loadGroups, packageLayout } from "../scripts/core/installer.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const SKILLS_DOCS = join(DOCS, "skills");
-const GENERATOR = join(PKG_SRC, "src", "scripts", "build-skills-docs.mjs");
+const GENERATOR = join(PKG_SRC, "src", "scripts", "docs", "build-skills-docs.mjs");
 const load = () => import(pathToFileURL(GENERATOR).href);
 
 /** A frontmatter field from a SKILL.md, the simple way: `key: "value"` or `key: value`. */

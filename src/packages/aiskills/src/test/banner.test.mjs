@@ -14,9 +14,9 @@ import { describe, test } from "node:test";
 import { pathToFileURL } from "node:url";
 
 import { PKG_SRC, REPO_ROOT, tempDir } from "./helpers.mjs";
-import { SKILLS_CLI_VERSION } from "../scripts/installer.mjs";
+import { SKILLS_CLI_VERSION } from "../scripts/core/installer.mjs";
 import { createHash } from "node:crypto";
-import { THEMES, DEFAULT_THEME, bannerSkinCss } from "../scripts/themes.mjs";
+import { THEMES, DEFAULT_THEME, bannerSkinCss } from "../scripts/docs/themes.mjs";
 
 /** The tEXt chunks of a PNG, as { keyword: text }. */
 function pngText(buf) {
@@ -34,7 +34,7 @@ function pngText(buf) {
   return out;
 }
 
-const BUILDER = join(PKG_SRC, "src", "scripts", "create-banner.mjs");
+const BUILDER = join(PKG_SRC, "src", "scripts", "docs", "create-banner.mjs");
 const BANNER_DIR = join(PKG_SRC, "docs", "banner");
 const PAGE = join(BANNER_DIR, "aiskills-banner.html");
 const PNG = join(BANNER_DIR, "banner_2x.png");

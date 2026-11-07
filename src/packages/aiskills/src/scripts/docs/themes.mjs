@@ -741,7 +741,7 @@ const LIGHTS_OUT_CSS = `/* ── Lights Out: the page itself changes, not only 
 
 /** CSS for the docs page: each theme's variables in light and dark, and Lights Out's own styles. */
 export function pageSkinCss() {
-  const out = ["/* Themes (src/scripts/themes.mjs): chosen with the gear menu; data-skin on <html>. */"];
+  const out = ["/* Themes (src/scripts/docs/themes.mjs): chosen with the gear menu; data-skin on <html>. */"];
   for (const t of THEMES.filter((x) => x.light)) {
     out.push(`:root[data-skin="${t.id}"]:not([data-effective="dark"]) {${tokens(t.light, t.fonts)}}`);
     out.push(`:root[data-skin="${t.id}"][data-effective="dark"] {${tokens(t.dark, t.fonts)}color-scheme:dark;}`);
@@ -759,7 +759,7 @@ export function pageSkinCss() {
  * theme's bright accents; dark ink (on white) uses its light-mode accents.
  */
 export function bannerSkinCss() {
-  const out = ["/* Banner themes (src/scripts/themes.mjs). */"];
+  const out = ["/* Banner themes (src/scripts/docs/themes.mjs). */"];
   for (const t of THEMES.filter((x) => x.banner)) {
     const b = t.banner;
     const s = `:root[data-skin="${t.id}"] #banner`;

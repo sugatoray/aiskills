@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { join, relative, sep } from "node:path";
 import { after, before, describe, test } from "node:test";
 
-import { npm, repoCopy } from "./helpers.mjs";
+import { PKG_SRC, npm, repoCopy } from "./helpers.mjs";
 
 let copy;
 before(() => {
@@ -107,9 +107,9 @@ describe("npm pack", () => {
       "LICENSE",
       "bin/aiskills.mjs",
       "bin/aix.mjs",
-      "src/scripts/cli.mjs",
-      "src/scripts/installer.mjs",
-      "src/scripts/postinstall.mjs",
+      "src/scripts/core/cli.mjs",
+      "src/scripts/core/installer.mjs",
+      "src/scripts/core/postinstall.mjs",
       ".claude-plugin/marketplace.json",
       ".aiskills/layout.json",
     ]) {
@@ -119,10 +119,10 @@ describe("npm pack", () => {
     assert.deepEqual(toRepoPaths(files, layout).sort(), shippable(copy.skills, layout).sort());
   });
 
-  test("ships only the bin/ entry point and the runtime files under src/scripts/", (t) => {
+  test("ships only the bin/ entry points and the runtime files under src/scripts/core/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/cli.mjs", "src/scripts/installer.mjs", "src/scripts/postinstall.mjs"]);
+    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/core/cli.mjs", "src/scripts/core/installer.mjs", "src/scripts/core/postinstall.mjs"]);
   });
 
   test("package.json declares the aiskills, ais and aix commands", () => {
@@ -133,7 +133,20 @@ describe("npm pack", () => {
   test("leaves out tests, dev scripts and the scrolls memory", (t) => {
     if (!copy) return t.skip("git not available");
     for (const p of files) {
-      assert.doesNotMatch(p, /^(src\/aiskills\/test\/|docs\/|SCROLLS\.md$|CLAUDE\.md$|AGENTS\.md$|src\/aiskills\/vendor-skills\.mjs$)/, p);
+      assert.doesNotMatch(p, /^(src\/test\/|src\/scripts\/docs\/|src\/scripts\/core\/(vendor-skills|skillsignore)\.mjs$|docs\/|SCROLLS\.md$|CLAUDE\.md$|AGENTS\.md$)/, p);
+    }
+    assert.ok(files.length > 20, "the file list is real");
+  });
+
+  test("src/scripts/ holds two groups: core/ (the package and its packaging) and docs/ (docs and banner)", () => {
+    const list = (rel) => readdirSync(join(PKG_SRC, "src", "scripts", rel), { withFileTypes: true }).map((e) => (e.isDirectory() ? e.name + "/" : e.name)).sort();
+    assert.deepEqual(list("."), ["core/", "docs/"]);
+    assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs", "postinstall.mjs", "skillsignore.mjs", "vendor-skills.mjs"]);
+    assert.deepEqual(list("docs"), ["build-docs-html.mjs", "build-skills-docs.mjs", "create-banner.mjs", "templates/", "themes.mjs"]);
+    assert.deepEqual(list("docs/templates"), ["banner-template.html", "docs-template.html"]);
+    // core/ never depends on docs/.
+    for (const f of list("core")) {
+      assert.doesNotMatch(readFileSync(join(PKG_SRC, "src", "scripts", "core", f), "utf8"), /from "\.\.\/docs\//, `core/${f} imports from docs/`);
     }
   });
 });

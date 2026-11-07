@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // Build the aiskills banner page from docs/banner/config.yaml and
-// src/scripts/banner-template.html, the way sugatoray/callai builds its
+// src/scripts/docs/templates/banner-template.html, the way sugatoray/callai builds its
 // banner (src/tools/banner/create_banner.py).
 //
 // Usage:
-//   node src/scripts/create-banner.mjs                 write docs/banner/aiskills-banner.html   (npm run banner)
-//   node src/scripts/create-banner.mjs --check         exit 1 if it is out of date; write nothing (npm run banner:check)
-//   node src/scripts/create-banner.mjs --png [PATH]    also render a PNG (default docs/banner/banner_2x.png; npm run banner:png)
+//   node src/scripts/docs/create-banner.mjs                 write docs/banner/aiskills-banner.html   (npm run banner)
+//   node src/scripts/docs/create-banner.mjs --check         exit 1 if it is out of date; write nothing (npm run banner:check)
+//   node src/scripts/docs/create-banner.mjs --png [PATH]    also render a PNG (default docs/banner/banner_2x.png; npm run banner:png)
 // Options:
 //   --out PATH                the page to write or check
 //   --package-version V       show this version instead of package.json's
@@ -26,15 +26,15 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { bundled } from "./build-skills-docs.mjs";
-import { SKILLS_CLI_VERSION } from "./installer.mjs";
-import { findRepoRoot } from "./vendor-skills.mjs";
+import { SKILLS_CLI_VERSION } from "../core/installer.mjs";
+import { findRepoRoot } from "../core/vendor-skills.mjs";
 import { THEMES, bannerSkinCss, themeById } from "./themes.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const PKG_DIR = resolve(HERE, "..", "..");
+const PKG_DIR = resolve(HERE, "..", "..", "..");
 export const BANNER_DIR = join(PKG_DIR, "docs", "banner");
 export const DEFAULT_CONFIG = join(BANNER_DIR, "config.yaml");
-export const DEFAULT_TEMPLATE = join(HERE, "banner-template.html");
+export const DEFAULT_TEMPLATE = join(HERE, "templates", "banner-template.html");
 export const DEFAULT_OUTPUT = join(BANNER_DIR, "aiskills-banner.html");
 export const DEFAULT_PNG = join(BANNER_DIR, "banner_2x.png");
 const LIST_KEYS = ["groups", "install_commands"];

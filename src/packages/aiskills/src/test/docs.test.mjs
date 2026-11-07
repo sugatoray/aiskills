@@ -20,11 +20,18 @@ import { PKG_SRC, REPO_ROOT, sandbox, tempDir } from "./helpers.mjs";
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const SKILL_SCRIPTS = join(REPO_ROOT, "skills", "docs", "create-lib-docs", "scripts");
 const SCRIPTS = join(PKG_SRC, "src", "scripts");
+const SCRIPT_DIRS = ["core", "docs"].map((d) => join(SCRIPTS, d));
 const python = spawnSync("python3", ["--version"]).status === 0 ? "python3" : null;
 
 const read = (rel) => readFileSync(join(DOCS, rel), "utf8");
-const source = (file) => readFileSync(join(SCRIPTS, file), "utf8");
-const allSource = () => readdirSync(SCRIPTS).filter((f) => f.endsWith(".mjs")).map(source).join("\n");
+const scriptFiles = () => SCRIPT_DIRS.flatMap((d) => readdirSync(d).filter((f) => f.endsWith(".mjs")).map((f) => join(d, f)));
+/** A script by file name, from whichever group it is in. */
+const source = (file) => readFileSync(scriptFiles().find((p) => p.endsWith("/" + file)), "utf8");
+const allSource = () => {
+  const files = scriptFiles();
+  assert.ok(files.length >= 9, `found only ${files.length} scripts under src/scripts/{core,docs}`);
+  return files.map((p) => readFileSync(p, "utf8")).join("\n");
+};
 
 /** Every *.md file under docs/docsite, as posix paths relative to it. */
 function pages(dir = DOCS, rel = "") {
@@ -139,7 +146,7 @@ describe("reference pages cover the code", () => {
     for (const n of names) assert.ok(hasHeadingWith(env, n), `no heading for \`${n}\` in reference/environment.md`);
   });
 
-  test("every error and warning message in src/scripts/ is in reference/errors.md", () => {
+  test("every error and warning message in src/scripts/core/ and src/scripts/docs/ is in reference/errors.md", () => {
     const errors = read("reference/errors.md");
     const code = allSource();
     // The first string literal passed to new Error(...), warn(...) or problems.push(...).

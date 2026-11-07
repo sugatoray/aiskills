@@ -2,7 +2,7 @@
 // Bundle the Markdown user docs into one HTML page with tabs, a page list,
 // an outline, search and a light/dark theme.
 //
-// Usage: node src/scripts/build-docs-html.mjs docs/docsite --out docs/docsite/index.html [--ref BRANCH]
+// Usage: node src/scripts/docs/build-docs-html.mjs docs/docsite --out docs/docsite/index.html [--ref BRANCH]
 //        (npm run docs:html)
 //
 // Tabs follow the landing page's `### Section` groups and the pages linked
@@ -23,8 +23,8 @@ import { fileURLToPath } from "node:url";
 import { DEFAULT_THEME, THEMES, fontsHref, pageSkinCss, themeById } from "./themes.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const PKG_DIR = resolve(HERE, "..", "..");
-const TEMPLATE = join(HERE, "docs-template.html");
+const PKG_DIR = resolve(HERE, "..", "..", "..");
+const TEMPLATE = join(HERE, "templates", "docs-template.html");
 export const REPO = "https://github.com/sugatoray/aiskills";
 const DOCS_IN_REPO = "src/packages/aiskills/docs/docsite/";
 const TAB_LABELS = { Help: "FAQ", "How-to guides": "Guides" };

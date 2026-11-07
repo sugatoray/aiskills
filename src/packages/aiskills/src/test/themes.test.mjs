@@ -8,7 +8,7 @@ import { pathToFileURL } from "node:url";
 
 import { PKG_SRC } from "./helpers.mjs";
 
-const load = () => import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
+const load = () => import(pathToFileURL(join(PKG_SRC, "src", "scripts", "docs", "themes.mjs")).href);
 
 const TOKENS = ["bg", "surface", "surface2", "fg", "muted", "line", "accent", "accentSoft", "accentFg", "codeBg", "codeFg", "kw", "str", "num", "com", "attr", "fn"];
 const IDS = ["lightsout", "teal", "paper", "phosphor", "grimoire", "signal", "frost", "dusk", "blueprint", "matcha", "rose"];

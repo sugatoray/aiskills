@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Built by src/scripts/create-banner.mjs from src/scripts/banner-template.html (the design) and docs/banner/config.yaml (the values). Change those, then run `npm run banner`; don't edit docs/banner/aiskills-banner.html by hand. -->
+<!-- Built by src/scripts/docs/create-banner.mjs from src/scripts/docs/templates/banner-template.html (the design) and docs/banner/config.yaml (the values). Change those, then run `npm run banner`; don't edit docs/banner/aiskills-banner.html by hand. -->
 <html lang="en" data-skin="{{ theme }}">
 <head>
 <meta charset="utf-8">
@@ -110,7 +110,7 @@
   .scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
 
   /* ───────────── Banner (exported) ───────────── */
-  /* banner:css:start (src/scripts/build-docs-html.mjs copies the banner CSS from here to the end marker) */
+  /* banner:css:start (src/scripts/docs/build-docs-html.mjs copies the banner CSS from here to the end marker) */
   #banner {
     --bg: #0d1517;
     --fg: #e8f0f0;
@@ -276,7 +276,7 @@
   <button class="btn" id="editToggle" aria-pressed="false">✎ Edit</button>
 
   <div class="skin-wrap">
-    <button class="btn ghost skin-btn" id="skinBtn" aria-haspopup="menu" aria-controls="skinMenu" aria-expanded="false" title="Colour theme (src/scripts/themes.mjs)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Theme</button>
+    <button class="btn ghost skin-btn" id="skinBtn" aria-haspopup="menu" aria-controls="skinMenu" aria-expanded="false" title="Colour theme (src/scripts/docs/themes.mjs)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Theme</button>
     <div class="skin-menu" id="skinMenu" role="menu" aria-label="Themes" hidden>
 {{ skin_menu_html }}
     </div>

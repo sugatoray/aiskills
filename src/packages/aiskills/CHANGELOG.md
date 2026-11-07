@@ -45,7 +45,7 @@ It includes everything listed under 0.2.0 and 0.1.0 below.
   of `docs/docsite/index.html`, and in the banner editor's toolbar, switches
   between 11 themes (light and dark each), remembered per browser. The
   default is **Lights Out**; the banner's theme is `theme` in
-  `docs/banner/config.yaml`. One list, `src/scripts/themes.mjs`, feeds both.
+  `docs/banner/config.yaml`. One list, `src/scripts/docs/themes.mjs`, feeds both.
 
 ### Changed
 

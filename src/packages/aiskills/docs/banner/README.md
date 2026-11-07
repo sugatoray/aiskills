@@ -6,9 +6,9 @@ A maintainer tool that builds the aiskills banner: a single, self-contained HTML
 
 | File | What it is |
 | --- | --- |
-| [`../../src/scripts/banner-template.html`](../../src/scripts/banner-template.html) | The page design, with `{{ name }}` placeholders. Edit this to change layout, styles or behaviour. |
+| [`../../src/scripts/docs/templates/banner-template.html`](../../src/scripts/docs/templates/banner-template.html) | The page design, with `{{ name }}` placeholders. Edit this to change layout, styles or behaviour. |
 | [`config.yaml`](config.yaml) | Every value that goes into the banner. Edit this to change text, badges or the terminal demo. |
-| [`../../src/scripts/create-banner.mjs`](../../src/scripts/create-banner.mjs) | The builder: fills the template from the config, `package.json` and the bundled skills. No dependencies (PNG export needs Playwright). |
+| [`../../src/scripts/docs/create-banner.mjs`](../../src/scripts/docs/create-banner.mjs) | The builder: fills the template from the config, `package.json` and the bundled skills. No dependencies (PNG export needs Playwright). |
 | [`aiskills-banner.html`](aiskills-banner.html) | The generated page (committed). **Don't edit by hand**: run `npm run banner`. |
 | [`banner_2x.png`](banner_2x.png) | The 2× PNG (committed), made by `npm run banner:png`. The package README shows it. |
 
@@ -41,7 +41,7 @@ Options, after `--` (e.g. `npm run banner -- --set tagline="Hello"`):
 | `package_name`, `package_version`, `license`, `repo_url` | `package.json` |
 | `node_requires` | `engines.node` in `package.json` |
 | `skills_count`, `groups_count`, `groups` | The skills the package really ships, and the repo's `marketplace.json` |
-| `skills_cli_version` | `SKILLS_CLI_VERSION` in `src/scripts/installer.mjs` |
+| `skills_cli_version` | `SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs` |
 
 The terminal demo's output lines are made from the bundled skills too (the `scrolls` group's real `bundled:` line, the pinned `skills` version), so the banner never shows output `aiskills` doesn't print. `route_skill` must be a skill the package doesn't bundle.
 
@@ -53,12 +53,12 @@ Open `aiskills-banner.html` and click **Edit**; every outlined piece of text bec
 
 ## Themes
 
-The banner uses the same 11 themes as the docs page (`src/scripts/themes.mjs`). `theme` in `config.yaml` sets the one the page opens in and that `banner_2x.png` is rendered in (default `lightsout`). The **⚙ Theme** menu in the toolbar previews the others and remembers your pick in this browser; `?export&skin=<id>` picks one for scripted exports. Each theme also has dark-ink accents, so white and transparent-for-light-pages exports stay readable.
+The banner uses the same 11 themes as the docs page (`src/scripts/docs/themes.mjs`). `theme` in `config.yaml` sets the one the page opens in and that `banner_2x.png` is rendered in (default `lightsout`). The **⚙ Theme** menu in the toolbar previews the others and remembers your pick in this browser; `?export&skin=<id>` picks one for scripted exports. Each theme also has dark-ink accents, so white and transparent-for-light-pages exports stay readable.
 
 `banner_2x.png` records its theme and the SHA-256 of the page it was rendered from in its PNG metadata, so the tests catch a PNG that wasn't re-rendered after a change.
 
 ## Where it's used
 
 - **Package README:** `banner_2x.png`, by an absolute `raw.githubusercontent.com` URL on `master`, so it also shows on npmjs.com. The image appears there once this folder is on `master`.
-- **Docs landing page (`docs/docsite/index.html`):** the banner itself, copied by `src/scripts/build-docs-html.mjs` from between the `banner:html` and `banner:css` markers, without the editing features. The Markdown landing page has no banner.
+- **Docs landing page (`docs/docsite/index.html`):** the banner itself, copied by `src/scripts/docs/build-docs-html.mjs` from between the `banner:html` and `banner:css` markers, without the editing features. The Markdown landing page has no banner.
 - **Fonts and export:** the page loads Google Fonts, and its PNG export loads `html-to-image` from jsDelivr, so both need network access.
