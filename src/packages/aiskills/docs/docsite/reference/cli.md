@@ -218,7 +218,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.2.0 — Sugato Ray's agent skills
+aiskills 0.3.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -312,7 +312,7 @@ ais -v
 ```
 
 ```text
-0.2.0
+0.3.0
 ```
 
 ## Options

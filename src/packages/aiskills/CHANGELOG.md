@@ -20,10 +20,47 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
-## [0.2.0] - Unreleased
+## [0.3.0] - Unreleased
 
 First release to be published to npm; this section gets its date when it is.
-It includes everything listed under 0.1.0 below.
+It includes everything listed under 0.2.0 and 0.1.0 below.
+
+### Added
+
+- **User documentation** in the repo at
+  [`src/packages/aiskills/docs/docsite/`](https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills/docs/docsite):
+  getting started, a page for every bundled skill (generated from the
+  skills, `npm run docs:skills`), a tutorial, how-to guides, concepts, a full
+  reference (commands, options, environment variables, files, errors), an
+  FAQ, and `llms.txt` / `llms-full.txt` for AI agents, plus the same docs as
+  one HTML page with tabs and search (`docs/docsite/index.html`,
+  `npm run docs:html`). Not shipped in the package. `npm test` checks it
+  against the code, runs its examples, and opens every page of the HTML in a
+  browser.
+- **A banner** at the top of the README and of the docs' landing page,
+  built from `docs/banner/config.yaml` by `npm run banner` /
+  `npm run banner:png`, with an in-browser editor and PNG export
+  (`docs/banner/`). Not shipped in the package.
+- **Themes for the docs page and the banner**: a gear menu at the top right
+  of `docs/docsite/index.html`, and in the banner editor's toolbar, switches
+  between 11 themes (light and dark each), remembered per browser. The
+  default is **Lights Out**; the banner's theme is `theme` in
+  `docs/banner/config.yaml`. One list, `src/scripts/themes.mjs`, feeds both.
+
+### Changed
+
+- The README opens with the banner image and links to the full
+  documentation.
+
+### Fixed
+
+- `uninstall -n` now prints the `npx` command that would really run,
+  including the pinned `skills` version (`npx -y skills@1.7.6 remove ...`).
+
+## [0.2.0] - Never published
+
+Superseded by 0.3.0 before it was published to npm, so it can't be installed
+on its own.
 
 ### Added
 
@@ -32,31 +69,6 @@ It includes everything listed under 0.1.0 below.
   was left out is listed in `.aiskills/layout.json` (`ignored`).
 - **`SECURITY.md`**: how to report a vulnerability, what the package writes
   and which network calls happen, and the protections below.
-- **User documentation** in the repo at
-  [`src/packages/aiskills/docs/docsite/`](https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills/docs/docsite):
-  getting started, a page for every bundled skill (generated from the
-  skills, `npm run docs:skills`), a tutorial, how-to guides, concepts, a full reference
-  (commands, options, environment variables, files, errors), an FAQ, and
-  `llms.txt` / `llms-full.txt` for AI agents, plus the same docs as one HTML
-  page with tabs, search and a dark theme (`docs/docsite/index.html`,
-  `npm run docs:html`). Not shipped in the package. `npm test` checks it
-  against the code, runs its examples, and opens every page of the HTML
-  in a browser.
-
-- **Themes for the docs page and the banner**: a gear menu at the top right
-  of `docs/docsite/index.html`, and in the banner editor's toolbar, switches
-  between 11 themes (light and dark each), remembered per browser. The
-  default is **Lights Out**; the banner's theme is `theme` in
-  `docs/banner/config.yaml`. One list, `src/scripts/themes.mjs`, feeds both.
-- **A banner** at the top of the README and of the docs' landing page,
-  built from `docs/banner/config.yaml` by `npm run banner` /
-  `npm run banner:png`, with an in-browser editor and PNG export
-  (`docs/banner/`). Not shipped in the package.
-
-### Fixed
-
-- `uninstall -n` now prints the `npx` command that would really run,
-  including the pinned `skills` version (`npx -y skills@1.7.6 remove ...`).
 
 ### Security
 
@@ -119,5 +131,6 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.3.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.2.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122
