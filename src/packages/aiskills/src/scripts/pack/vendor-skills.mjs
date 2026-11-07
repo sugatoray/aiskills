@@ -19,14 +19,14 @@
 // groups from marketplace.json keep working in both layouts. LICENSE and
 // .claude-plugin/marketplace.json are copied too.
 //
-//   node src/scripts/core/vendor-skills.mjs          # (re)vendor    (npm run vendor)
-//   node src/scripts/core/vendor-skills.mjs --clean  # remove copies (npm run clean)
+//   node src/scripts/pack/vendor-skills.mjs          # (re)vendor    (npm run vendor)
+//   node src/scripts/pack/vendor-skills.mjs --clean  # remove copies (npm run clean)
 
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LAYOUT_REL, NESTED_EXTRAS_REL, readSkillName } from "./installer.mjs";
+import { LAYOUT_REL, NESTED_EXTRAS_REL, readSkillName } from "../core/installer.mjs";
 import { IGNORE_FILE, isIgnored, parseIgnore } from "./skillsignore.mjs";
 
 // Local build/runtime junk that is never part of a skill.

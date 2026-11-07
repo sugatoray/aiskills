@@ -17,7 +17,8 @@ docs/banner/            banner: config.yaml, GENERATED aiskills-banner.html (edi
 docs/meta/              ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 bin/aiskills.mjs        thin entry point: imports ../src/scripts/core/cli.mjs
 bin/aix.mjs             sets AISKILLS_ROUTE=1, then imports the same CLI (aix = aiskills --route)
-src/scripts/core/       cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs (pack time)
+src/scripts/core/       cli.mjs, installer.mjs, postinstall.mjs (published)
+src/scripts/pack/       vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/       build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs, templates/ (build time only)
                         create-banner.mjs + banner-template.html, themes.mjs (build time only)
 src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs

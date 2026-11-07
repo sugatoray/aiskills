@@ -27,7 +27,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { bundled } from "./build-skills-docs.mjs";
 import { SKILLS_CLI_VERSION } from "../core/installer.mjs";
-import { findRepoRoot } from "../core/vendor-skills.mjs";
+import { findRepoRoot } from "../pack/vendor-skills.mjs";
 import { THEMES, bannerSkinCss, themeById } from "./themes.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));

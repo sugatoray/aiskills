@@ -133,21 +133,34 @@ describe("npm pack", () => {
   test("leaves out tests, dev scripts and the scrolls memory", (t) => {
     if (!copy) return t.skip("git not available");
     for (const p of files) {
-      assert.doesNotMatch(p, /^(src\/test\/|src\/scripts\/docs\/|src\/scripts\/core\/(vendor-skills|skillsignore)\.mjs$|docs\/|SCROLLS\.md$|CLAUDE\.md$|AGENTS\.md$)/, p);
+      assert.doesNotMatch(p, /^(src\/test\/|src\/scripts\/docs\/|src\/scripts\/pack\/|src\/scripts\/README\.md$|docs\/|SCROLLS\.md$|CLAUDE\.md$|AGENTS\.md$)/, p);
     }
     assert.ok(files.length > 20, "the file list is real");
   });
 
-  test("src/scripts/ holds two groups: core/ (the package and its packaging) and docs/ (docs and banner)", () => {
+  test("src/scripts/ holds three groups: core/ (runtime), pack/ (packaging) and docs/ (docs and banner)", () => {
     const list = (rel) => readdirSync(join(PKG_SRC, "src", "scripts", rel), { withFileTypes: true }).map((e) => (e.isDirectory() ? e.name + "/" : e.name)).sort();
-    assert.deepEqual(list("."), ["core/", "docs/"]);
-    assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs", "postinstall.mjs", "skillsignore.mjs", "vendor-skills.mjs"]);
+    assert.deepEqual(list("."), ["README.md", "core/", "docs/", "pack/"]);
+    assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs", "postinstall.mjs"]);
+    assert.deepEqual(list("pack"), ["skillsignore.mjs", "vendor-skills.mjs"]);
     assert.deepEqual(list("docs"), ["build-docs-html.mjs", "build-skills-docs.mjs", "create-banner.mjs", "templates/", "themes.mjs"]);
     assert.deepEqual(list("docs/templates"), ["banner-template.html", "docs-template.html"]);
-    // core/ never depends on docs/.
-    for (const f of list("core")) {
-      assert.doesNotMatch(readFileSync(join(PKG_SRC, "src", "scripts", "core", f), "utf8"), /from "\.\.\/docs\//, `core/${f} imports from docs/`);
+    // Imports only point "down": docs/ -> pack/ -> core/. core/ ships alone, so it may import neither.
+    const read = (dir, f) => readFileSync(join(PKG_SRC, "src", "scripts", dir, f), "utf8");
+    for (const f of list("core")) assert.doesNotMatch(read("core", f), /from "\.\.\/(docs|pack)\//, `core/${f} imports from docs/ or pack/`);
+    for (const f of list("pack")) assert.doesNotMatch(read("pack", f), /from "\.\.\/docs\//, `pack/${f} imports from docs/`);
+  });
+
+  test("src/scripts/README.md explains each folder and lists every file in it", () => {
+    const readme = readFileSync(join(PKG_SRC, "src", "scripts", "README.md"), "utf8");
+    for (const dir of ["core", "pack", "docs"]) {
+      assert.match(readme, new RegExp(`^## \`${dir}/\``, "m"), `no section for ${dir}/`);
+      const section = readme.split(new RegExp(`^## \`${dir}/\``, "m"))[1].split(/^## /m)[0];
+      const files = readdirSync(join(PKG_SRC, "src", "scripts", dir)).filter((f) => f !== "templates");
+      for (const f of files) assert.ok(section.includes("`" + f + "`"), `${dir}/${f} isn't described in its section`);
     }
+    assert.ok(readme.includes("`templates/`"), "docs/templates/ isn't described");
+    for (const rule of ["published", "never imports", "files"]) assert.ok(readme.includes(rule), `README should explain: ${rule}`);
   });
 });
 

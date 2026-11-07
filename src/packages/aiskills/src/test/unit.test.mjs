@@ -25,7 +25,7 @@ import {
   specSkillName,
 } from "../scripts/core/installer.mjs";
 import { listTree, tempDir, writeFixtureTree } from "./helpers.mjs";
-import { vendor } from "../scripts/core/vendor-skills.mjs";
+import { vendor } from "../scripts/pack/vendor-skills.mjs";
 
 let root;
 before(() => {

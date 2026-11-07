@@ -22,16 +22,20 @@ src/packages/aiskills/
 ├── bin/aiskills.mjs          entry point for `aiskills` and `ais`
 ├── bin/aix.mjs               entry point for `aix`: sets AISKILLS_ROUTE=1, then loads the CLI
 └── src/scripts/
-    ├── core/                 the package and its packaging
+    ├── README.md             what each folder is for, and the import rule
+    ├── core/                 what ships: the runtime code
     │   ├── cli.mjs           argument parsing and the commands
     │   ├── installer.mjs     all shared logic (no side effects on import)
-    │   ├── postinstall.mjs   npm postinstall hook
-    │   ├── skillsignore.mjs  .skillsignore parser/matcher (pack time only; not published)
-    │   └── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
-    └── docs/                 docs and banner builders (not published); they use core/, never the reverse
+    │   └── postinstall.mjs   npm postinstall hook
+    ├── pack/                 packaging, run at npm pack (not published)
+    │   ├── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
+    │   └── skillsignore.mjs  .skillsignore parser/matcher
+    └── docs/                 docs and banner builders (not published)
         ├── build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs
         └── templates/        docs-template.html, banner-template.html
 ```
+
+Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `core/`, and `core/` uses neither (it ships on its own). `packaging.test.mjs` checks this.
 
 | Module | Owns | Main functions |
 | --- | --- | --- |

@@ -19,7 +19,8 @@ How to work on, test and release `@sugatoray-ai/aiskills`. How it's built is in
 ```text
 package.json, README.md, CHANGELOG.md, SECURITY.md
 bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
-src/scripts/core/                      cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs
+src/scripts/core/                      cli.mjs, installer.mjs, postinstall.mjs (published; see src/scripts/README.md)
+src/scripts/pack/                      vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/                      docs and banner builders, themes.mjs, templates/ (never published)
 src/test/                              node:test suite
 docs/docsite/                          user documentation, llms.txt, index.html (not published)

@@ -16,7 +16,7 @@ import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // This file lives at <package>/src/test/helpers.mjs.
-import { vendor } from "../scripts/core/vendor-skills.mjs";
+import { vendor } from "../scripts/pack/vendor-skills.mjs";
 
 export const PKG_SRC = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const REPO_ROOT = resolve(PKG_SRC, "..", "..", "..");

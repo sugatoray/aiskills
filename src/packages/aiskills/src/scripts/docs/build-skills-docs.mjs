@@ -17,7 +17,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SKILLS_CLI_VERSION, loadGroups, syncSkills } from "../core/installer.mjs";
-import { findRepoRoot, vendor } from "../core/vendor-skills.mjs";
+import { findRepoRoot, vendor } from "../pack/vendor-skills.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = resolve(HERE, "..", "..", "..");

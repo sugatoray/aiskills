@@ -460,7 +460,7 @@ built) and [docs/meta/FEATURES.md](docs/meta/FEATURES.md) (every feature, with
 where it's documented and tested).
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
-committed here. `prepack` (`src/scripts/core/vendor-skills.mjs`) runs right before
+committed here. `prepack` (`src/scripts/pack/vendor-skills.mjs`) runs right before
 `npm pack` / `npm publish` and:
 
 - flattens `<repo>/skills/<group>/<skill>/` into `skills/<skill>/` (the folder
@@ -540,13 +540,14 @@ src/packages/aiskills/
 │   ├── aiskills.mjs          # thin entry point: imports src/scripts/core/cli.mjs
 │   └── aix.mjs               # the same, in --route mode
 ├── src/
-│   ├── scripts/
-│   │   ├── core/             # the package and its packaging
+│   ├── scripts/              # see src/scripts/README.md
+│   │   ├── core/             # what ships: the runtime code
 │   │   │   ├── cli.mjs           # the `aiskills` command
 │   │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
-│   │   │   ├── postinstall.mjs   # npm postinstall hook
-│   │   │   ├── skillsignore.mjs  # .skillsignore rules (not published)
-│   │   │   └── vendor-skills.mjs # prepack: copies <repo>/skills in (not published)
+│   │   │   └── postinstall.mjs   # npm postinstall hook
+│   │   ├── pack/             # packaging, run at npm pack (not published)
+│   │   │   ├── vendor-skills.mjs # prepack: copies <repo>/skills in
+│   │   │   └── skillsignore.mjs  # .skillsignore rules
 │   │   └── docs/             # docs and banner (not published)
 │   │       ├── build-skills-docs.mjs  # docs/docsite/skills/ from the bundled skills
 │   │       ├── build-docs-html.mjs    # docs/docsite -> index.html

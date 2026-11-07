@@ -31,7 +31,7 @@ export function installRoot() {
 export const log = (...a) => console.log("[aiskills]", ...a);
 export const warn = (...a) => console.warn("[aiskills]", ...a);
 
-// Reverse of the renames done by src/scripts/core/vendor-skills.mjs.
+// Reverse of the renames done by src/scripts/pack/vendor-skills.mjs.
 const DOTFILES = { _gitignore: ".gitignore", _npmignore: ".npmignore" };
 function restoreDotfiles(dir) {
   for (const ent of readdirSync(dir, { withFileTypes: true })) {
