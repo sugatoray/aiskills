@@ -35,6 +35,18 @@ It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
   explains the three folders and the rule that imports only point down
   (`docs/` → `pack/` → `core/`). The `aiskills`, `ais` and `aix` commands and
   the npm install step work exactly as before.
+- **User docs refreshed for 0.4.0.** The docs landing page has a new
+  "Ways to read these docs" section: the Markdown pages, the single-page
+  `index.html` (tabs, search, 11 themes from the gear menu, Lights Out by
+  default, light/dark toggle), and `llms.txt` / `llms-full.txt` for AI
+  agents. The files reference now says what the npm package contains and
+  what stays in the repo (`src/scripts/pack/`, `src/scripts/docs/`,
+  `src/test/`, `docs/`). Every command, option, environment variable and
+  error message is still covered, and the checked examples still print what
+  the pages show.
+- **Maintainer docs** (`docs/meta/ARCHITECTURE.md`, `FEATURES.md` and
+  `MAINTAINERS.md`) describe the `core/` / `pack/` / `docs/` layout, the
+  docs and banner builders, the themes, and the current test suites.
 
 ### Fixed
 
