@@ -456,8 +456,10 @@ and how to report a vulnerability.
 
 Maintainer docs: [docs/meta/MAINTAINERS.md](docs/meta/MAINTAINERS.md) (workflow
 and releases), [docs/meta/ARCHITECTURE.md](docs/meta/ARCHITECTURE.md) (how it's
-built) and [docs/meta/FEATURES.md](docs/meta/FEATURES.md) (every feature, with
-where it's documented and tested).
+built), [docs/meta/FEATURES.md](docs/meta/FEATURES.md) (every feature, with
+where it's documented and tested) and [src/scripts/README.md](src/scripts/README.md)
+(what each code folder is for: `core/` ships, `pack/` runs at `npm pack`,
+`docs/` builds the docs and banner).
 
 The package source lives in `src/packages/aiskills/` of the repo. The skills are **not**
 committed here. `prepack` (`src/scripts/pack/vendor-skills.mjs`) runs right before
@@ -576,7 +578,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
 | `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command) and `src/scripts/core/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
-| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); `src/test/`, the vendor script, `docs/` and the scrolls files don't ship. |
+| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the three runtime files in `src/scripts/core/` ship as code: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |
 | `src/test/docs-skills.test.mjs` | The Skills section of the docs (`docs/docsite/skills/`): one page per skill the package really ships, up to date with each `SKILL.md` (description, version, group, how it starts, requirements, source link, shipped files), and a Skills list on the landing page right after Getting started. |
 | `src/test/themes.test.mjs` | The shared themes (`src/scripts/docs/themes.mjs`): 11 themes, Lights Out the default, every token for light and dark, text/link/button contrast of at least 4.5:1 in every theme and mode, Google Fonts links, and generated CSS (banner rules never reach outside the banner). |

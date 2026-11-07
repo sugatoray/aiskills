@@ -20,10 +20,33 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
-## [0.3.0] - Unreleased
+## [0.4.0] - Unreleased
 
 First release to be published to npm; this section gets its date when it is.
-It includes everything listed under 0.2.0 and 0.1.0 below.
+It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
+
+### Changed
+
+- **The code is organized by when it runs.** The three files that ship
+  moved from `src/scripts/` to `src/scripts/core/` (`cli.mjs`,
+  `installer.mjs`, `postinstall.mjs`). The scripts that build the package
+  are in `src/scripts/pack/`, and the docs and banner builders in
+  `src/scripts/docs/`; neither is published. `src/scripts/README.md`
+  explains the three folders and the rule that imports only point down
+  (`docs/` → `pack/` → `core/`). The `aiskills`, `ais` and `aix` commands and
+  the npm install step work exactly as before.
+
+### Fixed
+
+- The root `README.md`, `CHANGELOG.md`, `SECURITY.md` and `LICENSE` are now
+  listed as `/README.md` etc. in `package.json` `"files"`. A plain
+  `README.md` also matches READMEs in subfolders, which would have
+  published `src/scripts/README.md`.
+
+## [0.3.0] - Never published
+
+Superseded by 0.4.0 before it was published to npm, so it can't be installed
+on its own.
 
 ### Added
 
@@ -131,6 +154,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.4.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.3.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.2.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.1.0]: https://github.com/sugatoray/aiskills/pull/122
