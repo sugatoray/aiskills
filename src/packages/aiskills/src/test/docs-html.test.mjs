@@ -126,6 +126,17 @@ describe("build-docs-html", () => {
     for (const t of THEMES.filter((x) => x.id !== "teal")) assert.ok(html.includes(`:root[data-skin="${t.id}"]`), `${t.id} CSS missing`);
   });
 
+  test("only the default theme's fonts load up front; every other theme's (Teal's too) load when chosen", async () => {
+    const { build } = await load();
+    const { THEMES, DEFAULT_THEME, fontsHref, themeById } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
+    const { html } = build(DOCS);
+    const head = html.slice(0, html.indexOf("</head>"));
+    const sheets = [...head.matchAll(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com\/[^"]+)"/g)].map((m) => m[1].replaceAll("&amp;", "&"));
+    assert.deepEqual(sheets, [fontsHref(themeById(DEFAULT_THEME))]);
+    const fonts = JSON.parse(/var FONTS = (\{.*?\}), saved/.exec(head)[1]);
+    for (const t of THEMES) assert.equal(fonts[t.id], t.id === DEFAULT_THEME ? "" : fontsHref(t), t.id);
+  });
+
   test("--no-banner leaves the banner out", async () => {
     const { build } = await load();
     const { html } = build(DOCS, { banner: null });

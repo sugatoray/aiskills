@@ -13,7 +13,7 @@
 <script>
   // Theme (gear menu): ?export&skin=<id> for scripted exports, else the one saved in this browser, else config.yaml's.
   (function () {
-    var IDS = ["teal","paper","phosphor","grimoire","signal","frost","dusk","blueprint","matcha","rose","lightsout"], q = new URLSearchParams(location.search), s = null;
+    var IDS = ["lightsout","teal","paper","phosphor","grimoire","signal","frost","dusk","blueprint","matcha","rose"], q = new URLSearchParams(location.search), s = null;
     if (q.has('export')) s = q.get('skin');
     else { try { s = localStorage.getItem('aiskills-banner-skin'); } catch (e) {} }
     if (IDS.indexOf(s) >= 0) document.documentElement.setAttribute('data-skin', s);
@@ -243,6 +243,13 @@
   #banner .pill { font-size: 15px; padding: 8px 13px 8px 11px; }
 
 /* Banner themes (src/scripts/themes.mjs). */
+:root[data-skin="lightsout"] #banner { --bg: #000000; --term-bg: #0a0a0b; --term-line: #2f3336; }
+:root[data-skin="lightsout"] #banner:not(.ink-dark) { --teal: #1d9bf0; --violet: #e7e9ea; }
+:root[data-skin="lightsout"] #banner.ink-dark { --teal: #0f6cbd; --violet: #a626a4; }
+:root[data-skin="lightsout"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(29,155,240, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(120,86,255, .20), transparent 70%); }
+:root[data-skin="lightsout"] #banner .term-body .p, :root[data-skin="lightsout"] #banner .install .dollar { color: #1d9bf0; }
+:root[data-skin="lightsout"] #banner .term-body .cursor { background: #1d9bf0; }
+:root[data-skin="lightsout"] #banner .mark { box-shadow: 0 10px 30px rgba(29,155,240, .25); }
 :root[data-skin="paper"] #banner { --bg: #17120e; --term-bg: #100c09; --term-line: #342a20; }
 :root[data-skin="paper"] #banner:not(.ink-dark) { --teal: #f0915f; --violet: #e8c27a; }
 :root[data-skin="paper"] #banner.ink-dark { --teal: #a8401b; --violet: #8a3a6b; }
@@ -306,13 +313,6 @@
 :root[data-skin="rose"] #banner .term-body .p, :root[data-skin="rose"] #banner .install .dollar { color: #ebbcba; }
 :root[data-skin="rose"] #banner .term-body .cursor { background: #ebbcba; }
 :root[data-skin="rose"] #banner .mark { box-shadow: 0 10px 30px rgba(235,188,186, .25); }
-:root[data-skin="lightsout"] #banner { --bg: #000000; --term-bg: #0a0a0b; --term-line: #2f3336; }
-:root[data-skin="lightsout"] #banner:not(.ink-dark) { --teal: #1d9bf0; --violet: #e7e9ea; }
-:root[data-skin="lightsout"] #banner.ink-dark { --teal: #0f6cbd; --violet: #a626a4; }
-:root[data-skin="lightsout"] #banner .bg-glow { background: radial-gradient(620px 420px at 8% 0%, rgba(29,155,240, .22), transparent 70%), radial-gradient(560px 460px at 100% 100%, rgba(120,86,255, .20), transparent 70%); }
-:root[data-skin="lightsout"] #banner .term-body .p, :root[data-skin="lightsout"] #banner .install .dollar { color: #1d9bf0; }
-:root[data-skin="lightsout"] #banner .term-body .cursor { background: #1d9bf0; }
-:root[data-skin="lightsout"] #banner .mark { box-shadow: 0 10px 30px rgba(29,155,240, .25); }
 
   /* banner:css:end */
 
@@ -348,6 +348,7 @@
   <div class="skin-wrap">
     <button class="btn ghost skin-btn" id="skinBtn" aria-haspopup="menu" aria-controls="skinMenu" aria-expanded="false" title="Colour theme (src/scripts/themes.mjs)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Theme</button>
     <div class="skin-menu" id="skinMenu" role="menu" aria-label="Themes" hidden>
+      <button class="skin-item" type="button" role="menuitemradio" data-skin="lightsout" aria-checked="true"><span class="sw" aria-hidden="true"><i style="background:#1d9bf0"></i><i style="background:#e7e9ea"></i><i style="background:#000000"></i></span><span class="nm">Lights Out</span><span class="ck" aria-hidden="true">✓</span><span class="ds">X-style pure black with shadcn zinc: frosted header, pill tabs, hairline borders, one blue. Geist throughout.</span></button>
       <button class="skin-item" type="button" role="menuitemradio" data-skin="teal" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#0b6d77"></i><i style="background:#d39af5"></i><i style="background:#0f1719"></i></span><span class="nm">Teal (current)</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Borrowed from callai: cool teal and violet, Bricolage + Public Sans.</span></button>
       <button class="skin-item" type="button" role="menuitemradio" data-skin="paper" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#a8401b"></i><i style="background:#e8c27a"></i><i style="background:#17130f"></i></span><span class="nm">Ink &amp; Paper</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Warm, editorial: cream paper, ink text, rust accent. Fraunces headings, Plex Sans body.</span></button>
       <button class="skin-item" type="button" role="menuitemradio" data-skin="phosphor" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#1a6f2e"></i><i style="background:#6be38a"></i><i style="background:#0a0f0b"></i></span><span class="nm">Phosphor</span><span class="ck" aria-hidden="true">✓</span><span class="ds">A terminal at night: green phosphor on near-black, mono headings. Plex Mono + Plex Sans.</span></button>
@@ -358,7 +359,6 @@
       <button class="skin-item" type="button" role="menuitemradio" data-skin="blueprint" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#1f4fc4"></i><i style="background:#6ee7f0"></i><i style="background:#0b1430"></i></span><span class="nm">Blueprint</span><span class="ck" aria-hidden="true">✓</span><span class="ds">An engineering drawing: blueprint blue and cyan, condensed headings. Barlow + Fira Code.</span></button>
       <button class="skin-item" type="button" role="menuitemradio" data-skin="matcha" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#3f6a2e"></i><i style="background:#e8d48a"></i><i style="background:#141913"></i></span><span class="nm">Matcha</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Soft and unhurried: sage green and warm cream. Lexend throughout, made for easy reading.</span></button>
       <button class="skin-item" type="button" role="menuitemradio" data-skin="rose" aria-checked="false"><span class="sw" aria-hidden="true"><i style="background:#934460"></i><i style="background:#c4a7e7"></i><i style="background:#191724"></i></span><span class="nm">Rosé</span><span class="ck" aria-hidden="true">✓</span><span class="ds">Muted pastels: rose, iris and gold on aubergine, or on parchment by day. Young Serif + Nunito Sans.</span></button>
-      <button class="skin-item" type="button" role="menuitemradio" data-skin="lightsout" aria-checked="true"><span class="sw" aria-hidden="true"><i style="background:#1d9bf0"></i><i style="background:#e7e9ea"></i><i style="background:#000000"></i></span><span class="nm">Lights Out</span><span class="ck" aria-hidden="true">✓</span><span class="ds">X-style pure black with shadcn zinc: frosted header, pill tabs, hairline borders, one blue. Geist throughout.</span></button>
     </div>
   </div>
 
@@ -403,7 +403,7 @@
   <button class="btn ghost" id="saveHtmlBtn" title="Download this page with your edits baked in">Save HTML</button>
   <button class="btn ghost" id="resetBtn" title="Discard saved edits">Reset</button>
 </div>
-<p class="hint">Click <b>Edit</b>, then click any outlined text to change it. Click <b>Save</b> to keep your edits in this browser; <b>Save HTML</b> downloads a copy with them built in. In the groups row, press <kbd>Enter</kbd> inside a pill to add one; empty a pill to remove it. Ink: light text is for dark pages and dark text for light ones; a transparent PNG is exported in either, named <kbd>-light-ink</kbd> or <kbd>-dark-ink</kbd>.</p>
+<p class="hint">Click <b>Edit</b>, then click any outlined text to change it. Click <b>Save</b> to keep your edits in this browser; <b>Save HTML</b> downloads a copy with them built in. In the groups row, press <kbd>Enter</kbd> inside a pill to add one; empty a pill to remove it. <b>Theme</b> previews the 11 colour themes (the one in <kbd>config.yaml</kbd> is the default and what <kbd>npm run banner:png</kbd> renders). Ink: light text is for dark pages and dark text for light ones; a transparent PNG is exported in either, named <kbd>-light-ink</kbd> or <kbd>-dark-ink</kbd>.</p>
 
 <div class="stage" id="stage">
   <div class="scaler" id="scaler">
@@ -474,7 +474,7 @@
 
 <script>
 (() => {
-  const STORE_KEY = 'aiskills-banner:66b0285c3b81';
+  const STORE_KEY = 'aiskills-banner:7d90a9069c65';
   const banner = document.getElementById('banner');
   const scaler = document.getElementById('scaler');
   const stage = document.getElementById('stage');

@@ -143,8 +143,8 @@ export function build(docs, { ref = "master", banner = BANNER } = {}) {
     .replaceAll("{{SKIN}}", DEFAULT_THEME)
     .replace("{{SKIN_DEFAULT_FONTS}}", () => `<link rel="stylesheet" href="${fontsHref(themeById(DEFAULT_THEME))}">`)
     .replace("{{SKIN_FONTS_JSON}}", () =>
-      // Teal's and the default theme's fonts are linked up front; the rest load when chosen.
-      JSON.stringify(Object.fromEntries(THEMES.map((t) => [t.id, t.id === "teal" || t.id === DEFAULT_THEME ? "" : fontsHref(t)]))))
+      // Only the default theme's fonts are linked up front; every other theme's load when it is chosen.
+      JSON.stringify(Object.fromEntries(THEMES.map((t) => [t.id, t.id === DEFAULT_THEME ? "" : fontsHref(t)]))))
     .replace("{{SKIN_MENU}}", () => skinMenuHtml())
     .replace("/*__SKIN_CSS__*/", () => pageSkinCss())
     .replace("/*__BANNER_CSS__*/", () => bannerCss)

@@ -1,4 +1,4 @@
-// The docs and banner themes: one list, used by build-docs-html.mjs (the gear
+// The docs and banner themes, the default (Lights Out) first: one list, used by build-docs-html.mjs (the gear
 // menu at the top right of docs/docsite/index.html) and create-banner.mjs (the
 // gear menu in the banner editor's toolbar).
 //
@@ -12,6 +12,71 @@
 export const DEFAULT_THEME = "lightsout";
 
 export const THEMES = [
+  {
+    "id": "lightsout",
+    "name": "Lights Out",
+    "blurb": "X-style pure black with shadcn zinc: frosted header, pill tabs, hairline borders, one blue. Geist throughout.",
+    "swatch": [
+      "#1d9bf0",
+      "#e7e9ea",
+      "#000000"
+    ],
+    "fonts": {
+      "display": "\"Geist\", system-ui, sans-serif",
+      "body": "\"Geist\", system-ui, sans-serif",
+      "mono": "\"Geist Mono\", ui-monospace, monospace"
+    },
+    "googleFonts": "family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600",
+    "light": {
+      "bg": "#ffffff",
+      "surface": "#fafafa",
+      "surface2": "#f4f4f5",
+      "fg": "#09090b",
+      "muted": "#66666e",
+      "line": "#e4e4e7",
+      "accent": "#0f6cbd",
+      "accentSoft": "#e8f2fc",
+      "accentFg": "#ffffff",
+      "codeBg": "#fafafa",
+      "codeFg": "#09090b",
+      "kw": "#a626a4",
+      "str": "#1a7f37",
+      "num": "#b35900",
+      "com": "#71717a",
+      "attr": "#0f6cbd",
+      "fn": "#4b3fd1"
+    },
+    "dark": {
+      "bg": "#000000",
+      "surface": "#0a0a0b",
+      "surface2": "#16181c",
+      "fg": "#e7e9ea",
+      "muted": "#8b9096",
+      "line": "#2f3336",
+      "accent": "#1d9bf0",
+      "accentSoft": "#071d2c",
+      "accentFg": "#031321",
+      "codeBg": "#0a0a0b",
+      "codeFg": "#e7e9ea",
+      "kw": "#c792ea",
+      "str": "#7ee2b8",
+      "num": "#f9c97c",
+      "com": "#6e767d",
+      "attr": "#1d9bf0",
+      "fn": "#82aaff"
+    },
+    "banner": {
+      "bg": "#000000",
+      "a": "#1d9bf0",
+      "b": "#e7e9ea",
+      "term": "#0a0a0b",
+      "line": "#2f3336",
+      "glowA": "29,155,240",
+      "glowB": "120,86,255",
+      "darkInkA": "#0f6cbd",
+      "darkInkB": "#a626a4"
+    }
+  },
   {
     "id": "teal",
     "name": "Teal (current)",
@@ -611,71 +676,6 @@ export const THEMES = [
       "glowB": "196,167,231",
       "darkInkA": "#934460",
       "darkInkB": "#7a4a9e"
-    }
-  },
-  {
-    "id": "lightsout",
-    "name": "Lights Out",
-    "blurb": "X-style pure black with shadcn zinc: frosted header, pill tabs, hairline borders, one blue. Geist throughout.",
-    "swatch": [
-      "#1d9bf0",
-      "#e7e9ea",
-      "#000000"
-    ],
-    "fonts": {
-      "display": "\"Geist\", system-ui, sans-serif",
-      "body": "\"Geist\", system-ui, sans-serif",
-      "mono": "\"Geist Mono\", ui-monospace, monospace"
-    },
-    "googleFonts": "family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600",
-    "light": {
-      "bg": "#ffffff",
-      "surface": "#fafafa",
-      "surface2": "#f4f4f5",
-      "fg": "#09090b",
-      "muted": "#66666e",
-      "line": "#e4e4e7",
-      "accent": "#0f6cbd",
-      "accentSoft": "#e8f2fc",
-      "accentFg": "#ffffff",
-      "codeBg": "#fafafa",
-      "codeFg": "#09090b",
-      "kw": "#a626a4",
-      "str": "#1a7f37",
-      "num": "#b35900",
-      "com": "#71717a",
-      "attr": "#0f6cbd",
-      "fn": "#4b3fd1"
-    },
-    "dark": {
-      "bg": "#000000",
-      "surface": "#0a0a0b",
-      "surface2": "#16181c",
-      "fg": "#e7e9ea",
-      "muted": "#8b9096",
-      "line": "#2f3336",
-      "accent": "#1d9bf0",
-      "accentSoft": "#071d2c",
-      "accentFg": "#031321",
-      "codeBg": "#0a0a0b",
-      "codeFg": "#e7e9ea",
-      "kw": "#c792ea",
-      "str": "#7ee2b8",
-      "num": "#f9c97c",
-      "com": "#6e767d",
-      "attr": "#1d9bf0",
-      "fn": "#82aaff"
-    },
-    "banner": {
-      "bg": "#000000",
-      "a": "#1d9bf0",
-      "b": "#e7e9ea",
-      "term": "#0a0a0b",
-      "line": "#2f3336",
-      "glowA": "29,155,240",
-      "glowB": "120,86,255",
-      "darkInkA": "#0f6cbd",
-      "darkInkB": "#a626a4"
     }
   }
 ];

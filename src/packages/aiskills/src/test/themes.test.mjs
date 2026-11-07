@@ -11,7 +11,7 @@ import { PKG_SRC } from "./helpers.mjs";
 const load = () => import(pathToFileURL(join(PKG_SRC, "src", "scripts", "themes.mjs")).href);
 
 const TOKENS = ["bg", "surface", "surface2", "fg", "muted", "line", "accent", "accentSoft", "accentFg", "codeBg", "codeFg", "kw", "str", "num", "com", "attr", "fn"];
-const IDS = ["teal", "paper", "phosphor", "grimoire", "signal", "frost", "dusk", "blueprint", "matcha", "rose", "lightsout"];
+const IDS = ["lightsout", "teal", "paper", "phosphor", "grimoire", "signal", "frost", "dusk", "blueprint", "matcha", "rose"];
 
 /** WCAG contrast ratio of two #rrggbb colours. */
 function contrast(a, b) {
@@ -24,10 +24,11 @@ function contrast(a, b) {
 }
 
 describe("themes", () => {
-  test("there are 11 themes in a fixed order, and Lights Out is the default", async () => {
+  test("there are 11 themes in a fixed order, and Lights Out, the default, comes first", async () => {
     const { THEMES, DEFAULT_THEME, themeById } = await load();
     assert.deepEqual(THEMES.map((t) => t.id), IDS);
     assert.equal(DEFAULT_THEME, "lightsout");
+    assert.equal(THEMES[0].id, DEFAULT_THEME, "the default is listed first, so the menu opens at the top");
     assert.equal(themeById("lightsout").name, "Lights Out");
     assert.equal(themeById("nope"), null);
     for (const t of THEMES) {

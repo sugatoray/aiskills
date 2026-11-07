@@ -131,6 +131,8 @@ describe("render", () => {
     assert.deepEqual(items, THEMES.map((t) => t.id));
     const css = html.split("banner:css:start")[1].split("banner:css:end")[0];
     assert.ok(css.includes(bannerSkinCss().trim()), "theme CSS sits between the banner:css markers, so the docs page gets it");
+    const hint = html.slice(html.indexOf('<p class="hint">'), html.indexOf("</p>", html.indexOf('<p class="hint">')));
+    assert.match(hint, /<b>Theme<\/b>/, "the hint explains the Theme menu");
     const other = render(resolveValues(readConfig(), { set: { theme: "paper" } }));
     assert.match(other, /<html lang="en" data-skin="paper">/);
   });
