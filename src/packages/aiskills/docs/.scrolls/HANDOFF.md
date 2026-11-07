@@ -3,7 +3,7 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-`@sugatoray-ai/aiskills` `0.3.0` (folder `src/packages/aiskills/`) is feature-complete for a first release, and now has full user documentation. `npm test` runs 245 offline tests (about 40 s; the docs and banner tests open Chromium when Playwright and cdnjs/jsDelivr are available) and `npm run test:e2e` runs 7 tests with the real `npx skills` (network). All pass. Everything is on branch `claude/focused-faraday-nqvduf` in the open PR [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122). Nothing has been published to npm, and the docs aren't on the web yet.
+`@sugatoray-ai/aiskills` `0.3.0` (folder `src/packages/aiskills/`) is feature-complete for a first release, and now has full user documentation. `npm test` runs 259 offline tests (about 60 s; the docs and banner tests open Chromium when Playwright and cdnjs/jsDelivr are available) and `npm run test:e2e` runs 7 tests with the real `npx skills` (network). All pass. Everything is on branch `claude/focused-faraday-nqvduf` in the open PR [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122). Nothing has been published to npm, and the docs aren't on the web yet.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -19,16 +19,17 @@ bin/aiskills.mjs        thin entry point: imports ../src/scripts/cli.mjs
 bin/aix.mjs             sets AISKILLS_ROUTE=1, then imports the same CLI (aix = aiskills --route)
 src/scripts/            cli.mjs, installer.mjs, postinstall.mjs (published); vendor-skills.mjs, skillsignore.mjs,
                         build-skills-docs.mjs, build-docs-html.mjs + docs-template.html,
-                        create-banner.mjs + banner-template.html (build time only)
-src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs
+                        create-banner.mjs + banner-template.html, themes.mjs (build time only)
+src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs
 (vendored, git-ignored) skills/<name>/ (flat), .aiskills/{layout.json,nested/}, .claude-plugin/, LICENSE
 ```
 
 ## What just happened
-- **Banner**, modelled on sugatoray/callai's `src/tools/banner/` (mockup first, then approved): `npm run banner` builds `docs/banner/aiskills-banner.html` from `src/scripts/banner-template.html` + `docs/banner/config.yaml`; `"auto"` values come from `package.json`, the bundled skills (counts, group aliases in `marketplace.json` order) and `SKILLS_CLI_VERSION`, and the terminal demo is built from the real bundled skills. `npm run banner:png` renders `banner_2x.png` (Playwright). The page is callai's editor (edit text and pills, save in browser, Save HTML, Reset, background/ink preview, PNG export) plus two fixes the user's screenshot prompted: unreadable ink is disabled (light on white, dark on dark), and transparent PNGs export with both inks ("Export all 15").
-- **Where it shows:** line 1 of the package README is `banner_2x.png` by an absolute `raw.githubusercontent.com/.../master/...` URL (so npmjs.com can show it); `docs/docsite/index.html` opens with the live banner on the Home tab (copied between the `banner:html`/`banner:css` markers, editing hooks stripped, wordmark `<h1>` → `<div>`; `--no-banner`). The Markdown landing page has no banner, as in callai. `npm run docs` rebuilds the banner page first.
-- Tests (`banner.test.mjs`, new `docs-html.test.mjs` cases) were written first; banner builder errors are in `reference/errors.md`.
-- Earlier this session: the user docs in `docs/docsite/` (Skills tab generated from the bundled skills, single-page `index.html`, `llms.txt`), and the `uninstall -n` pinned-version fix.
+- **Themes** (chosen from a mockup of 11; the user picked **Lights Out**: X-style pure black + shadcn zinc + Geist): `src/scripts/themes.mjs` is one list (Lights Out first, `DEFAULT_THEME = "lightsout"`), feeding a **gear menu** at the top right of `docs/docsite/index.html` and a **⚙ Theme** menu in the banner editor. Choices are remembered per browser (docs: applied in `<head>` before paint; unknown names fall back to the default); only the default's fonts load up front, the rest on demand. The banner's theme is `theme` in `docs/banner/config.yaml` (default `lightsout`), and its theme CSS sits inside the `banner:css` markers so the docs landing banner follows the page's theme.
+- **`banner_2x.png` is now checked**: it carries PNG `tEXt` chunks with its theme and the SHA-256 of the page it was rendered from, so a stale PNG fails `banner.test.mjs`.
+- **Finishing pass**: default listed first in both menus, Teal's fonts no longer always downloaded, banner hint explains the Theme menu; generated pages rebuilt.
+- **Version bumped to `0.3.0`** (`0.2.0` marked "Never published", like `0.1.0`); CHANGELOG `## [0.3.0] - Unreleased` holds the docs, banner, themes and the `uninstall -n` fix. `npm test` (259) and `npm run test:e2e` (7) pass.
+- Published for review as private artifacts: the docs page (https://claude.ai/artifact/6EDgyyQAxAK4ch324V9KNb) and the older theme mockup (https://claude.ai/artifact/AWW2bzv19QjvMaz7iHpupi, now superseded).
 
 ## Known issues / open threads
 - **Awaiting the user (AIS-8):** publish the docs on GitHub Pages like callai (`sugatoray.github.io/callai`)? callai's `.github/workflows/docs.yml` builds and deploys with `actions/deploy-pages`; the aiskills repo has no workflows. Open question: site root or a subpath such as `/aiskills/npm/`.

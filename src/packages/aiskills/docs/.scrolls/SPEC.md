@@ -43,5 +43,8 @@ Full user docs live in the repo at `src/packages/aiskills/docs/docsite/` (not in
 ## Banner
 The package README and the docs' landing page open with a banner (1280 × 640): the version, Node range, license, skill and group counts, the install command, a terminal demo of real `ais`/`aix` output, and the skill groups. Its values come from the package and the bundled skills, so it stays accurate across releases. Maintainers edit it in `docs/banner/config.yaml`, or in the browser (`docs/banner/aiskills-banner.html`), and export PNGs for dark, white, black or transparent backgrounds; text that wouldn't be readable on a background can't be chosen.
 
+## Themes
+The docs page and the banner editor each have a gear menu with 11 themes (Lights Out, the default, plus Teal, Ink & Paper, Phosphor, Grimoire, Signal, Frost, Dusk, Blueprint, Matcha and Rosé), each in light and dark. The choice is remembered in the reader's browser, every theme keeps text, links and buttons at 4.5:1 contrast or better, and the banner shown on the README and the docs landing page follows the chosen (or configured) theme.
+
 ## `.skillsignore`
 A `.skillsignore` (`.gitignore` syntax) in the repo's `skills/` or any folder below leaves matching files, folders or whole skills out of the package, and so out of every install and the `--nested` rebuild. The ignore files never ship; ignoring only a `SKILL.md` is refused; what was left out is listed in `.aiskills/layout.json` (`ignored`).
