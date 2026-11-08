@@ -154,9 +154,14 @@ describe("reference pages cover the code", () => {
     }
   });
 
-  test("no docs page describes an npm install step (removed in 0.4.0, AIS-7)", () => {
-    for (const v of ["AISKILLS_SKIP_POSTINSTALL", "AISKILLS_SKIP_SKILLS_ADD", "INIT_CWD", "--foreground-scripts", "postinstall.mjs"]) {
-      for (const page of pages()) assert.ok(!read(page).includes(v), `${page} still mentions ${v}`);
+  test("no docs page or diagram describes an npm install step (removed in 0.4.0, AIS-7)", () => {
+    const svgs = readdirSync(join(DOCS, "images")).filter((f) => f.endsWith(".svg")).map((f) => `images/${f}`);
+    assert.ok(svgs.length >= 3, "diagrams found");
+    for (const v of ["AISKILLS_SKIP_POSTINSTALL", "AISKILLS_SKIP_SKILLS_ADD", "INIT_CWD", "--foreground-scripts", "postinstall", "npm install step", "never fails npm install"]) {
+      for (const page of [...pages(), ...svgs]) {
+        const text = read(page).replace(/[Nn]o `?preinstall`?, `?install`? or `?postinstall`? script/g, "");
+        assert.ok(!text.includes(v), `${page} still mentions ${v}`);
+      }
     }
   });
 

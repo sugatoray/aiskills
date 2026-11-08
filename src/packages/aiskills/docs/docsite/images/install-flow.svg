@@ -49,5 +49,5 @@
   <line x1="372" y1="130" x2="372" y2="166" stroke="#dc2626" stroke-width="1.5" marker-end="url(#a)"/>
   <line x1="517" y1="130" x2="517" y2="166" stroke="#dc2626" stroke-width="1.5" marker-end="url(#a)"/>
   <line x1="662" y1="130" x2="662" y2="166" stroke="#dc2626" stroke-width="1.5" marker-end="url(#a)"/>
-  <text x="20" y="280" fill="#475569" font-size="13">The npm install step runs the same steps, reading only AISKILLS_* variables, and never fails npm install.</text>
+  <text x="20" y="280" fill="#475569" font-size="13">npm install runs none of this: these steps start only when you run aiskills install.</text>
 </svg>

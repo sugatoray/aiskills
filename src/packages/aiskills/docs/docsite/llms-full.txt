@@ -2122,7 +2122,7 @@ Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stop
 
 - **`npx skills` output is mixed in.** `aiskills` lets `npx skills` print to your terminal. Use exit codes and `aiskills installed` to check results.
 - **Two pieces of `npx skills` text are parsed**: the "Valid agents:" list (for `-a` patterns) and `find` results (for `--route`). A new `skills` release could change them, which is one reason the version is pinned.
-- **Updates come with the package.** Skills change when you install a newer `@sugatoray-ai/aiskills`.
+- **Updates come with the package, and you apply them.** Skills change when you install a newer `@sugatoray-ai/aiskills` and run `aiskills install` again; installing the package by itself never changes your agents.
 
 See also: [Layouts](layouts.md) · [Security model](security.md) · [Files and schemas](../reference/files.md)
 
