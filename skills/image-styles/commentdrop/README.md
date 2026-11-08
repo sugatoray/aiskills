@@ -3,7 +3,7 @@
 Add floating simulated social comments to an image.
 
 ```text
-/commentdrop [[ use the last image; comments: The colors are incredible! ]]
+/commentdrop [[ the last or the attached image; comments: The colors are incredible! ]]
 ```
 
 Attach an image or refer to a recent one. Supply sample comments, or omit them to generate fictional, context-appropriate reactions. The effect is a still image with floating comment cards; comments do not represent real engagement.
