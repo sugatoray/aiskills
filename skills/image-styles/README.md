@@ -1,5 +1,7 @@
 # Image styles
 
+Skills for generating images in a variety of styles and applying visual styles or effects to existing images. The collection can grow to include additional styles and techniques.
+
 | Skill | Description |
 | --- | --- |
 | [artwallbg](artwallbg/README.md) | Generate a vivid scene in front of a monumental spray-painted wall. |

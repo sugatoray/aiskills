@@ -1,7 +1,7 @@
 {
   "name": "image-styles-skills",
   "version": "1.0.0",
-  "description": "Spray-painted art wall scenes and floating simulated social comments.",
+  "description": "Skills for generating images in a variety of styles and applying visual styles or effects to existing images.",
   "author": {
     "name": "Sugato Ray",
     "url": "https://github.com/sugatoray"
@@ -11,8 +11,10 @@
   "license": "MIT",
   "keywords": [
     "image",
-    "street-art",
-    "commentdrop"
+    "image-styles",
+    "image-generation",
+    "image-editing",
+    "visual-effects"
   ],
   "skills": [
     "./artwallbg",

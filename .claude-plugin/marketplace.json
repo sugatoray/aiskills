@@ -108,13 +108,14 @@
     {
       "name": "image-styles-skills",
       "source": "./image-styles",
-      "description": "Create monumental spray-painted art walls and floating simulated social comment overlays.",
+      "description": "Skills for generating images in a variety of styles and applying visual styles or effects to existing images, including art walls and simulated comment overlays.",
       "category": "productivity",
       "keywords": [
         "image",
-        "visualization",
-        "street-art",
-        "commentdrop"
+        "image-styles",
+        "image-generation",
+        "image-editing",
+        "visual-effects"
       ]
     }
   ]

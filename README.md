@@ -323,7 +323,7 @@ with every skill twice — pick one.
 
 ### 🎨 Image styles
 
-Create spray-painted art wall scenes and add floating simulated social comments. See the [image styles guide](skills/image-styles/README.md).
+Skills for generating images in a variety of styles and applying visual styles or effects to existing images. The current skills create spray-painted art wall scenes and add simulated social comment overlays. See the [image styles guide](skills/image-styles/README.md).
 
 ```sh
 npx skills add sugatoray/aiskills --skill artwallbg
