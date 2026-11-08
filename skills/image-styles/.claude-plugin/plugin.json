@@ -1,0 +1,21 @@
+{
+  "name": "image-styles-skills",
+  "version": "1.0.0",
+  "description": "Spray-painted art wall scenes and floating simulated social comments.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "image",
+    "street-art",
+    "commentdrop"
+  ],
+  "skills": [
+    "./artwallbg",
+    "./commentdrop"
+  ]
+}

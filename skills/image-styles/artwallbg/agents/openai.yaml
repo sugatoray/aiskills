@@ -1,0 +1,6 @@
+interface:
+  display_name: "Art Wall Background"
+  short_description: "Create a scene before a huge spray-painted wall"
+  default_prompt: "Use $artwallbg to create a scene before a huge spray-painted wall."
+policy:
+  allow_implicit_invocation: false

@@ -104,6 +104,18 @@
         "playwright",
         "ffmpeg"
       ]
+    },
+    {
+      "name": "image-styles-skills",
+      "source": "./image-styles",
+      "description": "Create monumental spray-painted art walls and floating simulated social comment overlays.",
+      "category": "productivity",
+      "keywords": [
+        "image",
+        "visualization",
+        "street-art",
+        "commentdrop"
+      ]
     }
   ]
 }
