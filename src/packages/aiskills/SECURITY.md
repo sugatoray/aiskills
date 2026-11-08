@@ -30,9 +30,11 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 
 ### When it runs
 
-- **`npm install`** runs the `postinstall` step (`src/scripts/core/postinstall.mjs`),
-  unless install scripts are disabled (`--ignore-scripts`, pnpm and bun by
-  default) or `AISKILLS_SKIP_POSTINSTALL=1` is set.
+- **`npm install` runs nothing.** The package has no `preinstall`, `install`
+  or `postinstall` script, so installing it (with npm, pnpm or bun) only puts
+  its files in the package manager's folder: no network requests, nothing
+  written to your home folder, no agent changed. `src/test/packaging.test.mjs`
+  fails if an install-time script is ever added.
 - **The `aiskills`, `ais` and `aix` commands** run only when you call them.
 - Nothing runs in the background or on a schedule.
 
@@ -40,7 +42,7 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 
 | Path | Written by | Notes |
 | --- | --- | --- |
-| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | `postinstall`, `install`, `sync`, `list`, `groups` | `skills/` is **replaced** on every sync; `--purge` deletes the **whole folder**. Both refuse a folder that isn't an aiskills folder (see [Protections](#protections-against-known-risks)). |
+| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | `install`, `sync`, `list`, `groups` | `skills/` is **replaced** on every sync; `--purge` deletes the **whole folder**. Both refuse a folder that isn't an aiskills folder (see [Protections](#protections-against-known-risks)). |
 | `~/.agents/skills/`, `~/.claude/skills/` and other agents' skill folders | `npx skills add` / `remove`, run by `install` / `uninstall` | Global scope. The `skills` CLI decides the exact folders. |
 | `./.claude/skills/`, `./skills-lock.json` etc. in the current folder | `npx skills`, with `-p`/`--project` | Project scope. |
 | A temporary folder under the OS temp dir | the agent-list lookup for `-a` patterns | Empty; deleted straight after. |
@@ -69,8 +71,6 @@ programs it starts:
 - npm's own lifecycle variables (`npm_config_global`, `npm_config_prefix`,
   `npm_lifecycle_*`, …) are removed before `npx` runs; registry, proxy and
   certificate settings are kept.
-- The `postinstall` step never fails `npm install`: errors are caught and
-  printed as warnings.
 
 ### Skills are code
 
@@ -90,7 +90,7 @@ your agent may run **with your permissions**.
 
 ### What the package build guarantees
 
-- `"files"` in `package.json` ships only `bin/`, the three runtime scripts,
+- `"files"` in `package.json` ships only `bin/`, the two runtime scripts,
   the vendored skills, metadata, README, CHANGELOG and LICENSE. Tests, the
   vendor script and the project-memory files never ship (also guarded by
   `.npmignore`).

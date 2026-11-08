@@ -13,14 +13,14 @@ Because `skills/` is flat, a project that installs the package as a dependency c
 ## Flat or nested install folder
 `~/.config/sugatoray/aiskills/skills/` is flat by default; `--nested` (before the command, or on `install`/`sync`; also `AISKILLS_LAYOUT=nested`) rebuilds the repo's exact nested layout, including group READMEs, `plugin.json` and `meta/`. The choice is remembered until `--flat`. Groups and installs behave the same in both.
 
-## Install on `npm install -g`
-Installing the package saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. A failure here never fails the npm install; the user can retry with `aiskills install`. Opt-outs: `AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1`, `CI`. (`src/scripts/core/postinstall.mjs`)
+## Install: `npm install -g`, then `aiskills install`
+`npm install` (or pnpm, or bun) only installs the `aiskills`, `ais` and `aix` commands: the package has no install step, so it makes no network calls, writes nothing to `~` and changes no agent. `aiskills install` (or `npx @sugatoray-ai/aiskills install`, without a global install) saves the skills to `~/.config/sugatoray/aiskills/skills/` (replacing any older copy) and runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, registering them with every agent `npx skills` detects. (Until 0.4.0 a `postinstall` step did this on `npm install`; removed by AIS-7.)
 
 ## `aiskills` CLI (also `ais`, and `aix` for route mode)
 `install` (alias `i`), `uninstall` (`r`, `rm`, `remove`), `installed` (`ls`), `groups` (`g`), `find` (`f`), `sync`, `list`, `path` (`p`), `help` (`h`), and `skills <args>` (passthrough to `npx skills`, with `:root` replaced by the install folder). Anything after `--` is appended to the underlying `npx skills` command. (`src/scripts/core/cli.mjs`, shared logic in `src/scripts/core/installer.mjs`)
 
 ## Choosing what to install: scope, agents, skills
-`-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable, which the npm postinstall step also reads.
+`-g/--global` (default) or `-p/--project` (installs into the current folder), `-a/--agent`, `-s/--skill`, `--copy`. Every option has an `AISKILLS_*` environment variable that sets its default.
 
 ## Uninstall
 `aiskills uninstall` removes, through `npx skills remove`, exactly the skills `npx skills list` says came from `~/.config/sugatoray/aiskills`. It also supports partial (`-s`, `-G`), per-agent (`-a`) and project (`-p`) removal, `--purge` to delete the local folder after a full uninstall, `-n/--dry-run` (prints the exact `npx` command, pinned version included), and `-f/--force` for names the package doesn't provide.

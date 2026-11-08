@@ -1,4 +1,4 @@
-// Shared logic for the postinstall hook and the `aiskills` CLI.
+// All the logic behind the `aiskills` CLI (src/scripts/core/cli.mjs).
 //
 // 1. Copy the vendored <package>/skills folder to
 //    ~/.config/sugatoray/aiskills/skills (replacing any previous copy).
@@ -126,9 +126,9 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
   return root;
 }
 
-// Inside an npm lifecycle script (postinstall) npm exports npm_config_global,
-// npm_config_prefix, npm_lifecycle_* etc. Passing those on makes the nested
-// `npx` resolve into the wrong prefix ("skills: not found"). Keep only the
+// Run through `npx @sugatoray-ai/aiskills` or `npm exec`, npm exports
+// npm_config_global, npm_config_prefix, npm_lifecycle_* etc. Passing those on
+// can make the nested `npx` resolve into the wrong prefix ("skills: not found"). Keep only the
 // settings that describe how to reach the registry.
 const KEEP_NPM_CONFIG = /^npm_config_(registry|cache|userconfig|globalconfig|https?_proxy|proxy|noproxy|no_proxy|cafile|ca|strict_ssl|@.*:registry|\/\/.*)$/i;
 function childEnv() {

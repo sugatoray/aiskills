@@ -97,7 +97,7 @@ describe("npm pack", () => {
     files = JSON.parse(res.stdout)[0].files.map((f) => f.path);
   });
 
-  test("ships the CLI, installer, postinstall, metadata and every skill", (t) => {
+  test("ships the CLI, installer, metadata and every skill", (t) => {
     if (!copy) return t.skip("git not available");
     for (const p of [
       "package.json",
@@ -109,7 +109,6 @@ describe("npm pack", () => {
       "bin/aix.mjs",
       "src/scripts/core/cli.mjs",
       "src/scripts/core/installer.mjs",
-      "src/scripts/core/postinstall.mjs",
       ".claude-plugin/marketplace.json",
       ".aiskills/layout.json",
     ]) {
@@ -122,7 +121,17 @@ describe("npm pack", () => {
   test("ships only the bin/ entry points and the runtime files under src/scripts/core/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/core/cli.mjs", "src/scripts/core/installer.mjs", "src/scripts/core/postinstall.mjs"]);
+    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/core/cli.mjs", "src/scripts/core/installer.mjs"]);
+  });
+
+  test("installing the package runs nothing: no install-time lifecycle scripts", () => {
+    // AIS-7 (option B): `npm install` only puts the files in place; `aiskills install`
+    // saves and registers the skills. npm runs these scripts when the package is
+    // installed as a dependency (prepare only for git installs).
+    const { scripts } = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8"));
+    for (const s of ["preinstall", "install", "postinstall", "prepare"]) {
+      assert.equal(scripts[s], undefined, `package.json must not have a "${s}" script`);
+    }
   });
 
   test("package.json declares the aiskills, ais and aix commands", () => {
@@ -141,7 +150,7 @@ describe("npm pack", () => {
   test("src/scripts/ holds three groups: core/ (runtime), pack/ (packaging) and docs/ (docs and banner)", () => {
     const list = (rel) => readdirSync(join(PKG_SRC, "src", "scripts", rel), { withFileTypes: true }).map((e) => (e.isDirectory() ? e.name + "/" : e.name)).sort();
     assert.deepEqual(list("."), ["README.md", "core/", "docs/", "pack/"]);
-    assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs", "postinstall.mjs"]);
+    assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs"]);
     assert.deepEqual(list("pack"), ["skillsignore.mjs", "vendor-skills.mjs"]);
     assert.deepEqual(list("docs"), ["build-docs-html.mjs", "build-skills-docs.mjs", "create-banner.mjs", "templates/", "themes.mjs"]);
     assert.deepEqual(list("docs/templates"), ["banner-template.html", "docs-template.html"]);

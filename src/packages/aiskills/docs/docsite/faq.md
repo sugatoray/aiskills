@@ -18,7 +18,7 @@ The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` pri
 
 ### How do I update the skills?
 
-Install a newer package: `npm install -g @sugatoray-ai/aiskills@latest`. The install step saves the new skills and registers them again. If you had picked particular skills or agents, run that `aiskills install ...` command again.
+Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, then run `aiskills install` again: it saves the new skills and registers them. If you had picked particular skills or agents, run that `aiskills install ...` command instead.
 
 ### Does it install Claude Code plugins?
 
@@ -49,13 +49,13 @@ Groups come from the plugin entries in the repo's `marketplace.json`. `newslette
 ### Nothing was installed by `npm install -g`
 
 - **Symptom:** `aiskills installed` shows nothing after the npm install.
-- **Cause:** the install step hides its output and never fails. It may have been skipped (`--ignore-scripts`, pnpm, bun, `CI` set) or `npx skills add` may have failed (offline, proxy).
-- **Fix:** run `aiskills install`. It prints what goes wrong.
+- **Cause:** that's expected. `npm install` only adds the `aiskills` command; the package has no install step, so it never changes your agents by itself.
+- **Fix:** run `aiskills install`. It prints each step, and any error.
 
-### `skills: not found` during the npm install
+### `skills: not found` when run through `npx @sugatoray-ai/aiskills`
 
 - **Cause:** an npm setting reached the nested `npx`. `aiskills` removes npm's own variables before running `npx`, so this means a new one got through.
-- **Fix:** run `aiskills install` after the npm install, and please [report it](https://github.com/sugatoray/aiskills/issues).
+- **Fix:** install the package with `npm install -g` and run `aiskills install`, and please [report it](https://github.com/sugatoray/aiskills/issues).
 
 ### A pattern does nothing, or matches files
 

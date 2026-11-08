@@ -26,7 +26,7 @@ How to work on, test and release `@sugatoray-ai/aiskills`. How it's built is in
 ```text
 package.json, README.md, CHANGELOG.md, SECURITY.md
 bin/aiskills.mjs, bin/aix.mjs          entry points (keep them thin)
-src/scripts/core/                      cli.mjs, installer.mjs, postinstall.mjs (published; see src/scripts/README.md)
+src/scripts/core/                      cli.mjs, installer.mjs (published; see src/scripts/README.md)
 src/scripts/pack/                      vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/                      docs and banner builders, themes.mjs, templates/ (never published)
 src/test/                              node:test suite
@@ -107,7 +107,9 @@ Set `HOME` per command, not with `export`: an exported `HOME` breaks the next
 - Tests never touch the real `HOME` or write into this folder: always use
   `sandbox()` / `repoCopy()`.
 - Check every input and do every lookup before the first install.
-- `postinstall` must never fail `npm install`.
+- No install-time scripts (`preinstall`, `install`, `postinstall`, `prepare`):
+  `npm install` must not change anything outside npm's folder (AIS-7).
+  `packaging.test.mjs` enforces it.
 - Don't add `s`, `l` or `u` as command aliases (`s` = sync or skills? `l`
   looks like `ls`; `u` usually means update). Command names (`aiskills`, `ais`,
   `aix`) are public: don't rename them.
@@ -244,7 +246,7 @@ ticket AIS-1 in `docs/.scrolls/PLAN.md`.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `skills: not found` from the postinstall step | npm's `npm_config_*` variables reached the nested `npx` | They're stripped in `childEnv()`; if it comes back, check new npm variables |
+| `skills: not found` when run through `npx @sugatoray-ai/aiskills` | npm's `npm_config_*` variables reached the nested `npx` | They're stripped in `childEnv()`; if it comes back, check new npm variables |
 | A skill's `.gitignore` missing after install | npm drops `.gitignore` files | Vendor renames them to `_gitignore`; `syncSkills()` renames them back |
 | `no ancestor ... contains skills/` from `npm run vendor` | The package was moved out of the repo | The vendor step needs the repo's `skills/` and `.claude-plugin/marketplace.json` above it |
 | `-a 'claude*'` says it can't read the agent list | `npx skills` changed its "Valid agents:" message | Update `knownAgents()` |

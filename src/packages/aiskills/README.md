@@ -32,18 +32,19 @@ This adds three commands:
 So `ais i -G scrolls` is `aiskills install -G scrolls`, and `aix i -s pdf` is
 `aiskills --route install -s pdf`. The rest of this README uses `aiskills`.
 
-During install, the `postinstall` hook:
+`npm install` only adds these commands: the package has **no install step**,
+so it makes no network calls, writes nothing to your home folder and changes
+no agent. It works the same with npm, pnpm and bun. Then run:
+
+```sh
+aiskills install        # or, without a global install: npx @sugatoray-ai/aiskills install
+```
+
+which:
 
 1. saves the skills to **`~/.config/sugatoray/aiskills/skills/`** and replaces any copy that's already there, and
 2. runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`,
    which registers every skill with the agents it detects (Claude Code, Codex, …).
-
-If step 2 fails (for example, offline or `--ignore-scripts`), the npm install
-still succeeds. Run step 2 again with:
-
-```sh
-npx @sugatoray-ai/aiskills install        # or: aiskills install
-```
 
 ### As a project dependency, with `npx skills experimental_sync`
 
@@ -52,7 +53,7 @@ also works with the `skills` CLI's own way of installing skills from a
 project's `node_modules`:
 
 ```sh
-npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills
+npm install --save-dev @sugatoray-ai/aiskills
 npx skills experimental_sync --agent claude-code --yes   # copies all of its skills into the project
 ```
 
@@ -237,8 +238,8 @@ new group appears automatically; no CLI code needs to change.
 
 `-s/--skill`, `-G/--group` and `-a/--agent` all accept
 [glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns, on both
-`install` and `uninstall`. The same applies to `AISKILLS_SKILLS`,
-`AISKILLS_GROUPS` and `AISKILLS_AGENTS` in the npm postinstall step.
+`install` and `uninstall`. The same applies to the `AISKILLS_SKILLS`,
+`AISKILLS_GROUPS` and `AISKILLS_AGENTS` defaults.
 
 | Pattern | Matches | Example |
 | --- | --- | --- |
@@ -434,16 +435,14 @@ aiskills skills update -g                       # npx skills update -g
 | Variable | Effect |
 | --- | --- |
 | `AISKILLS_HOME` | Override the install root (default `~/.config/sugatoray/aiskills`) |
-| `AISKILLS_SCOPE=project` | Install to the project npm was invoked from instead of globally |
+| `AISKILLS_SCOPE=project` | Same as `-p`: work on the current project instead of globally |
 | `AISKILLS_AGENTS` | Comma-separated agents or [patterns](#patterns-for--s--g-and--a), passed as `--agent` |
 | `AISKILLS_SKILLS` | Comma-separated skills or [patterns](#patterns-for--s--g-and--a), passed as `--skill` (default: all) |
 | `AISKILLS_GROUPS` | Comma-separated group names, aliases or [patterns](#patterns-for--s--g-and--a) (see [Skill groups](#skill-groups)); combined with `AISKILLS_SKILLS` |
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
-| `AISKILLS_ROUTE=1` | Same as `--route`. Also lets the postinstall step route non-bundled names in `AISKILLS_SKILLS` |
+| `AISKILLS_ROUTE=1` | Same as `--route` |
 | `AISKILLS_SKILLS_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version; e.g. `latest`) |
-| `AISKILLS_SKIP_SKILLS_ADD=1` | Postinstall saves the files but skips `npx skills add` (also skipped when `CI` is set) |
-| `AISKILLS_SKIP_POSTINSTALL=1` | Skip the postinstall hook entirely |
 
 ## Security
 
@@ -545,8 +544,7 @@ src/packages/aiskills/
 │   ├── scripts/              # see src/scripts/README.md
 │   │   ├── core/             # what ships: the runtime code
 │   │   │   ├── cli.mjs           # the `aiskills` command
-│   │   │   ├── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
-│   │   │   └── postinstall.mjs   # npm postinstall hook
+│   │   │   └── installer.mjs     # shared logic (sync, npx skills calls, groups, patterns, --route)
 │   │   ├── pack/             # packaging, run at npm pack (not published)
 │   │   │   ├── vendor-skills.mjs # prepack: copies <repo>/skills in
 │   │   │   └── skillsignore.mjs  # .skillsignore rules
@@ -576,16 +574,16 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | File | What it covers |
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
-| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command) and `src/scripts/core/postinstall.mjs`, run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command), run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
-| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the three runtime files in `src/scripts/core/` ship as code: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |
+| `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the two runtime files in `src/scripts/core/` ship as code, and `package.json` has no install-time script: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |
 | `src/test/docs-skills.test.mjs` | The Skills section of the docs (`docs/docsite/skills/`): one page per skill the package really ships, up to date with each `SKILL.md` (description, version, group, how it starts, requirements, source link, shipped files), and a Skills list on the landing page right after Getting started. |
 | `src/test/themes.test.mjs` | The shared themes (`src/scripts/docs/themes.mjs`): 11 themes, Lights Out the default, every token for light and dark, text/link/button contrast of at least 4.5:1 in every theme and mode, Google Fonts links, and generated CSS (banner rules never reach outside the banner). |
 | `src/test/banner.test.mjs` | The banner (`docs/banner/`): `config.yaml` parsing, "auto" values from `package.json` and the bundled skills, the generated page is up to date (`npm run banner:check`), the README opens with `banner_2x.png` (2560 × 1280), and, with Playwright, the editor: saved edits, Reset, unreadable ink disabled, text contrast ≥ 4.5:1 on every allowed background, and PNG export sizes. |
 | `src/test/docs-html.test.mjs` | The single-page HTML docs (`docs/docsite/index.html`): it is up to date, holds every page and diagram in tabs that follow the landing page, and, when Playwright and cdnjs are available, every page renders in Chromium with every link going to a page and heading that exist. |
 | `src/test/docs-workflow.test.mjs` | The GitHub Pages workflow (`.github/workflows/aiskills-docs.yml` at the repo root): it runs on `master` and by hand, watches paths that exist, builds with `npm run docs:site` on the branch being built, uploads `site/` and deploys it with `actions/deploy-pages`; `site/` is git-ignored and not published. |
-| `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: postinstall with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
+| `src/test/e2e.test.mjs` | Skipped unless `AISKILLS_E2E=1`. Packs the package, installs it with `npm install -g` into a throwaway prefix and `HOME`, and drives the real `npx skills`: the npm install changes nothing, `aiskills install` with a group, group and pattern installs, partial uninstall, `--nested` rebuilding the repo's folder exactly, `npx skills experimental_sync` from a project's `node_modules`, `--purge`. |
 
 Every test works in a temporary folder with its own `HOME` and `AISKILLS_HOME`. The packaging and e2e tests use a temporary copy of the repo, so nothing is written into this folder or your real home folder. The CLI tests are skipped on Windows because the stand-in `npx` is a POSIX script, and `npm run test:e2e` uses POSIX syntax to set the variable.
 

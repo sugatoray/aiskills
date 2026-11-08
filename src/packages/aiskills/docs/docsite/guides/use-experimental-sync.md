@@ -6,10 +6,10 @@ The `skills` CLI has an `experimental_sync` command that installs skills found i
 
 ## Steps
 
-1. Add the package as a dev dependency, without its install step:
+1. Add the package as a dev dependency:
 
    ```bash
-   npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills
+   npm install --save-dev @sugatoray-ai/aiskills
    ```
 
 2. Install its skills into the project:
@@ -25,7 +25,7 @@ The `skills` CLI has an `experimental_sync` command that installs skills found i
 ### Update
 
 ```bash
-npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills@latest
+npm install --save-dev @sugatoray-ai/aiskills@latest
 npx skills experimental_sync --agent claude-code --yes
 ```
 

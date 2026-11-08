@@ -8,7 +8,7 @@ The [`skills`](https://www.npmjs.com/package/skills) CLI (`npx skills`) already 
 
 | You want to | With `npx skills` alone | With `aiskills` |
 | --- | --- | --- |
-| Get all the skills | `npx skills add sugatoray/aiskills --global` (latest `master`) | `npm install -g @sugatoray-ai/aiskills` (a released, versioned set) |
+| Get all the skills | `npx skills add sugatoray/aiskills --global` (latest `master`) | `npm install -g @sugatoray-ai/aiskills`, then `aiskills install` (a released, versioned set) |
 | Install a related set | List each skill with `--skill` | `-G scrolls` (groups come from the repo's `marketplace.json`) |
 | Pick by pattern | Not supported | `-s 'scrolls-*'`, `-a 'claude*'` |
 | Remove only these skills | Name each one; same-named skills from other sources go too | `aiskills uninstall` removes exactly what it installed |
@@ -25,6 +25,6 @@ The [`skills`](https://www.npmjs.com/package/skills) CLI (`npx skills`) already 
 
 - It doesn't copy skills into agent folders itself. `npx skills` does that, and keeps its own record of what is installed.
 - It doesn't install Claude Code plugins. It reads the repo's `.claude-plugin/marketplace.json` only to group the skills.
-- It doesn't update skills by itself. Install a newer package version (`npm install -g @sugatoray-ai/aiskills@latest`) to get newer skills.
+- It doesn't update skills by itself. Install a newer package version (`npm install -g @sugatoray-ai/aiskills@latest`) and run `aiskills install` again to get newer skills.
 
 See also: [How aiskills works](../concepts/how-it-works.md) · [Installation](installation.md)

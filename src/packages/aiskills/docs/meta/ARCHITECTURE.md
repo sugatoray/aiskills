@@ -25,8 +25,7 @@ src/packages/aiskills/
     ├── README.md             what each folder is for, and the import rule
     ├── core/                 what ships: the runtime code
     │   ├── cli.mjs           argument parsing and the commands
-    │   ├── installer.mjs     all shared logic (no side effects on import)
-    │   └── postinstall.mjs   npm postinstall hook
+    │   └── installer.mjs     all shared logic (no side effects on import)
     ├── pack/                 packaging, run at npm pack (not published)
     │   ├── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
     │   └── skillsignore.mjs  .skillsignore parser/matcher
@@ -48,13 +47,12 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 | `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill` (drops results failing `isSafeRegistrySpec`), `resolveExternal`, `skillsAddExternal` |
 | `installer.mjs` – guards | Not damaging what isn't ours | `assertInstallFolder` (used by `syncSkills`, `purgeRoot`, and `uninstall --purge` up front) |
 | `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups` |
-| `postinstall.mjs` | What `npm install` does | `main` (reads only `AISKILLS_*` env) |
 | `docs/build-skills-docs.mjs` | The Skills pages, from what the package really ships | `bundled` (vendors into a temp folder), `render`, `frontmatter` |
 | `docs/build-docs-html.mjs` | `docs/docsite/index.html` | `collect` (tabs from the landing page's `### Section` lists), `bannerParts`, `skinMenuHtml`, `build` |
 | `docs/create-banner.mjs` | The banner page and `banner_2x.png` | `parseConfig`, `resolveValues` ("auto" values), `render`, `renderPng`, `addPngText` |
 | `docs/themes.mjs` | The 11 themes (default first) | `THEMES`, `DEFAULT_THEME`, `pageSkinCss`, `bannerSkinCss`, `fontsHref` |
 
-The `installer.mjs`, `cli.mjs` and `postinstall.mjs` rows are `core/`. All
+The `installer.mjs` and `cli.mjs` rows are `core/`. All
 `docs/` builders write only under `docs/`; `src/scripts/README.md` has the
 same map in short.
 
@@ -110,7 +108,10 @@ name, names that aren't safe folder names, and a `.skillsignore` that ignores
 a `SKILL.md` but not its folder. Skills are copied file by file from the
 filtered list.
 
-### `aiskills install` (and `postinstall`)
+### `aiskills install`
+
+`npm install` runs nothing: the package has no install-time scripts. This
+flow starts only when the user runs `aiskills install`.
 
 ```text
 parse options ─▶ syncSkills(layout) ─▶ selectedSkills(-s, -G) ─▶ expandAgents(-a)
@@ -167,9 +168,9 @@ folder next to it, then swaps it in.
 | Ship `skills/` flat | `npx skills experimental_sync` only looks one level deep in `node_modules` packages. |
 | Keep `layout.json` + `nested/` | `--nested` can rebuild the repo exactly, and groups don't depend on the current layout. |
 | Groups from `marketplace.json`, never plugins | Reuse the repo's existing grouping without installing Claude Code plugins. |
-| `postinstall` never fails | A failed `npx` (offline, proxy) must not break `npm install`; `aiskills install` retries. |
+| No install step (`postinstall`); `aiskills install` does the work (AIS-7) | Installing a package that changes agents' instructions should be explicit. Install scripts are skipped by pnpm, bun and `--ignore-scripts` and their output is hidden by npm 7+, so they failed silently for many users; they also get the package flagged by scanners. Tested: no `preinstall`/`install`/`postinstall`/`prepare` script. |
 | Validate and look up everything before installing | A bad name or ambiguous registry match changes nothing. |
-| Strip `npm_*` env before `npx` | Inside `postinstall`, npm's variables make the nested `npx` resolve into the wrong prefix. |
+| Strip `npm_*` env before `npx` | Run through `npx @sugatoray-ai/aiskills` or `npm exec`, npm's variables can make the nested `npx` resolve into the wrong prefix. |
 | Parse `npx skills` text for the agent list and `find` | `skills` has no machine-readable form for these; both fail loudly if the format changes. `list --json` is used everywhere else. |
 | No runtime dependencies | Smaller attack surface and faster installs. |
 | Pin the `skills` CLI version | A new `skills` release must be tested before users get it. |

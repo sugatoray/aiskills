@@ -295,11 +295,9 @@ Examples:
 Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
-                         Defaults for the options above (also used by the npm postinstall)
+                         Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
-  AISKILLS_SKIP_POSTINSTALL=1   Skip the npm postinstall hook entirely
-  AISKILLS_SKIP_SKILLS_ADD=1    Postinstall copies files but skips 'npx skills add'
 ```
 
 ### `-v`, `--version`

@@ -41,10 +41,12 @@ aiskills sync --flat
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 ```
 
-### Nested from the npm install step
+### Nested by default
+
+Set `AISKILLS_LAYOUT=nested` in your shell profile, and every sync uses the nested layout without `--nested`:
 
 ```bash
-AISKILLS_LAYOUT=nested npm install -g @sugatoray-ai/aiskills
+export AISKILLS_LAYOUT=nested
 ```
 
 ## Troubleshooting

@@ -1,6 +1,6 @@
 # How aiskills works
 
-`aiskills` saves the bundled skills to one folder on your machine and asks `npx skills` to install them from there; it never writes into agent folders itself.
+`aiskills` saves the bundled skills to one folder on your machine and asks `npx skills` to install them from there; it never writes into agent folders itself. Installing the npm package does neither: both happen only when you run `aiskills install`.
 
 ![Architecture: the npm package syncs its skills to ~/.config/sugatoray/aiskills (1), aiskills runs npx skills add on that folder (2), and npx skills installs into the agents' skill folders (3); with --route, npx skills also finds and adds skills from the skills.sh registry and GitHub](../images/architecture.svg)
 
@@ -38,7 +38,7 @@ A skill counts as installed **by `aiskills`** when `npx skills list --json` repo
 
 Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stops the command with exit code 1 and installs nothing.
 
-`uninstall` reads `npx skills list --json`, keeps the rows from the install folder (or any source with `--route`), matches `-s`/`-G` against them, and runs `npx skills remove`. The npm install step runs the install steps with no options, only `AISKILLS_*` variables.
+`uninstall` reads `npx skills list --json`, keeps the rows from the install folder (or any source with `--route`), matches `-s`/`-G` against them, and runs `npx skills remove`.
 
 ## Why it works this way
 

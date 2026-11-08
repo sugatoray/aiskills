@@ -23,7 +23,8 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 ## [0.4.0] - Unreleased
 
 First release to be published to npm; this section gets its date when it is.
-It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
+It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below, except the
+npm install step (see **Removed**).
 
 ### Added
 
@@ -35,14 +36,13 @@ It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
 
 ### Changed
 
-- **The code is organized by when it runs.** The three files that ship
-  moved from `src/scripts/` to `src/scripts/core/` (`cli.mjs`,
-  `installer.mjs`, `postinstall.mjs`). The scripts that build the package
+- **The code is organized by when it runs.** The files that ship moved
+  from `src/scripts/` to `src/scripts/core/` (`cli.mjs` and `installer.mjs`). The scripts that build the package
   are in `src/scripts/pack/`, and the docs and banner builders in
   `src/scripts/docs/`; neither is published. `src/scripts/README.md`
   explains the three folders and the rule that imports only point down
-  (`docs/` → `pack/` → `core/`). The `aiskills`, `ais` and `aix` commands and
-  the npm install step work exactly as before.
+  (`docs/` → `pack/` → `core/`). The `aiskills`, `ais` and `aix` commands
+  work exactly as before.
 - **User docs refreshed for 0.4.0.** The docs landing page has a new
   "Ways to read these docs" section: the Markdown pages, the single-page
   `index.html` (tabs, search, 11 themes from the gear menu, Lights Out by
@@ -55,6 +55,25 @@ It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below.
 - **Maintainer docs** (`docs/meta/ARCHITECTURE.md`, `FEATURES.md` and
   `MAINTAINERS.md`) describe the `core/` / `pack/` / `docs/` layout, the
   docs and banner builders, the themes, and the current test suites.
+
+### Removed
+
+- **The npm install step (`postinstall`).** `npm install` now only installs
+  the `aiskills`, `ais` and `aix` commands: it makes no network requests,
+  writes nothing to your home folder and changes no agent. Run
+  `aiskills install` (or `npx @sugatoray-ai/aiskills install`) to save the
+  skills and register them with your agents, as before. The install step's
+  variables `AISKILLS_SKIP_POSTINSTALL` and `AISKILLS_SKIP_SKILLS_ADD` are
+  gone, and `CI` and `INIT_CWD` are no longer read. The other `AISKILLS_*`
+  variables still set defaults for the commands.
+
+  **Breaking** compared with 0.1.0–0.3.0, which ran the step on
+  `npm install`; none of those versions was published, so no installed copy
+  is affected. Why: pnpm, bun and `--ignore-scripts` skip install scripts
+  and npm 7+ hides their output, so the step failed silently for many
+  users, and changing agents' instructions during `npm install` is what
+  security scanners flag. The "Configure the npm install step" guide is
+  replaced by [Set default choices](https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/docs/docsite/guides/set-defaults.md).
 
 ### Fixed
 

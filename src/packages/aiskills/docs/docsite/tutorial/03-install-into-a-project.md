@@ -34,13 +34,16 @@ aiskills uninstall -p -G stata
 
 Global and project installs are separate. A skill can be installed in both, and removing one leaves the other.
 
-## Set it at npm install time
+## Make project scope the default
 
-To make the npm install step install into a project, set `AISKILLS_SCOPE=project` and run `npm install` in that project. The install step uses the folder npm was started from (`INIT_CWD`):
+`AISKILLS_SCOPE=project` makes every command work on the current project without `-p`. Set it in the project's shell (or a tool like direnv):
 
 ```bash
-AISKILLS_SCOPE=project AISKILLS_GROUPS=stata npm install --save-dev @sugatoray-ai/aiskills
+export AISKILLS_SCOPE=project
+aiskills install -G stata
 ```
+
+`-g` still works for a single command. See [Set default choices](../guides/set-defaults.md).
 
 For a project dependency, [`npx skills experimental_sync`](../guides/use-experimental-sync.md) is another way to install the skills, pinned by your lockfile.
 
@@ -48,7 +51,7 @@ For a project dependency, [`npx skills experimental_sync`](../guides/use-experim
 
 - `-p` installs, lists and removes skills in the current project.
 - The default, `-g`, is for your user, in every project.
-- `AISKILLS_SCOPE=project` does the same for the npm install step.
+- `AISKILLS_SCOPE=project` makes project scope the default.
 
 Reference: [`-p`, `--project`](../reference/cli.md#-p---project) · [`AISKILLS_SCOPE`](../reference/environment.md#aiskills_scope)
 

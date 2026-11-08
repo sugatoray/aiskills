@@ -29,7 +29,7 @@ const scriptFiles = () => SCRIPT_DIRS.flatMap((d) => readdirSync(d).filter((f) =
 const source = (file) => readFileSync(scriptFiles().find((p) => p.endsWith("/" + file)), "utf8");
 const allSource = () => {
   const files = scriptFiles();
-  assert.ok(files.length >= 9, `found only ${files.length} scripts under src/scripts/{core,pack,docs}`);
+  assert.ok(files.length >= 8, `found only ${files.length} scripts under src/scripts/{core,pack,docs}`);
   return files.map((p) => readFileSync(p, "utf8")).join("\n");
 };
 
@@ -142,8 +142,22 @@ describe("reference pages cover the code", () => {
       ...[...code.matchAll(/\bAISKILLS_[A-Z_]*[A-Z]\b/g)].map((m) => m[0]),
       ...[...code.matchAll(/process\.env\.([A-Z_]+)/g)].map((m) => m[1]),
     ]);
-    assert.ok(names.has("AISKILLS_HOME") && names.has("INIT_CWD"), [...names].join(", "));
+    assert.ok(names.has("AISKILLS_HOME") && names.has("AISKILLS_SKILLS_VERSION"), [...names].join(", "));
     for (const n of names) assert.ok(hasHeadingWith(env, n), `no heading for \`${n}\` in reference/environment.md`);
+  });
+
+  test("reference/environment.md documents only AISKILLS_* variables the code reads", () => {
+    const env = read("reference/environment.md");
+    const code = allSource();
+    for (const [, n] of env.matchAll(/^#{2,4} `(AISKILLS_[A-Z_]+)`/gm)) {
+      assert.match(code, new RegExp(`\\b${n}\\b`), `reference/environment.md documents ${n}, which the code no longer reads`);
+    }
+  });
+
+  test("no docs page describes an npm install step (removed in 0.4.0, AIS-7)", () => {
+    for (const v of ["AISKILLS_SKIP_POSTINSTALL", "AISKILLS_SKIP_SKILLS_ADD", "INIT_CWD", "--foreground-scripts", "postinstall.mjs"]) {
+      for (const page of pages()) assert.ok(!read(page).includes(v), `${page} still mentions ${v}`);
+    }
   });
 
   test("every error and warning message in src/scripts/core/, pack/ and docs/ is in reference/errors.md", () => {

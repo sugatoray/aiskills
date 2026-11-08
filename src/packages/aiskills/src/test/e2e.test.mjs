@@ -30,6 +30,7 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
     const pack = npm(["pack", "--pack-destination", copy.dir], { cwd: copy.pkg });
     assert.equal(pack.status, 0, pack.stderr);
     const tgz = readdirSync(copy.dir).find((f) => f.endsWith(".tgz"));
+    // No install step (AIS-7): AISKILLS_* variables set here must have no effect.
     const install = npm(["install", "-g", "--prefix", prefix, join(copy.dir, tgz)], {
       cwd: copy.dir,
       env: { ...env(), AISKILLS_GROUPS: "personas", AISKILLS_AGENTS: "claude-code" },
@@ -42,7 +43,15 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
 
   const root = () => join(home, ".config", "sugatoray", "aiskills");
 
-  test("postinstall saved the skills and installed the requested group", () => {
+  test("npm install -g only installs the command: nothing saved, nothing registered", () => {
+    assert.ok(existsSync(cli), "the aiskills command is linked");
+    assert.ok(!existsSync(root()), "npm install must not write ~/.config/sugatoray/aiskills");
+    assert.ok(!existsSync(join(home, ".claude", "skills")), "npm install must not touch agent folders");
+    assert.ok(!existsSync(join(home, ".agents")), "npm install must not touch agent folders");
+  });
+
+  test("aiskills install saves the skills and installs the requested group", () => {
+    assert.equal(aiskills("install", "-G", "personas", "-a", "claude-code").status, 0);
     assert.ok(existsSync(join(root(), "skills")));
     assert.ok(existsSync(join(root(), ".claude-plugin", "marketplace.json")));
     assert.ok(existsSync(join(home, ".claude", "skills", "prodigy")));
@@ -73,7 +82,7 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
     mkdirSync(join(proj, ".claude"), { recursive: true });
     writeFileSync(join(proj, "package.json"), JSON.stringify({ name: "proj", private: true }));
     const tgz = readdirSync(copy.dir).find((f) => f.endsWith(".tgz"));
-    const inst = npm(["install", "--ignore-scripts", join(copy.dir, tgz)], { cwd: proj, env: env() });
+    const inst = npm(["install", join(copy.dir, tgz)], { cwd: proj, env: env() });
     assert.equal(inst.status, 0, inst.stderr);
     const res = spawnSync(process.platform === "win32" ? "npx.cmd" : "npx", ["-y", "skills", "experimental_sync", "--agent", "claude-code", "--yes"], {
       cwd: proj,

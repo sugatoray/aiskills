@@ -7,9 +7,10 @@ The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskil
 
 ```bash
 npm install -g @sugatoray-ai/aiskills
+aiskills install
 ```
 
-That is all most people need: the install step registers every skill with the agents it finds. To choose a group and an agent yourself:
+That is all most people need: `npm install` only adds the `aiskills` command, and `aiskills install` saves the skills and registers every one with the agents it finds. To choose a group and an agent yourself:
 
 <!-- verify -->
 ```bash
@@ -27,7 +28,7 @@ aiskills install -G scrolls -a claude-code
 ## Features
 
 - **Every skill in one package**: 13 skills in 6 groups, at the version you installed.
-- **Install on `npm install -g`**: a `postinstall` step saves and registers the skills, and never fails the npm install.
+- **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
 - **Global or per project**: `-g` (default) or `-p`.
 - **Clean uninstall**: full, partial, per agent or per project, with `--dry-run` and `--purge`.
@@ -41,7 +42,7 @@ aiskills install -G scrolls -a claude-code
 ### Getting started
 
 - [Why aiskills](getting-started/why-aiskills.md): what the package adds on top of `npx skills`, and when you don't need it.
-- [Installation](getting-started/installation.md): install with npm, choose what the install step does, and check it worked.
+- [Installation](getting-started/installation.md): install with npm, run `aiskills install`, and check it worked.
 - [Quickstart](getting-started/quickstart.md): see the groups, install one for one agent, check it, and remove it.
 
 ### Skills
@@ -73,7 +74,7 @@ aiskills install -G scrolls -a claude-code
 
 ### How-to guides
 
-- [Configure the npm install step](guides/configure-npm-install.md): choose skills, agents and scope with `AISKILLS_*` variables, or turn the step off.
+- [Set default choices](guides/set-defaults.md): make skills, agents and scope the defaults with `AISKILLS_*` variables.
 - [Use the package with `npx skills experimental_sync`](guides/use-experimental-sync.md): install the skills from a project's `node_modules`, pinned by your lockfile.
 - [Keep the repo's nested layout](guides/keep-the-nested-layout.md): browse or edit the skills in the folders they have in the repo.
 - [Run any `npx skills` command](guides/run-npx-skills-directly.md): pass arguments straight to `npx skills`, with `:root` for the install folder.
@@ -94,7 +95,7 @@ aiskills install -G scrolls -a claude-code
 
 - [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
-- [Environment variables](reference/environment.md): every variable `aiskills` and its install step read.
+- [Environment variables](reference/environment.md): every variable `aiskills` reads.
 - [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
 - [`.skillsignore`](reference/skillsignore.md): the rule syntax for leaving files out of the package.
 - [Errors and exit codes](reference/errors.md): every error and warning, with its cause and fix.
@@ -122,7 +123,7 @@ The [`skills`](https://www.npmjs.com/package/skills) CLI (`npx skills`) already 
 
 | You want to | With `npx skills` alone | With `aiskills` |
 | --- | --- | --- |
-| Get all the skills | `npx skills add sugatoray/aiskills --global` (latest `master`) | `npm install -g @sugatoray-ai/aiskills` (a released, versioned set) |
+| Get all the skills | `npx skills add sugatoray/aiskills --global` (latest `master`) | `npm install -g @sugatoray-ai/aiskills`, then `aiskills install` (a released, versioned set) |
 | Install a related set | List each skill with `--skill` | `-G scrolls` (groups come from the repo's `marketplace.json`) |
 | Pick by pattern | Not supported | `-s 'scrolls-*'`, `-a 'claude*'` |
 | Remove only these skills | Name each one; same-named skills from other sources go too | `aiskills uninstall` removes exactly what it installed |
@@ -139,14 +140,14 @@ The [`skills`](https://www.npmjs.com/package/skills) CLI (`npx skills`) already 
 
 - It doesn't copy skills into agent folders itself. `npx skills` does that, and keeps its own record of what is installed.
 - It doesn't install Claude Code plugins. It reads the repo's `.claude-plugin/marketplace.json` only to group the skills.
-- It doesn't update skills by itself. Install a newer package version (`npm install -g @sugatoray-ai/aiskills@latest`) to get newer skills.
+- It doesn't update skills by itself. Install a newer package version (`npm install -g @sugatoray-ai/aiskills@latest`) and run `aiskills install` again to get newer skills.
 
 See also: [How aiskills works](../concepts/how-it-works.md) · [Installation](installation.md)
 
 <!-- source: getting-started/installation.md -->
 # Installation
 
-Install the package globally with npm; its install step saves the skills and registers them with your agents.
+Install the `aiskills` command with npm, then run `aiskills install` to save the skills and register them with your agents.
 
 **You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
 
@@ -154,27 +155,23 @@ Install the package globally with npm; its install step saves the skills and reg
 
 ```bash
 npm install -g @sugatoray-ai/aiskills
+aiskills install
 ```
 
-npm runs the package's `postinstall` step, which:
+The first command only installs the package and its commands. It runs no install step: nothing is written to your home folder and no agent is changed. pnpm (`pnpm add -g`) and bun (`bun add -g`) work the same way.
+
+`aiskills install`:
 
 1. saves the skills to `~/.config/sugatoray/aiskills/skills/`, replacing any older copy, and
 2. runs `npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, which installs every skill for every agent `npx skills` detects.
 
-npm 7 and later hide the output of install steps, so you won't see this happen. If step 2 fails (offline, behind a proxy, or with `--ignore-scripts`), the npm install still succeeds. Run it again with `aiskills install`.
-
-> [!NOTE]
-> pnpm and bun don't run install steps by default. After `pnpm add -g` or `bun add -g`, run `aiskills install` once.
-
-## Choose what the install step does
-
-The install step reads `AISKILLS_*` environment variables. For example, only the scrolls group, only for Claude Code:
+To choose, pass options. For example, only the scrolls group, only for Claude Code:
 
 ```bash
-AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
+aiskills install -G scrolls -a claude-code
 ```
 
-To save the files but not register them, set `AISKILLS_SKIP_SKILLS_ADD=1`. To skip the step entirely, set `AISKILLS_SKIP_POSTINSTALL=1`. All the variables are in [Configure the npm install step](../guides/configure-npm-install.md).
+To save the skills without registering them, run `aiskills sync`. Every option is in the [CLI reference](../reference/cli.md).
 
 ## Check it worked
 
@@ -203,17 +200,18 @@ npx @sugatoray-ai/aiskills install -G scrolls
 
 ## Update
 
-Install the newer version the same way. The install step replaces `~/.config/sugatoray/aiskills/skills/` with the new skills and runs `npx skills add` again:
+Install the newer version, then run `aiskills install` again. It replaces `~/.config/sugatoray/aiskills/skills/` with the new skills and runs `npx skills add` again:
 
 ```bash
 npm install -g @sugatoray-ai/aiskills@latest
+aiskills install
 ```
 
-If you had chosen particular skills, agents or flags, run that `aiskills install ...` command again afterwards (or set the same `AISKILLS_*` variables for the npm install).
+If you had chosen particular skills, agents or flags, run that `aiskills install ...` command instead.
 
 ## Remove
 
-npm doesn't run any step on uninstall, so remove the skills first:
+Remove the skills first, then the package:
 
 ```bash
 aiskills uninstall --purge
@@ -222,7 +220,7 @@ npm uninstall -g @sugatoray-ai/aiskills
 
 See [Remove everything](../guides/remove-everything.md).
 
-See also: [Quickstart](quickstart.md) · [Environment variables](../reference/environment.md)
+See also: [Quickstart](quickstart.md) · [Set default choices](../guides/set-defaults.md)
 
 <!-- source: getting-started/quickstart.md -->
 # Quickstart
@@ -1373,13 +1371,16 @@ aiskills uninstall -p -G stata
 
 Global and project installs are separate. A skill can be installed in both, and removing one leaves the other.
 
-## Set it at npm install time
+## Make project scope the default
 
-To make the npm install step install into a project, set `AISKILLS_SCOPE=project` and run `npm install` in that project. The install step uses the folder npm was started from (`INIT_CWD`):
+`AISKILLS_SCOPE=project` makes every command work on the current project without `-p`. Set it in the project's shell (or a tool like direnv):
 
 ```bash
-AISKILLS_SCOPE=project AISKILLS_GROUPS=stata npm install --save-dev @sugatoray-ai/aiskills
+export AISKILLS_SCOPE=project
+aiskills install -G stata
 ```
+
+`-g` still works for a single command. See [Set default choices](../guides/set-defaults.md).
 
 For a project dependency, [`npx skills experimental_sync`](../guides/use-experimental-sync.md) is another way to install the skills, pinned by your lockfile.
 
@@ -1387,7 +1388,7 @@ For a project dependency, [`npx skills experimental_sync`](../guides/use-experim
 
 - `-p` installs, lists and removes skills in the current project.
 - The default, `-g`, is for your user, in every project.
-- `AISKILLS_SCOPE=project` does the same for the npm install step.
+- `AISKILLS_SCOPE=project` makes project scope the default.
 
 Reference: [`-p`, `--project`](../reference/cli.md#-p---project) · [`AISKILLS_SCOPE`](../reference/environment.md#aiskills_scope)
 
@@ -1576,34 +1577,34 @@ Reference: [`uninstall`](../reference/cli.md#uninstall) · [Remove everything](.
 
 Previous: [4. Add external skills](04-add-external-skills.md) · Back to the [docs home](../README.md)
 
-<!-- source: guides/configure-npm-install.md -->
-# How to configure the npm install step
+<!-- source: guides/set-defaults.md -->
+# How to set default choices with environment variables
 
-Use `AISKILLS_*` environment variables when you want `npm install` itself to install a particular set of skills, or nothing at all.
+Use `AISKILLS_*` environment variables when you run `aiskills` with the same choices every time, or when a script or CI job should not have to repeat them.
 
-The package's `postinstall` step reads the same choices as `aiskills install`, but from the environment, because npm passes no arguments to it.
+`aiskills install`, `uninstall`, `installed` and `sync` read these variables as defaults. An option on the command line replaces the matching variable.
 
 ## Steps
 
 1. Pick the variables for what you want:
 
-   | You want | Set |
-   | --- | --- |
-   | Some groups | `AISKILLS_GROUPS=scrolls,personas` |
-   | Some skills | `AISKILLS_SKILLS='scrolls-*,prodigy'` |
-   | Some agents | `AISKILLS_AGENTS=claude-code,codex` |
-   | The current project, not your user | `AISKILLS_SCOPE=project` |
-   | Copies instead of symlinks | `AISKILLS_COPY=1` |
-   | The repo's folder layout | `AISKILLS_LAYOUT=nested` |
-   | Also external skills in `AISKILLS_SKILLS` | `AISKILLS_ROUTE=1` |
+   | You want | Set | Same as |
+   | --- | --- | --- |
+   | Some groups | `AISKILLS_GROUPS=scrolls,personas` | `-G` |
+   | Some skills | `AISKILLS_SKILLS='scrolls-*,prodigy'` | `-s` |
+   | Some agents | `AISKILLS_AGENTS=claude-code,codex` | `-a` |
+   | The current project, not your user | `AISKILLS_SCOPE=project` | `-p` |
+   | Copies instead of symlinks | `AISKILLS_COPY=1` | `--copy` |
+   | The repo's folder layout | `AISKILLS_LAYOUT=nested` | `--nested` |
+   | Also external skills in `-s` | `AISKILLS_ROUTE=1` | `--route` |
 
-2. Set them on the npm command:
+2. Set them for one command:
 
    ```bash
-   AISKILLS_GROUPS=scrolls AISKILLS_AGENTS='claude*' npm install -g @sugatoray-ai/aiskills
+   AISKILLS_GROUPS=scrolls AISKILLS_AGENTS='claude*' aiskills install
    ```
 
-3. Check the result, since npm hides the step's output:
+3. Check the result:
 
    ```bash
    aiskills installed
@@ -1611,35 +1612,26 @@ The package's `postinstall` step reads the same choices as `aiskills install`, b
 
 ## Variations
 
-### Save the files but don't register them
+### Make them your defaults everywhere
 
-```bash
-AISKILLS_SKIP_SKILLS_ADD=1 npm install -g @sugatoray-ai/aiskills
-```
-
-The skills are saved to `~/.config/sugatoray/aiskills/skills/`; run `aiskills install ...` later. The step also skips registering when `CI` is set.
-
-### Skip the step entirely
-
-```bash
-AISKILLS_SKIP_POSTINSTALL=1 npm install -g @sugatoray-ai/aiskills
-```
-
-Or `npm install --ignore-scripts`. Nothing is written until you run `aiskills install` or `aiskills sync`.
-
-### Make the choices the defaults for the CLI too
-
-`aiskills install`, `uninstall` and `installed` read the same variables as defaults; options on the command line replace them. Put them in your shell profile to use them everywhere:
+Put them in your shell profile (`~/.bashrc`, `~/.zshrc`, ...):
 
 ```bash
 export AISKILLS_AGENTS=claude-code,codex
 ```
 
+### Override a default for one command
+
+Options win over variables. With `AISKILLS_AGENTS=claude-code` set, this installs for Codex only:
+
+```bash
+aiskills install -a codex
+```
+
 ## Troubleshooting
 
-- **No skills appeared after `npm install`**: the step never fails the npm install, so look for a reason by running the same choice with the CLI, e.g. `aiskills install -G scrolls`. It prints the error.
-- **pnpm or bun**: they skip install steps by default; run `aiskills install` once.
-- **An unknown name in `AISKILLS_SKILLS`** stops the step with `unknown skill(s) in AISKILLS_SKILLS`. Fix the name, or set `AISKILLS_ROUTE=1` to look it up.
+- **A command installs for fewer agents or skills than expected**: a variable is set in your shell. `env | grep AISKILLS_` shows them.
+- **A name in `AISKILLS_SKILLS` isn't bundled**: `aiskills install` stops with `not provided by this package`. Fix the name, or set `AISKILLS_ROUTE=1` to look it up in the skills registry.
 
 See also: [Environment variables](../reference/environment.md) · [Installation](../getting-started/installation.md)
 
@@ -1652,10 +1644,10 @@ The `skills` CLI has an `experimental_sync` command that installs skills found i
 
 ## Steps
 
-1. Add the package as a dev dependency, without its install step:
+1. Add the package as a dev dependency:
 
    ```bash
-   npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills
+   npm install --save-dev @sugatoray-ai/aiskills
    ```
 
 2. Install its skills into the project:
@@ -1671,7 +1663,7 @@ The `skills` CLI has an `experimental_sync` command that installs skills found i
 ### Update
 
 ```bash
-npm install --save-dev --ignore-scripts @sugatoray-ai/aiskills@latest
+npm install --save-dev @sugatoray-ai/aiskills@latest
 npx skills experimental_sync --agent claude-code --yes
 ```
 
@@ -1726,10 +1718,12 @@ aiskills sync --flat
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 ```
 
-### Nested from the npm install step
+### Nested by default
+
+Set `AISKILLS_LAYOUT=nested` in your shell profile, and every sync uses the nested layout without `--nested`:
 
 ```bash
-AISKILLS_LAYOUT=nested npm install -g @sugatoray-ai/aiskills
+export AISKILLS_LAYOUT=nested
 ```
 
 ## Troubleshooting
@@ -1948,14 +1942,14 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
 
 ### Unattended install from npm
 
-Set the choices as environment variables, so a single `npm install` does everything:
+`npm install` only adds the command, so run `aiskills install` after it. Its exit code tells a script whether it worked:
 
 ```bash
-AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
-aiskills installed
+npm install -g @sugatoray-ai/aiskills
+aiskills install -G scrolls -a claude-code
 ```
 
-The npm install step never fails `npm install`, so check the result afterwards with `aiskills installed`.
+Or without a global install: `npx -y @sugatoray-ai/aiskills install -G scrolls -a claude-code`.
 
 ### No telemetry
 
@@ -2078,7 +2072,7 @@ See also: [`.skillsignore` reference](../reference/skillsignore.md) · [Files an
 <!-- source: concepts/how-it-works.md -->
 # How aiskills works
 
-`aiskills` saves the bundled skills to one folder on your machine and asks `npx skills` to install them from there; it never writes into agent folders itself.
+`aiskills` saves the bundled skills to one folder on your machine and asks `npx skills` to install them from there; it never writes into agent folders itself. Installing the npm package does neither: both happen only when you run `aiskills install`.
 
 ![Architecture: the npm package syncs its skills to ~/.config/sugatoray/aiskills (1), aiskills runs npx skills add on that folder (2), and npx skills installs into the agents' skill folders (3); with --route, npx skills also finds and adds skills from the skills.sh registry and GitHub](../images/architecture.svg)
 
@@ -2116,7 +2110,7 @@ A skill counts as installed **by `aiskills`** when `npx skills list --json` repo
 
 Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stops the command with exit code 1 and installs nothing.
 
-`uninstall` reads `npx skills list --json`, keeps the rows from the install folder (or any source with `--route`), matches `-s`/`-G` against them, and runs `npx skills remove`. The npm install step runs the install steps with no options, only `AISKILLS_*` variables.
+`uninstall` reads `npx skills list --json`, keeps the rows from the install folder (or any source with `--route`), matches `-s`/`-G` against them, and runs `npx skills remove`.
 
 ## Why it works this way
 
@@ -2275,7 +2269,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 
 | What | When |
 | --- | --- |
-| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by the npm install step, `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
+| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
 | Agents' skill folders | Only through `npx skills add` / `remove`. |
 | An empty temporary folder | While reading the agent list for `-a` patterns; deleted straight after. |
 | The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub. |
@@ -2284,6 +2278,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 
 Each one is covered by the test suite.
 
+- **No install step.** The package has no `preinstall`, `install` or `postinstall` script, so `npm install` (or pnpm, or bun) only puts files in npm's own folder: no network calls, nothing written to your home folder, no agent changed. Your agents change only when you run `aiskills install`.
 - **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it, and only accepts an exact version, `latest` or `next`.
 - **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
 - **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
@@ -2599,11 +2594,9 @@ Examples:
 Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
-                         Defaults for the options above (also used by the npm postinstall)
+                         Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
-  AISKILLS_SKIP_POSTINSTALL=1   Skip the npm postinstall hook entirely
-  AISKILLS_SKIP_SKILLS_ADD=1    Postinstall copies files but skips 'npx skills add'
 ```
 
 ### `-v`, `--version`
@@ -2763,9 +2756,9 @@ See also: [CLI reference](cli.md) · [2. Pick skills and agents](../tutorial/02-
 <!-- source: reference/environment.md -->
 # Environment variables reference
 
-Every environment variable `aiskills` and its npm install step read; this page is exhaustive.
+Every environment variable `aiskills` reads; this page is exhaustive. `npm install` reads none of them: the package has no install step.
 
-Variables give defaults. An option on the command line replaces the matching variable. The npm install step (`postinstall`) takes no options, so it reads only these. Values that are lists are comma-separated, and accept [patterns](patterns.md). "Truthy" means `1`, `true` or `yes`, in any case.
+Variables give defaults. An option on the command line replaces the matching variable. Values that are lists are comma-separated, and accept [patterns](patterns.md). "Truthy" means `1`, `true` or `yes`, in any case.
 
 <!-- verify -->
 ```bash
@@ -2780,7 +2773,7 @@ AISKILLS_LAYOUT=nested aiskills sync
 
 ### `AISKILLS_SKILLS`
 
-Default for `-s`: skill names or patterns. Unset: every skill. In the install step, a name that isn't bundled is an error unless [`AISKILLS_ROUTE`](#aiskills_route) is truthy.
+Default for `-s`: skill names or patterns. Unset: every skill. A name that isn't bundled is an error unless [`AISKILLS_ROUTE`](#aiskills_route) is truthy.
 
 ### `AISKILLS_GROUPS`
 
@@ -2800,7 +2793,7 @@ Truthy = `--copy`.
 
 ### `AISKILLS_ROUTE`
 
-Truthy = `--route`. The `aix` command sets it. In the install step, lets names in `AISKILLS_SKILLS` that aren't bundled be looked up.
+Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` that aren't bundled be looked up.
 
 ### `AISKILLS_LAYOUT`
 
@@ -2816,24 +2809,6 @@ The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is 
 
 The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest` or `next`; anything else is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
 
-## The npm install step
-
-### `AISKILLS_SKIP_POSTINSTALL`
-
-Truthy: the install step does nothing. Same effect as `npm install --ignore-scripts` for this package.
-
-### `AISKILLS_SKIP_SKILLS_ADD`
-
-Truthy: the install step saves the skills to the install folder but doesn't run `npx skills add`.
-
-### `CI`
-
-Truthy (most CI systems set `CI=true`): same as `AISKILLS_SKIP_SKILLS_ADD`. Only the install step reads it; `aiskills install` in CI still installs.
-
-### `INIT_CWD`
-
-Set by npm to the folder `npm install` was run from. With `AISKILLS_SCOPE=project`, the install step installs into that folder.
-
 ## Read by `npx skills`, passed through
 
 `aiskills` passes every variable to `npx` except npm's own `npm_*` variables (registry, proxy and certificate settings among them are kept). These are worth knowing:
@@ -2842,7 +2817,7 @@ Set by npm to the folder `npm install` was run from. With `AISKILLS_SCOPE=projec
 | --- | --- |
 | `DISABLE_TELEMETRY`, `DO_NOT_TRACK` | Turn off its anonymous usage data to `skills.sh` |
 
-See also: [Configure the npm install step](../guides/configure-npm-install.md) · [CLI reference](cli.md)
+See also: [Set default choices](../guides/set-defaults.md) · [CLI reference](cli.md)
 
 <!-- source: reference/files.md -->
 # Files and schemas reference
@@ -2851,7 +2826,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 
 ## The install folder
 
-`~/.config/sugatoray/aiskills/` (or [`AISKILLS_HOME`](environment.md#aiskills_home)), written by every sync (`install`, `sync`, `list`, `groups` and the npm install step):
+`~/.config/sugatoray/aiskills/` (or [`AISKILLS_HOME`](environment.md#aiskills_home)), written by every sync (`install`, `sync`, `list` and `groups`; never by `npm install`):
 
 ```text
 ~/.config/sugatoray/aiskills/
@@ -2913,7 +2888,7 @@ Written when the package is built, and copied to the install folder.
 ```text
 @sugatoray-ai/aiskills/
 ├── bin/aiskills.mjs, bin/aix.mjs     the commands (aiskills and ais share one file)
-├── src/scripts/core/                 cli.mjs, installer.mjs, postinstall.mjs
+├── src/scripts/core/                 cli.mjs, installer.mjs
 ├── skills/<skill>/                   the skills, flat
 ├── .aiskills/layout.json, .aiskills/nested/
 ├── .claude-plugin/marketplace.json
@@ -3029,8 +3004,6 @@ Errors and warnings go to stderr and start with `[aiskills]`. Parts in `<angle b
 | `0` | Success. `uninstall` also exits `0` when there was nothing to remove. |
 | `1` | `aiskills` stopped with one of the errors below, or `installed` couldn't read `npx skills list`. No skill was installed or removed. |
 | any other | The exit code of the `npx skills` command it ran, passed through. |
-
-The npm install step always exits `0`, so that `npm install` never fails because of it. Its problems are printed as [warnings](#install-step-warnings).
 
 <!-- verify -->
 ```bash
@@ -3271,37 +3244,6 @@ unknown command: <name>
 
 **Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. **Fix:** remove those characters; skill names and specs never need them.
 
-## Install step warnings
-
-The npm install step prints these and still lets `npm install` succeed.
-
-### Unknown skills in `AISKILLS_SKILLS`
-
-```text
-[aiskills] postinstall did not complete: unknown skill(s) in AISKILLS_SKILLS: <names> (set AISKILLS_ROUTE=1 to look them up)
-[aiskills] run 'npx aiskills install' to retry.
-```
-
-**Cause:** a name in `AISKILLS_SKILLS` isn't bundled. **Fix:** fix the name, or set `AISKILLS_ROUTE=1`.
-
-### Install step didn't complete
-
-```text
-[aiskills] postinstall did not complete: <error>
-[aiskills] run 'npx aiskills install' to retry.
-```
-
-**Cause:** any of the errors on this page, raised during the install step. **Fix:** run `aiskills install` with the same choices to see and fix it.
-
-### `npx skills add` failed
-
-```text
-[aiskills] 'npx skills add' exited with <code>. Skills are saved in <install folder>/skills;
-[aiskills] register them later with:  npx skills add <install folder> --global
-```
-
-**Cause:** `npx skills add` failed (often no network access). The skills are on disk. **Fix:** run `aiskills install` when it can reach the registry.
-
 ## Packaging errors (maintainers)
 
 These come from `npm pack` / `npm run vendor`, when the package is built from the repo.
@@ -3494,7 +3436,7 @@ The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` pri
 
 ### How do I update the skills?
 
-Install a newer package: `npm install -g @sugatoray-ai/aiskills@latest`. The install step saves the new skills and registers them again. If you had picked particular skills or agents, run that `aiskills install ...` command again.
+Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, then run `aiskills install` again: it saves the new skills and registers them. If you had picked particular skills or agents, run that `aiskills install ...` command instead.
 
 ### Does it install Claude Code plugins?
 
@@ -3525,13 +3467,13 @@ Groups come from the plugin entries in the repo's `marketplace.json`. `newslette
 ### Nothing was installed by `npm install -g`
 
 - **Symptom:** `aiskills installed` shows nothing after the npm install.
-- **Cause:** the install step hides its output and never fails. It may have been skipped (`--ignore-scripts`, pnpm, bun, `CI` set) or `npx skills add` may have failed (offline, proxy).
-- **Fix:** run `aiskills install`. It prints what goes wrong.
+- **Cause:** that's expected. `npm install` only adds the `aiskills` command; the package has no install step, so it never changes your agents by itself.
+- **Fix:** run `aiskills install`. It prints each step, and any error.
 
-### `skills: not found` during the npm install
+### `skills: not found` when run through `npx @sugatoray-ai/aiskills`
 
 - **Cause:** an npm setting reached the nested `npx`. `aiskills` removes npm's own variables before running `npx`, so this means a new one got through.
-- **Fix:** run `aiskills install` after the npm install, and please [report it](https://github.com/sugatoray/aiskills/issues).
+- **Fix:** install the package with `npm install -g` and run `aiskills install`, and please [report it](https://github.com/sugatoray/aiskills/issues).
 
 ### A pattern does nothing, or matches files
 

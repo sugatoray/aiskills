@@ -1,6 +1,6 @@
 # Installation
 
-Install the package globally with npm; its install step saves the skills and registers them with your agents.
+Install the `aiskills` command with npm, then run `aiskills install` to save the skills and register them with your agents.
 
 **You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
 
@@ -8,27 +8,23 @@ Install the package globally with npm; its install step saves the skills and reg
 
 ```bash
 npm install -g @sugatoray-ai/aiskills
+aiskills install
 ```
 
-npm runs the package's `postinstall` step, which:
+The first command only installs the package and its commands. It runs no install step: nothing is written to your home folder and no agent is changed. pnpm (`pnpm add -g`) and bun (`bun add -g`) work the same way.
+
+`aiskills install`:
 
 1. saves the skills to `~/.config/sugatoray/aiskills/skills/`, replacing any older copy, and
 2. runs `npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, which installs every skill for every agent `npx skills` detects.
 
-npm 7 and later hide the output of install steps, so you won't see this happen. If step 2 fails (offline, behind a proxy, or with `--ignore-scripts`), the npm install still succeeds. Run it again with `aiskills install`.
-
-> [!NOTE]
-> pnpm and bun don't run install steps by default. After `pnpm add -g` or `bun add -g`, run `aiskills install` once.
-
-## Choose what the install step does
-
-The install step reads `AISKILLS_*` environment variables. For example, only the scrolls group, only for Claude Code:
+To choose, pass options. For example, only the scrolls group, only for Claude Code:
 
 ```bash
-AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
+aiskills install -G scrolls -a claude-code
 ```
 
-To save the files but not register them, set `AISKILLS_SKIP_SKILLS_ADD=1`. To skip the step entirely, set `AISKILLS_SKIP_POSTINSTALL=1`. All the variables are in [Configure the npm install step](../guides/configure-npm-install.md).
+To save the skills without registering them, run `aiskills sync`. Every option is in the [CLI reference](../reference/cli.md).
 
 ## Check it worked
 
@@ -57,17 +53,18 @@ npx @sugatoray-ai/aiskills install -G scrolls
 
 ## Update
 
-Install the newer version the same way. The install step replaces `~/.config/sugatoray/aiskills/skills/` with the new skills and runs `npx skills add` again:
+Install the newer version, then run `aiskills install` again. It replaces `~/.config/sugatoray/aiskills/skills/` with the new skills and runs `npx skills add` again:
 
 ```bash
 npm install -g @sugatoray-ai/aiskills@latest
+aiskills install
 ```
 
-If you had chosen particular skills, agents or flags, run that `aiskills install ...` command again afterwards (or set the same `AISKILLS_*` variables for the npm install).
+If you had chosen particular skills, agents or flags, run that `aiskills install ...` command instead.
 
 ## Remove
 
-npm doesn't run any step on uninstall, so remove the skills first:
+Remove the skills first, then the package:
 
 ```bash
 aiskills uninstall --purge
@@ -76,4 +73,4 @@ npm uninstall -g @sugatoray-ai/aiskills
 
 See [Remove everything](../guides/remove-everything.md).
 
-See also: [Quickstart](quickstart.md) · [Environment variables](../reference/environment.md)
+See also: [Quickstart](quickstart.md) · [Set default choices](../guides/set-defaults.md)

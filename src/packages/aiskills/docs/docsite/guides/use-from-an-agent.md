@@ -74,14 +74,14 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
 
 ### Unattended install from npm
 
-Set the choices as environment variables, so a single `npm install` does everything:
+`npm install` only adds the command, so run `aiskills install` after it. Its exit code tells a script whether it worked:
 
 ```bash
-AISKILLS_GROUPS=scrolls AISKILLS_AGENTS=claude-code npm install -g @sugatoray-ai/aiskills
-aiskills installed
+npm install -g @sugatoray-ai/aiskills
+aiskills install -G scrolls -a claude-code
 ```
 
-The npm install step never fails `npm install`, so check the result afterwards with `aiskills installed`.
+Or without a global install: `npx -y @sugatoray-ai/aiskills install -G scrolls -a claude-code`.
 
 ### No telemetry
 

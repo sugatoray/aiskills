@@ -6,9 +6,10 @@ The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskil
 
 ```bash
 npm install -g @sugatoray-ai/aiskills
+aiskills install
 ```
 
-That is all most people need: the install step registers every skill with the agents it finds. To choose a group and an agent yourself:
+That is all most people need: `npm install` only adds the `aiskills` command, and `aiskills install` saves the skills and registers every one with the agents it finds. To choose a group and an agent yourself:
 
 <!-- verify -->
 ```bash
@@ -26,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 ## Features
 
 - **Every skill in one package**: 13 skills in 6 groups, at the version you installed.
-- **Install on `npm install -g`**: a `postinstall` step saves and registers the skills, and never fails the npm install.
+- **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
 - **Global or per project**: `-g` (default) or `-p`.
 - **Clean uninstall**: full, partial, per agent or per project, with `--dry-run` and `--purge`.
@@ -40,7 +41,7 @@ aiskills install -G scrolls -a claude-code
 ### Getting started
 
 - [Why aiskills](getting-started/why-aiskills.md): what the package adds on top of `npx skills`, and when you don't need it.
-- [Installation](getting-started/installation.md): install with npm, choose what the install step does, and check it worked.
+- [Installation](getting-started/installation.md): install with npm, run `aiskills install`, and check it worked.
 - [Quickstart](getting-started/quickstart.md): see the groups, install one for one agent, check it, and remove it.
 
 ### Skills
@@ -72,7 +73,7 @@ aiskills install -G scrolls -a claude-code
 
 ### How-to guides
 
-- [Configure the npm install step](guides/configure-npm-install.md): choose skills, agents and scope with `AISKILLS_*` variables, or turn the step off.
+- [Set default choices](guides/set-defaults.md): make skills, agents and scope the defaults with `AISKILLS_*` variables.
 - [Use the package with `npx skills experimental_sync`](guides/use-experimental-sync.md): install the skills from a project's `node_modules`, pinned by your lockfile.
 - [Keep the repo's nested layout](guides/keep-the-nested-layout.md): browse or edit the skills in the folders they have in the repo.
 - [Run any `npx skills` command](guides/run-npx-skills-directly.md): pass arguments straight to `npx skills`, with `:root` for the install folder.
@@ -93,7 +94,7 @@ aiskills install -G scrolls -a claude-code
 
 - [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
-- [Environment variables](reference/environment.md): every variable `aiskills` and its install step read.
+- [Environment variables](reference/environment.md): every variable `aiskills` reads.
 - [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
 - [`.skillsignore`](reference/skillsignore.md): the rule syntax for leaving files out of the package.
 - [Errors and exit codes](reference/errors.md): every error and warning, with its cause and fix.

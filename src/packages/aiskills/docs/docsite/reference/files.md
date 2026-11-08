@@ -4,7 +4,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 
 ## The install folder
 
-`~/.config/sugatoray/aiskills/` (or [`AISKILLS_HOME`](environment.md#aiskills_home)), written by every sync (`install`, `sync`, `list`, `groups` and the npm install step):
+`~/.config/sugatoray/aiskills/` (or [`AISKILLS_HOME`](environment.md#aiskills_home)), written by every sync (`install`, `sync`, `list` and `groups`; never by `npm install`):
 
 ```text
 ~/.config/sugatoray/aiskills/
@@ -66,7 +66,7 @@ Written when the package is built, and copied to the install folder.
 ```text
 @sugatoray-ai/aiskills/
 ├── bin/aiskills.mjs, bin/aix.mjs     the commands (aiskills and ais share one file)
-├── src/scripts/core/                 cli.mjs, installer.mjs, postinstall.mjs
+├── src/scripts/core/                 cli.mjs, installer.mjs
 ├── skills/<skill>/                   the skills, flat
 ├── .aiskills/layout.json, .aiskills/nested/
 ├── .claude-plugin/marketplace.json

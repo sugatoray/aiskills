@@ -1,4 +1,4 @@
-// CLI tests for bin/aiskills.mjs (-> src/scripts/core/cli.mjs) and src/scripts/core/postinstall.mjs.
+// CLI tests for bin/aiskills.mjs (-> src/scripts/core/cli.mjs).
 //
 // Each test runs the real CLI in a throwaway sandbox (see helpers.mjs) with a
 // stand-in `npx` first on PATH, then checks the exact `npx skills` commands
@@ -228,8 +228,8 @@ describe("layouts: --flat (default) and --nested", posixOnly, () => {
     }
   });
 
-  test("postinstall honours AISKILLS_LAYOUT", () => {
-    const r = sb.postinstall({ env: { AISKILLS_LAYOUT: "nested" } });
+  test("sync honours AISKILLS_LAYOUT", () => {
+    const r = sb.run(["sync"], { env: { AISKILLS_LAYOUT: "nested" } });
     assert.equal(r.status, 0, r.out);
     assert.ok(existsSync(join(sb.root, "skills", "alpha", "a1", "SKILL.md")));
     assert.ok(existsSync(join(sb.root, "skills", "beta", ".gitignore")));
@@ -586,63 +586,45 @@ describe("aiskills installed / find / skills passthrough", posixOnly, () => {
   });
 });
 
-describe("postinstall", posixOnly, () => {
-  test("saves the skills and installs everything globally", () => {
-    const r = sb.postinstall();
+describe("no install step: aiskills install does the work (AIS-7)", posixOnly, () => {
+  test("the package has no postinstall script to run", () => {
+    assert.ok(!existsSync(join(sb.pkg, "src", "scripts", "core", "postinstall.mjs")));
+    assert.equal(JSON.parse(readFileSync(join(sb.pkg, "package.json"), "utf8")).scripts.postinstall, undefined);
+  });
+
+  test("--help no longer describes an npm install step or its variables", () => {
+    const out = sb.run(["--help"]).out;
+    assert.doesNotMatch(out, /postinstall|AISKILLS_SKIP_|npm install/i);
+    assert.match(out, /AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY\n\s+Defaults for the options above\n/);
+  });
+
+  test("aiskills install saves the skills and installs everything globally", () => {
+    const r = sb.run(["install"]);
     assert.equal(r.status, 0, r.out);
     assert.ok(existsSync(join(sb.root, "skills", "a1", "SKILL.md")));
     assert.deepEqual(changes(r.calls), [["add", sb.root, "--global", "--skill", "*", "--yes"]]);
-    assert.equal(r.calls[0].cwd, sb.root);
   });
 
-  test("honours AISKILLS_GROUPS / AISKILLS_AGENTS patterns", () => {
-    const r = sb.postinstall({ env: { AISKILLS_GROUPS: "b*", AISKILLS_AGENTS: "claude*" } });
+  test("AISKILLS_GROUPS / AISKILLS_AGENTS patterns are defaults for aiskills install", () => {
+    const r = sb.run(["install"], { env: { AISKILLS_GROUPS: "b*", AISKILLS_AGENTS: "claude*" } });
     assert.equal(r.status, 0, r.out);
     assert.deepEqual(changes(r.calls), [
       ["add", sb.root, "--global", "--skill", "beta-one", "--skill", "beta-two", "--agent", "claude-code", "--yes"],
     ]);
   });
 
-  test("project scope runs in INIT_CWD", () => {
-    const r = sb.postinstall({ env: { AISKILLS_SCOPE: "project", INIT_CWD: sb.home } });
-    assert.equal(r.calls[0].cwd, sb.home);
-    assert.ok(!skillsArgs(r.calls[0]).includes("--global"));
-  });
-
-  test("CI and AISKILLS_SKIP_SKILLS_ADD save files but run nothing", () => {
-    for (const env of [{ CI: "true" }, { AISKILLS_SKIP_SKILLS_ADD: "1" }]) {
-      const r = sb.postinstall({ env });
-      assert.equal(r.status, 0);
-      assert.deepEqual(r.calls, []);
-      assert.ok(existsSync(join(sb.root, "skills")));
-    }
-  });
-
-  test("AISKILLS_SKIP_POSTINSTALL does nothing at all", () => {
-    const r = sb.postinstall({ env: { AISKILLS_SKIP_POSTINSTALL: "1" } });
-    assert.equal(r.status, 0);
-    assert.deepEqual(r.calls, []);
-    assert.ok(!existsSync(sb.root));
-  });
-
-  test("never fails npm install, even when npx fails or input is bad", () => {
-    for (const env of [{ FAKE_EXIT: "1" }, { AISKILLS_GROUPS: "nope" }, { AISKILLS_SKILLS: "not-bundled" }]) {
-      const r = sb.postinstall({ env });
-      assert.equal(r.status, 0, JSON.stringify(env));
-    }
-  });
-
-  test("npm lifecycle variables are not passed on to npx, registry settings are", () => {
-    const r = sb.postinstall({
+  test("npm variables (from npx / npm exec) are not passed on to npx skills, registry settings are", () => {
+    const r = sb.run(["install"], {
       env: {
         npm_config_global: "true",
         npm_config_prefix: "/x",
-        npm_lifecycle_event: "postinstall",
+        npm_lifecycle_event: "npx",
         npm_config_registry: "https://r.example/",
         npm_config_cache: "/tmp/cache",
       },
     });
     assert.equal(r.status, 0, r.out);
-    assert.deepEqual(r.calls[0].npmEnv.sort(), ["npm_config_cache", "npm_config_registry"]);
+    const add = r.calls.find((c) => skillsArgs(c)[0] === "add");
+    assert.deepEqual(add.npmEnv.sort(), ["npm_config_cache", "npm_config_registry"]);
   });
 });

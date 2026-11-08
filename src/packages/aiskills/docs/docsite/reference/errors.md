@@ -12,8 +12,6 @@ Errors and warnings go to stderr and start with `[aiskills]`. Parts in `<angle b
 | `1` | `aiskills` stopped with one of the errors below, or `installed` couldn't read `npx skills list`. No skill was installed or removed. |
 | any other | The exit code of the `npx skills` command it ran, passed through. |
 
-The npm install step always exits `0`, so that `npm install` never fails because of it. Its problems are printed as [warnings](#install-step-warnings).
-
 <!-- verify -->
 ```bash
 aiskills install --purge
@@ -252,37 +250,6 @@ unknown command: <name>
 ```
 
 **Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. **Fix:** remove those characters; skill names and specs never need them.
-
-## Install step warnings
-
-The npm install step prints these and still lets `npm install` succeed.
-
-### Unknown skills in `AISKILLS_SKILLS`
-
-```text
-[aiskills] postinstall did not complete: unknown skill(s) in AISKILLS_SKILLS: <names> (set AISKILLS_ROUTE=1 to look them up)
-[aiskills] run 'npx aiskills install' to retry.
-```
-
-**Cause:** a name in `AISKILLS_SKILLS` isn't bundled. **Fix:** fix the name, or set `AISKILLS_ROUTE=1`.
-
-### Install step didn't complete
-
-```text
-[aiskills] postinstall did not complete: <error>
-[aiskills] run 'npx aiskills install' to retry.
-```
-
-**Cause:** any of the errors on this page, raised during the install step. **Fix:** run `aiskills install` with the same choices to see and fix it.
-
-### `npx skills add` failed
-
-```text
-[aiskills] 'npx skills add' exited with <code>. Skills are saved in <install folder>/skills;
-[aiskills] register them later with:  npx skills add <install folder> --global
-```
-
-**Cause:** `npx skills add` failed (often no network access). The skills are on disk. **Fix:** run `aiskills install` when it can reach the registry.
 
 ## Packaging errors (maintainers)
 

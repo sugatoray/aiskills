@@ -8,7 +8,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 
 | What | When |
 | --- | --- |
-| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by the npm install step, `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
+| `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
 | Agents' skill folders | Only through `npx skills add` / `remove`. |
 | An empty temporary folder | While reading the agent list for `-a` patterns; deleted straight after. |
 | The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub. |
@@ -17,6 +17,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 
 Each one is covered by the test suite.
 
+- **No install step.** The package has no `preinstall`, `install` or `postinstall` script, so `npm install` (or pnpm, or bun) only puts files in npm's own folder: no network calls, nothing written to your home folder, no agent changed. Your agents change only when you run `aiskills install`.
 - **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it, and only accepts an exact version, `latest` or `next`.
 - **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
 - **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.

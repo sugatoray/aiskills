@@ -47,16 +47,14 @@ The whole CLI is also available as **`ais`** (identical) and **`aix`**
 add up. Command-line values replace the env defaults.
 
 Other environment variables: `AISKILLS_HOME` (install folder),
-`AISKILLS_SKILLS_VERSION` (the `skills` CLI version `npx` runs; pinned by default),
-`AISKILLS_SKIP_POSTINSTALL=1`, `AISKILLS_SKIP_SKILLS_ADD=1` (also implied by
-`CI`).
+`AISKILLS_SKILLS_VERSION` (the `skills` CLI version `npx` runs; pinned by default).
 
 ## Feature list
 
 | Feature | Summary | User docs | Tests |
 | --- | --- | --- | --- |
 | Bundled skills | All repo skills ship flat, with `.aiskills/layout.json` + `nested/` keeping the original layout | [How it works](../docsite/concepts/how-it-works.md), [Layouts](../docsite/concepts/layouts.md) | `packaging.test.mjs` |
-| Install on `npm install -g` | `postinstall` saves the skills and runs `npx skills add`; never fails the install | [Installation](../docsite/getting-started/installation.md), [Configure the npm install step](../docsite/guides/configure-npm-install.md) | `cli.test.mjs` → postinstall |
+| No install step | `npm install` runs no script; `aiskills install` (or `npx @sugatoray-ai/aiskills install`) saves and registers the skills; `AISKILLS_*` variables set defaults | [Installation](../docsite/getting-started/installation.md), [Set default choices](../docsite/guides/set-defaults.md), [Security model](../docsite/concepts/security.md) | `packaging.test.mjs`, `cli.test.mjs` → no install step, `e2e.test.mjs` |
 | Project dependency + `experimental_sync` | Flat `skills/` lets `npx skills experimental_sync` install from `node_modules` | [Use with `experimental_sync`](../docsite/guides/use-experimental-sync.md) | `e2e.test.mjs` |
 | Scope, agents, skills | `-g`/`-p`, `-a`, `-s`, `--copy`, `--` passthrough | [CLI reference](../docsite/reference/cli.md#options), [Tutorial 2–3](../docsite/tutorial/02-pick-skills-and-agents.md) | `cli.test.mjs` |
 | Uninstall | Full / partial / per agent / per project, `--purge`, `--dry-run`, `--force` | [Tutorial 5](../docsite/tutorial/05-uninstall.md), [Remove everything](../docsite/guides/remove-everything.md) | `cli.test.mjs`, `e2e.test.mjs` |
