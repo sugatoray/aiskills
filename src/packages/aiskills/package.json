@@ -1,7 +1,7 @@
 {
   "name": "@sugatoray-ai/aiskills",
   "version": "0.5.0",
-  "description": "Curated agent skills (scrolls-agentic-memory and others) for every coding agent, in one npm package.",
+  "description": "Curated agent skills (scrolls agentic memory and more) for every coding agent, in one npm package.",
   "keywords": [
     "agent-skills",
     "skills",
@@ -13,7 +13,7 @@
     "visualization",
     "developer-tools"
   ],
-  "homepage": "https://sugatoray.github.io/aiskills",
+  "homepage": "https://sugatoray.github.io/aiskills/",
   "bugs": {
     "url": "https://github.com/sugatoray/aiskills/issues"
   },
