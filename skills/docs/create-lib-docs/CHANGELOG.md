@@ -3,6 +3,21 @@
 All notable changes to the `create-lib-docs` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-11-09
+
+### Added
+
+- **A License page is now part of every docs set.** `SKILL.md` puts `license.md` in the docs tree
+  and on the landing page under its own `### License` section, so a tabbed site gets a License tab.
+  The page states the library's license (SPDX id, linked to `LICENSE`) and gives a table: one row
+  for the library and, when it bundles parts with their own licenses (plugins, skills, templates,
+  fonts, data), one row per part with its license and where that is declared, all taken from the
+  files.
+- `references/templates.md`: a License page skeleton, and `### License` in the landing page
+  template. `references/patterns.md`: a License row in the information architecture.
+- `scripts/check_docs.py` reports `license.md: missing` when there is no License page, and
+  `license.md: no table` when it has no Markdown table. Tests cover both.
+
 ## [1.1.0] - 2026-11-01
 
 ### Added

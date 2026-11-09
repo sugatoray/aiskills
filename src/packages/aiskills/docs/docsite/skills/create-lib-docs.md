@@ -5,7 +5,7 @@ Writes top-grade, verified user documentation for a library, CLI or framework as
 | Property | Value |
 | --- | --- |
 | Group | `docs-skills` (alias `docs`) |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Starts | When you ask for it: you type `/create-lib-docs` (your agent doesn't start it on its own) |
 | License | MIT |
 | Source | [skills/docs/create-lib-docs](https://github.com/sugatoray/aiskills/tree/master/skills/docs/create-lib-docs) |

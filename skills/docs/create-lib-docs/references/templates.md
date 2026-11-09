@@ -46,6 +46,9 @@ doesn't need, but keep the order.
 
 ### Help
 - [FAQ and troubleshooting](faq.md): <summary>
+
+### License
+- [License](license.md): <the library's license, and what each bundled part uses>
 ````
 
 `scripts/build_llms_txt.py` builds `llms.txt` from these `###` sections and their link lists, so
@@ -164,4 +167,34 @@ See: [<guide that uses it>](../guides/<page>.md)
 **Cause:** <why it happens>.
 
 **Fix:** <what to do>.
+````
+
+## License page
+
+`license.md`, linked from the landing page under `### License`. Take every value from the files,
+not from memory. With no bundled parts, the table has the library's row only.
+
+````markdown
+# License
+
+<Library> is licensed under <SPDX id>; <the parts it bundles keep their own licenses: …>.
+
+## <Library>
+
+| Part | License | Declared in |
+| --- | --- | --- |
+| <the library: CLI, API, …> | [<SPDX id>](<link to LICENSE>) | `<package.json / pyproject.toml>` |
+
+## Bundled <parts>
+
+| <Part> | License | Declared in |
+| --- | --- | --- |
+| <name> | <SPDX id> | `<its own metadata file>` |
+
+## What this means
+
+- <Using the library> → <its license>.
+- <Copying or changing a bundled part> → <that part's license>.
+
+See also: [<related page>](<page>.md)
 ````

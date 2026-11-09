@@ -7,7 +7,7 @@ metadata:
   name: create-lib-docs
   type: skill
   author: sugatoray
-  version: "1.1.0"
+  version: "1.2.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/docs/create-lib-docs"
 ---
 
@@ -68,6 +68,7 @@ docs/<lib>/
 ├── concepts/            explanations and mental models, with diagrams
 ├── reference/           exhaustive and dry: CLI, API, config, schemas, errors (one anchor each)
 ├── faq.md               troubleshooting + questions people actually ask
+├── license.md           the library's license, and a table of what each bundled part uses
 ├── images/              SVG diagrams (text-based, diffable)
 ├── llms.txt             index for AI agents (generated)
 └── llms-full.txt        every page in reading order, one file (generated)
@@ -76,6 +77,15 @@ docs/<lib>/
 Drop a section only if the library really has nothing for it, e.g. a one-function library needs no
 tutorial. Size the tutorial to the learning path, not to the feature count. FastAPI's has ~50 short
 steps; a small CLI needs 5–10. Write the plan (page list, one line each) before writing pages.
+
+Always write `license.md`, and link it from the landing page under its own `### License` section,
+so a site built from those sections gets a License tab. It says, in its first sentence, what license
+the library itself uses (the SPDX id, linked to the `LICENSE` file), then gives a table. When the
+library bundles or vendors parts with their own licenses (plugins, skills, templates, fonts, data),
+the table has one row per part: its name, its license, and where that license is declared. Take
+every value from the files themselves (`package.json`/`pyproject.toml`, `LICENSE`, each part's own
+metadata), never from memory, and say plainly when parts differ from the library. Generate the
+table if the parts can change, so it can't go stale.
 
 ### 3. Write the pages
 
@@ -138,7 +148,8 @@ Re-run it whenever a page changes. Both files are generated, so never edit them 
   - images exist and have alt text;
   - every code fence has a language;
   - every page is reachable from `README.md`;
-  - `llms.txt` lists every page.
+  - `llms.txt` lists every page;
+  - `license.md` exists and has a table.
 - **Run every snippet.** Shell commands and code examples run, and their output matches what the
   page shows (allowing for timestamps, ids and durations). Where the real dependency is
   unavailable, run against the project's fakes or stubs and say so on the page.

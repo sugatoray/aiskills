@@ -103,6 +103,10 @@ aiskills install -G scrolls -a claude-code
 
 - [FAQ and troubleshooting](faq.md): answers to common questions and fixes for common problems.
 
+### License
+
+- [License](license.md): the package's license, and a table of the license each bundled skill uses.
+
 ## Ways to read these docs
 
 - **These Markdown pages**, on GitHub or in your editor.

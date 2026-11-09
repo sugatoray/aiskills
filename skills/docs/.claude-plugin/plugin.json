@@ -1,6 +1,6 @@
 {
   "name": "docs-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Docs skills: writes verified user documentation for a library, CLI or framework, structured like FastAPI, Pydantic, DuckDB and Effect docs: Getting Started, Tutorial, How-to Guides, Concepts, Reference, FAQ, SVG diagrams, and llms.txt for AI agents. Every snippet is run before it is published.",
   "author": {
     "name": "Sugato Ray",

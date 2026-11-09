@@ -25,9 +25,15 @@ def _site(tmp_path, pages):
     return tmp_path
 
 
+LICENSE_PAGE = (
+    "# License\n\nLib is MIT; the plugins it bundles keep their own licenses.\n\n"
+    "| Part | License | Declared in |\n| --- | --- | --- |\n| lib | MIT | `LICENSE` |\n"
+)
+
 GOOD = {
     "README.md": "# Lib\n\nLib does things.\n\n### Guides\n\n- [Guides](guides/README.md): all guides\n"
-    "- [Ref](ref.md#the-flag): the reference\n",
+    "- [Ref](ref.md#the-flag): the reference\n\n### License\n\n- [License](license.md): what is licensed how\n",
+    "license.md": LICENSE_PAGE,
     "guides/README.md": "# Guides\n\nTask recipes.\n\n- [Do X](do-x.md)\n",
     "guides/do-x.md": "# Do X\n\nHow to do X.\n\n```bash\nlib x\n```\n\n![X flow](../img.svg)\n",
     "ref.md": "# Reference\n\nEvery flag.\n\n## The flag\n\n## The flag\n\nSee [twice](#the-flag-1).\n",
@@ -74,10 +80,39 @@ def test_problems_are_reported(tmp_path):
 
 def test_folder_link_without_readme_is_fine(tmp_path):
     # GitHub lists a folder's files, so linking one that has no README.md isn't broken.
-    site = _site(tmp_path, {"README.md": "# L\n\nSee [fixtures](fixtures/).\n", "fixtures/a.json": "{}"})
+    site = _site(tmp_path, {"README.md": "# L\n\nSee [fixtures](fixtures/) and [License](license.md).\n", "fixtures/a.json": "{}", "license.md": LICENSE_PAGE})
     assert check_docs.check(site) == []
 
 
 def test_links_inside_code_are_ignored(tmp_path):
-    site = _site(tmp_path, {"README.md": "# L\n\n````markdown\n```bash\n[x](nowhere.md)\n```\n````\n\n`[y](nope.md)`\n"})
+    site = _site(tmp_path, {"README.md": "# L\n\n````markdown\n```bash\n[x](nowhere.md)\n```\n````\n\n`[y](nope.md)` [License](license.md)\n", "license.md": LICENSE_PAGE})
     assert check_docs.check(site) == []
+
+
+def test_a_license_page_is_required(tmp_path):
+    pages = {k: v for k, v in GOOD.items() if k != "license.md"}
+    pages["README.md"] = pages["README.md"].replace("- [License](license.md): what is licensed how\n", "")
+    problems = "\n".join(check_docs.check(_site(tmp_path, pages)))
+    assert "license.md: missing" in problems
+
+
+def test_the_license_page_needs_a_table(tmp_path):
+    site = _site(tmp_path, {**GOOD, "license.md": "# License\n\nLib is MIT.\n"})
+    problems = "\n".join(check_docs.check(site))
+    assert "license.md: no table" in problems
+
+
+def test_the_license_page_must_be_linked_from_the_landing_page(tmp_path):
+    readme = GOOD["README.md"].replace("- [License](license.md): what is licensed how\n", "")
+    problems = "\n".join(check_docs.check(_site(tmp_path, {**GOOD, "README.md": readme})))
+    assert "license.md: not reachable from README.md" in problems
+
+
+def test_the_skill_asks_for_the_license_page():
+    root = SCRIPTS.parent
+    skill = (root / "SKILL.md").read_text(encoding="utf-8")
+    assert "license.md" in skill and "### License" in skill, "SKILL.md puts license.md in the tree and the landing page"
+    templates = (root / "references" / "templates.md").read_text(encoding="utf-8")
+    assert "## License page" in templates, "templates.md has a License page skeleton"
+    patterns = (root / "references" / "patterns.md").read_text(encoding="utf-8")
+    assert "license.md" in patterns, "patterns.md maps licensing onto the information architecture"

@@ -13,6 +13,8 @@ Checks:
 - images have alt text;
 - every opening code fence names a language;
 - every page is reachable from README.md by following links;
+- a license.md page exists, with at least one Markdown table (the library's license, and the
+  license of each component it bundles, if any);
 - llms.txt (if the folder has one) lists every page.
 """
 
@@ -116,6 +118,14 @@ def check(docs: Path) -> list[str]:
         for page in pages:
             if page not in seen:
                 problems.append(f"{page.relative_to(docs.parent)}: not reachable from README.md")
+    license_page = docs / "license.md"
+    if not license_page.exists():
+        problems.append(
+            "license.md: missing (add a License page: the library's license, and a table of the license "
+            "each bundled component uses; link it from README.md under ### License)"
+        )
+    elif not re.search(r"^\s*\|[\s:|-]*-[\s:|-]*\|\s*$", license_page.read_text(encoding="utf-8"), re.M):
+        problems.append("license.md: no table (list each part and its license in a Markdown table)")
     llms = docs / "llms.txt"
     if llms.exists():
         listed = {resolve(llms, t.partition("#")[0]) for _, _, _, t in scan(llms)[0]}

@@ -481,7 +481,7 @@ committed here. `prepack` (`src/scripts/pack/vendor-skills.mjs`) runs right befo
   of files outside any skill folder) and copies those files to
   `.aiskills/nested/` at their original paths;
 - leaves out whatever a `.skillsignore` excludes (see below);
-- copies `<repo>/.claude-plugin/marketplace.json` and `LICENSE`.
+- copies `<repo>/.claude-plugin/marketplace.json`.
 
 It stops with an error if two skills share a name, a skill sits inside
 another skill, or a name can't be used as a folder name.
@@ -570,7 +570,8 @@ src/packages/aiskills/
 ├── docs/banner/              # banner: config.yaml, editor page, banner_2x.png (not published)
 ├── docs/meta/                # ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 ├── docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   # project memory (not published)
-└── skills/, .aiskills/, .claude-plugin/, LICENSE      # vendored at pack time (git-ignored)
+├── LICENSE                   # Apache-2.0, for the package (committed; never vendored)
+└── skills/, .aiskills/, .claude-plugin/               # vendored at pack time (git-ignored)
 ```
 
 ### Tests
@@ -602,3 +603,13 @@ npm never ships files named `.gitignore`/`.npmignore`. To get around this, the
 vendor step renames them to `_gitignore`/`_npmignore` (in `skills/` and
 `.aiskills/nested/`), and the installer renames them back when it writes to
 `~/.config/sugatoray/aiskills/skills`.
+
+## License
+
+The `@sugatoray-ai/aiskills` package (the `aiskills`, `ais` and `aix`
+commands and everything else this package adds) is licensed under the
+[Apache License 2.0](LICENSE). Copyright 2026 Sugato Ray.
+
+Each bundled skill keeps the license in its `SKILL.md` (`license:`); today
+every bundled skill is MIT, as in the
+[sugatoray/aiskills](https://github.com/sugatoray/aiskills) repo.

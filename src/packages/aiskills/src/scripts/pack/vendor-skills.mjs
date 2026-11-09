@@ -16,8 +16,10 @@
 //
 // so `aiskills --nested` can rebuild <repo>/skills exactly (minus ignored
 // files and the .skillsignore files themselves), and the skill
-// groups from marketplace.json keep working in both layouts. LICENSE and
-// .claude-plugin/marketplace.json are copied too.
+// groups from marketplace.json keep working in both layouts.
+// .claude-plugin/marketplace.json is copied too. The package's LICENSE
+// (Apache-2.0) is committed in the package folder and never vendored: the
+// repo's own LICENSE is MIT, and each skill keeps the license in its SKILL.md.
 //
 //   node src/scripts/pack/vendor-skills.mjs          # (re)vendor    (npm run vendor)
 //   node src/scripts/pack/vendor-skills.mjs --clean  # remove copies (npm run clean)
@@ -89,7 +91,7 @@ export function findRepoRoot(start) {
 
 /** Remove everything vendor() writes. */
 export function clean(pkgDir) {
-  for (const p of ["skills", ".claude-plugin", ".aiskills", "LICENSE"]) rmSync(join(pkgDir, p), { recursive: true, force: true });
+  for (const p of ["skills", ".claude-plugin", ".aiskills"]) rmSync(join(pkgDir, p), { recursive: true, force: true });
 }
 
 /**
@@ -157,8 +159,6 @@ export function vendor({ repoRoot, pkgDir }) {
   mkdirSync(dirname(join(pkgDir, LAYOUT_REL)), { recursive: true });
   writeFileSync(join(pkgDir, LAYOUT_REL), JSON.stringify(layout, null, 2) + "\n");
 
-  const license = join(repoRoot, "LICENSE");
-  if (existsSync(license)) cpSync(license, join(pkgDir, "LICENSE"));
   const market = join(repoRoot, ".claude-plugin", "marketplace.json");
   if (existsSync(market)) {
     mkdirSync(join(pkgDir, ".claude-plugin"), { recursive: true });
@@ -177,7 +177,7 @@ if (isMain) {
   try {
     if (process.argv.includes("--clean")) {
       clean(pkgDir);
-      console.log("[aiskills] removed vendored skills/, .claude-plugin/, .aiskills/ and LICENSE");
+      console.log("[aiskills] removed vendored skills/, .claude-plugin/ and .aiskills/");
     } else {
       const repoRoot = findRepoRoot(pkgDir);
       const layout = vendor({ repoRoot, pkgDir });

@@ -17,6 +17,7 @@ each pattern maps onto a docs folder written in plain Markdown.
 | Errors | "What does this error mean, and how do I fix it?" | Pydantic *Error Messages* (Usage Errors: one `{#error-code}` anchor per error, with a snippet that triggers it and the fix) | One anchor per error/exit code: message, cause, fix |
 | Comparisons | "I know X; how does this differ?" | Effect *Additional resources* (Coming from ZIO, Effect vs Promise, Myths); FastAPI *Alternatives* | Short, fair, specific |
 | FAQ / troubleshooting | "Something's wrong" | DuckDB `troubleshooting.md`; Effect *Myths* | Symptom → cause → fix |
+| License (`license.md`) | "Can I use this, and under what terms?" | Every package registry's license field; projects that vendor third-party code list it in a NOTICE or third-party table | The library's license, then a table: each bundled part, its license, where declared |
 | Agent index | "Load these docs into my context" | Pydantic `llmstxt` plugin (`llms.txt`, `llms-full.txt`, sections from concepts/API); Effect `llms.txt` | Generated from the docs |
 
 This is the [Diátaxis](https://diataxis.fr/) split (tutorials, how-to guides, explanation,

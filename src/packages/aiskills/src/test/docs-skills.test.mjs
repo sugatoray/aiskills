@@ -131,6 +131,52 @@ describe("docs/docsite/skills/", () => {
   });
 });
 
+describe("docs/docsite/license.md", () => {
+  const LICENSE_PAGE = join(DOCS, "license.md");
+  const text = () => readFileSync(LICENSE_PAGE, "utf8");
+  const pkg = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8"));
+
+  test("exists, and opens with the package's license from package.json, linked to its LICENSE", () => {
+    assert.ok(existsSync(LICENSE_PAGE), "missing license.md");
+    const md = text();
+    assert.match(md, /^# License\n\n/);
+    const first = md.split("\n\n")[1];
+    assert.ok(first.includes(`\`${pkg.name}\``) && first.includes(pkg.license), `first paragraph: ${first}`);
+    assert.ok(md.includes(`| The npm package: the \`aiskills\`, \`ais\` and \`aix\` commands and their code | [${pkg.license}](../../LICENSE) | \`package.json\` (\`"license"\`), \`LICENSE\` |`));
+  });
+
+  test("has a table row for every bundled skill, with the license from its own SKILL.md", () => {
+    const md = text();
+    assert.ok(md.includes("| Skill | Group | License | Declared in |\n| --- | --- | --- | --- |"), "the skills table header");
+    const rows = md.split("\n").filter((l) => /^\| \[`/.test(l));
+    assert.equal(rows.length, box.names.length, "one row per bundled skill");
+    for (const name of box.names) {
+      const license = field(readFileSync(join(box.current.root, "skills", name, "SKILL.md"), "utf8"), "license") ?? "not stated";
+      const group = box.groupOf.get(name)?.alias ?? "-";
+      const src = `https://github.com/sugatoray/aiskills/blob/master/skills/${box.layout.skills[name]}/SKILL.md`;
+      assert.ok(md.includes(`| [\`${name}\`](skills/${name}.md) | ${group} | ${license} | [\`SKILL.md\`](${src}) |`), `${name}: row`);
+    }
+  });
+
+  test("says when the skills' licenses differ from the package's", () => {
+    const licenses = new Set(box.names.map((n) => field(readFileSync(join(box.current.root, "skills", n, "SKILL.md"), "utf8"), "license")));
+    if (licenses.size === 1 && !licenses.has(pkg.license)) {
+      const [only] = licenses;
+      assert.match(text(), new RegExp(`every bundled skill is ${only}, not ${pkg.license}`));
+    }
+  });
+
+  test("is linked from the landing page under ### License, so the HTML docs get a License tab", async () => {
+    const readme = readFileSync(join(DOCS, "README.md"), "utf8");
+    assert.match(readme, /\n### License\n\n- \[License\]\(license\.md\): /);
+    assert.ok(readme.indexOf("### License") > readme.indexOf("### Help"), "after Help");
+    const { collect } = await import(pathToFileURL(join(PKG_SRC, "src", "scripts", "docs", "build-docs-html.mjs")).href);
+    const tab = collect(DOCS).tabs.find((t) => t.label === "License");
+    assert.ok(tab, "a License tab");
+    assert.deepEqual(tab.pages, ["license.md"]);
+  });
+});
+
 describe("the generator", () => {
   test("reads quoted frontmatter values, with escapes", async () => {
     const { frontmatter } = await load();

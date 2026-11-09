@@ -40,7 +40,7 @@ Alias `docs`. Install the group with `aiskills install -G docs`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`create-lib-docs`](create-lib-docs.md) | 1.1.0 | Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,… |
+| [`create-lib-docs`](create-lib-docs.md) | 1.2.0 | Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,… |
 
 ## diagrams-skills
 

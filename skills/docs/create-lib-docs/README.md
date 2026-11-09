@@ -4,7 +4,8 @@ Writes top-grade, verified user documentation for a library, CLI or framework: M
 SVG diagrams, structured the way FastAPI, Pydantic, DuckDB and Effect structure theirs.
 
 - **Sections:** landing page, Getting Started, a progressive Tutorial, How-to Guides, Concepts,
-  Reference (with one anchor per error), FAQ.
+  Reference (with one anchor per error), FAQ, and a License page with a table of what the library
+  and each part it bundles is licensed under.
 - **For AI agents:** `llms.txt` and `llms-full.txt`.
 - **Verified:** every fact comes from the code, `--help` and tests, and every snippet is run before
   it's published.
@@ -21,7 +22,7 @@ create-lib-docs/
 │   ├── patterns.md        what to copy from FastAPI / Pydantic / DuckDB / Effect, and why
 │   └── templates.md       page skeletons: landing, tutorial step, guide, concept, reference, error
 ├── scripts/
-│   ├── check_docs.py      links, anchors, images, fences, reachability, llms.txt coverage
+│   ├── check_docs.py      links, anchors, images, fences, reachability, license page, llms.txt coverage
 │   └── build_llms_txt.py  llms.txt + llms-full.txt from the landing page's sections
 ├── tests/
 │   └── test_scripts.py
