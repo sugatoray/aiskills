@@ -168,7 +168,8 @@ function terminalHtml(v) {
     ``,
     `<span class="p">$</span> aix i <span class="f">-s</span> <span class="s">${esc(v.route_skill)}</span>   <span class="c"># not bundled</span>`,
     `<span class="o">[aiskills] found ${esc(v.route_source)}@${esc(v.route_skill)}</span>`,
-    ``,
+    // The confirmation the CLI asks before installing a skill a lookup found (answered y).
+    `<span class="o">Install 1 external skill from the registry? [y/N]</span> y`,
     `<span class="p">$</span> <span class="cursor"></span>`,
   ].join("\n");
 }

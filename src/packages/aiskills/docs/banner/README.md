@@ -43,7 +43,7 @@ Options, after `--` (e.g. `npm run banner -- --set tagline="Hello"`):
 | `skills_count`, `groups_count`, `groups` | The skills the package really ships, and the repo's `marketplace.json` |
 | `skills_cli_version` | `SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs` |
 
-The terminal demo's output lines are made from the bundled skills too (the `scrolls` group's real `bundled:` line, the pinned `skills` version), so the banner never shows output `aiskills` doesn't print. It opens with `ais sync` (save only) and its `skills saved to …` line, then `ais groups`, `ais i` and `aix i`. In `install_commands`, a trailing `# comment` is shown dimmed, in the terminal's comment colour. `route_skill` must be a skill the package doesn't bundle.
+The terminal demo's output lines are made from the bundled skills too (the `scrolls` group's real `bundled:` line, the pinned `skills` version), so the banner never shows output `aiskills` doesn't print. It opens with `ais sync` (save only) and its `skills saved to …` line, then `ais groups`, `ais i` and `aix i`, which ends with the CLI's real confirmation prompt, answered `y`. In `install_commands`, a trailing `# comment` is shown dimmed, in the terminal's comment colour. `route_skill` must be a skill the package doesn't bundle.
 
 ## Editing in the browser
 

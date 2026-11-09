@@ -157,6 +157,20 @@ describe("render", () => {
     assert.match(readFileSync(join(PKG_SRC, "src", "scripts", "core", "installer.mjs"), "utf8"), /log\(`skills saved to \$\{dest\}/);
   });
 
+  test("the aix demo shows the confirmation prompt the CLI really prints, and the terminal keeps its height", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const v = resolveValues(readConfig());
+    const banner = bannerMarkup(render(v));
+    const term = banner.slice(banner.indexOf('<div class="term-body"'), banner.indexOf("</div>", banner.indexOf('<div class="term-body"')));
+    const aix = term.slice(term.indexOf("aix i"));
+    assert.ok(aix.includes(`<span class="o">[aiskills] found ${v.route_source}@${v.route_skill}</span>\n`), "the lookup result");
+    assert.ok(aix.includes(`<span class="o">Install 1 external skill from the registry? [y/N]</span> y\n`), "the prompt, answered y");
+    assert.match(aix, /\n<span class="p">\$<\/span> <span class="cursor"><\/span>$/, "the cursor follows straight after");
+    const cli = readFileSync(join(PKG_SRC, "src", "scripts", "core", "cli.mjs"), "utf8");
+    assert.ok(cli.includes("external skill${n === 1 ? \"\" : \"s\"} from the registry? [y/N] "), "the CLI prints that prompt");
+    assert.ok(term.split("\n").length <= 15, `the terminal has ${term.split("\n").length} lines; more would crowd the groups row`);
+  });
+
   test("the page opens in the configured theme, with a gear menu of every theme in its toolbar", async () => {
     const { resolveValues, readConfig, render } = await load();
     const html = render(resolveValues(readConfig()));

@@ -99,12 +99,13 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--nested|--flat] [-- <extra npx skills args>]   # alias: i
-aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra npx skills args>]   # alias: i
+aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--route] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills   (alias: ls)
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills   (alias: g)
 aiskills find <query>        # search the skills registry (= npx skills find)   (alias: f)
-# --route (before or after the command) hands non-bundled skills to npx skills
+# --route (before or after the command) hands non-bundled skills to npx skills;
+# a skill it finds by lookup is shown and confirmed ([y/N]) unless -y; -n previews an install
 aiskills --route install|uninstall|installed ...
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
 aiskills sync [--nested|--flat]   # only refresh ~/.config/sugatoray/aiskills/skills
@@ -136,6 +137,8 @@ aiskills install -a claude-code,codex          # only these agents
 aiskills install -s scrolls-setup,scrolls-help # only these skills
 aiskills install --project                     # into the current project
 aiskills install --group scrolls --global --agent claude-code
+aiskills install -n -G stata                   # preview: what would be installed, and the commands
+aiskills sync                                  # only save the skills; don't register them
 ```
 
 ## Skill groups
@@ -575,14 +578,14 @@ src/packages/aiskills/
 The suite uses the built-in `node:test` runner and has no dependencies.
 
 ```sh
-npm test            # unit + CLI + packaging tests: offline, a few seconds
+npm test            # unit, CLI, packaging, docs and banner tests: offline, about a minute
 npm run test:e2e    # also a real install with the real `npx skills` (needs network)
 ```
 
 | File | What it covers |
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
-| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command), run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. |
+| `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command), run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. The `aix` confirmation is tested without a terminal and, through util-linux `script`, in a real pseudo-terminal answering the `[y/N]` prompt. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the two runtime files in `src/scripts/core/` ship as code, and `package.json` has no install-time script: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |

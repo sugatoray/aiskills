@@ -134,6 +134,20 @@ describe("npm pack", () => {
     }
   });
 
+  test("the README's CLI summary lists every option install and uninstall accept", () => {
+    const cli = readFileSync(join(PKG_SRC, "src", "scripts", "core", "cli.mjs"), "utf8");
+    const flags = { scope: ["-g", "-p"], agent: ["-a"], skill: ["-s"], group: ["-G"], copy: ["--copy"], route: ["--route"], layout: ["--nested", "--flat"],
+                    dryRun: ["-n"], yes: ["-y"], purge: ["--purge"], force: ["-f"] };
+    const readme = readFileSync(join(PKG_SRC, "README.md"), "utf8");
+    for (const [cmd, re] of [["install", /const opts = parse\(rest, \[([^\]]+)\]\);/], ["uninstall", /return uninstall\(parse\(rest, \[([^\]]+)\]\)\);/]]) {
+      const allowed = [...cli.match(re)[1].matchAll(/"(\w+)"/g)].map((m) => m[1]);
+      assert.ok(allowed.length > 3, `${cmd}: parsed ${allowed}`);
+      const line = readme.split("\n").find((l) => new RegExp(`^aiskills ${cmd} +\\[`).test(l)); // the CLI summary line
+      assert.ok(line, `README has no 'aiskills ${cmd}' line`);
+      for (const opt of allowed) for (const f of flags[opt]) assert.ok(line.includes(`[${f}`) || line.includes(`|${f}`), `README 'aiskills ${cmd}' line lacks ${f}`);
+    }
+  });
+
   test("package.json declares the aiskills, ais and aix commands", () => {
     const { bin } = JSON.parse(readFileSync(join(copy?.pkg ?? ".", "package.json"), "utf8"));
     assert.deepEqual(bin, { aiskills: "bin/aiskills.mjs", ais: "bin/aiskills.mjs", aix: "bin/aix.mjs" });

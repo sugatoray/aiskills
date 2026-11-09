@@ -72,7 +72,9 @@ npm install step (see **Removed**).
   `ais sync   # save only`. The tagline is now "Agent skills for every coding
   agent, in one npm package." (it said "in one npm install", which stopped
   being true when the install step was removed). A trailing `# comment` in
-  a banner install command is shown dimmed.
+  a banner install command is shown dimmed. The `aix i -s pdf` demo ends
+  with the confirmation prompt the CLI really asks (`Install 1 external
+  skill from the registry? [y/N] y`).
 - **Maintainer docs** (`docs/meta/ARCHITECTURE.md`, `FEATURES.md` and
   `MAINTAINERS.md`) describe the `core/` / `pack/` / `docs/` layout, the
   docs and banner builders, the themes, and the current test suites.
