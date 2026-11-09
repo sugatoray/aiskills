@@ -20,9 +20,9 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
-## [0.4.0] - Unreleased
+## [0.4.0] - 2026-11-09
 
-First release to be published to npm; this section gets its date when it is.
+First release published to npm.
 It includes everything listed under 0.3.0, 0.2.0 and 0.1.0 below, except the
 npm install step (see **Removed**).
 
