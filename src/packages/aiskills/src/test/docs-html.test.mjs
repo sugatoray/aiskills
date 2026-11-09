@@ -49,7 +49,7 @@ describe("build-docs-html", () => {
       readdirSync(join(DOCS, "images")).filter((f) => f.endsWith(".svg")).map((f) => `images/${f}`).sort(),
     );
     for (const uri of Object.values(d.images)) assert.match(uri, /^data:image\/svg\+xml;base64,/);
-    assert.deepEqual(d.tabs.map((t) => t.id), ["home", "getting-started", "skills", "tutorial", "guides", "concepts", "reference", "faq"]);
+    assert.deepEqual(d.tabs.map((t) => t.id), ["home", "getting-started", "skills", "tutorial", "guides", "concepts", "reference", "faq", "license"]);
     for (const p of d.pages) assert.equal(p.md, readFileSync(join(DOCS, p.path), "utf8"), `${p.path} changed in the bundle`);
   });
 

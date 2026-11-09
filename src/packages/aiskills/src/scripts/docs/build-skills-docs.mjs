@@ -3,6 +3,7 @@
 //   docs/docsite/skills/README.md     an overview, by group
 //   docs/docsite/skills/<name>.md     one page per skill
 //   docs/docsite/README.md            the list between <!-- skills:start --> and <!-- skills:end -->
+//   docs/docsite/license.md           the package's license, and a table of every bundled skill's
 //
 // Usage: node src/scripts/docs/build-skills-docs.mjs   (npm run docs:skills)
 //
@@ -179,6 +180,49 @@ See also: [Skill groups](../concepts/skill-groups.md) · [1. Install a group](..
 `;
 }
 
+/** docs/docsite/license.md: the package's license, and a table of every bundled skill's. */
+function licensePage(skills, pkg) {
+  const of = (s) => s.fm.license ?? "not stated";
+  const licenses = [...new Set(skills.map(of))];
+  const differ =
+    licenses.length === 1 && licenses[0] !== pkg.license
+      ? `every bundled skill is ${licenses[0]}, not ${pkg.license}`
+      : `the bundled skills use: ${licenses.join(", ")}`;
+  const rows = skills.map(
+    (s) => `| [\`${s.name}\`](skills/${s.name}.md) | ${s.group?.alias ?? "-"} | ${cell(of(s))} | [\`SKILL.md\`](${BLOB}${s.path}/SKILL.md) |`,
+  );
+  return `# License
+
+The \`${pkg.name}\` npm package is licensed under ${pkg.license}. Each skill it bundles keeps its own license, declared in that skill's \`SKILL.md\`; today ${differ}.
+
+## The package
+
+| Part | License | Declared in |
+| --- | --- | --- |
+| The npm package: the \`aiskills\`, \`ais\` and \`aix\` commands and their code | [${pkg.license}](../../LICENSE) | \`package.json\` (\`"license"\`), \`LICENSE\` |
+
+## Bundled skills
+
+${skills.length} skills, sorted by name.
+
+| Skill | Group | License | Declared in |
+| --- | --- | --- | --- |
+${rows.join("\n")}
+
+The skills come from the [sugatoray/aiskills](https://github.com/sugatoray/aiskills) repo, whose own \`LICENSE\` covers them too.
+
+## What this means
+
+- **Running \`aiskills\`** (installing, listing, removing skills) uses the package, under ${pkg.license}.
+- **Using, copying or changing a skill** follows that skill's license in the table above.
+- **External skills** you add with [\`--route\`](reference/cli.md#--route) or \`aix\` aren't part of the package; each keeps the license its own source gives it.
+
+This page is generated from \`package.json\` and the skills' own \`SKILL.md\` files by \`npm run docs:skills\`.
+
+See also: [Bundled skills](skills/README.md) · [Security model](concepts/security.md)
+`;
+}
+
 /** The Skills list for the landing page (between the markers). */
 function landingList(skills) {
   return [
@@ -193,7 +237,8 @@ function landingList(skills) {
  */
 export function render({ repoRoot = findRepoRoot(PKG_DIR), docs = DOCS } = {}) {
   const { skills, groups } = bundled(repoRoot);
-  const out = { "skills/README.md": overview(skills, groups) };
+  const pkg = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
+  const out = { "skills/README.md": overview(skills, groups), "license.md": licensePage(skills, pkg) };
   for (const s of skills) out[`skills/${s.name}.md`] = skillPage(s);
   const readme = readFileSync(join(docs, "README.md"), "utf8");
   const i = readme.indexOf(START);
@@ -209,6 +254,7 @@ export function main() {
   const dir = join(DOCS, "skills");
   mkdirSync(dir, { recursive: true });
   for (const f of readdirSync(dir)) if (f.endsWith(".md") && !out[`skills/${f}`]) rmSync(join(dir, f));
+  // license.md sits at the top of the docs, next to README.md.
   for (const [rel, text] of Object.entries(out)) writeFileSync(join(DOCS, rel), text);
   writeFileSync(join(DOCS, "README.md"), landing);
   console.error(`wrote ${Object.keys(out).length} pages to ${dir}`);

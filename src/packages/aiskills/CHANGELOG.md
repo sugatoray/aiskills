@@ -48,6 +48,12 @@ npm install step (see **Removed**).
   without installing anything (the saved copy is still refreshed, as `sync`
   does). Before, `-n` was an `uninstall` option only.
 
+- **A License page in the docs** (`docs/docsite/license.md`, and a License
+  tab in the single-page docs): the package's license, and a table of every
+  bundled skill with its group, its license and the `SKILL.md` that declares
+  it (all 13 are MIT today). Generated from `package.json` and the skills by
+  `npm run docs:skills`, so it can't go stale.
+
 ### Changed
 
 - **The package is licensed Apache-2.0** (was MIT). `package.json` says

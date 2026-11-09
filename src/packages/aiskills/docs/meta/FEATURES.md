@@ -53,6 +53,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 
 | Feature | Summary | User docs | Tests |
 | --- | --- | --- | --- |
+| License | Package Apache-2.0 (`LICENSE`, `package.json`); each bundled skill keeps its `SKILL.md` license (MIT); a generated License page with a table of both | [License](../docsite/license.md) | `packaging.test.mjs`, `docs-skills.test.mjs` |
 | Bundled skills | All repo skills ship flat, with `.aiskills/layout.json` + `nested/` keeping the original layout | [How it works](../docsite/concepts/how-it-works.md), [Layouts](../docsite/concepts/layouts.md) | `packaging.test.mjs` |
 | No install step | `npm install` runs no script; `aiskills install` (or `npx @sugatoray-ai/aiskills install`) saves and registers the skills; `AISKILLS_*` variables set defaults | [Installation](../docsite/getting-started/installation.md), [Set default choices](../docsite/guides/set-defaults.md), [Security model](../docsite/concepts/security.md) | `packaging.test.mjs`, `cli.test.mjs` → no install step, `e2e.test.mjs` |
 | Project dependency + `experimental_sync` | Flat `skills/` lets `npx skills experimental_sync` install from `node_modules` | [Use with `experimental_sync`](../docsite/guides/use-experimental-sync.md) | `e2e.test.mjs` |
