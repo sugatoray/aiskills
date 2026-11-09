@@ -243,12 +243,18 @@ every `npx` call runs. To move to a newer one:
    `npm run clean`.
 5. `npm publish`, logged in as a member of the `sugatoray-ai` npm org.
    `prepack` vendors the skills automatically; `publishConfig.access` is
-   `public`.
+   `public`. npm may **stage** the release instead of publishing it (staged
+   publishing): the npm page then shows a `0.0.0-stage` "Temporary Holding
+   Version" (for a new package) or nothing new. No one at npm reviews it; a
+   maintainer approves it with 2FA, either `npm stage list` then
+   `npm stage approve <stage-id>` (npm 11.15+, Node 22.14+), or **Approve** in
+   the package's Staged Packages tab on npmjs.com. Check with
+   `npm view @sugatoray-ai/aiskills version`.
 6. `npm run clean`, then update the release note in
    `docs/.scrolls/SPEC.md` and run `/scrolls-update`.
 
-The first published release (`0.4.0`; `0.3.0`, `0.2.0` and `0.1.0` were never published) is
-ticket AIS-1 in `docs/.scrolls/PLAN.md`.
+The first published release is `0.4.0` (2026-11-09; `0.3.0`, `0.2.0` and `0.1.0` were never
+published).
 
 ## Troubleshooting
 

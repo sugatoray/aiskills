@@ -495,6 +495,7 @@ npm run pack:dry      # list what will ship
 # move the CHANGELOG.md "Unreleased" entries under the new version, with today's date
 npm version patch     # bump the version (patch/minor/major, see CHANGELOG.md)
 npm publish           # prepack re-vendors the skills automatically
+# if npm stages it: npm stage list, then npm stage approve <stage-id> (2FA)
 npm run clean         # remove the vendored copy
 ```
 
