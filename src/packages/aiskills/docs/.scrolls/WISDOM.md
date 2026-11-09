@@ -61,7 +61,7 @@ Bad patterns or decisions to never take, and why they were rejected.
 - Never auto-pick among several registry matches for a name under `--route`. List them and make the user pin `owner/repo@skill`; it's third-party code with full agent permissions.
 - A full `uninstall` (no `-s`/`-G`) must only remove skills whose recorded source is the install folder, even with `--route`.
 - Don't copy a reference repo's layout without checking it actually has the shape asked for; `sugatoray/pptxdiff`'s `src/packages/*` have no inner `src/` (only its root package does). Say what you found and which part you're copying.
-- Don't commit the vendored `skills/`, `.claude-plugin/` or `LICENSE` copies in the package folder; `npm run clean` removes them.
+- Don't commit the vendored `skills/`, `.aiskills/` or `.claude-plugin/` copies in the package folder; `npm run clean` removes them. `LICENSE` is the exception: it is the package's own Apache-2.0 text, committed, and the vendor step must never overwrite it with the repo's MIT `LICENSE` (tested by SHA-256).
 
 ## Wisdom — best practices and Red/Green TDD
 Best practices worth reusing.

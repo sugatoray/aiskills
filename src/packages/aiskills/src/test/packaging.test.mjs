@@ -6,6 +6,12 @@ import { join, relative, sep } from "node:path";
 import { after, before, describe, test } from "node:test";
 
 import { PKG_SRC, npm, repoCopy } from "./helpers.mjs";
+import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+
+// SHA-256 of https://www.apache.org/licenses/LICENSE-2.0.txt
+const APACHE_2_SHA256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30";
+const sha256 = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
 
 let copy;
 before(() => {
@@ -52,7 +58,7 @@ describe("vendor-skills.mjs", () => {
     for (const e of tops) assert.ok(existsSync(join(copy.pkg, "skills", e.name, "SKILL.md")), e.name);
   });
 
-  test("skills/ + .aiskills/nested/ hold every repo file, file-for-file, plus marketplace.json and LICENSE", (t) => {
+  test("skills/ + .aiskills/nested/ hold every repo file, file-for-file, plus marketplace.json", (t) => {
     if (!copy) return t.skip("git not available");
     const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
     const pkgPaths = [
@@ -68,7 +74,7 @@ describe("vendor-skills.mjs", () => {
       JSON.parse(readFileSync(join(copy.pkg, ".claude-plugin", "marketplace.json"), "utf8")),
       JSON.parse(readFileSync(join(copy.repo, ".claude-plugin", "marketplace.json"), "utf8")),
     );
-    assert.ok(existsSync(join(copy.pkg, "LICENSE")));
+    assert.equal(sha256(join(copy.pkg, "LICENSE")), APACHE_2_SHA256, "vendoring keeps the package's own Apache-2.0 LICENSE (the repo's LICENSE is MIT)");
   });
 
   test("renames nested .gitignore/.npmignore so npm keeps them", (t) => {
@@ -84,7 +90,8 @@ describe("vendor-skills.mjs", () => {
     npm(["run", "-s", "vendor"], { cwd: copy.pkg });
     const res = npm(["run", "-s", "clean"], { cwd: copy.pkg });
     assert.equal(res.status, 0, res.stderr);
-    for (const p of ["skills", ".claude-plugin", ".aiskills", "LICENSE"]) assert.ok(!existsSync(join(copy.pkg, p)), p);
+    for (const p of ["skills", ".claude-plugin", ".aiskills"]) assert.ok(!existsSync(join(copy.pkg, p)), p);
+    assert.equal(sha256(join(copy.pkg, "LICENSE")), APACHE_2_SHA256, "clean keeps the committed LICENSE");
   });
 });
 
@@ -146,6 +153,18 @@ describe("npm pack", () => {
       assert.ok(line, `README has no 'aiskills ${cmd}' line`);
       for (const opt of allowed) for (const f of flags[opt]) assert.ok(line.includes(`[${f}`) || line.includes(`|${f}`), `README 'aiskills ${cmd}' line lacks ${f}`);
     }
+  });
+
+  test("the package is licensed Apache-2.0: package.json, a committed LICENSE with the official text, and the README", () => {
+    assert.equal(JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8")).license, "Apache-2.0");
+    assert.equal(sha256(join(PKG_SRC, "LICENSE")), APACHE_2_SHA256, "LICENSE is https://www.apache.org/licenses/LICENSE-2.0.txt, unchanged");
+    const tracked = spawnSync("git", ["ls-files", "--error-unmatch", "LICENSE"], { cwd: PKG_SRC });
+    assert.equal(tracked.status, 0, "LICENSE is committed, not vendored");
+    const readme = readFileSync(join(PKG_SRC, "README.md"), "utf8");
+    const section = readme.slice(readme.indexOf("\n## License\n"));
+    assert.ok(readme.includes("\n## License\n"), "README has a License section");
+    assert.match(section, /\[Apache License 2\.0\]\(LICENSE\)/);
+    assert.match(section, /bundled skill keeps the license in its `SKILL\.md`/);
   });
 
   test("package.json declares the aiskills, ais and aix commands", () => {

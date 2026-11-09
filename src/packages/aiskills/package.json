@@ -19,7 +19,7 @@
     "url": "git+https://github.com/sugatoray/aiskills.git",
     "directory": "src/packages/aiskills"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Sugato Ray (https://github.com/sugatoray)",
   "type": "module",
   "bin": {

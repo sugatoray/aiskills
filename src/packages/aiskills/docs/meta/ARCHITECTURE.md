@@ -98,7 +98,8 @@ aiskills.json                        { package, version, layout, installedAt, sk
 <repo>/skills/<group>/<skill>/...  ──vendor()──▶  skills/<skill>/...
 <repo>/skills/<group>/README.md    ──────────▶  .aiskills/nested/<group>/README.md
                                    ──────────▶  .aiskills/layout.json
-<repo>/.claude-plugin/marketplace.json, LICENSE ──▶ copied as is
+<repo>/.claude-plugin/marketplace.json ──────▶ copied as is
+(the package's LICENSE, Apache-2.0, is committed in the package folder; the repo's MIT LICENSE isn't copied)
 ```
 
 While walking `skills/`, `vendor()` loads each folder's `.skillsignore` (outer

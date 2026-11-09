@@ -3,7 +3,7 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-`@sugatoray-ai/aiskills` `0.4.0` (folder `src/packages/aiskills/`) is feature-complete for a first release, and now has full user documentation. `npm test` runs 284 offline tests (about 60 s; the docs and banner tests open Chromium when Playwright and cdnjs/jsDelivr are available) and `npm run test:e2e` runs 8 tests with the real `npx skills` (network). All pass. Everything is on branch `claude/focused-faraday-nqvduf` in the open PR [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122). Nothing has been published to npm. The docs have a GitHub Pages workflow but aren't live until it reaches `master`.
+`@sugatoray-ai/aiskills` `0.4.0` (folder `src/packages/aiskills/`) is feature-complete for a first release, and now has full user documentation. `npm test` runs 284 offline tests (about 60 s; the docs and banner tests open Chromium when Playwright and cdnjs/jsDelivr are available) and `npm run test:e2e` runs 8 tests with the real `npx skills` (network). All pass. [sugatoray/aiskills#122](https://github.com/sugatoray/aiskills/pull/122) is merged; follow-up work (the license change) is on `claude/focused-faraday-nqvduf`, restarted from `master`. Nothing has been published to npm. The docs are live at https://sugatoray.github.io/aiskills/ (GitHub Pages, deployed by `.github/workflows/aiskills-docs.yml`).
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -22,10 +22,12 @@ src/scripts/core/       cli.mjs, installer.mjs (published; there is no install s
 src/scripts/pack/       vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/       build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs, templates/ (build time only)
 src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs
-(vendored, git-ignored) skills/<name>/ (flat), .aiskills/{layout.json,nested/}, .claude-plugin/, LICENSE
+LICENSE                 Apache-2.0, the package's own (committed; never vendored)
+(vendored, git-ignored) skills/<name>/ (flat), .aiskills/{layout.json,nested/}, .claude-plugin/
 ```
 
 ## What just happened
+- **License: MIT → Apache-2.0 for the package (user's request)**, on `claude/focused-faraday-nqvduf` restarted from `master` after PR #122 merged. Committed `LICENSE` (official Apache-2.0 text, SHA-256 tested), `package.json` license, `.gitignore` no longer ignores `LICENSE`, the vendor step no longer copies the repo's MIT `LICENSE` and `clean` keeps it; README License section; banner badge shows Apache-2.0. Bundled skills keep `license: MIT` in their SKILL.md (user to decide if they should change too). Docs site is live (run #2 after the user enabled Pages).
 - **Banner + package README refresh**: the banner's `aix i -s pdf` demo now ends with the real `Install 1 external skill from the registry? [y/N] y` prompt (blank line before the cursor dropped, so the terminal keeps 15 lines; tested). README: CLI summary lists `--route`, `-y`, `-n` on install and `--route` on uninstall (new packaging test parses the options `cli.mjs` accepts), `install -n` / `sync` examples, cli.test row mentions the pty tests, `npm test` takes about a minute. `banner_2x.png` re-rendered.
 - **`aix` safety confirmation (user's request)**: skills a `--route` lookup found are listed and confirmed (`[y/N]`, default no) before anything is installed; no terminal → stop unless `-y`/`--yes`; pinned specs skip it; new `install -n`. Red/Green: 8 CLI tests (3 run in a pseudo-terminal via `sandbox().tty()`, which waits for `[y/N] ` before typing — typing ahead made the pty echo the answer before the prompt); 4 existing lookup tests now pass `-y`. Docs runner gained `<!-- verify: tty=<answer> -->`, so tutorial 4's terminal example is verified. CLI/errors references, concepts, security, agent guide, README, SECURITY.md, docs/meta, CHANGELOG (0.4.0 Added, marked breaking for unattended lookups) updated.
 - **Banner: two install steps (user-approved mockup, Option A modified)**: install box = `npm install -g …` + `aiskills install   # save + register` (comment dimmed via `<span class="cmt">`, sharing `.term-body .c`'s colour, because the box keeps the terminal background in every ink); terminal opens with `ais sync   # save only` + `skills saved to ~/.config/…/skills`; tagline "…in one npm package." (README alt and `BANNER_ALT` follow it, tested). Red/Green: 3 new banner tests; the browser contrast tests caught `--muted` failing on white/dark ink (2.94:1) before the colour was switched. `banner_2x.png`, the banner page and `index.html` rebuilt; 273 tests pass.
@@ -41,8 +43,7 @@ src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.m
 - Review links (private artifacts): the docs page https://claude.ai/artifact/6EDgyyQAxAK4ch324V9KNb (Version 7: current, with the `aix` confirmation and the banner showing its prompt); the theme mockup https://claude.ai/artifact/AWW2bzv19QjvMaz7iHpupi (superseded).
 
 ## Known issues / open threads
-- **To go live:** the owner sets Settings → Pages → Build and deployment → Source: "GitHub Actions", then merges PR #122; the push to `master` deploys. A workflow_dispatch run also needs the file on `master` first.
-- PR #122 is open; publish only after it's merged (AIS-1). Until it's on `master`, the README's banner image URL returns 404 (on GitHub and npm).
+- PR #122 is merged; publishing 0.4.0 to npm (AIS-1) is the next step, after the license change lands on `master`.
 - `--route` lookups still only tested against a fake registry (AIS-2). This session's network reached the npm registry and cdnjs, but `sugatoray.github.io` was blocked; skills.sh wasn't tried.
 - `/scrolls-update` isn't an installed command in these sessions; follow `skills/scrolls/scrolls-update/SKILL.md` from the repo by hand.
 - See `GAP_ANALYSIS.md` for the rest.

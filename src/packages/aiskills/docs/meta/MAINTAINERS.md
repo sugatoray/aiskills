@@ -34,7 +34,8 @@ docs/docsite/                          user documentation, llms.txt, index.html 
 docs/banner/                           banner: config.yaml, editor page, banner_2x.png (not published)
 docs/meta/                             ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 docs/.scrolls/, SCROLLS.md, CLAUDE.md, AGENTS.md   project memory (not published)
-skills/, .aiskills/, .claude-plugin/, LICENSE      vendored at pack time (git-ignored)
+LICENSE                                Apache-2.0, the package's own (committed; never vendored)
+skills/, .aiskills/, .claude-plugin/   vendored at pack time (git-ignored)
 ```
 
 This layout was chosen deliberately by the repo owner. Don't move files

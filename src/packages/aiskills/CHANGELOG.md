@@ -50,6 +50,12 @@ npm install step (see **Removed**).
 
 ### Changed
 
+- **The package is licensed Apache-2.0** (was MIT). `package.json` says
+  `"license": "Apache-2.0"`, and the package ships its own `LICENSE` with
+  the Apache License 2.0 text instead of a copy of the repo's MIT `LICENSE`.
+  Each bundled skill keeps the license in its `SKILL.md` (all MIT today).
+  Nothing has been published under MIT, so no installed copy is affected.
+
 - **The code is organized by when it runs.** The files that ship moved
   from `src/scripts/` to `src/scripts/core/` (`cli.mjs` and `installer.mjs`). The scripts that build the package
   are in `src/scripts/pack/`, and the docs and banner builders in
