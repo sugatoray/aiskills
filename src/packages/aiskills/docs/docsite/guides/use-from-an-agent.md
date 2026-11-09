@@ -20,9 +20,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
          "name": "scrolls-skills",
          "alias": "scrolls",
    …
-     "ungrouped": [
-       "newsletter-ai"
-     ]
+     "ungrouped": []
    }
    ```
 

@@ -16,7 +16,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 

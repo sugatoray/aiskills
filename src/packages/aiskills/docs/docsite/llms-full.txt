@@ -1,7 +1,7 @@
 <!-- source: README.md -->
 # @sugatoray-ai/aiskills
 
-`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, newsletters, diagrams, docs, development) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
 
 The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskills/skills/`, and are registered with your agents by `npx skills add`. The `aiskills` command then installs, lists and removes them by name, by group or by pattern, and with `--route` it manages skills from other sources too.
 
@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Every skill in one package**: 13 skills in 6 groups, at the version you installed.
+- **Skills in one package**: 12 skills in 6 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
 - **Global or per project**: `-g` (default) or `-p`.
@@ -52,7 +52,6 @@ aiskills install -G scrolls -a claude-code
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
 - [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
-- [newsletter-ai](skills/newsletter-ai.md): Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes…
 - [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
 - [scrolls-help](skills/scrolls-help.md): Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,…
 - [scrolls-hide](skills/scrolls-hide.md): Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the…
@@ -303,7 +302,7 @@ See also: [CLI reference](../reference/cli.md)
 <!-- source: skills/README.md -->
 # Bundled skills
 
-Every skill in this version of the package (13 skills in 6 groups), with what it does and how to install it.
+Every skill in this version of the package (12 skills in 6 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -360,14 +359,6 @@ Alias `personas`. Install the group with `aiskills install -G personas`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`prodigy`](prodigy.md) | 1.0.0 | Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and… |
-
-## Not in a group
-
-Install these by name (`-s`) or with `-G all`.
-
-| Skill | Version | What it does |
-| --- | --- | --- |
-| [`newsletter-ai`](newsletter-ai.md) | 1.5.3 | Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes… |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 
@@ -554,82 +545,6 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/netw
 - `tests/test_graph.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
-
-<!-- source: skills/newsletter-ai.md -->
-# newsletter-ai
-
-Generates the weekly executive AI intelligence newsletter: researches the last 7 days of AI developments (with 30-90 day context where needed) and writes them up as a 15-part executive brief — the Top 20 developments, model intelligence, open-vs-closed, talent, funding/M&A, production deployment, agents, chips/compute, data centers/energy, the global AI race, a company watchlist, key numbers, under-the-radar signals, what changed this week, and a closing synthesis. Defaults to markdown chat output; pass -o/--output yaml (or --yaml) to instead produce a sourced YAML document, and add -r/--report path/to/folder-or-report.html to render it straight into an interactive, light/dark, multi-tab HTML report (with per-tab References accordions, its source YAML fused in for single-file distribution, and a Download-data button) written next to a copy of the YAML. Use when the user runs /newsletter-ai (aliased as the shorthand /nltr-ai — treat both identically), or asks to draft, write, or update this week's AI newsletter/intelligence brief.
-
-| Property | Value |
-| --- | --- |
-| Group | None: install it with `-s` or `-G all` |
-| Version | 1.5.3 |
-| Starts | When you type `/newsletter-ai`, or your agent uses it when a task fits its description |
-| Also answers to | `/nltr-ai` (described in the skill; not a separate skill) |
-| License | MIT |
-| Source | [skills/newsletters/newsletter-ai](https://github.com/sugatoray/aiskills/tree/master/skills/newsletters/newsletter-ai) |
-
-## Install
-
-For one agent (leave out `-a` for every agent `npx skills` finds):
-
-<!-- verify -->
-```bash
-aiskills install -s newsletter-ai -a claude-code
-```
-
-```text
-[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: newsletter-ai
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill newsletter-ai --agent claude-code --yes
-```
-
-Into the current project instead: add `-p`. To remove it:
-
-```bash
-aiskills uninstall -s newsletter-ai
-```
-
-## What's inside
-
-The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/newsletter-ai/`:
-
-- `.gitignore`
-- `CHANGELOG.md`
-- `README.md`
-- `SKILL.md`
-- `assets/PROMPT.md`
-- `assets/images/report-citations-dark.png`
-- `assets/images/report-overview-light.png`
-- `assets/templates/icons.svg`
-- `assets/templates/report.html`
-- `assets/templates/sample-report.yaml`
-- `builder/build_report.py`
-- `builder/capture_screenshots.py`
-- `builder/fuse.py`
-- `builder/paths.py`
-- `builder/report_data.py`
-- `builder/requirements.txt`
-- `builder/screenshots.cjs`
-- `meta/FEATURES.md`
-- `meta/MAINTAINERS.md`
-- `meta/MARKDOWN_FORMATTING.md`
-- `pyproject.toml`
-- `tests/browser/check_download.cjs`
-- `tests/conftest.py`
-- `tests/fixtures/sample.yaml`
-- `tests/test_browser_download.py`
-- `tests/test_build_report.py`
-- `tests/test_capture_screenshots.py`
-- `tests/test_cli.py`
-- `tests/test_example_data.py`
-- `tests/test_fuse.py`
-- `tests/test_packaging.py`
-- `tests/test_paths.py`
-- `tests/test_report_data.py`
-- `uv.lock`
-
-See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/newsletters/newsletter-ai/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/newsletters/newsletter-ai/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
 <!-- source: skills/prodigy.md -->
 # prodigy
@@ -1201,13 +1116,10 @@ personas-skills  (alias: personas)
   Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems,...
   skills: prodigy
 
-(ungrouped; use -s or -G all)
-  skills: newsletter-ai
-
 Install a group:  aiskills install --group <name|alias> --global --agent <agent>
 ```
 
-Each group has a name (`scrolls-skills`) and a shorter alias (`scrolls`, the name without `-skills`). Either works. `newsletter-ai` belongs to no group; you install it by name, or with the built-in group `all`.
+Each group has a name (`scrolls-skills`) and a shorter alias (`scrolls`, the name without `-skills`). Either works. Every bundled skill is in a group; a skill that wasn't would be listed under `(ungrouped; use -s or -G all)`, to install by name or with the built-in group `all`.
 
 ## Install one group for one agent
 
@@ -1299,7 +1211,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -1308,13 +1220,13 @@ aiskills install -s 'scroll-*'
 
 <!-- verify -->
 ```bash
-aiskills install -G personas -s newsletter-ai -a claude-code
+aiskills install -G personas -s create-lib-docs -a claude-code
 ```
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: newsletter-ai, prodigy
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill newsletter-ai --skill prodigy --agent claude-code --yes
+[aiskills] bundled: create-lib-docs, prodigy
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill create-lib-docs --skill prodigy --agent claude-code --yes
 ```
 
 ## Several agents
@@ -1417,7 +1329,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 
@@ -1914,9 +1826,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
          "name": "scrolls-skills",
          "alias": "scrolls",
    …
-     "ungrouped": [
-       "newsletter-ai"
-     ]
+     "ungrouped": []
    }
    ```
 
@@ -2186,9 +2096,9 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
-| `all` (built in) | | all 13 skills |
+| `all` (built in) | | all 12 skills |
 
-`newsletter-ai` is in no group. Install it with `-s newsletter-ai` or `-G all`. `aiskills groups` always shows the list for the version you have.
+Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 
 ## How names are matched
 
@@ -2445,17 +2355,16 @@ aiskills installed [-g|-p] [--route]
 | Options | [`-g`](#-g---global), [`-p`](#-p---project), [`--route`](#--route) (all skills, with a source column) |
 | Exit code | `1` if `npx skills list` can't be read |
 
-<!-- verify: list=scrolls-setup,newsletter-ai -->
+<!-- verify: list=scrolls-setup,owner/repo@pdf -->
 ```bash
 aiskills ls
 ```
 
 ```text
-newsletter-ai              -                      Claude Code
 scrolls-setup              scrolls-skills         Claude Code
 ```
 
-A `-` in the group column means the skill belongs to no group.
+Only skills installed from the install folder are listed; `pdf`, installed from `owner/repo`, is left out (add `--route` to list it). A `-` in the group column means the skill belongs to no group.
 
 ### `groups`
 
@@ -2619,7 +2528,7 @@ Anything after '--' is appended to the underlying 'npx skills' command.
 Examples:
   aiskills groups                             # what groups exist
   aiskills install --group scrolls --global --agent claude-code
-  aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+  aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'
@@ -2968,7 +2877,7 @@ Files named `.gitignore` and `.npmignore` inside the skills are stored as `_giti
       "skills": ["scrolls-help", "scrolls-hide", "…"]
     }
   ],
-  "ungrouped": ["newsletter-ai"]
+  "ungrouped": []
 }
 ```
 
@@ -3006,7 +2915,7 @@ See also: [How aiskills works](../concepts/how-it-works.md) · [Layouts](../conc
 
 The rule syntax of `.skillsignore` files, which leave files, folders or whole skills out of the package when it is built; this page is exhaustive.
 
-A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users.
+A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users. The repo uses one: `skills/newsletters/.skillsignore` holds `newsletter-ai/`, which leaves that skill out of the package (it stays installable from the repo with `npx skills add`).
 
 ## Syntax
 
@@ -3535,11 +3444,19 @@ In the single-page HTML version of these docs (`index.html`), click the gear at 
 
 No. Only the commands are public; the files under `src/scripts/core/` can change in any release.
 
-### What is a skill group, and why is `newsletter-ai` "ungrouped"?
+### What is a skill group?
 
-Groups come from the plugin entries in the repo's `marketplace.json`. `newsletter-ai` isn't in any entry, so install it by name or with `-G all`. See [Skill groups](concepts/skill-groups.md).
+Groups come from the plugin entries in the repo's `marketplace.json`; every bundled skill is in one. See [Skill groups](concepts/skill-groups.md).
 
-## Troubleshooting
+### Why isn't `newsletter-ai` in the package?
+
+The repo's `skills/newsletters/.skillsignore` leaves it out on purpose, so `aiskills` doesn't install it. It is still in the repo, so you can install it straight from there:
+
+```bash
+npx skills add sugatoray/aiskills --skill newsletter-ai --global
+```
+
+or through `aix`, naming the source (pinned, so it isn't asked about): `aix install -s sugatoray/aiskills@newsletter-ai`.
 
 ### Nothing was installed by `npm install -g`
 
@@ -3592,14 +3509,13 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-13 skills, sorted by name.
+12 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |
 | [`create-lib-docs`](skills/create-lib-docs.md) | docs | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/SKILL.md) |
 | [`network-flow`](skills/network-flow.md) | diagrams | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/SKILL.md) |
-| [`newsletter-ai`](skills/newsletter-ai.md) | - | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/newsletters/newsletter-ai/SKILL.md) |
 | [`prodigy`](skills/prodigy.md) | personas | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/SKILL.md) |
 | [`scrolls-help`](skills/scrolls-help.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/SKILL.md) |
 | [`scrolls-hide`](skills/scrolls-hide.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-hide/SKILL.md) |

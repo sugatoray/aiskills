@@ -73,9 +73,9 @@ describe("values", () => {
     const local = market.plugins.filter((p) => typeof p.source === "string");
     assert.deepEqual(v.groups, local.map((p) => p.name.replace(/-skills$/, "")));
     assert.equal(v.groups_count, String(local.length));
-    assert.equal(v.skills_count, "13");
+    assert.equal(v.skills_count, "12"); // 13 in the repo; skills/newsletters/.skillsignore leaves newsletter-ai out
     assert.equal(v.version_label, `v${pkg.version}`);
-    assert.equal(v.counts_label, `13 skills · ${local.length} groups`);
+    assert.equal(v.counts_label, `12 skills · ${local.length} groups`);
   });
 
   test("the banner's theme is Lights Out by default, and must be a known theme", async () => {
@@ -114,7 +114,7 @@ describe("render", () => {
     const v = resolveValues(readConfig());
     const banner = bannerMarkup(render(v));
     assert.ok(banner.includes(`<b>v${pkg.version}</b>`));
-    assert.ok(banner.includes("13 skills · 6 groups"));
+    assert.ok(banner.includes("12 skills · 6 groups"));
     assert.ok(banner.includes(`npm install -g ${pkg.name}`));
     for (const g of v.groups) assert.ok(banner.includes(`<span class="pill">${g}</span>`), g);
     assert.ok(banner.includes(`skills@${SKILLS_CLI_VERSION} add`), "pinned skills version in the demo");

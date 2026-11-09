@@ -74,7 +74,9 @@ describe("docs/docsite/skills/", () => {
       assert.ok(row.includes(field(md, "version")), `${name}: version missing from its row`);
     }
     for (const g of new Set(box.groupOf.values())) assert.ok(overview.includes(`## ${g.name}`), `no section for ${g.name}`);
-    assert.match(overview, /## Not in a group/);
+    // A "Not in a group" section only when some bundled skill has no group.
+    if (box.names.some((n) => !box.groupOf.has(n))) assert.match(overview, /## Not in a group/);
+    else assert.doesNotMatch(overview, /## Not in a group/);
   });
 
   test("each skill page shows its description, group, version, how it starts, and its source", () => {

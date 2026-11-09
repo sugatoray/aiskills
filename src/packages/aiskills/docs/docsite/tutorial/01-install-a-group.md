@@ -36,13 +36,10 @@ personas-skills  (alias: personas)
   Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems,...
   skills: prodigy
 
-(ungrouped; use -s or -G all)
-  skills: newsletter-ai
-
 Install a group:  aiskills install --group <name|alias> --global --agent <agent>
 ```
 
-Each group has a name (`scrolls-skills`) and a shorter alias (`scrolls`, the name without `-skills`). Either works. `newsletter-ai` belongs to no group; you install it by name, or with the built-in group `all`.
+Each group has a name (`scrolls-skills`) and a shorter alias (`scrolls`, the name without `-skills`). Either works. Every bundled skill is in a group; a skill that wasn't would be listed under `(ungrouped; use -s or -G all)`, to install by name or with the built-in group `all`.
 
 ## Install one group for one agent
 

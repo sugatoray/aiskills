@@ -105,17 +105,16 @@ aiskills installed [-g|-p] [--route]
 | Options | [`-g`](#-g---global), [`-p`](#-p---project), [`--route`](#--route) (all skills, with a source column) |
 | Exit code | `1` if `npx skills list` can't be read |
 
-<!-- verify: list=scrolls-setup,newsletter-ai -->
+<!-- verify: list=scrolls-setup,owner/repo@pdf -->
 ```bash
 aiskills ls
 ```
 
 ```text
-newsletter-ai              -                      Claude Code
 scrolls-setup              scrolls-skills         Claude Code
 ```
 
-A `-` in the group column means the skill belongs to no group.
+Only skills installed from the install folder are listed; `pdf`, installed from `owner/repo`, is left out (add `--route` to list it). A `-` in the group column means the skill belongs to no group.
 
 ### `groups`
 
@@ -279,7 +278,7 @@ Anything after '--' is appended to the underlying 'npx skills' command.
 Examples:
   aiskills groups                             # what groups exist
   aiskills install --group scrolls --global --agent claude-code
-  aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+  aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'

@@ -25,9 +25,9 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
-| `all` (built in) | | all 13 skills |
+| `all` (built in) | | all 12 skills |
 
-`newsletter-ai` is in no group. Install it with `-s newsletter-ai` or `-G all`. `aiskills groups` always shows the list for the version you have.
+Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 
 ## How names are matched
 

@@ -89,7 +89,7 @@ Files named `.gitignore` and `.npmignore` inside the skills are stored as `_giti
       "skills": ["scrolls-help", "scrolls-hide", "…"]
     }
   ],
-  "ungrouped": ["newsletter-ai"]
+  "ungrouped": []
 }
 ```
 

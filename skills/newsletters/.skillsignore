@@ -1,0 +1,4 @@
+# Leave newsletter-ai out of the @sugatoray-ai/aiskills npm package (and so out of
+# 'aiskills install'). It stays in this repo, so 'npx skills add sugatoray/aiskills
+# --skill newsletter-ai' still installs it. Syntax: src/packages/aiskills/docs/docsite/reference/skillsignore.md
+newsletter-ai/
