@@ -1419,9 +1419,9 @@ aiskills install -s pdf
 
 ## Look it up with `--route`
 
-With `--route`, a bare name that isn't bundled is looked up with `npx skills find`. If exactly one result has exactly that name, it is installed:
+With `--route`, a bare name that isn't bundled is looked up with `npx skills find`. If exactly one result has exactly that name, `aiskills` shows it and asks before installing anything. In a terminal, answering `y`:
 
-<!-- verify: find=anthropics/skills@pdf -->
+<!-- verify: find=anthropics/skills@pdf tty=y -->
 ```bash
 aiskills --route install -s pdf -a claude-code
 ```
@@ -1430,11 +1430,33 @@ aiskills --route install -s pdf -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] 'pdf' is not bundled; looking it up with 'npx skills find pdf' ...
 [aiskills] found anthropics/skills@pdf
+[aiskills] found in the skills registry (not bundled; third-party code your agents may run):
+    anthropics/skills@pdf  (1.2K installs)  for 'pdf'
+Install 1 external skill from the registry? [y/N] y
 [aiskills] external: anthropics/skills@pdf
 [aiskills] running: npx -y skills@1.7.6 add anthropics/skills@pdf --global --agent claude-code --yes
 ```
 
-The example output above was produced with a stand-in registry that returns one result, `anthropics/skills@pdf`; the real registry may return other results. If several results share the exact name, `aiskills` stops and lists them, and you pick one. It never chooses for you.
+Check the source (`anthropics/skills`) before you answer. Only `y` or `yes` installs; Enter or anything else stops with `nothing installed: not confirmed`. This is a safety check: an external skill is code from someone else that your agents may run.
+
+In a script, or once you've checked the source, `-y` (`--yes`) answers yes in advance. Without a terminal and without `-y`, `aiskills` stops and installs nothing:
+
+<!-- verify: find=anthropics/skills@pdf -->
+```bash
+aiskills --route install -s pdf -a claude-code -y
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] 'pdf' is not bundled; looking it up with 'npx skills find pdf' ...
+[aiskills] found anthropics/skills@pdf
+[aiskills] found in the skills registry (not bundled; third-party code your agents may run):
+    anthropics/skills@pdf  (1.2K installs)  for 'pdf'
+[aiskills] external: anthropics/skills@pdf
+[aiskills] running: npx -y skills@1.7.6 add anthropics/skills@pdf --global --agent claude-code --yes
+```
+
+The example outputs above were produced with a stand-in registry that returns one result, `anthropics/skills@pdf` with 1.2K installs; the real registry may return other results and counts. If several results share the exact name, `aiskills` stops and lists them, and you pick one. It never chooses for you. To see what would be installed without installing anything, add `-n` (`--dry-run`).
 
 `aix` is a shorter way to write `aiskills --route`:
 
@@ -1444,7 +1466,7 @@ aix i -s pdf -a claude-code
 
 ## Name the source yourself
 
-An `owner/repo@skill` (or `owner/repo`, a git URL, or a local path) skips the lookup and goes straight to `npx skills add`:
+An `owner/repo@skill` (or `owner/repo`, a git URL, or a local path) skips the lookup and goes straight to `npx skills add`. It isn't asked about, because you named the source:
 
 <!-- verify -->
 ```bash
@@ -1484,10 +1506,10 @@ scrolls-setup              bundled                        scrolls-skills        
 ## Recap
 
 - Without `--route`, `aiskills` only manages bundled skills.
-- With `--route` (or `aix`), a bare name is looked up and installed only on a unique exact match; `owner/repo@skill` is used as given.
+- With `--route` (or `aix`), a bare name is looked up, and installed only on a unique exact match that you confirm (`y` at the prompt, or `-y` in advance); `owner/repo@skill` is used as given, without asking.
 - External skills are installed from their source; they are never copied into `~/.config/sugatoray/aiskills`.
 
-Reference: [`--route`](../reference/cli.md#--route) · [Bundled and external skills](../concepts/bundled-and-external.md)
+Reference: [`--route`](../reference/cli.md#--route) · [`-y`](../reference/cli.md#-y---yes) · [Bundled and external skills](../concepts/bundled-and-external.md)
 
 Next: [5. Uninstall](05-uninstall.md) · Previous: [3. Install into a project](03-install-into-a-project.md)
 
@@ -1961,7 +1983,13 @@ DO_NOT_TRACK=1 aiskills install -G scrolls -a claude-code
 
 ### External skills
 
-Prefer `owner/repo@skill` over a bare name with `--route`. A bare name fails when the registry has several exact matches, and the registry can change between runs.
+Prefer `owner/repo@skill` over a bare name with `--route`. A bare name fails when the registry has several exact matches, the registry can change between runs, and a skill found by a lookup must be confirmed: with no terminal, `aiskills` stops with `not installing external skills without confirmation` unless you pass `-y`. Check what a lookup would install first with `-n`:
+
+```bash
+aix i -n -s pdf
+```
+
+Then pin what it found (`aix i -s anthropics/skills@pdf`), or pass `-y` once you've checked the source.
 
 ## Troubleshooting
 
@@ -2238,7 +2266,7 @@ Bundled skills ship in this package; external skills come from anywhere else, an
 | `-s` entry | What happens |
 | --- | --- |
 | A bundled name or a pattern | Installed from the install folder, as without `--route`. Patterns only match bundled skills. |
-| A bare name that isn't bundled, e.g. `pdf` | `npx skills find pdf`; installed only if exactly one result is named exactly `pdf`. |
+| A bare name that isn't bundled, e.g. `pdf` | `npx skills find pdf`; installed only if exactly one result is named exactly `pdf`, and only after you confirm it (`y` at the prompt, or `-y`). |
 | `owner/repo@skill` | `npx skills add owner/repo@skill`, no lookup. |
 | `owner/repo`, a URL or a path | `npx skills add <spec>`, which installs the skills found there. |
 
@@ -2249,6 +2277,14 @@ Bundled skills ship in this package; external skills come from anywhere else, an
 ## Why a bare name needs exactly one match
 
 The registry is shared and changes. If two repositories both publish a skill called `pdf`, picking one would be a guess about which code you trust. `aiskills` stops and lists the candidates so you can choose with `owner/repo@skill`. It also ignores results whose `owner/repo@skill` contains anything but letters, digits, `.`, `_` and `-`.
+
+## Why a found skill is confirmed
+
+Even a unique exact match is the registry's choice, not yours: anyone can publish a skill called `pdf`. So `aiskills` shows what the lookup found (`owner/repo@skill`, its install count, and the name you typed) and asks `Install <n> external skill(s) from the registry? [y/N]` before installing anything, bundled skills included. Only `y` or `yes` installs.
+
+- With no terminal to ask in (a script, CI, an agent), it stops instead, unless you pass `-y` (`--yes`).
+- `-n` (`--dry-run`) shows the matches and the exact commands without installing.
+- An `owner/repo@skill`, URL or path is never asked about: you named the source yourself.
 
 ## Trade-offs and limits
 
@@ -2281,6 +2317,7 @@ Each one is covered by the test suite.
 - **No install step.** The package has no `preinstall`, `install` or `postinstall` script, so `npm install` (or pnpm, or bun) only puts files in npm's own folder: no network calls, nothing written to your home folder, no agent changed. Your agents change only when you run `aiskills install`.
 - **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it, and only accepts an exact version, `latest` or `next`.
 - **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
+- **Found skills are confirmed.** A skill the registry lookup chose is shown (source, install count) and installed only after you answer `y`, or pass `-y`. Without a terminal and without `-y`, nothing is installed. Pinned `owner/repo@skill` specs aren't asked about. See [`-y`](../reference/cli.md#-y---yes).
 - **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
 - **Only its own folders are replaced or deleted.** `sync`, `install` and `uninstall --purge` refuse a folder that has other files but no `aiskills.json`. This guards against an `AISKILLS_HOME` pointed at the wrong place.
 - **npm's own variables are removed** before `npx` runs (registry, proxy and certificate settings are kept).
@@ -2334,15 +2371,15 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 Save the skills to the install folder (see [`sync`](#sync)), then run `npx skills add <install folder>` with the selected skills and agents.
 
 ```text
-aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [--nested|--flat] [-- <extra>]
+aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra>]
 ```
 
 | | |
 | --- | --- |
 | Alias | `i` |
-| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`-y`](#-y---yes), [`-n`](#-n---dry-run), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
 | Default | Every skill, `--global`, agents detected by `npx skills` |
-| Exit code | `1` if a name, pattern or lookup fails (nothing is installed); otherwise the exit code of `npx skills add` |
+| Exit code | `1` if a name, pattern or lookup fails, or an external skill isn't confirmed (nothing is installed); otherwise the exit code of `npx skills add` |
 
 <!-- verify -->
 ```bash
@@ -2354,7 +2391,7 @@ aiskills install
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes
 ```
 
-With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up and installed after the bundled ones (`external: <spec>`).
+With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up; each skill the lookup found is shown and must be confirmed (see [`-y`](#-y---yes)) before anything, bundled skills included, is installed. External skills are installed after the bundled ones (`external: <spec>`).
 
 See: [1. Install a group](../tutorial/01-install-a-group.md) · [2. Pick skills and agents](../tutorial/02-pick-skills-and-agents.md)
 
@@ -2551,6 +2588,7 @@ Routing (install, uninstall, installed; may also go before the command):
       --route            Hand skills that are NOT bundled to 'npx skills'.
                          The 'aix' command is 'aiskills --route' (e.g. 'aix i -s pdf'):
                            install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
+                                                                 after you confirm (shows the match first; see -y)
                                       -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
                            uninstall: -s <name|pattern>     -> also matches skills from other sources
                            installed: lists every installed skill with its source
@@ -2563,6 +2601,9 @@ Layout of ~/.config/sugatoray/aiskills/skills (install, sync; may also go before
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
+  -y, --yes              Install skills that --route found by a registry lookup without asking
+                         (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
+  -n, --dry-run          Show what would be installed, and the exact commands; install nothing
 
 uninstall only:
       --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
@@ -2622,8 +2663,9 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `-a`, `-s`, `-G` | ✓ | ✓ | | | |
 | `--route` | ✓ | ✓ | ✓ | | |
 | `--nested`, `--flat` | ✓ | | | | ✓ |
-| `--copy` | ✓ | | | | |
-| `--purge`, `-f`, `-n` | | ✓ | | | |
+| `--copy`, `-y` | ✓ | | | | |
+| `-n` | ✓ | ✓ | | | |
+| `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
 | `--` | ✓ | ✓ | | | |
 
@@ -2663,6 +2705,15 @@ Write `<install folder>/skills/` flat, one folder per skill (the default). Remem
 
 Pass `--copy` to `npx skills add`: copy the files into agent folders instead of symlinking them. Env: [`AISKILLS_COPY`](environment.md#aiskills_copy).
 
+### `-y`, `--yes`
+
+On install with [`--route`](#--route), install the skills that a registry lookup found without asking. Without it, `aiskills` lists each one (`owner/repo@skill`, its install count, and the name you gave), then:
+
+- in a terminal, asks `Install <n> external skill(s) from the registry? [y/N]`; only `y` or `yes` installs, and anything else stops with `nothing installed: not confirmed` (exit `1`);
+- with no terminal (a script, CI, an agent), stops with `not installing external skills without confirmation` (exit `1`).
+
+Either way nothing is installed, not even the bundled skills, until the external ones are confirmed. A skill given as `owner/repo@skill`, a URL or a path is never asked about: you named its source. Bundled skills never ask. See [Security model](../concepts/security.md).
+
 ### `--purge`
 
 After a full uninstall, delete the install folder. Refused with `-s`/`-G`, and refused for a folder that isn't an aiskills folder (checked before anything is removed).
@@ -2674,6 +2725,8 @@ On uninstall, pass `-s` names to `npx skills remove` even if this package doesn'
 ### `-n`, `--dry-run`
 
 On uninstall, print what would be removed and the exact `npx skills` command, and change nothing.
+
+On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines. Nothing is installed. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
 
 ### `--json`
 
@@ -3190,6 +3243,26 @@ unknown command: <name>
 ```
 
 **Warning.** **Cause:** results whose `owner/repo@skill` has characters other than letters, digits, `.`, `_` and `-` are never used. **Fix:** none needed. If the skill you want was among them, check its source and pass it yourself.
+
+### Not confirmed (no terminal)
+
+```text
+[aiskills] found in the skills registry (not bundled; third-party code your agents may run):
+    <owner/repo@skill>  (<n> installs)  for '<name>'
+[aiskills] not installing external skills without confirmation: <owner/repo@skill>, …
+  re-run with -y/--yes to install them, or pin each one with -s owner/repo@skill
+```
+
+**Cause:** `--route` (or `aix`) found a skill by looking up a bare name, and there is no terminal to ask in (a script, CI, an agent). Nothing was installed, not even bundled skills. **Fix:** check the listed source, then re-run with [`-y`](cli.md#-y---yes), or pin it: `-s <owner/repo@skill>`.
+
+### Not confirmed
+
+```text
+Install <n> external skill(s) from the registry? [y/N] n
+[aiskills] nothing installed: not confirmed
+```
+
+**Cause:** you answered anything but `y` or `yes` (Enter means no). Nothing was installed. **Fix:** none needed. To install, run again and answer `y`, or pin the skill as `owner/repo@skill`.
 
 ## Files and folders
 

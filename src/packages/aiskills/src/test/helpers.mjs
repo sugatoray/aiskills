@@ -84,12 +84,25 @@ if (a[0] === "find") { process.stdout.write(read("FAKE_FIND_FILE", "")); process
 process.exit(Number(process.env.FAKE_EXIT || 0));
 `;
 
+/** Runs a command in a pseudo-terminal (util-linux `script`); types argv[3] + Enter at "[y/N] ". */
+const TTY_DRIVER = `import { spawn } from "node:child_process";
+const [cmd, answer] = process.argv.slice(2);
+const child = spawn("script", ["-qec", cmd, "/dev/null"], { stdio: ["pipe", "pipe", "inherit"] });
+let out = "", typed = false;
+child.stdout.on("data", (d) => {
+  out += d;
+  if (!typed && out.includes("[y/N] ")) { typed = true; child.stdin.write(answer + "\\n"); }
+});
+child.on("close", (code) => { process.stdout.write(out); process.exit(code ?? 1); });
+`;
+
 /**
  * A fresh sandbox, built from the fixture skills, or from the repo's real
  * (git-tracked) skills and marketplace.json with { realSkills: true }.
  * Returns helpers:
  *   run(args, {env})       run bin/aiskills.mjs (-> src/scripts/core/cli.mjs), returns { status, out, calls }
  *   aix(args, {env})       the same through bin/aix.mjs (= aiskills --route)
+ *   tty(args, answer, {env, aix})  run aiskills (or aix) in a pseudo-terminal via `script`, typing <answer> + Enter
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
  */
@@ -151,6 +164,16 @@ export function sandbox({ realSkills = false } = {}) {
     root,
     run: (args, { env } = {}) => exec(join(pkg, "bin", "aiskills.mjs"), args, env),
     aix: (args, { env } = {}) => exec(join(pkg, "bin", "aix.mjs"), args, env),
+    tty: (args, answer, { env, aix = false } = {}) => {
+      rmSync(log, { force: true });
+      const q = (s) => `'${String(s).replace(/'/g, "'\\''")}'`;
+      const cmd = [process.execPath, join(pkg, "bin", aix ? "aix.mjs" : "aiskills.mjs"), ...args].map(q).join(" ");
+      // Type the answer only once the [y/N] prompt is on screen, as a person would.
+      const driver = join(dir, "tty-driver.mjs");
+      writeFileSync(driver, TTY_DRIVER);
+      const res = spawnSync(process.execPath, [driver, cmd, answer], { cwd: dir, env: { ...baseEnv(), ...env }, encoding: "utf8" });
+      return { status: res.status, out: (res.stdout ?? "").replace(/\r\n?/g, "\n") + (res.stderr ?? ""), calls: calls() };
+    },
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),

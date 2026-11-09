@@ -85,7 +85,10 @@ your agent may run **with your permissions**.
   installs a bare name only when **exactly one** registry result has that
   exact name; with several, it stops and asks you to pin `owner/repo@skill`.
   It never picks for you, and ignores results with unsafe characters. All
-  lookups run before anything is installed.
+  lookups run before anything is installed. A skill a lookup found is shown
+  (source and install count) and installed only after you confirm it at a
+  `[y/N]` prompt (default no) or pass `-y`; with no terminal and no `-y`,
+  nothing is installed. Pinned `owner/repo@skill` specs aren't asked about.
   Prefer pinned `owner/repo@skill` specs from sources you trust.
 
 ### What the package build guarantees

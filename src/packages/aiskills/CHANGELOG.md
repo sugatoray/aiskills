@@ -33,6 +33,20 @@ npm install step (see **Removed**).
   sugatoray/callai's) builds the single-page docs with the new
   `npm run docs:site` on every push to `master` that changes them, and
   deploys them with `actions/deploy-pages`. It can also be run by hand.
+- **`aix` (and `--route`) confirm external skills before installing.** A
+  skill that a registry lookup found for a bare name (`aix i -s pdf`) is now
+  listed with its `owner/repo@skill`, install count and the name you typed,
+  then `aiskills` asks `Install <n> external skill(s) from the registry?
+  [y/N]` (default no). Nothing is installed, not even bundled skills, until
+  you answer `y`/`yes`. With no terminal (scripts, CI, agents) it stops with
+  `not installing external skills without confirmation` unless you pass the
+  new `-y`/`--yes`. A pinned `owner/repo@skill`, URL or path isn't asked
+  about, since you named the source. **Breaking** for scripts that ran
+  `--route` lookups unattended: add `-y`, or pin the skill.
+- **`install -n` / `--dry-run`** shows what would be installed, including
+  what a `--route` lookup found, and the exact `npx skills add` commands,
+  without installing anything (the saved copy is still refreshed, as `sync`
+  does). Before, `-n` was an `uninstall` option only.
 
 ### Changed
 

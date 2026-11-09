@@ -206,7 +206,8 @@ describe("reference pages cover the code", () => {
 /**
  * Examples marked for verification:
  *
- *   <!-- verify -->                               (or: <!-- verify: list=a,owner/repo@b find=owner/repo@c -->)
+ *   <!-- verify -->                               (or: <!-- verify: list=a,owner/repo@b find=owner/repo@c tty=y -->; tty=<answer> runs it in a
+ *   pseudo-terminal and types <answer> + Enter at a prompt)
  *   ```bash
  *   aiskills groups
  *   ```
@@ -328,7 +329,10 @@ describe("examples in the docs print what the docs show", () => {
         }
         const [cmd, ...args] = w;
         assert.ok(["aiskills", "ais", "aix"].includes(cmd), `${ex.where}: can only verify aiskills/ais/aix, not '${cmd}'`);
-        const res = cmd === "aix" ? b.aix(args, { env }) : b.run(args, { env });
+        // tty=<answer>: run in a pseudo-terminal and type <answer> + Enter at the prompt.
+        const res = "tty" in ex.params
+          ? b.tty(args, ex.params.tty ?? "", { env, aix: cmd === "aix" })
+          : cmd === "aix" ? b.aix(args, { env }) : b.run(args, { env });
         out += res.out;
       }
       const home = b.home;

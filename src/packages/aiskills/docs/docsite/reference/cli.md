@@ -35,15 +35,15 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 Save the skills to the install folder (see [`sync`](#sync)), then run `npx skills add <install folder>` with the selected skills and agents.
 
 ```text
-aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [--nested|--flat] [-- <extra>]
+aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra>]
 ```
 
 | | |
 | --- | --- |
 | Alias | `i` |
-| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`-y`](#-y---yes), [`-n`](#-n---dry-run), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
 | Default | Every skill, `--global`, agents detected by `npx skills` |
-| Exit code | `1` if a name, pattern or lookup fails (nothing is installed); otherwise the exit code of `npx skills add` |
+| Exit code | `1` if a name, pattern or lookup fails, or an external skill isn't confirmed (nothing is installed); otherwise the exit code of `npx skills add` |
 
 <!-- verify -->
 ```bash
@@ -55,7 +55,7 @@ aiskills install
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes
 ```
 
-With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up and installed after the bundled ones (`external: <spec>`).
+With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up; each skill the lookup found is shown and must be confirmed (see [`-y`](#-y---yes)) before anything, bundled skills included, is installed. External skills are installed after the bundled ones (`external: <spec>`).
 
 See: [1. Install a group](../tutorial/01-install-a-group.md) · [2. Pick skills and agents](../tutorial/02-pick-skills-and-agents.md)
 
@@ -252,6 +252,7 @@ Routing (install, uninstall, installed; may also go before the command):
       --route            Hand skills that are NOT bundled to 'npx skills'.
                          The 'aix' command is 'aiskills --route' (e.g. 'aix i -s pdf'):
                            install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
+                                                                 after you confirm (shows the match first; see -y)
                                       -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
                            uninstall: -s <name|pattern>     -> also matches skills from other sources
                            installed: lists every installed skill with its source
@@ -264,6 +265,9 @@ Layout of ~/.config/sugatoray/aiskills/skills (install, sync; may also go before
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
+  -y, --yes              Install skills that --route found by a registry lookup without asking
+                         (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
+  -n, --dry-run          Show what would be installed, and the exact commands; install nothing
 
 uninstall only:
       --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
@@ -323,8 +327,9 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `-a`, `-s`, `-G` | ✓ | ✓ | | | |
 | `--route` | ✓ | ✓ | ✓ | | |
 | `--nested`, `--flat` | ✓ | | | | ✓ |
-| `--copy` | ✓ | | | | |
-| `--purge`, `-f`, `-n` | | ✓ | | | |
+| `--copy`, `-y` | ✓ | | | | |
+| `-n` | ✓ | ✓ | | | |
+| `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
 | `--` | ✓ | ✓ | | | |
 
@@ -364,6 +369,15 @@ Write `<install folder>/skills/` flat, one folder per skill (the default). Remem
 
 Pass `--copy` to `npx skills add`: copy the files into agent folders instead of symlinking them. Env: [`AISKILLS_COPY`](environment.md#aiskills_copy).
 
+### `-y`, `--yes`
+
+On install with [`--route`](#--route), install the skills that a registry lookup found without asking. Without it, `aiskills` lists each one (`owner/repo@skill`, its install count, and the name you gave), then:
+
+- in a terminal, asks `Install <n> external skill(s) from the registry? [y/N]`; only `y` or `yes` installs, and anything else stops with `nothing installed: not confirmed` (exit `1`);
+- with no terminal (a script, CI, an agent), stops with `not installing external skills without confirmation` (exit `1`).
+
+Either way nothing is installed, not even the bundled skills, until the external ones are confirmed. A skill given as `owner/repo@skill`, a URL or a path is never asked about: you named its source. Bundled skills never ask. See [Security model](../concepts/security.md).
+
 ### `--purge`
 
 After a full uninstall, delete the install folder. Refused with `-s`/`-G`, and refused for a folder that isn't an aiskills folder (checked before anything is removed).
@@ -375,6 +389,8 @@ On uninstall, pass `-s` names to `npx skills remove` even if this package doesn'
 ### `-n`, `--dry-run`
 
 On uninstall, print what would be removed and the exact `npx skills` command, and change nothing.
+
+On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines. Nothing is installed. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
 
 ### `--json`
 

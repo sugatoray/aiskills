@@ -10,6 +10,7 @@ import {
   installedFromRoot,
   isFromRoot,
   listInstalled,
+  confirm,
   resolveExternal,
   skillsAddExternal,
   specSkillName,
@@ -63,6 +64,7 @@ Routing (install, uninstall, installed; may also go before the command):
       --route            Hand skills that are NOT bundled to 'npx skills'.
                          The 'aix' command is 'aiskills --route' (e.g. 'aix i -s pdf'):
                            install:   -s <name>             -> npx skills find <name>, then add owner/repo@<name>
+                                                                 after you confirm (shows the match first; see -y)
                                       -s owner/repo[@skill] -> npx skills add owner/repo[@skill] (also URLs/paths)
                            uninstall: -s <name|pattern>     -> also matches skills from other sources
                            installed: lists every installed skill with its source
@@ -75,6 +77,9 @@ Layout of ${ROOT}/skills (install, sync; may also go before the command):
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
+  -y, --yes              Install skills that --route found by a registry lookup without asking
+                         (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
+  -n, --dry-run          Show what would be installed, and the exact commands; install nothing
 
 uninstall only:
       --purge            Also delete ${ROOT} (only with a full uninstall)
@@ -114,7 +119,7 @@ Environment:
 const split = (v) => (v ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
 function parse(argv, allowed) {
-  const opts = { ...envOptions(), purge: false, force: false, dryRun: false, json: false };
+  const opts = { ...envOptions(), purge: false, force: false, dryRun: false, yes: false, json: false };
   // Values from the command line replace the env defaults, then accumulate.
   const seen = new Set();
   const add = (key, v) => {
@@ -143,6 +148,7 @@ function parse(argv, allowed) {
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
     else if ((a === "-n" || a === "--dry-run") && ok("dryRun")) opts.dryRun = true;
+    else if ((a === "-y" || a === "--yes") && ok("yes")) opts.yes = true;
     else throw new Error(`unknown option: ${a}`);
     if (["-a", "--agent", "-s", "--skill", "-G", "--group", "--groups"].includes(a) && args[i] === undefined) {
       throw new Error(`${a} needs a value`);
@@ -274,7 +280,7 @@ function main() {
   switch (cmd) {
     case "install":
     case "i": {
-      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout"]);
+      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout", "dryRun", "yes"]);
       const root = syncSkills({ version, layout: opts.layout });
       const picked = selectedSkills(opts, root);
       const external = picked?.unknown ?? [];
@@ -290,6 +296,29 @@ function main() {
       const agents = expandAgents(opts.agents);
       // Resolve every external skill before installing anything.
       const routed = external.length ? resolveExternal(external) : [];
+      // Safety: a skill the registry lookup chose is third-party code. Show it, and
+      // install it (or anything else) only once the user confirms. A pinned
+      // owner/repo@skill, URL or path was named exactly, so it isn't asked about.
+      const looked = routed.filter((r) => r.lookedUp);
+      if (looked.length) {
+        log(
+          "found in the skills registry (not bundled; third-party code your agents may run):\n" +
+            looked.map((r) => `    ${r.spec}${r.installs ? `  (${r.installs})` : ""}  for '${r.entry}'`).join("\n"),
+        );
+        if (!opts.yes && !opts.dryRun) {
+          const specs = looked.map((r) => r.spec).join(", ");
+          if (!process.stdin.isTTY) {
+            throw new Error(
+              `not installing external skills without confirmation: ${specs}\n` +
+                `  re-run with -y/--yes to install them, or pin each one with -s owner/repo@skill`,
+            );
+          }
+          const n = looked.length;
+          if (!confirm(`Install ${n} external skill${n === 1 ? "" : "s"} from the registry? [y/N] `)) {
+            throw new Error("nothing installed: not confirmed");
+          }
+        }
+      }
       const cwd = opts.global ? root : process.cwd();
       let status = 0;
       if (!picked || bundled.length) {

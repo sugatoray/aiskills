@@ -149,7 +149,9 @@ code:
   `reference/errors.md`.
 - **Examples with output** must be marked `<!-- verify -->` (optionally
   `<!-- verify: list=<names> find=<owner/repo@skill> -->` to set what the
-  stand-in `npx skills list` / `find` return). The test runs them against the
+  stand-in `npx skills list` / `find` return, and `tty=<answer>` to run it in
+  a pseudo-terminal and type `<answer>` at a `[y/N]` prompt; needs util-linux
+  `script`). The test runs them against the
   repo's real skills and compares the output exactly; a line holding only
   `…` matches any number of lines. Output after an `aiskills`/`ais`/`aix`
   command without the marker fails the test.

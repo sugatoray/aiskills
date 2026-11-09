@@ -48,6 +48,8 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **Hardcoded repo-root depth** broke when the package moved. `vendor-skills.mjs` walks up to the first folder with `skills/` and `.claude-plugin/marketplace.json`.
 - **`export HOME=<tmp>` in a test shell** also breaks the next `git commit` (no identity). Set `HOME` per command, not with `export`.
 
+- **Testing a prompt under `script` (pseudo-terminal): typing ahead echoes the answer before the prompt**, and the prompt line then shows no answer. `sandbox().tty()` runs a small driver that waits for `[y/N] ` on the output before writing the answer, as a person would.
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 
@@ -55,6 +57,7 @@ Bad patterns or decisions to never take, and why they were rejected.
 - Don't add `s`, `l` or `u` as command aliases: `s` could mean `sync` or `skills`, `l` reads as `list` but sits next to `ls` (= `installed`), and many CLIs use `u` for "update". Prefer `npm`'s own short forms (`i`, `r`, `ls`).
 - Don't make install-time behaviour opt-in through an env var. The install script stays (so scanners and pnpm still flag it), the hint it prints is hidden by npm 7+, and users lose the one-step install. AIS-7 removed the script entirely instead.
 - Never run `npx skills` interactively from scripts; always pass `--yes` (scripts and CI have no TTY).
+- Never install a skill a `--route` lookup found without the user's confirmation (`[y/N]`, default no, or `-y`); without a terminal, stop rather than assume yes. Pinned `owner/repo@skill` is the user's own choice and isn't asked.
 - Never auto-pick among several registry matches for a name under `--route`. List them and make the user pin `owner/repo@skill`; it's third-party code with full agent permissions.
 - A full `uninstall` (no `-s`/`-G`) must only remove skills whose recorded source is the install folder, even with `--route`.
 - Don't copy a reference repo's layout without checking it actually has the shape asked for; `sugatoray/pptxdiff`'s `src/packages/*` have no inner `src/` (only its root package does). Say what you found and which part you're copying.

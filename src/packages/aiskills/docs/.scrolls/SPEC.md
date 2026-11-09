@@ -48,3 +48,6 @@ The docs page and the banner editor each have a gear menu with 11 themes (Lights
 
 ## `.skillsignore`
 A `.skillsignore` (`.gitignore` syntax) in the repo's `skills/` or any folder below leaves matching files, folders or whole skills out of the package, and so out of every install and the `--nested` rebuild. The ignore files never ship; ignoring only a `SKILL.md` is refused; what was left out is listed in `.aiskills/layout.json` (`ignored`).
+
+## Confirm external skills found by a lookup (`aix`, `--route`)
+When `--route` looks up a bare name and finds a unique exact match, `aiskills install` lists it (`owner/repo@skill`, install count, the name typed) and asks `Install <n> external skill(s) from the registry? [y/N]` before installing anything, bundled skills included; only `y`/`yes` proceeds. Without a terminal it stops (exit 1) unless `-y`/`--yes` is given. Pinned `owner/repo@skill`, URLs and paths aren't asked about. `install -n`/`--dry-run` shows what would be installed and the exact `npx skills add` commands. (`src/scripts/core/cli.mjs`, `confirm()` in `installer.mjs`)

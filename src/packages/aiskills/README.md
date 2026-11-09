@@ -317,7 +317,7 @@ Each `-s` entry is handled as follows:
 | `-s` entry | What happens |
 | --- | --- |
 | A bundled skill name, or a pattern | Installed from `~/.config/sugatoray/aiskills`, the same as without `--route`. |
-| A bare name that isn't bundled, e.g. `pdf` | Looked up with `npx skills find pdf`. If **exactly one** result has that exact name, `npx skills add <owner/repo>@pdf` installs it. |
+| A bare name that isn't bundled, e.g. `pdf` | Looked up with `npx skills find pdf`. If **exactly one** result has that exact name, it is shown and, once you **confirm**, `npx skills add <owner/repo>@pdf` installs it. |
 | `owner/repo@skill` | Passed straight to `npx skills add owner/repo@skill`, with no lookup. |
 | `owner/repo`, a git URL, or a local path | Passed straight to `npx skills add <spec>`, which installs the skills found there. |
 
@@ -325,6 +325,13 @@ Each `-s` entry is handled as follows:
   included) and `--copy` as the bundled ones.
 - **Lookups first.** Every external lookup runs before anything is installed.
   If one fails, nothing is installed.
+- **Confirmation.** Each skill a lookup found is listed (`owner/repo@skill`,
+  install count, the name you typed), then `aiskills` asks
+  `Install <n> external skill(s) from the registry? [y/N]`. Only `y`/`yes`
+  installs anything, bundled skills included. Without a terminal it stops
+  unless you pass `-y`/`--yes`; `-n`/`--dry-run` shows the matches and the
+  exact commands without installing. A pinned `owner/repo@skill` isn't asked
+  about.
 - **Several matches.** If more than one skill has the exact name, the command
   stops and lists them, e.g. `a/one@dupe` and `b/two@dupe`. Pick one with
   `-s owner/repo@skill`. `aiskills` never chooses for you.
@@ -336,7 +343,8 @@ Each `-s` entry is handled as follows:
 
 ```sh
 aiskills find pdf                                    # browse the registry
-aiskills --route install -s pdf -a claude-code       # look up + install
+aiskills --route install -s pdf -a claude-code       # look up, confirm, install
+aiskills --route install -n -s pdf                   # look up only: show what would be installed
 aiskills --route install -s anthropics/skills@docx   # pinned, no lookup
 aiskills --route install -G scrolls -s pdf -p        # bundled group + external skill, project scope
 ```

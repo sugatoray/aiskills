@@ -93,7 +93,13 @@ DO_NOT_TRACK=1 aiskills install -G scrolls -a claude-code
 
 ### External skills
 
-Prefer `owner/repo@skill` over a bare name with `--route`. A bare name fails when the registry has several exact matches, and the registry can change between runs.
+Prefer `owner/repo@skill` over a bare name with `--route`. A bare name fails when the registry has several exact matches, the registry can change between runs, and a skill found by a lookup must be confirmed: with no terminal, `aiskills` stops with `not installing external skills without confirmation` unless you pass `-y`. Check what a lookup would install first with `-n`:
+
+```bash
+aix i -n -s pdf
+```
+
+Then pin what it found (`aix i -s anthropics/skills@pdf`), or pass `-y` once you've checked the source.
 
 ## Troubleshooting
 

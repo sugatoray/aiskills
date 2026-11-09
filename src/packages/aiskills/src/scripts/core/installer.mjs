@@ -6,7 +6,7 @@
 //    are registered with the user's agents (Claude Code, Codex, ...).
 
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -200,7 +200,7 @@ export function runSkills(args, { cwd, capture = false, quiet = false, captureSt
  * opts: { global=true, agents=[], skills=['*'], copy=false, list=false, cwd, extra=[] }
  */
 export function skillsAdd(root = installRoot(), opts = {}) {
-  const { global = true, agents = [], skills = ["*"], copy = false, list = false, cwd, extra = [] } = opts;
+  const { global = true, agents = [], skills = ["*"], copy = false, list = false, cwd, extra = [], dryRun = false } = opts;
   const args = ["add", root];
   if (list) {
     args.push("--list");
@@ -212,7 +212,39 @@ export function skillsAdd(root = installRoot(), opts = {}) {
     args.push("--yes");
   }
   args.push(...extra);
-  return runSkills(args, { cwd });
+  return dryRun ? showDryRun(args) : runSkills(args, { cwd });
+}
+
+/** For install -n: print the exact `npx skills` command instead of running it. */
+function showDryRun(args) {
+  log(`[dry-run] npx -y ${skillsPackageSpec()} ${args.join(" ")}`);
+  return 0;
+}
+
+/**
+ * Ask a yes/no question on the terminal (stderr) and read the answer from
+ * stdin. Only `y` or `yes` (any case) is yes; Enter, anything else or end of
+ * input is no. Call it only when stdin is a terminal.
+ */
+export function confirm(question, fd = 0) {
+  process.stderr.write(question);
+  const buf = Buffer.alloc(1);
+  let answer = "";
+  for (;;) {
+    let n;
+    try {
+      n = readSync(fd, buf, 0, 1, null);
+    } catch (err) {
+      if (err.code === "EAGAIN") continue;
+      if (err.code === "EOF") break;
+      throw err;
+    }
+    if (!n) break;
+    const ch = buf.toString("utf8");
+    if (ch === "\n" || ch === "\r") break;
+    answer += ch;
+  }
+  return /^y(es)?$/i.test(answer.trim());
 }
 
 // ---------------------------------------------------------------- uninstall
@@ -524,14 +556,16 @@ export function findSkill(query) {
  * Turn the entries that aren't bundled into `npx skills add` specs.
  * A bare name must have exactly one exact-name match in `npx skills find`;
  * otherwise this throws with the candidates so the user can pin
- * owner/repo@skill. Returns [{ entry, spec }].
+ * owner/repo@skill. Returns [{ entry, spec, installs, lookedUp }]; `lookedUp`
+ * is false for entries given as a source (owner/repo@skill, URL, path), which
+ * the user named exactly, and true for names the registry lookup chose.
  */
 export function resolveExternal(entries) {
   const resolved = [];
   const problems = [];
   for (const entry of entries) {
     if (isSourceSpec(entry)) {
-      resolved.push({ entry, spec: entry });
+      resolved.push({ entry, spec: entry, lookedUp: false });
       continue;
     }
     log(`'${entry}' is not bundled; looking it up with 'npx skills find ${entry}' ...`);
@@ -543,7 +577,7 @@ export function resolveExternal(entries) {
     const show = (list) => list.slice(0, 10).map((h) => `    ${h.spec}${h.installs ? `  (${h.installs})` : ""}`).join("\n");
     if (exact.length === 1) {
       log(`found ${exact[0].spec}`);
-      resolved.push({ entry, spec: exact[0].spec });
+      resolved.push({ entry, spec: exact[0].spec, installs: exact[0].installs, lookedUp: true });
     } else if (exact.length > 1) {
       problems.push(`'${entry}' matches several skills; pick one with -s <owner/repo@skill>:\n${show(exact)}`);
     } else if (hits.length) {
@@ -557,13 +591,13 @@ export function resolveExternal(entries) {
 }
 
 /** `npx skills add <spec> [--global] [--agent a] [--copy] --yes`. */
-export function skillsAddExternal(spec, { global = true, agents = [], copy = false, cwd, extra = [] } = {}) {
+export function skillsAddExternal(spec, { global = true, agents = [], copy = false, cwd, extra = [], dryRun = false } = {}) {
   const args = ["add", spec];
   if (global) args.push("--global");
   for (const a of agents) args.push("--agent", a);
   if (copy) args.push("--copy");
   args.push("--yes", ...extra);
-  return runSkills(args, { cwd });
+  return dryRun ? showDryRun(args) : runSkills(args, { cwd });
 }
 
 /**

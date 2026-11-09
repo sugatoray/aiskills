@@ -44,7 +44,7 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 | `installer.mjs` – skills | Reading skill names and groups | `readSkillName`, `skillNamesIn`, `packageSkillNames`, `loadGroups` |
 | `installer.mjs` – selection | Turning `-s`/`-G`/`-a` into exact names | `globToRegExp`, `expandPatterns`, `skillsForGroups`, `selectedSkills`, `knownAgents`, `expandAgents` |
 | `installer.mjs` – `npx skills` | Every call to the `skills` CLI | `runSkills` (the only place `npx` is started; pins `skills@SKILLS_CLI_VERSION`, checks Windows shell characters), `skillsAdd`, `skillsRemove`, `listInstalled`, `installedFromRoot`, `isFromRoot` |
-| `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill` (drops results failing `isSafeRegistrySpec`), `resolveExternal`, `skillsAddExternal` |
+| `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill` (drops results failing `isSafeRegistrySpec`), `resolveExternal` (marks `lookedUp`), `confirm` (the `[y/N]` prompt), `skillsAddExternal` |
 | `installer.mjs` – guards | Not damaging what isn't ours | `assertInstallFolder` (used by `syncSkills`, `purgeRoot`, and `uninstall --purge` up front) |
 | `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups` |
 | `docs/build-skills-docs.mjs` | The Skills pages, from what the package really ships | `bundled` (vendors into a temp folder), `render`, `frontmatter` |
@@ -116,7 +116,9 @@ flow starts only when the user runs `aiskills install`.
 ```text
 parse options ─▶ syncSkills(layout) ─▶ selectedSkills(-s, -G) ─▶ expandAgents(-a)
              ─▶ [--route: resolveExternal() for names not bundled — all lookups first]
-             ─▶ npx skills add <install folder> --skill … --agent … --yes
+             ─▶ [found by a lookup: list them, then confirm() [y/N] in a terminal, or -y;
+                 no terminal and no -y: stop. Pinned owner/repo@skill skips this.]
+             ─▶ npx skills add <install folder> --skill … --agent … --yes   (-n: print it instead)
              ─▶ [--route: npx skills add <owner/repo@skill> … for each external]
 ```
 
@@ -170,6 +172,7 @@ folder next to it, then swaps it in.
 | Groups from `marketplace.json`, never plugins | Reuse the repo's existing grouping without installing Claude Code plugins. |
 | No install step (`postinstall`); `aiskills install` does the work (AIS-7) | Installing a package that changes agents' instructions should be explicit. Install scripts are skipped by pnpm, bun and `--ignore-scripts` and their output is hidden by npm 7+, so they failed silently for many users; they also get the package flagged by scanners. Tested: no `preinstall`/`install`/`postinstall`/`prepare` script. |
 | Validate and look up everything before installing | A bad name or ambiguous registry match changes nothing. |
+| Confirm skills a lookup found; never assume yes without a terminal | A unique exact match is still the registry's choice of third-party code. Showing it and asking `[y/N]` (default no) lets the user check the source; scripts must opt in with `-y` or pin `owner/repo@skill`. Pinned specs aren't asked: the user named the source. |
 | Strip `npm_*` env before `npx` | Run through `npx @sugatoray-ai/aiskills` or `npm exec`, npm's variables can make the nested `npx` resolve into the wrong prefix. |
 | Parse `npx skills` text for the agent list and `find` | `skills` has no machine-readable form for these; both fail loudly if the format changes. `list --json` is used everywhere else. |
 | No runtime dependencies | Smaller attack surface and faster installs. |

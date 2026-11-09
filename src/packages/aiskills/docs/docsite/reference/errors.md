@@ -198,6 +198,26 @@ unknown command: <name>
 
 **Warning.** **Cause:** results whose `owner/repo@skill` has characters other than letters, digits, `.`, `_` and `-` are never used. **Fix:** none needed. If the skill you want was among them, check its source and pass it yourself.
 
+### Not confirmed (no terminal)
+
+```text
+[aiskills] found in the skills registry (not bundled; third-party code your agents may run):
+    <owner/repo@skill>  (<n> installs)  for '<name>'
+[aiskills] not installing external skills without confirmation: <owner/repo@skill>, …
+  re-run with -y/--yes to install them, or pin each one with -s owner/repo@skill
+```
+
+**Cause:** `--route` (or `aix`) found a skill by looking up a bare name, and there is no terminal to ask in (a script, CI, an agent). Nothing was installed, not even bundled skills. **Fix:** check the listed source, then re-run with [`-y`](cli.md#-y---yes), or pin it: `-s <owner/repo@skill>`.
+
+### Not confirmed
+
+```text
+Install <n> external skill(s) from the registry? [y/N] n
+[aiskills] nothing installed: not confirmed
+```
+
+**Cause:** you answered anything but `y` or `yes` (Enter means no). Nothing was installed. **Fix:** none needed. To install, run again and answer `y`, or pin the skill as `owner/repo@skill`.
+
 ## Files and folders
 
 ### Not an aiskills folder

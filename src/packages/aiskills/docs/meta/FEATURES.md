@@ -60,7 +60,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | Uninstall | Full / partial / per agent / per project, `--purge`, `--dry-run`, `--force` | [Tutorial 5](../docsite/tutorial/05-uninstall.md), [Remove everything](../docsite/guides/remove-everything.md) | `cli.test.mjs`, `e2e.test.mjs` |
 | Skill groups | From `marketplace.json`; name or alias (minus `-skills`); `all` | [Skill groups](../docsite/concepts/skill-groups.md), [Bundled skills](../docsite/skills/README.md) | `unit.test.mjs`, `cli.test.mjs` |
 | Glob patterns | `*`, `?`, `[abc]`, `[a-z]`, `[!abc]` for `-s`, `-G`, `-a` | [Patterns reference](../docsite/reference/patterns.md) | `unit.test.mjs`, `cli.test.mjs` |
-| External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule; pinned specs; any-source uninstall | [Bundled and external skills](../docsite/concepts/bundled-and-external.md), [Tutorial 4](../docsite/tutorial/04-add-external-skills.md) | `cli.test.mjs` |
+| External skills (`--route`, `aix`) | Registry lookup with unique-exact-match rule, then a `[y/N]` confirmation of what was found (`-y` to pre-confirm; stops without a terminal); `install -n` preview; pinned specs skip both; any-source uninstall | [Bundled and external skills](../docsite/concepts/bundled-and-external.md), [Tutorial 4](../docsite/tutorial/04-add-external-skills.md) | `cli.test.mjs` |
 | `.skillsignore` | `.gitignore`-style rules under `skills/` keep files, folders or skills out of the package | [`.skillsignore` reference](../docsite/reference/skillsignore.md), [Leave files out](../docsite/guides/leave-files-out.md) | `skillsignore.test.mjs`, `packaging.test.mjs` |
 | Layouts (`--flat` / `--nested`) | Flat default; nested rebuilds the repo byte for byte (minus `.skillsignore`d files); remembered | [Layouts](../docsite/concepts/layouts.md), [Keep the nested layout](../docsite/guides/keep-the-nested-layout.md) | `cli.test.mjs`, `unit.test.mjs`, `e2e.test.mjs` |
 | Short commands | `ais`, `aix`, and aliases `i`, `r`, `ls`, `g`, `f`, `p`, `h` | [CLI reference](../docsite/reference/cli.md#commands) | `cli.test.mjs`, `e2e.test.mjs` |
@@ -76,6 +76,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 - Installing anything as a Claude Code plugin. `marketplace.json` is read only
   for grouping.
 - Picking one of several registry matches for a bare name under `--route`.
+- Installing a skill a registry lookup found without the user's confirmation (`y` at the prompt, or `-y`).
 - Removing external skills in a full uninstall.
 - Single-letter aliases `s`, `l`, `u` (ambiguous; see MAINTAINERS).
 

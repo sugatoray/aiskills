@@ -4,11 +4,13 @@
 // stand-in `npx` first on PATH, then checks the exact `npx skills` commands
 // the CLI issued and what it wrote to disk. No network, no real $HOME.
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
 import { FIXTURE_SKILLS, listTree, row, sandbox, skillsArgs, skillsPackage } from "./helpers.mjs";
+import { SKILLS_CLI_VERSION } from "../scripts/core/installer.mjs";
 
 const posixOnly = { skip: process.platform === "win32" && "stand-in npx is a POSIX script" };
 
@@ -315,7 +317,7 @@ describe("groups and patterns", posixOnly, () => {
 describe("aiskills install --route", posixOnly, () => {
   test("a bare name with one exact match is looked up, then installed after the bundled ones", () => {
     sb.setFind("Install with npx skills add <owner/repo@skill>\n\nacme/tools@ext 1.2K installs\n└ https://skills.sh/acme/tools/ext\n\nacme/tools@ext-plus 3 installs\n");
-    const r = sb.run(["install", "--route", "-s", "a1,ext", "-a", "claude-code"]);
+    const r = sb.run(["install", "--route", "-s", "a1,ext", "-a", "claude-code", "--yes"]);
     assert.equal(r.status, 0, r.out);
     assert.deepEqual(skillsArgs(r.calls.find((c) => skillsArgs(c)[0] === "find")), ["find", "ext"]);
     assert.deepEqual(changes(r.calls), [
@@ -326,7 +328,7 @@ describe("aiskills install --route", posixOnly, () => {
 
   test("--route also works before the command, and via AISKILLS_ROUTE", () => {
     sb.setFind("acme/tools@ext\n");
-    for (const [args, env] of [[["--route", "install", "-s", "ext"], {}], [["install", "-s", "ext"], { AISKILLS_ROUTE: "1" }]]) {
+    for (const [args, env] of [[["--route", "install", "-s", "ext", "-y"], {}], [["install", "-s", "ext", "-y"], { AISKILLS_ROUTE: "1" }]]) {
       const r = sb.run(args, { env });
       assert.equal(r.status, 0, r.out);
       assert.deepEqual(changes(r.calls), [["add", "acme/tools@ext", "--global", "--yes"]]);
@@ -370,8 +372,8 @@ describe("aiskills install --route", posixOnly, () => {
 describe("aix (= aiskills --route)", posixOnly, () => {
   test("install routes non-bundled names exactly like aiskills --route", () => {
     sb.setFind("acme/tools@ext 1.2K installs\n");
-    const viaAix = sb.aix(["i", "-s", "a1,ext", "-a", "claude-code"]);
-    const viaFlag = sb.run(["--route", "install", "-s", "a1,ext", "-a", "claude-code"]);
+    const viaAix = sb.aix(["i", "-s", "a1,ext", "-a", "claude-code", "-y"]);
+    const viaFlag = sb.run(["--route", "install", "-s", "a1,ext", "-a", "claude-code", "-y"]);
     assert.equal(viaAix.status, 0, viaAix.out);
     assert.deepEqual(changes(viaAix.calls), changes(viaFlag.calls));
     assert.deepEqual(changes(viaAix.calls), [
@@ -399,6 +401,86 @@ describe("aix (= aiskills --route)", posixOnly, () => {
   });
 });
 
+describe("aix safety: external skills found by a lookup are confirmed before anything is installed", posixOnly, () => {
+  const FIND = "acme/tools@ext 1.2K installs\n";
+  const FOUND = /\[aiskills\] found in the skills registry \(not bundled; third-party code your agents may run\):\n {4}acme\/tools@ext {2}\(1\.2K installs\) {2}for 'ext'\n/;
+  const BOTH = (agent = []) => [
+    ["add", sb.root, "--global", "--skill", "a1", ...agent, "--yes"],
+    ["add", "acme/tools@ext", "--global", ...agent, "--yes"],
+  ];
+  const noScript = spawnSync("script", ["--version"]).status !== 0 && "needs util-linux 'script' for a pseudo-terminal";
+
+  test("no terminal and no --yes: show the match, install nothing (not even bundled skills), exit 1", () => {
+    sb.setFind(FIND);
+    const r = sb.aix(["i", "-s", "a1,ext"]);
+    assert.equal(r.status, 1, r.out);
+    assert.match(r.out, FOUND);
+    assert.match(r.out, /\[aiskills\] not installing external skills without confirmation: acme\/tools@ext\n {2}re-run with -y\/--yes to install them, or pin each one with -s owner\/repo@skill/);
+    assert.deepEqual(changes(r.calls), []);
+  });
+
+  test("-y and --yes confirm in advance", () => {
+    sb.setFind(FIND);
+    for (const flag of ["-y", "--yes"]) {
+      const r = sb.aix(["i", "-s", "a1,ext", flag]);
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, FOUND, "the match is still shown");
+      assert.deepEqual(changes(r.calls), BOTH(), flag);
+    }
+  });
+
+  test("a pinned owner/repo@skill needs no confirmation: you named the source", () => {
+    const r = sb.aix(["i", "-s", "acme/tools@ext"]);
+    assert.equal(r.status, 0, r.out);
+    assert.doesNotMatch(r.out, /\[y\/N\]|without confirmation/);
+    assert.deepEqual(changes(r.calls), [["add", "acme/tools@ext", "--global", "--yes"]]);
+  });
+
+  test("bundled skills never ask", { skip: noScript }, () => {
+    const r = sb.tty(["i", "-s", "a1"], "n");
+    assert.equal(r.status, 0, r.out);
+    assert.doesNotMatch(r.out, /\[y\/N\]/);
+    assert.deepEqual(changes(r.calls), [["add", sb.root, "--global", "--skill", "a1", "--yes"]]);
+  });
+
+  test("in a terminal: the matches are listed, then [y/N]; y or yes installs", { skip: noScript }, () => {
+    sb.setFind(FIND);
+    for (const answer of ["y", "YES"]) {
+      const r = sb.tty(["i", "-s", "a1,ext", "-a", "claude-code"], answer, { aix: true });
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, /acme\/tools@ext {2}\(1\.2K installs\)[\s\S]*Install 1 external skill from the registry\? \[y\/N\] /);
+      assert.deepEqual(changes(r.calls), BOTH(["--agent", "claude-code"]), answer);
+    }
+  });
+
+  test("in a terminal: Enter, n or anything else installs nothing, exit 1", { skip: noScript }, () => {
+    sb.setFind("acme/tools@ext 1.2K installs\nzed/kit@other 7 installs\n");
+    for (const answer of ["", "n", "sure"]) {
+      const r = sb.tty(["i", "-s", "a1,ext,other"], answer, { aix: true });
+      assert.equal(r.status, 1, r.out);
+      assert.match(r.out, /Install 2 external skills from the registry\? \[y\/N\] /);
+      assert.match(r.out, /\[aiskills\] nothing installed: not confirmed/);
+      assert.deepEqual(changes(r.calls), [], JSON.stringify(answer));
+    }
+  });
+
+  test("install -n / --dry-run: show the matches and the exact commands, install nothing", () => {
+    sb.setFind(FIND);
+    for (const flag of ["-n", "--dry-run"]) {
+      const r = sb.aix(["i", flag, "-s", "a1,ext", "-a", "claude-code"]);
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, FOUND);
+      assert.ok(r.out.includes(`[aiskills] [dry-run] npx -y skills@${SKILLS_CLI_VERSION} add ${sb.root} --global --skill a1 --agent claude-code --yes\n`), r.out);
+      assert.ok(r.out.includes(`[aiskills] [dry-run] npx -y skills@${SKILLS_CLI_VERSION} add acme/tools@ext --global --agent claude-code --yes\n`), r.out);
+      assert.deepEqual(changes(r.calls), [], flag);
+    }
+  });
+
+  test("-y and -n are install options only", () => {
+    assert.match(sb.run(["installed", "-y"]).out, /option -y is not valid here/);
+  });
+});
+
 describe("security: registry text, folder guard, pinned skills CLI", posixOnly, () => {
   // 1. --route must never pass unsafe registry text on to npx.
   test("--route ignores registry results with unsafe characters and installs nothing", () => {
@@ -413,7 +495,7 @@ describe("security: registry text, folder guard, pinned skills CLI", posixOnly, 
 
   test("--route still uses the safe result when an unsafe one is listed too", () => {
     sb.setFind("ev&il/tools@ext 99 installs\nacme/tools@ext 1 installs\n");
-    const r = sb.run(["install", "--route", "-s", "ext"]);
+    const r = sb.run(["install", "--route", "-s", "ext", "-y"]);
     assert.equal(r.status, 0, r.out);
     assert.deepEqual(changes(r.calls), [["add", "acme/tools@ext", "--global", "--yes"]]);
   });
