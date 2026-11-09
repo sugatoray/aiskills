@@ -1,0 +1,63 @@
+{
+  "name": "@sugatoray-ai/aiskills",
+  "version": "0.4.0",
+  "description": "Sugato Ray's curated agent skills (scrolls, stata, personas, ...) vendored as an npm package and registered with `npx skills add` on install.",
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "claude-code",
+    "codex",
+    "ai",
+    "scrolls"
+  ],
+  "homepage": "https://github.com/sugatoray/aiskills#readme",
+  "bugs": {
+    "url": "https://github.com/sugatoray/aiskills/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sugatoray/aiskills.git",
+    "directory": "src/packages/aiskills"
+  },
+  "license": "MIT",
+  "author": "Sugato Ray (https://github.com/sugatoray)",
+  "type": "module",
+  "bin": {
+    "aiskills": "bin/aiskills.mjs",
+    "ais": "bin/aiskills.mjs",
+    "aix": "bin/aix.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/scripts/core/cli.mjs",
+    "src/scripts/core/installer.mjs",
+    "skills/",
+    ".claude-plugin/marketplace.json",
+    ".aiskills/",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/SECURITY.md",
+    "/LICENSE"
+  ],
+  "scripts": {
+    "vendor": "node src/scripts/pack/vendor-skills.mjs",
+    "clean": "node src/scripts/pack/vendor-skills.mjs --clean",
+    "docs:skills": "node src/scripts/docs/build-skills-docs.mjs",
+    "docs:html": "node src/scripts/docs/build-docs-html.mjs docs/docsite --out docs/docsite/index.html",
+    "docs:site": "node src/scripts/docs/build-docs-html.mjs docs/docsite --out site/index.html",
+    "banner": "node src/scripts/docs/create-banner.mjs",
+    "banner:check": "node src/scripts/docs/create-banner.mjs --check",
+    "banner:png": "node src/scripts/docs/create-banner.mjs --png",
+    "docs": "npm run banner && npm run docs:skills && python3 ../../../skills/docs/create-lib-docs/scripts/build_llms_txt.py docs/docsite && npm run docs:html",
+    "prepack": "node src/scripts/pack/vendor-skills.mjs",
+    "pack:dry": "npm pack --dry-run",
+    "test": "node --test src/test/*.test.mjs",
+    "test:e2e": "AISKILLS_E2E=1 node --test src/test/e2e.test.mjs"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

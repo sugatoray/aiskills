@@ -1,0 +1,60 @@
+# Data for the aiskills banner. `npm run banner` reads this file and
+# src/scripts/docs/templates/banner-template.html and writes docs/banner/aiskills-banner.html.
+# `npm run banner:png` also renders docs/banner/banner_2x.png (the README image).
+#
+# Rules: every value is a double-quoted string, or a list of double-quoted strings.
+# "auto" means read the value from the package and the repository:
+#   package_name, package_version, node_requires, license, repo_url -> package.json
+#   skills_count, groups_count, groups                               -> the bundled skills and marketplace.json
+#   skills_cli_version                                               -> SKILLS_CLI_VERSION in src/scripts/core/installer.mjs
+# Text values can use {package_name}, {package_version}, {node_requires}, {license}, {repo_url},
+# {skills_count}, {groups_count} and {skills_cli_version}.
+# Command-line flags (--package-version, --set KEY=VALUE) override this file.
+
+# ── From the package and the repository ("auto") or set by hand ──
+package_name: "auto"
+package_version: "auto"
+node_requires: "auto"
+license: "auto"
+repo_url: "auto"
+skills_count: "auto"
+groups_count: "auto"
+skills_cli_version: "auto"
+groups: "auto"
+
+# ── Page ──
+page_title: "aiskills banner"
+# The colour theme (src/scripts/docs/themes.mjs): lightsout (default), teal, paper, phosphor, grimoire,
+# signal, frost, dusk, blueprint, matcha or rose. The editor's gear menu previews the others.
+theme: "lightsout"
+
+# ── Badges ──
+version_label: "v{package_version}"
+node_label: "Node {node_requires}"
+license_label: "{license}"
+counts_label: "{skills_count} skills · {groups_count} groups"
+
+# ── Wordmark and copy ──
+mark_glyph: "/_"
+wordmark_accent: "ai"
+wordmark_plain: "skills"
+tagline: "Agent skills for every coding agent, in one npm package."
+subtitle: "Pick Sugato Ray's skills by group, name or pattern, and install them into Claude Code, Codex, Cursor and more."
+# Install commands, shown with a `$` prompt; a trailing "# comment" is dimmed. install_style:
+# "box" (one box, a line per command; up to 3) or "chips" (a separate chip per command; up to 2).
+# `npm install` runs no install step, so `aiskills install` is the second step.
+install_commands:
+  - "npm install -g {package_name}"
+  - "aiskills install   # save + register"
+install_style: "box"
+
+# ── Terminal demo (the output lines are made from the bundled skills) ──
+terminal_title: "~/project — zsh"
+demo_group: "scrolls"
+demo_agent: "claude-code"
+route_skill: "pdf"
+route_source: "anthropics/skills"
+
+# ── Groups row ──
+group_label: "groups"
+repo_label: "{repo_url}"

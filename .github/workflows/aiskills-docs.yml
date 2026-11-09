@@ -1,0 +1,65 @@
+# Publishes the @sugatoray-ai/aiskills user docs (src/packages/aiskills/docs/docsite/, bundled by
+# `npm run docs:site` into one page) on GitHub Pages at https://sugatoray.github.io/aiskills/.
+# Same pipeline shape as sugatoray/callai's docs.yml: build on master, upload a Pages artifact, deploy
+# it with actions/deploy-pages. There is no gh-pages branch; the site is deployed straight from master.
+#
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# src/packages/aiskills/src/test/docs-workflow.test.mjs keeps this file pointing at real paths.
+name: aiskills-docs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/packages/aiskills/docs/docsite/**"
+      - "src/packages/aiskills/docs/banner/**"
+      - "src/packages/aiskills/src/scripts/docs/**"
+      - "src/packages/aiskills/package.json"
+      - ".github/workflows/aiskills-docs.yml"
+  # Manual run on any branch (pick it in "Use workflow from"). Untick "deploy" to only build the site
+  # and keep it as a downloadable artifact (Pages deploys are limited by the github-pages environment).
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to GitHub Pages (untick to only build)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/packages/aiskills
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # --ref: links from the docs to files outside docs/docsite/ point at GitHub on the branch being built.
+      # The builder has no npm dependencies, so there is no npm install step.
+      - run: npm run docs:site -- --ref ${{ github.ref_name }}
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: src/packages/aiskills/site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'workflow_dispatch' || inputs.deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
