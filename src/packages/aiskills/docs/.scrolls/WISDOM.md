@@ -54,6 +54,10 @@ Specific bugs that have bitten this project before — avoid repeating them.
 
 - **Tests that derive "what ships" from `git ls-files skills`** must subtract what a `.skillsignore` leaves out (read `ignored` from `.aiskills/layout.json`); `shippable()` in packaging.test and `shippedSkillFiles()` in e2e do. They silently assumed no `.skillsignore` existed until `skills/newsletters/.skillsignore`.
 
+- **Tests must never send a real skills.sh count.** The count runs a detached `npx skills add sugatoray/aiskills` after every successful install. The sandbox sets `AISKILLS_STATS=0` unless `sandbox({ stats: true })` (only `stats.test.mjs` and the docs examples, against the fake `npx`), and strips `DO_NOT_TRACK`/`DISABLE_TELEMETRY`/`CI` so results don't depend on the runner; `e2e.test.mjs` (real `npx skills`) sets `DO_NOT_TRACK=1`. A detached process writes to the fake-npx log *after* the CLI returns, so a test that checks `calls` of a stats-on sandbox must use `AISKILLS_STATS_FOREGROUND=1` or poll `b.calls()`.
+- **`--stats` wins over `AISKILLS_STATS=0`** (flag > env > remembered > on), like `--nested` over `AISKILLS_LAYOUT`; only `DO_NOT_TRACK`/`DISABLE_TELEMETRY`/CI beat the flag. A test expecting `--stats` + `AISKILLS_STATS=0` to be off is wrong.
+- **Don't call skills.sh's telemetry endpoint directly** (`https://www.skills.sh/tele/t`, found in `skills@1.7.6`'s `dist/cli.mjs`): it's undocumented and owned by the `skills` CLI. The count goes through the real CLI so it stays honest and follows the CLI's own rules (public repo check, opt-outs).
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 

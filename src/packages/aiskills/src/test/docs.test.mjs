@@ -288,7 +288,7 @@ function linesMatch(expected, actual) {
 describe("examples in the docs print what the docs show", () => {
   const box = { current: null };
   before(() => {
-    box.current = sandbox({ realSkills: true });
+    box.current = sandbox({ realSkills: true, stats: true });
   });
   after(() => box.current?.cleanup());
 

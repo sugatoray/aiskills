@@ -43,7 +43,7 @@ Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stop
 ## Why it works this way
 
 - **One tool owns the agent folders.** `npx skills` already knows every agent's folder layout and keeps a record. Delegating to it keeps `aiskills` small and gives it new agents for free.
-- **A local folder works offline.** After the npm install, `aiskills install` needs no network except to fetch the `skills` CLI the first time.
+- **A local folder works offline.** After the npm install, `aiskills install` needs no network except to fetch the `skills` CLI the first time. (The [skills.sh install count](install-count.md) afterwards uses github.com, and is skipped silently without it.)
 - **No runtime dependencies.** The package is plain Node.js.
 
 ## Trade-offs and limits

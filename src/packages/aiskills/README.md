@@ -44,7 +44,11 @@ which:
 
 1. saves the skills to **`~/.config/sugatoray/aiskills/skills/`** and replaces any copy that's already there, and
 2. runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`,
-   which registers every skill with the agents it detects (Claude Code, Codex, …).
+   which registers every skill with the agents it detects (Claude Code, Codex, …),
+   and then
+3. adds the install to the skills' install count on [skills.sh](https://skills.sh),
+   in the background (see [The skills.sh install count](#the-skillssh-install-count);
+   off with `--no-stats`).
 
 ### As a project dependency, with `npx skills experimental_sync`
 
@@ -99,7 +103,7 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra npx skills args>]   # alias: i
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [--stats|--no-stats] [-- <extra npx skills args>]   # alias: i
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--route] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills   (alias: ls)
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills   (alias: g)
@@ -108,7 +112,7 @@ aiskills find <query>        # search the skills registry (= npx skills find)   
 # a skill it finds by lookup is shown and confirmed ([y/N]) unless -y; -n previews an install
 aiskills --route install|uninstall|installed ...
 aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/sugatoray/aiskills
-aiskills sync [--nested|--flat]   # only refresh ~/.config/sugatoray/aiskills/skills
+aiskills sync [--nested|--flat] [--stats|--no-stats]   # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
 ```
@@ -442,6 +446,38 @@ aiskills skills update -g                       # npx skills update -g
 `install` and `uninstall` also pass anything after `--` through to
 `npx skills`.
 
+## The skills.sh install count
+
+[skills.sh](https://skills.sh) shows how often each skill is installed, counted
+by `npx skills add` when it installs from GitHub. `aiskills install` installs
+from a local folder (`~/.config/sugatoray/aiskills`), which `npx skills` doesn't
+count. So after a successful install of bundled skills, `aiskills` also runs
+
+```sh
+npx -y skills@1.7.6 add sugatoray/aiskills --skill <each installed skill> --agent <your -a, or universal> --copy --yes
+```
+
+in a new temp folder, in the background, and deletes the folder when it's done.
+That run makes a shallow clone of the repo from github.com and sends skills.sh
+the same install event any `npx skills add sugatoray/aiskills` sends (after
+asking api.github.com whether the repo is public). Nothing it installs is kept,
+and your agents use the copy in `~/.config/sugatoray/aiskills` as before.
+
+- **No github.com, no count:** behind a firewall, the clone or the check fails,
+  nothing is counted, and nothing is shown. The install itself has already
+  succeeded either way.
+- **Not counted:** failed installs, `-n/--dry-run`, external skills from
+  `--route` (`npx skills add owner/repo@skill` counts those itself), `sync`.
+- **Turn it off:** `--no-stats` (remembered in `aiskills.json` until `--stats`;
+  `aiskills sync --no-stats` sets it without installing), or
+  `AISKILLS_STATS=0`. It's always off when `DO_NOT_TRACK`, `DISABLE_TELEMETRY`
+  or `CI` is set.
+
+`aiskills install` prints one line when it starts the count:
+`[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)`.
+`AISKILLS_STATS_FOREGROUND=1` waits for it and shows its output, to see why
+a count fails.
+
 ## Environment variables
 
 | Variable | Effect |
@@ -455,12 +491,16 @@ aiskills skills update -g                       # npx skills update -g
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route` |
 | `AISKILLS_SKILLS_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version; e.g. `latest`) |
+| `AISKILLS_STATS=0\|1` | Same as `--no-stats` / `--stats` for one command, not remembered (see [The skills.sh install count](#the-skillssh-install-count)) |
+| `AISKILLS_STATS_FOREGROUND=1` | Wait for the skills.sh count and show its output |
+| `DO_NOT_TRACK`, `DISABLE_TELEMETRY` | Turn off the skills.sh count, and the `skills` CLI's own telemetry |
 
 ## Security
 
 Skills are code that your agent may run with your permissions. See
 [SECURITY.md](SECURITY.md) for what this package writes, which network calls
-happen (and how to turn off the `skills` CLI's telemetry), known limitations,
+happen (including the skills.sh install count, and how to turn it and the
+`skills` CLI's telemetry off), known limitations,
 and how to report a vulnerability.
 
 ## Maintainers: building & publishing
@@ -589,6 +629,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
 | `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command), run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. The `aix` confirmation is tested without a terminal and, through util-linux `script`, in a real pseudo-terminal answering the `[y/N]` prompt. |
+| `src/test/stats.test.mjs` | The skills.sh install count: `resolveStats` (flag, `AISKILLS_STATS`, remembered choice, default on; `DO_NOT_TRACK`, `DISABLE_TELEMETRY` and CI always off), the exact `npx skills add sugatoray/aiskills` command, that it runs after a successful bundled install in a temp folder that is then removed (in the foreground and in the background), only for the installed skills and chosen agents, never for failed installs, `-n`, `--route` externals or `sync`, and that a failing count (github.com unreachable) is silent and leaves the exit status alone. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the two runtime files in `src/scripts/core/` ship as code, and `package.json` has no install-time script: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |
 | `src/test/docs.test.mjs` | The user docs in `docs/docsite/`: the create-lib-docs checker (links, anchors, fences, reachability) passes and `llms.txt` is current; every command, alias, option, environment variable and error message in `src/scripts/` is in the reference; every example marked `<!-- verify -->` is run against the repo's real skills and must print exactly what the page shows. |

@@ -81,6 +81,8 @@ if (a[0] === "add" && a.includes("__aiskills_probe__")) {
   process.exit(1);
 }
 if (a[0] === "find") { process.stdout.write(read("FAKE_FIND_FILE", "")); process.exit(0); }
+// The skills.sh install count (aiskills install, stats on): FAKE_STATS_EXIT fakes github.com being unreachable.
+if (a[0] === "add" && a[1] === "sugatoray/aiskills" && process.env.FAKE_STATS_EXIT) { console.error("fatal: unable to access 'https://github.com/sugatoray/aiskills.git/'"); process.exit(Number(process.env.FAKE_STATS_EXIT)); }
 process.exit(Number(process.env.FAKE_EXIT || 0));
 `;
 
@@ -105,8 +107,11 @@ child.on("close", (code) => { process.stdout.write(out); process.exit(code ?? 1)
  *   tty(args, answer, {env, aix})  run aiskills (or aix) in a pseudo-terminal via `script`, typing <answer> + Enter
  *   setList(rows)          what the fake `npx skills list --json` returns
  *   setFind(text)          what the fake `npx skills find` prints
+ *   calls()                the npx calls logged since the last run (also by background processes)
+ * The skills.sh install count is off (AISKILLS_STATS=0) unless { stats: true },
+ * so a background `npx skills add sugatoray/aiskills` never lands in another test's calls.
  */
-export function sandbox({ realSkills = false } = {}) {
+export function sandbox({ realSkills = false, stats = false } = {}) {
   const dir = tempDir();
   const pkg = join(dir, "pkg");
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
@@ -128,7 +133,7 @@ export function sandbox({ realSkills = false } = {}) {
   const baseEnv = () => {
     const env = {};
     for (const [k, v] of Object.entries(process.env)) {
-      if (/^(AISKILLS_|npm_)/i.test(k) || k === "CI") continue;
+      if (/^(AISKILLS_|npm_)/i.test(k) || ["CI", "DO_NOT_TRACK", "DISABLE_TELEMETRY"].includes(k)) continue;
       env[k] = v;
     }
     return {
@@ -137,6 +142,7 @@ export function sandbox({ realSkills = false } = {}) {
       HOME: home,
       USERPROFILE: home,
       AISKILLS_HOME: root,
+      ...(stats ? {} : { AISKILLS_STATS: "0" }),
       FAKE_NPX_LOG: log,
       ...(existsSync(listFile) ? { FAKE_LIST_FILE: listFile } : {}),
       ...(existsSync(findFile) ? { FAKE_FIND_FILE: findFile } : {}),
@@ -174,6 +180,7 @@ export function sandbox({ realSkills = false } = {}) {
       const res = spawnSync(process.execPath, [driver, cmd, answer], { cwd: dir, env: { ...baseEnv(), ...env }, encoding: "utf8" });
       return { status: res.status, out: (res.stdout ?? "").replace(/\r\n?/g, "\n") + (res.stderr ?? ""), calls: calls() };
     },
+    calls,
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),

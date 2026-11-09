@@ -50,6 +50,7 @@
 - [Layouts: flat and nested](concepts/layouts.md): the two shapes of the install folder and how the choice is made.
 - [Bundled and external skills](concepts/bundled-and-external.md): what `--route` changes for install, uninstall and listing.
 - [Security model](concepts/security.md): what the package touches, and the protections that are tested.
+- [The skills.sh install count](concepts/install-count.md): how installs through aiskills are counted on skills.sh, and how to turn it off.
 
 ## Reference
 

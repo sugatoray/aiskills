@@ -36,7 +36,10 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
   written to your home folder, no agent changed. `src/test/packaging.test.mjs`
   fails if an install-time script is ever added.
 - **The `aiskills`, `ais` and `aix` commands** run only when you call them.
-- Nothing runs in the background or on a schedule.
+- Nothing runs on a schedule. The one thing that runs in the background is
+  the [skills.sh install count](#the-skillssh-install-count) after
+  `aiskills install`; it ends on its own (at most 2 minutes) and
+  `--no-stats` turns it off.
 
 ### Files it writes
 
@@ -46,13 +49,14 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 | `~/.agents/skills/`, `~/.claude/skills/` and other agents' skill folders | `npx skills add` / `remove`, run by `install` / `uninstall` | Global scope. The `skills` CLI decides the exact folders. |
 | `./.claude/skills/`, `./skills-lock.json` etc. in the current folder | `npx skills`, with `-p`/`--project` | Project scope. |
 | A temporary folder under the OS temp dir | the agent-list lookup for `-a` patterns | Empty; deleted straight after. |
+| A temporary folder under the OS temp dir (`aiskills-stats-*`) | the [skills.sh install count](#the-skillssh-install-count) after `install` | A throwaway project install from GitHub; deleted when the count ends. |
 
 It never reads or changes your code, git state, or anything else.
 
 ### Network access
 
 `aiskills` itself makes **no** network requests. All of them come from the
-programs it starts:
+`npx skills` commands it starts:
 
 - **`npx -y skills@1.7.6 ...`** downloads the [`skills`](https://www.npmjs.com/package/skills)
   CLI from the npm registry if it isn't cached. The version is pinned (see
@@ -62,6 +66,35 @@ programs it starts:
   passes both variables through, so setting either one turns this off.
 - **`--route` / `aix`** run `npx skills find` (queries `skills.sh`) and
   `npx skills add <owner/repo@skill>` (downloads from GitHub or the given URL).
+- **`aiskills install`** (bundled skills) then runs the skills.sh install
+  count, below: github.com, api.github.com and skills.sh.
+
+### The skills.sh install count
+
+skills.sh counts installs that `npx skills add` makes from GitHub, not those
+from a local folder like `aiskills install`'s. So after a successful install
+of bundled skills, `aiskills` runs, in a new temp folder and in the
+background:
+
+```sh
+npx -y skills@1.7.6 add sugatoray/aiskills --skill <each installed skill> --agent <your -a, or universal> --copy --yes
+```
+
+- **What it sends:** the `skills` CLI shallow-clones
+  `https://github.com/sugatoray/aiskills`, asks `api.github.com` whether the
+  repo is public, and sends `skills.sh` its usual install event: the repo, the
+  skill names, the agents, the `skills` CLI version, and (if it detects one)
+  the AI agent it runs under. `aiskills` adds nothing to it. No file from your
+  projects or your install folder is read or sent.
+- **What it changes:** nothing outside the temp folder, which is deleted when
+  the count ends (a project install never touches your global skills or your
+  projects' `skills-lock.json`). It's stopped after 2 minutes.
+- **When it fails** (no access to github.com, a proxy, a timeout), nothing is
+  counted and nothing is shown; the install's result is unchanged.
+- **Off:** `--no-stats` (remembered until `--stats`), `AISKILLS_STATS=0`, and
+  always with `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`/`GITHUB_ACTIONS`.
+  Not run for `-n/--dry-run`, failed installs, `sync`, or external skills
+  (`--route`).
 
 ### Running other programs
 

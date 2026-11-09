@@ -80,7 +80,7 @@ because npm drops the real names.
 skills/                              flat (default) or nested (the repo's exact layout)
 .aiskills/layout.json                copied from the package
 .claude-plugin/marketplace.json      copied from the package
-aiskills.json                        { package, version, layout, installedAt, skills }
+aiskills.json                        { package, version, layout, stats?, installedAt, skills }
 ```
 
 ### Owned by `npx skills` (read, never written, by aiskills)
@@ -121,6 +121,10 @@ parse options ─▶ syncSkills(layout) ─▶ selectedSkills(-s, -G) ─▶ exp
                  no terminal and no -y: stop. Pinned owner/repo@skill skips this.]
              ─▶ npx skills add <install folder> --skill … --agent … --yes   (-n: print it instead)
              ─▶ [--route: npx skills add <owner/repo@skill> … for each external]
+             ─▶ [bundled install succeeded, resolveStats() on: countInstall() —
+                 a detached node process runs npx skills add sugatoray/aiskills --skill …
+                 in a new temp folder (the skills.sh install count), then deletes it;
+                 failures are swallowed; -n prints it instead]
 ```
 
 ### `aiskills uninstall`
@@ -172,6 +176,7 @@ folder next to it, then swaps it in.
 | Keep `layout.json` + `nested/` | `--nested` can rebuild the repo exactly, and groups don't depend on the current layout. |
 | Groups from `marketplace.json`, never plugins | Reuse the repo's existing grouping without installing Claude Code plugins. |
 | No install step (`postinstall`); `aiskills install` does the work (AIS-7) | Installing a package that changes agents' instructions should be explicit. Install scripts are skipped by pnpm, bun and `--ignore-scripts` and their output is hidden by npm 7+, so they failed silently for many users; they also get the package flagged by scanners. Tested: no `preinstall`/`install`/`postinstall`/`prepare` script. |
+| Count installs on skills.sh by re-running the real CLI against GitHub, in the background | `npx skills add <local folder>` sends no install event. Running `npx skills add sugatoray/aiskills` in a throwaway temp folder lets the official CLI send its own event (only for a public repo, after its own checks), instead of `aiskills` calling skills.sh's undocumented endpoint. It needs github.com, so it fails silently behind a firewall; detached, so the install doesn't wait. Off with `--no-stats` (remembered), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, CI. |
 | Validate and look up everything before installing | A bad name or ambiguous registry match changes nothing. |
 | Confirm skills a lookup found; never assume yes without a terminal | A unique exact match is still the registry's choice of third-party code. Showing it and asking `[y/N]` (default no) lets the user check the source; scripts must opt in with `-y` or pin `owner/repo@skill`. Pinned specs aren't asked: the user named the source. |
 | Strip `npm_*` env before `npx` | Run through `npx @sugatoray-ai/aiskills` or `npm exec`, npm's variables can make the nested `npx` resolve into the wrong prefix. |
