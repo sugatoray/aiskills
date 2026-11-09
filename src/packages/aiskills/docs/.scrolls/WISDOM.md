@@ -50,9 +50,12 @@ Specific bugs that have bitten this project before — avoid repeating them.
 
 - **Testing a prompt under `script` (pseudo-terminal): typing ahead echoes the answer before the prompt**, and the prompt line then shows no answer. `sandbox().tty()` runs a small driver that waits for `[y/N] ` on the output before writing the answer, as a person would.
 
+- **pytest isn't installed in these sessions**, but the repo's Python skill tests (`skills/docs/create-lib-docs/tests`) need it: `pip install pytest` first, then `python3 -m pytest -q skills/docs/create-lib-docs/tests`.
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 
+- Don't reuse a merged PR's branch for new work. After a merge, put follow-up work on a **new** branch (the user asked for this explicitly). GitHub deletes the merged branch, so pushing to the old name recreates it.
 - Never add an install-time script (`preinstall`, `install`, `postinstall`, `prepare`). A package that rewrites agents' instructions during `npm install` is what scanners flag, and the script fails silently under pnpm, bun, `--ignore-scripts` and npm 7+'s hidden output. `packaging.test.mjs` enforces it (AIS-7).
 - Don't add `s`, `l` or `u` as command aliases: `s` could mean `sync` or `skills`, `l` reads as `list` but sits next to `ls` (= `installed`), and many CLIs use `u` for "update". Prefer `npm`'s own short forms (`i`, `r`, `ls`).
 - Don't make install-time behaviour opt-in through an env var. The install script stays (so scanners and pnpm still flag it), the hint it prints is hidden by npm 7+, and users lose the one-step install. AIS-7 removed the script entirely instead.
