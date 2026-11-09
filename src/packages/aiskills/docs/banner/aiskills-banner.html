@@ -214,7 +214,7 @@
   #banner .term-body .p { color: #5cc6cf; }
   #banner .term-body .f { color: #d39af5; }
   #banner .term-body .s { color: #9fd88a; }
-  #banner .term-body .c { color: #6f8386; }
+  #banner .term-body .c, #banner .install .cmt { color: #6f8386; white-space: pre; }
   #banner .term-body .h { color: #8fb4ff; font-weight: 700; }
   #banner .term-body .ok { color: #9fd88a; }
   #banner .term-body .cursor { display: inline-block; width: 9px; height: 18px; background: #5cc6cf; vertical-align: -3px; }
@@ -425,11 +425,12 @@
             <h1 class="name" data-edit><span class="grad">ai</span>skills</h1>
           </div>
 
-          <p class="tagline" data-edit>Agent skills for every coding agent, in one npm install.</p>
+          <p class="tagline" data-edit>Agent skills for every coding agent, in one npm package.</p>
           <p class="sub" data-edit>Pick Sugato Ray's skills by group, name or pattern, and install them into Claude Code, Codex, Cursor and more.</p>
 
           <div class="install install-box">
             <div class="line"><span class="dollar">$</span><span data-edit>npm install -g @sugatoray-ai/aiskills</span></div>
+            <div class="line"><span class="dollar">$</span><span data-edit>aiskills install<span class="cmt">   # save + register</span></span></div>
           </div>
         </div>
 
@@ -438,7 +439,10 @@
             <i style="background:#ff8a7a"></i><i style="background:#f2b36b"></i><i style="background:#9fd88a"></i>
             <span class="t" data-edit>~/project — zsh</span>
           </div>
-<div class="term-body" data-edit><span class="p">$</span> ais groups
+<div class="term-body" data-edit><span class="p">$</span> ais sync   <span class="c"># save only</span>
+<span class="o">[aiskills] skills saved to ~/.config/…/skills</span>
+
+<span class="p">$</span> ais groups
 <span class="h">scrolls-skills</span>  <span class="c">(alias: scrolls)</span>
 <span class="h">stata-skills</span>    <span class="c">(alias: stata)</span>  <span class="c">…</span>
 
@@ -474,7 +478,7 @@
 
 <script>
 (() => {
-  const STORE_KEY = 'aiskills-banner:042264a83a33';
+  const STORE_KEY = 'aiskills-banner:c8af1b9610dc';
   const banner = document.getElementById('banner');
   const scaler = document.getElementById('scaler');
   const stage = document.getElementById('stage');

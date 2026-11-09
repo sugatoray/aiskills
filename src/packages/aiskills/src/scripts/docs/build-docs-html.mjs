@@ -29,7 +29,7 @@ export const REPO = "https://github.com/sugatoray/aiskills";
 const DOCS_IN_REPO = "src/packages/aiskills/docs/docsite/";
 const TAB_LABELS = { Help: "FAQ", "How-to guides": "Guides" };
 export const BANNER = join(PKG_DIR, "docs", "banner", "aiskills-banner.html");
-const BANNER_ALT = "aiskills: agent skills for every coding agent, in one npm install";
+const BANNER_ALT = "aiskills: agent skills for every coding agent, in one npm package";
 
 /** The text between the lines holding two marker comments. */
 function between(text, start, end, file) {

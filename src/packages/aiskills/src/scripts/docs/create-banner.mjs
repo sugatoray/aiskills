@@ -130,7 +130,12 @@ function installHtml(v) {
     throw new Error(`install_style "${style}" has room for 1 to ${INSTALL_LIMITS[style]} install commands, not ${cmds.length}`);
   }
   const row = style === "box" ? "line" : "install";
-  const rows = cmds.map((c) => `            <div class="${row}"><span class="dollar">$</span><span data-edit>${esc(c)}</span></div>`);
+  // A trailing "# comment" (with the spaces before it) is dimmed.
+  const text = (c) => {
+    const m = /^(.*?\S)(\s+#.*)$/.exec(c);
+    return m ? `${esc(m[1])}<span class="cmt">${esc(m[2])}</span>` : esc(c);
+  };
+  const rows = cmds.map((c) => `            <div class="${row}"><span class="dollar">$</span><span data-edit>${text(c)}</span></div>`);
   return `          <div class="${style === "box" ? "install install-box" : "install-chips"}">\n${rows.join("\n")}\n          </div>`;
 }
 
@@ -151,6 +156,9 @@ function terminalHtml(v) {
   const n = demo.skills.length;
   const bundledLine = n === 1 ? demo.skills[0] : `${demo.skills[0]}, … (${n})`;
   return [
+    `<span class="p">$</span> ais sync   <span class="c"># save only</span>`,
+    `<span class="o">[aiskills] skills saved to ~/.config/…/skills</span>`,
+    ``,
     `<span class="p">$</span> ais groups`,
     ...listing,
     ``,

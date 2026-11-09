@@ -38,12 +38,14 @@ counts_label: "{skills_count} skills · {groups_count} groups"
 mark_glyph: "/_"
 wordmark_accent: "ai"
 wordmark_plain: "skills"
-tagline: "Agent skills for every coding agent, in one npm install."
+tagline: "Agent skills for every coding agent, in one npm package."
 subtitle: "Pick Sugato Ray's skills by group, name or pattern, and install them into Claude Code, Codex, Cursor and more."
-# Install commands, shown with a `$` prompt. install_style: "box" (one box, a line per
-# command; up to 3) or "chips" (a separate chip per command; up to 2).
+# Install commands, shown with a `$` prompt; a trailing "# comment" is dimmed. install_style:
+# "box" (one box, a line per command; up to 3) or "chips" (a separate chip per command; up to 2).
+# `npm install` runs no install step, so `aiskills install` is the second step.
 install_commands:
   - "npm install -g {package_name}"
+  - "aiskills install   # save + register"
 install_style: "box"
 
 # ── Terminal demo (the output lines are made from the bundled skills) ──

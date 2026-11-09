@@ -1,4 +1,4 @@
-![aiskills: agent skills for every coding agent, in one npm install](https://raw.githubusercontent.com/sugatoray/aiskills/master/src/packages/aiskills/docs/banner/banner_2x.png)
+![aiskills: agent skills for every coding agent, in one npm package](https://raw.githubusercontent.com/sugatoray/aiskills/master/src/packages/aiskills/docs/banner/banner_2x.png)
 
 # @sugatoray-ai/aiskills
 

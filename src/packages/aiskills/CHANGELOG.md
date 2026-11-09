@@ -52,6 +52,13 @@ npm install step (see **Removed**).
   `src/test/`, `docs/`). Every command, option, environment variable and
   error message is still covered, and the checked examples still print what
   the pages show.
+- **The banner shows the two install steps.** The install box reads
+  `npm install -g @sugatoray-ai/aiskills`, then
+  `aiskills install   # save + register`; the terminal demo opens with
+  `ais sync   # save only`. The tagline is now "Agent skills for every coding
+  agent, in one npm package." (it said "in one npm install", which stopped
+  being true when the install step was removed). A trailing `# comment` in
+  a banner install command is shown dimmed.
 - **Maintainer docs** (`docs/meta/ARCHITECTURE.md`, `FEATURES.md` and
   `MAINTAINERS.md`) describe the `core/` / `pack/` / `docs/` layout, the
   docs and banner builders, the themes, and the current test suites.

@@ -42,6 +42,7 @@ const pkg = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8"));
 const load = () => import(pathToFileURL(BUILDER).href);
 
 /** The banner's own markup, between the markers. */
+const parseConfigFile = () => Object.fromEntries([...readFileSync(join(PKG_SRC, "docs", "banner", "config.yaml"), "utf8").matchAll(/^(\w+): "(.*)"$/gm)].map((m) => [m[1], m[2]]));
 const bannerMarkup = (html) => html.split("<!-- banner:html:start -->")[1].split("<!-- banner:html:end -->")[0];
 
 describe("config.yaml", () => {
@@ -121,6 +122,41 @@ describe("render", () => {
     assert.ok(banner.includes("github.com/sugatoray/aiskills"));
   });
 
+  test("no install step (AIS-7): the tagline says one npm package, and the box shows npm install, then aiskills install", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const v = resolveValues(readConfig());
+    assert.equal(v.tagline, "Agent skills for every coding agent, in one npm package.");
+    assert.deepEqual(v.install_commands, [`npm install -g ${pkg.name}`, "aiskills install   # save + register"]);
+    assert.equal(v.install_style, "box");
+    const banner = bannerMarkup(render(v));
+    const box = banner.slice(banner.indexOf('<div class="install install-box">'), banner.indexOf("</div>\n          </div>", banner.indexOf("install-box")));
+    assert.equal(box.match(/class="line"/g)?.length, 2, "two lines in the box");
+    assert.ok(box.includes(`<span data-edit>npm install -g ${pkg.name}</span>`));
+    assert.ok(box.includes('<span data-edit>aiskills install<span class="cmt">   # save + register</span></span>'));
+  });
+
+  test("a # comment in an install command is dimmed, in both install styles", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    for (const style of ["box", "chips"]) {
+      const v = resolveValues(readConfig(), { set: { install_style: style, install_commands: "a b   # why,c d" } });
+      const banner = bannerMarkup(render(v));
+      assert.ok(banner.includes('<span data-edit>a b<span class="cmt">   # why</span></span>'), style);
+      assert.ok(banner.includes("<span data-edit>c d</span>"), `${style}: a command without a comment is unchanged`);
+    }
+    const css = render(resolveValues(readConfig())).split("banner:css:start")[1].split("banner:css:end")[0];
+    // The box has the terminal's background in every ink, so it shares the terminal's comment colour.
+    assert.match(css, /#banner \.term-body \.c, #banner \.install \.cmt \{ color: #[0-9a-f]{6}; white-space: pre; \}/, "install comments share the terminal's comment colour");
+  });
+
+  test("the terminal demo opens with ais sync (save only), before ais groups", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const banner = bannerMarkup(render(resolveValues(readConfig())));
+    const term = banner.slice(banner.indexOf('<div class="term-body"'));
+    assert.match(term, /^<div class="term-body"[^>]*><span class="p">\$<\/span> ais sync   <span class="c"># save only<\/span>\n<span class="o">\[aiskills\] skills saved to ~\/\.config\/…\/skills<\/span>\n\n<span class="p">\$<\/span> ais groups\n/);
+    // The output line is the real message, shortened: the installer prints "skills saved to <folder>/skills".
+    assert.match(readFileSync(join(PKG_SRC, "src", "scripts", "core", "installer.mjs"), "utf8"), /log\(`skills saved to \$\{dest\}/);
+  });
+
   test("the page opens in the configured theme, with a gear menu of every theme in its toolbar", async () => {
     const { resolveValues, readConfig, render } = await load();
     const html = render(resolveValues(readConfig()));
@@ -162,6 +198,10 @@ describe("where the banner is used", () => {
     const m = /^!\[([^\]]+)\]\((https:\/\/raw\.githubusercontent\.com\/sugatoray\/aiskills\/master\/(.+))\)$/.exec(first);
     assert.ok(m, `README.md line 1: ${first}`);
     assert.ok(m[1].startsWith("aiskills: "), "alt text");
+    const tagline = parseConfigFile().tagline;
+    const alt = `aiskills: ${tagline[0].toLowerCase()}${tagline.slice(1).replace(/\.$/, "")}`;
+    assert.equal(m[1], alt, "the README's alt text follows the banner's tagline");
+    assert.ok(readFileSync(join(PKG_SRC, "src", "scripts", "docs", "build-docs-html.mjs"), "utf8").includes(`const BANNER_ALT = "${alt}";`), "so does the docs page's banner label");
     assert.ok(existsSync(join(REPO_ROOT, m[3])), `${m[3]} doesn't exist in the repo`);
     assert.equal(join(REPO_ROOT, m[3]), PNG);
   });
@@ -217,7 +257,7 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
   test("edits are saved in the browser, kept after a reload, and Reset restores the original", () =>
     open(async (p) => {
       await p.click("#editToggle");
-      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 13);
+      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 14); // incl. both install commands
       await p.locator("#banner .tagline").evaluate((el) => (el.textContent = "Edited."));
       await p.locator("#pills .pill").last().click();
       await p.keyboard.press("End");
