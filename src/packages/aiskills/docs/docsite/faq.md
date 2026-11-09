@@ -40,11 +40,19 @@ In the single-page HTML version of these docs (`index.html`), click the gear at 
 
 No. Only the commands are public; the files under `src/scripts/core/` can change in any release.
 
-### What is a skill group, and why is `newsletter-ai` "ungrouped"?
+### What is a skill group?
 
-Groups come from the plugin entries in the repo's `marketplace.json`. `newsletter-ai` isn't in any entry, so install it by name or with `-G all`. See [Skill groups](concepts/skill-groups.md).
+Groups come from the plugin entries in the repo's `marketplace.json`; every bundled skill is in one. See [Skill groups](concepts/skill-groups.md).
 
-## Troubleshooting
+### Why isn't `newsletter-ai` in the package?
+
+The repo's `skills/newsletters/.skillsignore` leaves it out on purpose, so `aiskills` doesn't install it. It is still in the repo, so you can install it straight from there:
+
+```bash
+npx skills add sugatoray/aiskills --skill newsletter-ai --global
+```
+
+or through `aix`, naming the source (pinned, so it isn't asked about): `aix install -s sugatoray/aiskills@newsletter-ai`.
 
 ### Nothing was installed by `npm install -g`
 

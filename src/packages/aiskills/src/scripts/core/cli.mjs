@@ -91,7 +91,7 @@ Anything after '--' is appended to the underlying 'npx skills' command.
 Examples:
   aiskills groups                             # what groups exist
   aiskills install --group scrolls --global --agent claude-code
-  aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+  aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'

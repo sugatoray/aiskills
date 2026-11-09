@@ -42,6 +42,15 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
   after(() => copy && rmSync(copy.dir, { recursive: true, force: true }));
 
   const root = () => join(home, ".config", "sugatoray", "aiskills");
+  /** Every tracked skill file, minus .skillsignore files and what they leave out (layout.json lists it). */
+  const shippedSkillFiles = () => {
+    const { ignored = [] } = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    return copy.skills.filter((p) => {
+      if (p.endsWith("/.skillsignore")) return false;
+      const rel = p.slice("skills/".length);
+      return !ignored.some((i) => (i.endsWith("/") ? rel.startsWith(i) : rel === i));
+    });
+  };
 
   test("npm install -g only installs the command: nothing saved, nothing registered", () => {
     assert.ok(existsSync(cli), "the aiskills command is linked");
@@ -68,7 +77,7 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
 
   test("--nested rebuilds the repo's skills/ folder exactly; --flat goes back", () => {
     assert.equal(aiskills("sync", "--nested").status, 0);
-    const shipped = copy.skills.filter((p) => !p.endsWith("/.skillsignore")); // no .skillsignore in the repo yet
+    const shipped = shippedSkillFiles();
     assert.deepEqual(listTree(join(root(), "skills")), shipped.map((p) => p.slice("skills/".length)).sort());
     for (const rel of shipped) {
       assert.ok(readFileSync(join(home, ".config", "sugatoray", "aiskills", rel)).equals(readFileSync(join(copy.repo, rel))), rel);
@@ -91,7 +100,8 @@ describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKI
       env: { ...process.env, ...env() },
     });
     assert.equal(res.status, 0, res.stdout + res.stderr);
-    const expected = copy.skills.filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    const expected = shippedSkillFiles().filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    assert.ok(!expected.includes("newsletter-ai"), "left out by skills/newsletters/.skillsignore");
     assert.deepEqual(readdirSync(join(proj, ".claude", "skills")).sort(), expected);
   });
 

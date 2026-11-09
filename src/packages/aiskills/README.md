@@ -3,7 +3,7 @@
 # @sugatoray-ai/aiskills
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
-(scrolls, stata, personas, newsletters, diagrams, docs, development), packaged
+(scrolls, stata, personas, diagrams, docs, development), packaged
 for npm. Every file under the repo's `skills/` folder ships, except what a
 [`.skillsignore`](#leaving-files-out-skillsignore) leaves out. The skills are
 flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
@@ -202,9 +202,10 @@ installed version. At the time of writing:
 | `personas-skills` | `personas` | prodigy |
 | `all` (built in) | | every skill |
 
-`newsletter-ai` isn't in any `marketplace.json` entry. It shows up in
-`aiskills groups` as ungrouped, and you can install it with
-`-s newsletter-ai` or `-G all`.
+`newsletter-ai` isn't in the package: `skills/newsletters/.skillsignore`
+leaves it out (see [`.skillsignore`](#leaving-files-out-skillsignore)). It is
+still in the repo, so `npx skills add sugatoray/aiskills --skill newsletter-ai`
+installs it, and so does `aix install -s sugatoray/aiskills@newsletter-ai`.
 
 ### Choosing groups on the command line
 
@@ -223,7 +224,7 @@ installed version. At the time of writing:
 ```sh
 aiskills install --group scrolls-skills --global --agent claude-code   # full group name
 aiskills install --group scrolls --global --agent claude-code          # same, via alias
-aiskills install -G scrolls,personas -s newsletter-ai -a claude-code,codex
+aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
 aiskills install -G stata --project
 aiskills uninstall -G scrolls          # remove every installed skill in the group
 ```

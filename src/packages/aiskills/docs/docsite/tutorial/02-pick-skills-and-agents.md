@@ -44,7 +44,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: create-issues-update-pr, create-lib-docs, network-flow, newsletter-ai, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -53,13 +53,13 @@ aiskills install -s 'scroll-*'
 
 <!-- verify -->
 ```bash
-aiskills install -G personas -s newsletter-ai -a claude-code
+aiskills install -G personas -s create-lib-docs -a claude-code
 ```
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: newsletter-ai, prodigy
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill newsletter-ai --skill prodigy --agent claude-code --yes
+[aiskills] bundled: create-lib-docs, prodigy
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill create-lib-docs --skill prodigy --agent claude-code --yes
 ```
 
 ## Several agents

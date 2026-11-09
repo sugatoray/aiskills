@@ -52,6 +52,8 @@ Specific bugs that have bitten this project before — avoid repeating them.
 
 - **pytest isn't installed in these sessions**, but the repo's Python skill tests (`skills/docs/create-lib-docs/tests`) need it: `pip install pytest` first, then `python3 -m pytest -q skills/docs/create-lib-docs/tests`.
 
+- **Tests that derive "what ships" from `git ls-files skills`** must subtract what a `.skillsignore` leaves out (read `ignored` from `.aiskills/layout.json`); `shippable()` in packaging.test and `shippedSkillFiles()` in e2e do. They silently assumed no `.skillsignore` existed until `skills/newsletters/.skillsignore`.
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 

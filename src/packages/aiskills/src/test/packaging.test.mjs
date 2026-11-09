@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { join, relative, sep } from "node:path";
 import { after, before, describe, test } from "node:test";
 
-import { PKG_SRC, npm, repoCopy } from "./helpers.mjs";
+import { PKG_SRC, REPO_ROOT, npm, repoCopy } from "./helpers.mjs";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
@@ -53,7 +53,10 @@ describe("vendor-skills.mjs", () => {
     assert.equal(res.status, 0, res.stderr);
     const tops = readdirSync(join(copy.pkg, "skills"), { withFileTypes: true });
     assert.ok(tops.every((e) => e.isDirectory()), "only folders at the top of skills/");
-    const expected = copy.skills.filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    // Every tracked skill, minus those a .skillsignore leaves out (layout.json lists them).
+    const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    const expected = shippable(copy.skills, layout).filter((p) => p.endsWith("/SKILL.md")).map((p) => p.split("/").at(-2)).sort();
+    assert.ok(expected.length > 5, `expected skills: ${expected}`);
     assert.deepEqual(tops.map((e) => e.name).sort(), expected);
     for (const e of tops) assert.ok(existsSync(join(copy.pkg, "skills", e.name, "SKILL.md")), e.name);
   });
@@ -77,11 +80,28 @@ describe("vendor-skills.mjs", () => {
     assert.equal(sha256(join(copy.pkg, "LICENSE")), APACHE_2_SHA256, "vendoring keeps the package's own Apache-2.0 LICENSE (the repo's LICENSE is MIT)");
   });
 
+  test("skills/newsletters/.skillsignore leaves newsletter-ai out of the package; the repo keeps it for npx skills add", (t) => {
+    if (!copy) return t.skip("git not available");
+    const ignore = join(REPO_ROOT, "skills", "newsletters", ".skillsignore");
+    assert.ok(existsSync(ignore), "skills/newsletters/.skillsignore");
+    const rules = readFileSync(ignore, "utf8").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
+    assert.deepEqual(rules, ["newsletter-ai/"]);
+    const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    assert.ok(!("newsletter-ai" in layout.skills), "not in layout.json's skills");
+    assert.ok(layout.ignored.includes("newsletters/newsletter-ai/"), `ignored: ${layout.ignored}`);
+    assert.ok(!existsSync(join(copy.pkg, "skills", "newsletter-ai")), "not vendored");
+    assert.ok(!existsSync(join(copy.pkg, ".aiskills", "nested", "newsletters")), "nothing of the family ships");
+    // npx skills add sugatoray/aiskills reads the repo itself, where the skill stays.
+    const tracked = spawnSync("git", ["ls-files", "--error-unmatch", "skills/newsletters/newsletter-ai/SKILL.md"], { cwd: REPO_ROOT });
+    assert.equal(tracked.status, 0, "the skill is still in the repo");
+  });
+
   test("renames nested .gitignore/.npmignore so npm keeps them", (t) => {
     if (!copy) return t.skip("git not available");
     const names = [...walk(join(copy.pkg, "skills")), ...walk(join(copy.pkg, ".aiskills", "nested"))];
     assert.ok(!names.some((p) => /(^|\/)\.(git|npm)ignore$/.test(p)), "no raw ignore files left");
-    const expected = copy.skills.filter((p) => /\/\.(git|npm)ignore$/.test(p)).length;
+    const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
+    const expected = shippable(copy.skills, layout).filter((p) => /\/\.(git|npm)ignore$/.test(p)).length;
     assert.equal(names.filter((p) => /(^|\/)_(git|npm)ignore$/.test(p)).length, expected);
   });
 
@@ -123,6 +143,11 @@ describe("npm pack", () => {
     }
     const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
     assert.deepEqual(toRepoPaths(files, layout).sort(), shippable(copy.skills, layout).sort());
+  });
+
+  test("ships nothing of newsletter-ai", (t) => {
+    if (!copy) return t.skip("git not available");
+    assert.deepEqual(files.filter((p) => /newsletter/i.test(p)), []);
   });
 
   test("ships only the bin/ entry points and the runtime files under src/scripts/core/", (t) => {

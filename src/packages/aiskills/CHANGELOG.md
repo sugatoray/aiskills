@@ -51,7 +51,7 @@ npm install step (see **Removed**).
 - **A License page in the docs** (`docs/docsite/license.md`, and a License
   tab in the single-page docs): the package's license, and a table of every
   bundled skill with its group, its license and the `SKILL.md` that declares
-  it (all 13 are MIT today). Generated from `package.json` and the skills by
+  it (all MIT today). Generated from `package.json` and the skills by
   `npm run docs:skills`, so it can't go stale.
 
 ### Changed
@@ -92,6 +92,14 @@ npm install step (see **Removed**).
   docs and banner builders, the themes, and the current test suites.
 
 ### Removed
+
+- **`newsletter-ai` is no longer bundled.** The repo's new
+  `skills/newsletters/.skillsignore` (`newsletter-ai/`) leaves it out of the
+  package, so `aiskills install` no longer installs it and the package has 12
+  skills, all in groups. It stays in the repo: `npx skills add
+  sugatoray/aiskills --skill newsletter-ai`, or
+  `aix install -s sugatoray/aiskills@newsletter-ai`, still installs it.
+  0.1.0–0.3.0 bundled it, but none was published.
 
 - **The npm install step (`postinstall`).** `npm install` now only installs
   the `aiskills`, `ais` and `aix` commands: it makes no network requests,
