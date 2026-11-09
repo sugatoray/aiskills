@@ -17,6 +17,7 @@ aiskills install -p -G stata -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: stata-recipes
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --skill stata-recipes --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 Compare it with the global install in step 1: the command has no `--global`, and `aiskills` runs it from your current folder. `npx skills` then installs the skill into that project's agent folders (for Claude Code, `.claude/skills/`) and records it there.

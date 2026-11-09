@@ -237,6 +237,14 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 **Cause:** `AISKILLS_LAYOUT`, or the `layout` in `aiskills.json`, isn't `flat` or `nested`. **Fix:** set `AISKILLS_LAYOUT=flat` or `nested`, or run `aiskills sync --flat`.
 
+### AISKILLS_STATS must be 1 or 0
+
+```text
+[aiskills] AISKILLS_STATS must be 1 or 0 (or true/false, yes/no, on/off); got '<value>'
+```
+
+**Cause:** `AISKILLS_STATS` is set to something else. **Fix:** set it to `0` (or `1`), or unset it. See [The skills.sh install count](../concepts/install-count.md).
+
 ### No vendored skills folder
 
 ```text

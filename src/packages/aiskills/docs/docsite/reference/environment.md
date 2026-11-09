@@ -43,6 +43,14 @@ Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` t
 
 `flat` or `nested`, the same as `--flat` / `--nested`. A command-line flag wins over it; it wins over the remembered layout. Any other value fails with `unknown layout`.
 
+### `AISKILLS_STATS`
+
+`0` or `1` (also `false`/`true`, `no`/`yes`, `off`/`on`): the same as `--no-stats` / `--stats` while it's set, but not remembered. `--stats`/`--no-stats` win over it; it wins over the choice remembered in `aiskills.json`. Empty means unset; any other value fails with `AISKILLS_STATS must be 1 or 0`. See [The skills.sh install count](../concepts/install-count.md).
+
+### `AISKILLS_STATS_FOREGROUND`
+
+`1` (or `true`, `yes`, `on`): run the [skills.sh install count](../concepts/install-count.md) in the foreground after `aiskills install`, and show its output, to see why a count doesn't happen. Its exit status still doesn't change the install's.
+
 ## Where things go
 
 ### `AISKILLS_HOME`
@@ -59,6 +67,7 @@ The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tes
 
 | Variable | Effect in `npx skills` |
 | --- | --- |
-| `DISABLE_TELEMETRY`, `DO_NOT_TRACK` | Turn off its anonymous usage data to `skills.sh` |
+| `DISABLE_TELEMETRY`, `DO_NOT_TRACK` | Turn off its anonymous usage data to `skills.sh`, and the [skills.sh install count](../concepts/install-count.md) (any value) |
+| `CI`, `GITHUB_ACTIONS` | Read by `aiskills`: when set, the skills.sh install count is off |
 
 See also: [Set default choices](../guides/set-defaults.md) · [CLI reference](cli.md)

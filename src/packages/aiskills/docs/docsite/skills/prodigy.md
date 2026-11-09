@@ -23,6 +23,7 @@ aiskills install -s prodigy -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: prodigy
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill prodigy --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 Or the whole `personas-skills` group:

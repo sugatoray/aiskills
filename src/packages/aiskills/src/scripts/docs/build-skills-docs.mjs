@@ -135,6 +135,7 @@ aiskills install -s ${s.name} -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: ${s.name}
 [aiskills] running: npx -y skills@${SKILLS_CLI_VERSION} add ~/.config/sugatoray/aiskills --global --skill ${s.name} --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 \`\`\`
 ${groupLine}
 Into the current project instead: add \`-p\`. To remove it:

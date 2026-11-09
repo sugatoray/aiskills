@@ -11,7 +11,8 @@ The full policy, including how to report a vulnerability, is in the package's [S
 | `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
 | Agents' skill folders | Only through `npx skills add` / `remove`. |
 | An empty temporary folder | While reading the agent list for `-a` patterns; deleted straight after. |
-| The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub. |
+| A temporary `aiskills-stats-*` folder | The [skills.sh install count](install-count.md) after `install`: a throwaway project install from GitHub, deleted when it ends. |
+| The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub, including for the [skills.sh install count](install-count.md). |
 
 ## Protections
 
@@ -32,6 +33,6 @@ Agent skills contain instructions, and sometimes scripts, that your agent may ru
 
 ## Telemetry
 
-`aiskills` sends nothing. The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set; `aiskills` passes both through.
+`aiskills` sends nothing itself. The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set; `aiskills` passes both through. After an install, `aiskills` runs `npx skills add sugatoray/aiskills` in a temp folder so the install is counted on skills.sh: see [The skills.sh install count](install-count.md). `--no-stats`, `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` and `CI` turn that off.
 
 See also: [Errors and exit codes](../reference/errors.md) · [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md)

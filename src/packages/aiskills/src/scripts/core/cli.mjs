@@ -11,6 +11,7 @@ import {
   isFromRoot,
   listInstalled,
   confirm,
+  countInstall,
   resolveExternal,
   skillsAddExternal,
   specSkillName,
@@ -18,6 +19,8 @@ import {
   log,
   packageSkillNames,
   purgeRoot,
+  resolveStats,
+  STATS_SOURCE,
   runSkills,
   selectedSkills,
   skillsAdd,
@@ -77,6 +80,12 @@ Layout of ${ROOT}/skills (install, sync; may also go before the command):
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
+      --no-stats         Don't add this install to the skills.sh install count. By default, after
+                         installing bundled skills, aiskills runs 'npx skills add ${STATS_SOURCE}' for
+                         them in a temp folder, in the background, so skills.sh counts the install
+                         (needs github.com; skipped silently without it). Remembered until --stats;
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+      --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
   -n, --dry-run          Show what would be installed, and the exact commands; install nothing
@@ -114,6 +123,8 @@ Environment:
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
+  AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 `;
 
 const split = (v) => (v ?? "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -144,6 +155,7 @@ function parse(argv, allowed) {
     else if (a === "--json" && ok("json")) opts.json = true;
     else if (a === "--route" && ok("route")) opts.route = true;
     else if ((a === "--nested" || a === "--flat") && ok("layout")) opts.layout = a.slice(2);
+    else if ((a === "--stats" || a === "--no-stats") && ok("stats")) opts.stats = a === "--stats";
     else if (a === "--copy" && ok("copy")) opts.copy = true;
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
@@ -280,8 +292,8 @@ function main() {
   switch (cmd) {
     case "install":
     case "i": {
-      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout", "dryRun", "yes"]);
-      const root = syncSkills({ version, layout: opts.layout });
+      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout", "dryRun", "yes", "stats"]);
+      const root = syncSkills({ version, layout: opts.layout, stats: opts.stats });
       const picked = selectedSkills(opts, root);
       const external = picked?.unknown ?? [];
       if (external.length && !opts.route) {
@@ -324,6 +336,10 @@ function main() {
       if (!picked || bundled.length) {
         if (picked) log(`bundled: ${bundled.join(", ")}`);
         status = skillsAdd(root, { ...opts, agents, skills: bundled ?? ["*"], cwd });
+        // Add it to the skills.sh install count (best effort; see countInstall).
+        if (status === 0 && resolveStats(opts.stats, root)) {
+          countInstall(bundled ?? [...packageSkillNames(root)].sort(), { agents, dryRun: opts.dryRun });
+        }
       }
       for (const { spec } of routed) {
         log(`external: ${spec}`);
@@ -348,9 +364,11 @@ function main() {
     case "skills":
       // Piggyback on any 'npx skills' command; ':root' -> install root.
       return runSkills(rest.map((a) => (a === ":root" ? ROOT : a)));
-    case "sync":
-      syncSkills({ version, layout: parse(rest, ["layout"]).layout });
+    case "sync": {
+      const { layout, stats } = parse(rest, ["layout", "stats"]);
+      syncSkills({ version, layout, stats });
       return 0;
+    }
     case "list":
       return skillsAdd(syncSkills({ version }), { list: true });
     case "path":

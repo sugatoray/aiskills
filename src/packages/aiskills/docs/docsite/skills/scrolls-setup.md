@@ -24,6 +24,7 @@ aiskills install -s scrolls-setup -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: scrolls-setup
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 Or the whole `scrolls-skills` group:

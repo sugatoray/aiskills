@@ -53,6 +53,7 @@ aiskills install
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 With `-s`/`-G`, it prints `bundled: <names>` first. With `--route`, names that aren't bundled are looked up; each skill the lookup found is shown and must be confirmed (see [`-y`](#-y---yes)) before anything, bundled skills included, is installed. External skills are installed after the bundled ones (`external: <spec>`).
@@ -217,7 +218,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.4.0 — Sugato Ray's agent skills
+aiskills 0.5.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -264,6 +265,12 @@ Layout of ~/.config/sugatoray/aiskills/skills (install, sync; may also go before
 
 install only:
       --copy             Copy files into agent dirs instead of symlinking
+      --no-stats         Don't add this install to the skills.sh install count. By default, after
+                         installing bundled skills, aiskills runs 'npx skills add sugatoray/aiskills' for
+                         them in a temp folder, in the background, so skills.sh counts the install
+                         (needs github.com; skipped silently without it). Remembered until --stats;
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+      --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
   -n, --dry-run          Show what would be installed, and the exact commands; install nothing
@@ -301,6 +308,8 @@ Environment:
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
+  AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```
 
 ### `-v`, `--version`
@@ -313,7 +322,7 @@ ais -v
 ```
 
 ```text
-0.4.0
+0.5.0
 ```
 
 ## Options
@@ -326,6 +335,7 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `-a`, `-s`, `-G` | ✓ | ✓ | | | |
 | `--route` | ✓ | ✓ | ✓ | | |
 | `--nested`, `--flat` | ✓ | | | | ✓ |
+| `--stats`, `--no-stats` | ✓ | | | | ✓ |
 | `--copy`, `-y` | ✓ | | | | |
 | `-n` | ✓ | ✓ | | | |
 | `--purge`, `-f` | | ✓ | | | |
@@ -364,6 +374,14 @@ Write `<install folder>/skills/` in the repo's nested layout. Remembered for lat
 
 Write `<install folder>/skills/` flat, one folder per skill (the default). Remembered for later commands.
 
+### `--stats`
+
+Add installs to the [skills.sh install count](../concepts/install-count.md) (the default). Undoes a remembered `--no-stats`. Has no effect when `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` or `GITHUB_ACTIONS` is set.
+
+### `--no-stats`
+
+Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
+
 ### `--copy`
 
 Pass `--copy` to `npx skills add`: copy the files into agent folders instead of symlinking them. Env: [`AISKILLS_COPY`](environment.md#aiskills_copy).
@@ -389,7 +407,7 @@ On uninstall, pass `-s` names to `npx skills remove` even if this package doesn'
 
 On uninstall, print what would be removed and the exact `npx skills` command, and change nothing.
 
-On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines. Nothing is installed. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
+On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines, and the [skills.sh count](../concepts/install-count.md) command as a `[dry-run] skills.sh count: ...` line. Nothing is installed or counted. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
 
 ### `--json`
 

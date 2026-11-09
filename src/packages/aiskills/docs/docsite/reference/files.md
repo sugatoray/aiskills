@@ -21,7 +21,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```json
 {
   "package": "@sugatoray-ai/aiskills",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "layout": "flat",
   "installedAt": "2026-11-06T10:26:01.152Z",
   "skills": "/home/me/.config/sugatoray/aiskills/skills"
@@ -33,6 +33,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 | `package` | string | Always `@sugatoray-ai/aiskills`. Its presence is what makes a folder safe for `aiskills` to replace or delete. |
 | `version` | string | The package version that wrote the folder. |
 | `layout` | `"flat"` \| `"nested"` | The layout of `skills/`, reused by the next sync unless overridden. |
+| `stats` | boolean, optional | Written by `--stats` / `--no-stats`: whether `aiskills install` adds installs to the [skills.sh count](../concepts/install-count.md). Kept by later syncs; absent means on. |
 | `installedAt` | string (ISO 8601) | When the folder was last synced. |
 | `skills` | string (absolute path) | The `skills/` folder. |
 

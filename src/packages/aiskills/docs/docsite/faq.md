@@ -30,7 +30,11 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 
 ### Does aiskills send any data?
 
-No. The `skills` CLI it runs sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set. See [Security model](concepts/security.md#telemetry).
+`aiskills` sends nothing itself. After `aiskills install`, it runs `npx skills add sugatoray/aiskills` once more in a temp folder, in the background, so the install is counted on skills.sh (off with `--no-stats` or `AISKILLS_STATS=0`); see [The skills.sh install count](concepts/install-count.md). The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set, and either one also turns the count off. See [Security model](concepts/security.md#telemetry).
+
+### Why don't my installs show up on skills.sh?
+
+The count needs github.com and api.github.com: without them it's skipped silently. It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
 
 ### How do I change how these docs look?
 

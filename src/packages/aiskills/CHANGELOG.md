@@ -20,6 +20,29 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-09
+
+### Added
+
+- **Installs through `aiskills` count on skills.sh.** `npx skills add` counts
+  an install on [skills.sh](https://skills.sh) only when it installs from
+  GitHub, so `aiskills install` (which installs from
+  `~/.config/sugatoray/aiskills`) never showed up there. After a successful
+  install of bundled skills, `aiskills` now runs
+  `npx -y skills@1.7.6 add sugatoray/aiskills --skill <each> --agent <your -a, or universal> --copy --yes`
+  in a new temp folder, in the background, and deletes the folder afterwards;
+  that run sends skills.sh the usual install event. It prints one line
+  (`adding this install to the skills.sh count in the background (turn off: --no-stats)`).
+  Without access to github.com nothing is counted and nothing is shown; the
+  install's exit status never changes. Not run for failed installs,
+  `-n/--dry-run` (which shows the command), external `--route` skills or
+  `sync`. See *The skills.sh install count* in the README and docs.
+- **`--no-stats` / `--stats`** on `install` and `sync`: turn the count off or
+  back on, remembered in `aiskills.json`. **`AISKILLS_STATS=0|1`** does the same
+  for as long as it's set. `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` and
+  `GITHUB_ACTIONS` always turn it off. **`AISKILLS_STATS_FOREGROUND=1`** waits
+  for the count and shows its output.
+
 ## [0.4.0] - 2026-11-09
 
 First release published to npm.

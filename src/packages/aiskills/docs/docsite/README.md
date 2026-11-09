@@ -20,6 +20,7 @@ aiskills install -G scrolls -a claude-code
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 `npx skills` then prints its own progress and installs the seven skills for Claude Code.
@@ -28,6 +29,7 @@ aiskills install -G scrolls -a claude-code
 
 - **Skills in one package**: 12 skills in 6 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
+- **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
 - **Global or per project**: `-g` (default) or `-p`.
 - **Clean uninstall**: full, partial, per agent or per project, with `--dry-run` and `--purge`.
@@ -88,6 +90,7 @@ aiskills install -G scrolls -a claude-code
 - [Layouts: flat and nested](concepts/layouts.md): the two shapes of the install folder and how the choice is made.
 - [Bundled and external skills](concepts/bundled-and-external.md): what `--route` changes for install, uninstall and listing.
 - [Security model](concepts/security.md): what the package touches, and the protections that are tested.
+- [The skills.sh install count](concepts/install-count.md): how installs through aiskills are counted on skills.sh, and how to turn it off.
 
 ### Reference
 

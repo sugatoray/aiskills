@@ -15,7 +15,8 @@ const enabled = process.env.AISKILLS_E2E === "1";
 
 describe("e2e: npm install -g + real npx skills", { skip: !enabled && "set AISKILLS_E2E=1 to run", timeout: 600_000 }, () => {
   let copy, home, prefix, cli;
-  const env = () => ({ HOME: home, USERPROFILE: home, AISKILLS_HOME: "" });
+  // DO_NOT_TRACK: these test installs must not reach the skills.sh count (or npx skills telemetry).
+  const env = () => ({ HOME: home, USERPROFILE: home, AISKILLS_HOME: "", DO_NOT_TRACK: "1" });
   const aiskills = (...args) => {
     const res = spawnSync(cli, args, { encoding: "utf8", env: { ...process.env, ...env() }, cwd: home });
     return { status: res.status, out: (res.stdout ?? "") + (res.stderr ?? "") };

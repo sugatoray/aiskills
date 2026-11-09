@@ -5,7 +5,7 @@
 // 2. Run `npx skills add ~/.config/sugatoray/aiskills ...` so the skills
 //    are registered with the user's agents (Claude Code, Codex, ...).
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
@@ -77,7 +77,7 @@ export function resolveLayout(explicit, root = installRoot()) {
  * Also copies marketplace.json and layout.json next to it, and records the
  * layout in <root>/aiskills.json so later commands keep using it.
  */
-export function syncSkills({ root = installRoot(), version, quiet = false, layout, pkgDir = PKG_DIR } = {}) {
+export function syncSkills({ root = installRoot(), version, quiet = false, layout, stats, pkgDir = PKG_DIR } = {}) {
   const pkgSkills = join(pkgDir, "skills");
   if (!existsSync(pkgSkills)) {
     throw new Error(`no vendored skills folder at ${pkgSkills}`);
@@ -114,10 +114,19 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
       cpSync(join(pkgDir, rel), target);
     }
   }
+  // --stats / --no-stats is remembered until changed (like the layout).
+  const keepStats = stats ?? readJson(join(root, "aiskills.json"))?.stats;
   writeFileSync(
     join(root, "aiskills.json"),
     JSON.stringify(
-      { package: "@sugatoray-ai/aiskills", version, layout: mode, installedAt: new Date().toISOString(), skills: dest },
+      {
+        package: "@sugatoray-ai/aiskills",
+        version,
+        layout: mode,
+        ...(typeof keepStats === "boolean" ? { stats: keepStats } : {}),
+        installedAt: new Date().toISOString(),
+        skills: dest,
+      },
       null,
       2,
     ) + "\n",
@@ -171,7 +180,7 @@ export const unsafeForWindowsShell = (args) => args.filter((a) => WINDOWS_SHELL_
 /** cmd.exe splits on spaces: quote arguments that contain whitespace (they can't contain '"'). */
 export const quoteForCmd = (args) => args.map((a) => (/\s/.test(a) ? `"${a}"` : a));
 
-export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false } = {}) {
+export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false, timeout } = {}) {
   const win = process.platform === "win32";
   const npx = win ? "npx.cmd" : "npx";
   const full = ["-y", skillsPackageSpec(), ...args];
@@ -189,6 +198,7 @@ export function runSkills(args, { cwd, capture = false, quiet = false, captureSt
     shell: process.platform === "win32",
     env: childEnv(),
     maxBuffer: 64 * 1024 * 1024,
+    ...(timeout ? { timeout, killSignal: "SIGKILL" } : {}),
   });
   if (res.error) throw res.error;
   const status = res.status ?? 1;
@@ -611,6 +621,93 @@ export function skillsRemove(names, opts = {}) {
   for (const a of agents) args.push("--agent", a);
   args.push("--yes", ...extra);
   return runSkills(args, { cwd });
+}
+
+// ------------------------------------------------------- skills.sh count
+
+// `npx skills add <local folder>` sends skills.sh no install event (only
+// GitHub sources are counted), so installs through aiskills never showed up
+// there. After a successful install, aiskills runs the real CLI once more
+// against the GitHub repo, as a throwaway project install in a temp folder;
+// that run sends skills.sh its usual event (after checking with
+// api.github.com that the repo is public). Nothing it installs is kept.
+// Without access to github.com the clone fails and nothing is counted or shown.
+
+/** The GitHub repo the bundled skills come from (package.json "repository"). */
+export const STATS_SOURCE = "sugatoray/aiskills";
+// Long enough for a shallow clone on a slow line; then the count is dropped.
+const STATS_TIMEOUT_MS = 120_000;
+const TRUE = /^(1|true|yes|on)$/i;
+const FALSE = /^(0|false|no|off)$/i;
+
+/**
+ * Whether `aiskills install` adds the install to the skills.sh count:
+ * --stats / --no-stats, then AISKILLS_STATS, then the choice remembered in
+ * <root>/aiskills.json, then on. DO_NOT_TRACK, DISABLE_TELEMETRY (which the
+ * skills CLI honours too) and CI (CI, GITHUB_ACTIONS) always turn it off.
+ */
+export function resolveStats(explicit, root = installRoot()) {
+  const e = process.env;
+  if (e.DO_NOT_TRACK || e.DISABLE_TELEMETRY || e.CI || e.GITHUB_ACTIONS) return false;
+  if (typeof explicit === "boolean") return explicit;
+  const v = e.AISKILLS_STATS?.trim();
+  if (v) {
+    if (TRUE.test(v)) return true;
+    if (FALSE.test(v)) return false;
+    throw new Error(`AISKILLS_STATS must be 1 or 0 (or true/false, yes/no, on/off); got '${v}'`);
+  }
+  const saved = readJson(join(root, "aiskills.json"))?.stats;
+  return typeof saved === "boolean" ? saved : true;
+}
+
+/** The `npx skills` arguments of the counted install (agents: the user's -a, else "universal"). */
+export function statsArgs(skills, agents = []) {
+  const args = ["add", STATS_SOURCE];
+  for (const s of skills) args.push("--skill", s);
+  for (const a of agents.length ? agents : ["universal"]) args.push("--agent", a);
+  return [...args, "--copy", "--yes"];
+}
+
+/**
+ * Add an install of <skills> to the skills.sh count: with dryRun, only show
+ * the command; otherwise run it in a new temp folder, in the background
+ * (AISKILLS_STATS_FOREGROUND=1: wait for it and show its output). Never
+ * fails and never changes the exit status.
+ */
+export function countInstall(skills, { agents = [], dryRun = false } = {}) {
+  const args = statsArgs(skills, agents);
+  if (dryRun) {
+    log(`[dry-run] skills.sh count: npx -y ${skillsPackageSpec()} ${args.join(" ")} (in a temp folder; turn off: --no-stats)`);
+    return;
+  }
+  log("adding this install to the skills.sh count in the background (turn off: --no-stats)");
+  try {
+    const dir = mkdtempSync(join(tmpdir(), "aiskills-stats-"));
+    if (TRUE.test(process.env.AISKILLS_STATS_FOREGROUND ?? "")) return runCount(dir, args, { quiet: false });
+    // A detached node process outlives this one, so the install returns at once.
+    const code = `import(${JSON.stringify(import.meta.url)}).then((m) => m.runCount(...JSON.parse(process.argv[1])))`;
+    const child = spawn(process.execPath, ["--input-type=module", "-e", code, JSON.stringify([dir, args])], {
+      detached: true,
+      stdio: "ignore",
+      windowsHide: true,
+      env: childEnv(),
+    });
+    child.on("error", () => rmSync(dir, { recursive: true, force: true }));
+    child.unref();
+  } catch {
+    // Counting is best effort.
+  }
+}
+
+/** Run the counted install in <dir>, then delete <dir>; errors are swallowed. */
+export function runCount(dir, args, { quiet = true } = {}) {
+  try {
+    runSkills(args, { cwd: dir, quiet, capture: quiet, captureStderr: quiet, timeout: STATS_TIMEOUT_MS });
+  } catch {
+    // github.com unreachable, timed out, npx missing: nothing to count.
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 /** Delete <root> (the ~/.config/sugatoray/aiskills folder). */

@@ -189,7 +189,8 @@ describe("reference pages cover the code", () => {
     const files = read("reference/files.md");
     const box = sandbox({ realSkills: true });
     try {
-      assert.equal(box.run(["sync"]).status, 0);
+      // --no-stats adds the optional "stats" field.
+      assert.equal(box.run(["sync", "--no-stats"]).status, 0);
       const fields = [
         ...Object.keys(JSON.parse(readFileSync(join(box.root, "aiskills.json"), "utf8"))),
         ...Object.keys(JSON.parse(readFileSync(join(box.root, ".aiskills", "layout.json"), "utf8"))),
@@ -288,7 +289,7 @@ function linesMatch(expected, actual) {
 describe("examples in the docs print what the docs show", () => {
   const box = { current: null };
   before(() => {
-    box.current = sandbox({ realSkills: true });
+    box.current = sandbox({ realSkills: true, stats: true });
   });
   after(() => box.current?.cleanup());
 
