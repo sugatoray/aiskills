@@ -1,16 +1,19 @@
 {
   "name": "@sugatoray-ai/aiskills",
   "version": "0.5.0",
-  "description": "Sugato Ray's curated agent skills (scrolls, stata, personas, ...) vendored as an npm package and registered with `npx skills add` on install.",
+  "description": "Curated agent skills (scrolls agentic memory and more) for every coding agent, in one npm package.",
   "keywords": [
     "agent-skills",
     "skills",
     "claude-code",
     "codex",
     "ai",
-    "scrolls"
+    "scrolls",
+    "agentic-memory",
+    "visualization",
+    "developer-tools"
   ],
-  "homepage": "https://github.com/sugatoray/aiskills#readme",
+  "homepage": "https://sugatoray.github.io/aiskills/",
   "bugs": {
     "url": "https://github.com/sugatoray/aiskills/issues"
   },

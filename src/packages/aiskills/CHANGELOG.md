@@ -43,6 +43,14 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   `GITHUB_ACTIONS` always turn it off. **`AISKILLS_STATS_FOREGROUND=1`** waits
   for the count and shows its output.
 
+### Changed
+
+- **npm package page:** a shorter `description` ("Curated agent skills
+  (scrolls agentic memory and more) for every coding agent, in one npm
+  package."), more `keywords` (`agentic-memory`, `visualization`,
+  `developer-tools`), and `homepage` now points at the docs site,
+  <https://sugatoray.github.io/aiskills/>, instead of the GitHub README.
+
 ## [0.4.0] - 2026-11-09
 
 First release published to npm.
