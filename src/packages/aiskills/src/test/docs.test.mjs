@@ -199,6 +199,21 @@ describe("reference pages cover the code", () => {
       box.cleanup();
     }
   });
+
+  test("reference/files.md's sample layout.json shows what this package really leaves out (ignored)", () => {
+    const box = sandbox({ realSkills: true });
+    try {
+      assert.equal(box.run(["sync"]).status, 0);
+      const real = JSON.parse(readFileSync(join(box.root, ".aiskills", "layout.json"), "utf8")).ignored;
+      const sample = /## `\.aiskills\/layout\.json`[\s\S]*?```json\n([\s\S]*?)\n```/.exec(read("reference/files.md"));
+      assert.ok(sample, "a ```json sample under ## `.aiskills/layout.json`");
+      const ignored = /"ignored": (\[.*\])/.exec(sample[1]);
+      assert.ok(ignored, "the sample has an ignored line");
+      assert.deepEqual(JSON.parse(ignored[1]), real);
+    } finally {
+      box.cleanup();
+    }
+  });
 });
 
 // ------------------------------------------------------------ examples
