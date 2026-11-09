@@ -21,7 +21,8 @@ version, and the steps to reproduce.
 
 | Version | Supported |
 | --- | --- |
-| `0.4.x` | Yes (current) |
+| `0.5.x` | Yes (current) |
+| `0.4.x` | No: upgrade to `0.5.x` |
 | `0.3.x`, `0.2.x`, `0.1.x` | Never published |
 
 Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).

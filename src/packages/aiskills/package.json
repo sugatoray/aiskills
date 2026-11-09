@@ -1,6 +1,6 @@
 {
   "name": "@sugatoray-ai/aiskills",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Sugato Ray's curated agent skills (scrolls, stata, personas, ...) vendored as an npm package and registered with `npx skills add` on install.",
   "keywords": [
     "agent-skills",

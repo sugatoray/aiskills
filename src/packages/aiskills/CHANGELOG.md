@@ -20,6 +20,10 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.5.0] - Unreleased
+
+Not published yet; this section gets its date when it is.
+
 ### Added
 
 - **Installs through `aiskills` count on skills.sh.** `npx skills add` counts
