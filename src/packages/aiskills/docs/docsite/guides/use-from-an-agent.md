@@ -48,7 +48,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    ```text
    [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
    [aiskills] no group matches: nope
-     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), all
+     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), all
      see 'aiskills groups'
    ```
 
