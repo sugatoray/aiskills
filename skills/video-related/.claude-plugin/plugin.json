@@ -1,0 +1,11 @@
+{
+  "name": "video-related-skills",
+  "version": "1.0.0",
+  "description": "Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt, real screenshots, TTS voiceover, ducked music) for a library, app or product.",
+  "author": {"name": "Sugato Ray", "url": "https://github.com/sugatoray"},
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": ["video", "promo", "explainer", "voiceover", "playwright", "ffmpeg"],
+  "skills": ["./dynamic-promo-video"]
+}

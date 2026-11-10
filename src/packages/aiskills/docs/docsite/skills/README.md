@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (12 skills in 6 groups), with what it does and how to install it.
+Every skill in this version of the package (13 skills in 7 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -57,6 +57,14 @@ Alias `personas`. Install the group with `aiskills install -G personas`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`prodigy`](prodigy.md) | 1.0.0 | Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and… |
+
+## video-related-skills
+
+Alias `video-related`. Install the group with `aiskills install -G video-related`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`dynamic-promo-video`](dynamic-promo-video.md) | 1.0.0 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 

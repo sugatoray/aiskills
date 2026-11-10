@@ -1,0 +1,47 @@
+# dynamic-promo-video
+
+Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. Use for explainer or launch videos made from code, real screenshots and TTS.
+
+| Property | Value |
+| --- | --- |
+| Group | `video-related-skills` (alias `video-related`) |
+| Version | 1.0.0 |
+| Starts | When you type `/dynamic-promo-video`, or your agent uses it when a task fits its description |
+| License | MIT |
+| Source | [skills/video-related/dynamic-promo-video](https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s dynamic-promo-video -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: dynamic-promo-video
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill dynamic-promo-video --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `video-related-skills` group:
+
+```bash
+aiskills install -G video-related -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s dynamic-promo-video
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/dynamic-promo-video/`:
+
+- `SKILL.md`
+
+See also: [All skills](README.md) · [Skill groups](../concepts/skill-groups.md)
