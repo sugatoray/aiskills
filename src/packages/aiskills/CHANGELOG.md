@@ -20,6 +20,48 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-11
+
+Interactive installs (pick the skills and agents from a list, or reuse the
+agents you picked last time), plus `aiskills info` and `aiskills releases`.
+
+### Added
+
+- **`aiskills install -i` / `--interactive`**: runs `npx skills add` without
+  `--yes`, so you pick the skills, the agents and the install method in its own
+  pickers. The agents you picked last time are pre-checked. `-s`/`-G`/`-a`
+  still skip the matching picker. Needs a terminal.
+- **`aiskills install -l` / `--last-agents`**: installs for the agents you last
+  picked in `npx skills add` (its `lastSelectedAgents`), instead of every
+  agent it detects.
+- **`aiskills info`**: shows this setup, like `conda info`: the versions, the
+  install folder and what was saved there, every setting with where its value
+  comes from, the `npx skills` lock file and last-picked agents, and the
+  `AISKILLS_*` variables that are set. Offline; `--full` also asks npm for the
+  latest version and `npx skills` for what is installed; `--json` for scripts.
+- **`aiskills releases`** (alias **`rel`**): the latest releases on npm (5 by
+  default; `rel 10`, `rel all`, `-L`/`--last`), with publish dates, ages,
+  dist-tags, the installed one marked and an update hint. `--downloads [period]`
+  adds a 7-day downloads column per version (the only per-version counts npm
+  keeps), the package total over a period (`all` by default, or `7d`, `2w`,
+  `1m`, `1y`, `<date>:<date>`, `<date>:`) and a breakdown by day, week or month
+  as a bar chart (`--chart`, the default) or table (`--table`); `--by`,
+  `--ascii`, `--json`.
+- **Firewalls and npm mirrors:** `aiskills rel` reads the releases through
+  your npm config, lists every version even when a mirror doesn't report
+  publish times (`–` and a `publish dates: not reported by <registry>` note),
+  names the registry in its errors and `--json`, and points to the changelog
+  inside the installed package as well as on GitHub. The docs say what works
+  behind a firewall, and how to use `--downloads` behind a TLS-inspecting proxy.
+- New environment variables `AISKILLS_TODAY` (fixes "today" for reproducible
+  output) and `AISKILLS_NPM_API_URL` (the download counts API, for tests).
+
+### Changed
+
+- **Docs:** tutorial step 2 shows `-i` and `-l` (with verified output), the
+  FAQ answers which agents `aiskills install` installs for, the agent guide
+  warns against `-i` in scripts, and the landing page lists the `video` group.
+
 ## [0.7.0] - 2026-11-11
 
 ### Added
@@ -339,6 +381,10 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.8.0]: https://github.com/sugatoray/aiskills/pull/184
+[0.7.0]: https://github.com/sugatoray/aiskills/pull/161
+[0.6.0]: https://github.com/sugatoray/aiskills/pull/162
+[0.5.0]: https://github.com/sugatoray/aiskills/pull/155
 [0.4.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.3.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.2.0]: https://github.com/sugatoray/aiskills/pull/122

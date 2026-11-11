@@ -134,6 +134,47 @@ describe("aiskills sync / install (bundled)", posixOnly, () => {
     assert.equal(add.cwd, sb.dir);
   });
 
+  test("install -i leaves out --yes and --skill '*' so npx skills shows its pickers", () => {
+    const r = sb.tty(["install", "-i"], "");
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(changes(r.calls), [["add", sb.root, "--global"]]);
+  });
+
+  test("install -i keeps -s/-G/-a (skipping those pickers) and still drops --yes", () => {
+    const r = sb.tty(["install", "--interactive", "-G", "alpha", "-a", "codex"], "");
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(changes(r.calls), [["add", sb.root, "--global", "--skill", "a1", "--skill", "a2", "--agent", "codex"]]);
+  });
+
+  test("install -i without a terminal is refused and installs nothing", () => {
+    const r = sb.run(["install", "-i"]);
+    assert.equal(r.status, 1);
+    assert.match(r.out, /-i\/--interactive needs a terminal/);
+    assert.deepEqual(changes(r.calls), []);
+  });
+
+  test("install --last-agents uses the agents npx skills recorded as last picked", () => {
+    mkdirSync(join(sb.home, ".agents"), { recursive: true });
+    writeFileSync(join(sb.home, ".agents", ".skill-lock.json"), JSON.stringify({ version: 3, skills: {}, lastSelectedAgents: ["claude-code", "codex"] }));
+    const r = sb.run(["install", "--last-agents", "-a", "cursor"]);
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(changes(r.calls), [["add", sb.root, "--global", "--skill", "*", "--agent", "cursor", "--agent", "claude-code", "--agent", "codex", "--yes"]]);
+    // XDG_STATE_HOME moves the lock, as in npx skills.
+    const state = join(sb.dir, "state");
+    mkdirSync(join(state, "skills"), { recursive: true });
+    writeFileSync(join(state, "skills", ".skill-lock.json"), JSON.stringify({ lastSelectedAgents: ["qoder"] }));
+    // -l is the short form.
+    const x = sb.run(["install", "-l"], { env: { XDG_STATE_HOME: state } });
+    assert.deepEqual(changes(x.calls), [["add", sb.root, "--global", "--skill", "*", "--agent", "qoder", "--yes"]]);
+  });
+
+  test("install --last-agents with nothing recorded is an error", () => {
+    const r = sb.run(["install", "--last-agents"]);
+    assert.equal(r.status, 1);
+    assert.match(r.out, /--last-agents: no agents recorded in .*\.skill-lock\.json/);
+    assert.deepEqual(changes(r.calls), []);
+  });
+
   test("-s, -G and -a accumulate, and --copy / -- extras pass through", () => {
     const r = sb.run(["install", "-G", "alpha", "-s", "lonely", "-s", "beta-one", "-a", "codex", "--copy", "--", "--full-depth"]);
     assert.equal(r.status, 0, r.out);

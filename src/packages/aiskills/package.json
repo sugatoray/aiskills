@@ -1,6 +1,6 @@
 {
   "name": "@sugatoray-ai/aiskills",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Curated agent skills (scrolls agentic memory and more) for every coding agent, in one npm package.",
   "keywords": [
     "agent-skills",
@@ -34,6 +34,7 @@
     "bin/",
     "src/scripts/core/cli.mjs",
     "src/scripts/core/installer.mjs",
+    "src/scripts/core/releases.mjs",
     "skills/",
     ".claude-plugin/marketplace.json",
     ".aiskills/",

@@ -65,6 +65,20 @@ The version of the `skills` CLI library that every `npx` call runs (not the vers
 
 Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning, and is removed in 1.0.0; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
 
+## `info` and `releases`
+
+### `AISKILLS_TODAY`
+
+A date (`YYYY-MM-DD`) that [`aiskills releases`](cli.md#releases) treats as today when it shows a release's age (`3 days ago`). Unset, today is the current UTC date. For reproducible output, as in tests and these docs; it doesn't change the download periods, which end on npm's latest day of data. Anything but a real date stops with `AISKILLS_TODAY must be a date (YYYY-MM-DD)`.
+
+### `AISKILLS_NPM_API_URL`
+
+The base URL of the npm download counts API that [`aiskills releases --downloads`](cli.md#--downloads) asks. Default: `https://api.npmjs.org`. For tests, or a mirror that serves the same paths (`/downloads/point/...`, `/downloads/range/...`, `/versions/...`). The release list itself comes from `npm view`, which uses your npm registry setting instead.
+
+### `TERM`
+
+Set by your terminal. When it is `dumb`, [`aiskills releases`](cli.md#releases) draws the downloads chart with `#`, as with [`--ascii`](cli.md#--ascii).
+
 ## Read by `npx skills`, passed through
 
 `aiskills` passes every variable to `npx` except npm's own `npm_*` variables (registry, proxy and certificate settings among them are kept). These are worth knowing:

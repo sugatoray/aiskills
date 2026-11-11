@@ -11,7 +11,7 @@ The code of `@sugatoray-ai/aiskills`, in three folders by when it runs and wheth
 ## Rules
 
 - **Imports point down only:** `docs/` → `pack/` → `core/`. `docs/` may import from `pack/` and `core/`, `pack/` may import from `core/`, and `core/` never imports from `pack/` or `docs/`, because it ships on its own and they don't. `src/test/packaging.test.mjs` fails if this is broken.
-- **What is published** is the `"files"` list in `package.json`, which names the two `core/` files one by one (plus `bin/`, the vendored skills, and the root `/README.md`, `/CHANGELOG.md`, `/SECURITY.md` and `/LICENSE`, written with a leading `/` so a README in a subfolder, like this one, isn't published too). A new file in `core/` that the CLI needs must be added to that list; the packaging tests show what ships.
+- **What is published** is the `"files"` list in `package.json`, which names the three `core/` files one by one (plus `bin/`, the vendored skills, and the root `/README.md`, `/CHANGELOG.md`, `/SECURITY.md` and `/LICENSE`, written with a leading `/` so a README in a subfolder, like this one, isn't published too). A new file in `core/` that the CLI needs must be added to that list; the packaging tests show what ships.
 - **Where a new file goes:** code a user's machine runs → `core/`; code that builds the package → `pack/`; code that builds documentation, the banner or anything under `docs/` → `docs/`. If none fits, ask before adding a fourth folder.
 - **Paths:** the scripts that need the package folder (`core/installer.mjs`, `pack/vendor-skills.mjs` and the three `docs/` builders) find it by going three levels up from their own folder; the others get it from `installer.mjs`. Moving a file to another depth means updating that.
 - **Tests** live in `src/test/`, not here. Change behaviour test-first (Red/Green); `npm test` runs them all.
@@ -24,6 +24,7 @@ What ships. The entry points in `bin/` (`aiskills.mjs`, `aix.mjs`) only import `
 | --- | --- |
 | `cli.mjs` | The `aiskills` command: argument parsing, the commands and their aliases, `--help`. Runs `main()` on import. |
 | `installer.mjs` | All shared logic, with no side effects on import: saving skills to `~/.config/sugatoray/aiskills`, every `npx skills` call (`runSkills`, the only place `npx` starts, with the pinned `skills` version), groups, glob patterns, `--route`, and the install-folder guard. |
+| `releases.mjs` | `aiskills releases` / `rel`: reads the releases with `npm view` (the user's npm config applies), fetches download counts from api.npmjs.org (in a child `node` with `NODE_USE_ENV_PROXY=1`, so `HTTPS_PROXY` is honoured), and parses counts and periods, groups days into rows and draws the release table, chart and table. Everything but `npmView` and `fetchJson` is pure. Imports `childEnv` from `installer.mjs`. |
 
 ## `pack/`
 

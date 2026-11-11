@@ -9,7 +9,7 @@
 //   home/   $HOME for the CLI; AISKILLS_HOME = home/.config/sugatoray/aiskills
 //   bin/npx a stand-in for npx that logs every call and returns canned output
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join, resolve } from "node:path";
@@ -93,6 +93,75 @@ if (a[0] === "add" && a[1] === "sugatoray/aiskills" && process.env.FAKE_STATS_EX
 process.exit(Number(process.env.FAKE_EXIT || 0));
 `;
 
+// Stand-in for npm: `npm view` (aiskills releases, info --full), answering
+// with the JSON in $FAKE_NPM_VIEW, or failing like npm does with FAKE_NPM_VIEW_ERROR=1;
+// and `npm config get registry` ($FAKE_NPM_REGISTRY, e.g. a company mirror).
+const FAKE_NPM = `#!/usr/bin/env node
+const fs = require("fs");
+const a = process.argv.slice(2);
+if (a[0] === "config" && a[1] === "get" && a[2] === "registry") {
+  console.log(process.env.FAKE_NPM_REGISTRY || "https://registry.npmjs.org/");
+  process.exit(0);
+}
+if (a[0] !== "view") process.exit(1);
+if (process.env.FAKE_NPM_VIEW_ERROR) {
+  console.error("npm error code E404");
+  console.error("npm error 404 Not Found - GET https://registry.npmjs.org/@sugatoray-ai%2faiskills - Not found");
+  process.exit(1);
+}
+process.stdout.write(process.env.FAKE_NPM_VIEW ? fs.readFileSync(process.env.FAKE_NPM_VIEW, "utf8") : "{}");
+`;
+
+// Stand-in for api.npmjs.org, run as its own process (the CLI is run with
+// spawnSync, which would block a server in the test process). Reads its
+// answers from <routes.json> on every request and logs each path.
+const FAKE_API = `import { appendFileSync, readFileSync } from "node:fs";
+import { createServer } from "node:http";
+const [routesFile, logFile] = process.argv.slice(2);
+const DAY = 86400000;
+createServer((req, res) => {
+  appendFileSync(logFile, req.url + "\\n");
+  const r = JSON.parse(readFileSync(routesFile, "utf8"));
+  const send = (code, body) => { res.writeHead(code, { "content-type": "application/json" }); res.end(JSON.stringify(body)); };
+  if (r.down) return send(503, { error: "down" });
+  const pkg = "@sugatoray-ai/aiskills";
+  if (req.url === "/downloads/point/last-day/" + pkg) return send(200, { downloads: r.daily?.[r.lastDay] ?? 0, start: r.lastDay, end: r.lastDay, package: pkg });
+  if (req.url === "/versions/" + encodeURIComponent(pkg) + "/last-week") return send(200, { package: pkg, downloads: r.perVersion ?? {} });
+  const m = /^\\/downloads\\/range\\/(\\d{4}-\\d{2}-\\d{2}):(\\d{4}-\\d{2}-\\d{2})\\/(.+)$/.exec(req.url);
+  if (m && m[3] === pkg) {
+    const days = [];
+    for (let t = Date.parse(m[1]); t <= Date.parse(m[2]); t += DAY) {
+      const day = new Date(t).toISOString().slice(0, 10);
+      days.push({ downloads: r.daily?.[day] ?? 0, day });
+    }
+    return send(200, { start: m[1], end: m[2], package: pkg, downloads: days });
+  }
+  send(404, { error: "Not Found" });
+}).listen(0, "127.0.0.1", function () { process.stdout.write("port " + this.address().port + "\\n"); });
+`;
+
+/** Sample registry data: the real publish times of 0.4.0-0.7.0, plus 0.8.0 on 2026-11-12. */
+export const SAMPLE_VIEW = {
+  time: {
+    created: "2026-11-09T05:01:33.181Z",
+    modified: "2026-11-12T10:00:00.000Z",
+    "0.0.0-stage": "2026-11-09T05:01:33.181Z",
+    "0.4.0": "2026-11-09T05:02:49.317Z",
+    "0.5.0": "2026-11-09T13:23:22.303Z",
+    "0.6.0": "2026-11-11T17:06:37.038Z",
+    "0.7.0": "2026-11-11T18:03:58.985Z",
+    "0.8.0": "2026-11-12T10:00:00.000Z",
+  },
+  "dist-tags": { latest: "0.8.0" },
+};
+
+/** Sample download counts (the real ones up to 2026-11-10). */
+export const SAMPLE_API = {
+  lastDay: "2026-11-10",
+  perVersion: { "0.0.0-stage": 122, "0.4.0": 162, "0.5.0": 140 },
+  daily: { "2026-11-09": 402, "2026-11-10": 22 },
+};
+
 /** Runs a command in a pseudo-terminal (util-linux `script`); types argv[3] + Enter at "[y/N] ". */
 const TTY_DRIVER = `import { spawn } from "node:child_process";
 const [cmd, answer] = process.argv.slice(2);
@@ -124,6 +193,7 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
+  cpSync(join(PKG_SRC, "CHANGELOG.md"), join(pkg, "CHANGELOG.md"));
   const repo = realSkills ? copyRealSkills(join(dir, "repo")) : writeFixtureTree(join(dir, "repo"));
   vendor({ repoRoot: repo, pkgDir: pkg });
   const home = join(dir, "home");
@@ -133,6 +203,12 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
   mkdirSync(fakeBin);
   writeFileSync(join(fakeBin, "npx"), FAKE_NPX);
   chmodSync(join(fakeBin, "npx"), 0o755);
+  writeFileSync(join(fakeBin, "npm"), FAKE_NPM);
+  chmodSync(join(fakeBin, "npm"), 0o755);
+  const viewFile = join(dir, "npm-view.json");
+  const routesFile = join(dir, "api.json");
+  const apiLog = join(dir, "api.log");
+  let api = null;
   const log = join(dir, "npx.log");
   const listFile = join(dir, "list.json");
   const findFile = join(dir, "find.txt");
@@ -153,6 +229,8 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
       FAKE_NPX_LOG: log,
       ...(existsSync(listFile) ? { FAKE_LIST_FILE: listFile } : {}),
       ...(existsSync(findFile) ? { FAKE_FIND_FILE: findFile } : {}),
+      ...(existsSync(viewFile) ? { FAKE_NPM_VIEW: viewFile } : {}),
+      ...(api ? { AISKILLS_NPM_API_URL: api.url } : {}),
     };
   };
   const calls = () =>
@@ -190,7 +268,39 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
     calls,
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
-    cleanup: () => rmSync(dir, { recursive: true, force: true }),
+    /** What the stand-in `npm view` answers (an object in npm view --json's shape). */
+    setView: (view) => writeFileSync(viewFile, JSON.stringify(view)),
+    /** What the stand-in api.npmjs.org answers: { lastDay, perVersion, daily: {day: n}, down }. */
+    setApi: (routes) => writeFileSync(routesFile, JSON.stringify(routes)),
+    /** Paths the stand-in api.npmjs.org was asked for since the last call. */
+    apiCalls: () => {
+      const lines = existsSync(apiLog) ? readFileSync(apiLog, "utf8").trim().split("\n").filter(Boolean) : [];
+      rmSync(apiLog, { force: true });
+      return lines;
+    },
+    /** Start the stand-in api.npmjs.org (async; await it in before/beforeEach). */
+    startApi: async () => {
+      if (api) return api;
+      if (!existsSync(routesFile)) writeFileSync(routesFile, JSON.stringify(SAMPLE_API));
+      const script = join(dir, "fake-api.mjs");
+      writeFileSync(script, FAKE_API);
+      const child = spawn(process.execPath, [script, routesFile, apiLog], { stdio: ["ignore", "pipe", "inherit"] });
+      const port = await new Promise((ok, fail) => {
+        let out = "";
+        child.stdout.on("data", (d) => {
+          out += d;
+          const m = /port (\d+)/.exec(out);
+          if (m) ok(Number(m[1]));
+        });
+        child.on("exit", (code) => fail(new Error(`fake api exited (${code})`)));
+      });
+      api = { url: `http://127.0.0.1:${port}`, child };
+      return api;
+    },
+    cleanup: () => {
+      api?.child.kill();
+      rmSync(dir, { recursive: true, force: true });
+    },
   };
 }
 

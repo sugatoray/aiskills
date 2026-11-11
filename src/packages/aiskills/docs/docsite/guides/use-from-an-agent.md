@@ -32,6 +32,8 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    aiskills install -g -G scrolls -a claude-code
    ```
 
+   Don't pass `-i`: it waits for a person to pick from a list, and without a terminal it stops with exit `1`. `-l` (the agents last picked in `npx skills add`) runs without asking, but depends on what a person picked before; `-a` is more predictable.
+
 4. **Branch on the exit code**, not on the text:
 
    | Exit code | Meaning |
@@ -67,6 +69,8 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    ```
 
    Each row has `name`, `source`, `sourceType`, `scope` and `agents`. A row with `sourceType` `local` and `source` equal to `aiskills path` was installed by `aiskills`. See [Files and schemas](../reference/files.md#npx-skills-list---json-rows).
+
+6. **Check the setup and the latest version as JSON.** `aiskills info --json` is offline and prints the version, folders and each setting with its source (`{ "aiskills", "installRoot", "saved", "settings": { "<name>": { "value", "source" } }, "skillsLock", "env" }`; `--full` adds `"full": { "npm": { "latest", "status" }, "installed": {...} }`). `aiskills rel 1 --json` gives the latest release: `.releases[0].version`, and `.installed` is this version. See [`info`](../reference/cli.md#info) and [`releases`](../reference/cli.md#releases).
 
 ## Variations
 

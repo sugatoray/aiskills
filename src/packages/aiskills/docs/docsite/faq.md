@@ -8,6 +8,10 @@ Answers to the questions people ask most, and fixes for the problems they hit.
 
 Every agent the `skills` CLI supports: Claude Code, Codex, Cursor, Qoder and many more. `aiskills` reads the list from `npx skills`, so a newer `skills` version brings new agents with no change here. Pass agent ids to `-a` (`claude-code`, `codex`, `cursor`, …).
 
+### Does `aiskills install` put the skills in every agent's folder?
+
+No, only in the agents `npx skills` detects: those whose folder already exists (such as `~/.claude` or `~/.codex`), plus the agents that share `~/.config/agents/skills`. Only when it detects none does it install for every agent it supports, creating a folder for each. To choose yourself, name agents with `-a`, pick them from a list with [`-i`](reference/cli.md#-i---interactive), or reuse your last pick with [`-l`](reference/cli.md#-l---last-agents). See [2. Pick skills and agents](tutorial/02-pick-skills-and-agents.md#pick-from-a-list--i).
+
 ### Where are the skills on my machine?
 
 The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` prints the folder). `npx skills` installs them into each agent's own folder, such as `~/.claude/skills/`, or the project's folders with `-p`.
@@ -19,6 +23,30 @@ The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` pri
 ### How do I update the skills?
 
 Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, then run `aiskills install` again: it saves the new skills and registers them. If you had picked particular skills or agents, run that `aiskills install ...` command instead.
+
+### How do I see my setup, or check for a newer version?
+
+`aiskills info` shows the aiskills version, the install folder, what was saved there and by which version, and every setting with where its value comes from (a flag's default, an `AISKILLS_*` variable, or remembered). It is offline; `aiskills info --full` also asks npm for the latest version. `aiskills rel` lists the latest releases on npm and marks the one you have; `aiskills rel --downloads` adds download counts. See [`info`](reference/cli.md#info) and [`releases`](reference/cli.md#releases).
+
+### Does aiskills work behind a firewall or with an npm mirror?
+
+Yes, except for download counts. Everything goes through npm and your npm config (`registry=`, proxy, `cafile`), so a company mirror (Artifactory, Nexus, Verdaccio, …) works:
+
+| Command | Needs | With only an npm mirror |
+| --- | --- | --- |
+| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, through `npx` | works |
+| `info` | nothing (local files) | works |
+| `info --full` | `npm view`, and `skills` through `npx` | works |
+| `releases` / `rel` | `npm view` | works; a mirror that strips publish times shows `–` as the date and says so |
+| `rel --downloads` | api.npmjs.org | fails with `could not reach api.npmjs.org`; mirrors don't serve download counts ([fixes](reference/errors.md#could-not-reach-apinpmjsorg)) |
+| the skills.sh install count | github.com | skipped silently; the install is unaffected |
+| `--route` / `aix` lookups | skills.sh | fail with an error; bundled skills don't need them |
+
+The `changelog:` line of `aiskills rel` is only printed, never fetched; its first path is the copy inside the installed package, readable offline. A TLS-inspecting proxy needs `NODE_EXTRA_CA_CERTS` for `--downloads` (npm itself uses `cafile`).
+
+### Why are download counts per version only for the last 7 days?
+
+Because npm only keeps per-version counts for the last 7 days; older ones aren't stored anywhere. `aiskills rel --downloads <period>` shows them in a column, and the package's total (all versions together) for any period, from all time (`all`, the default) to a day (`1d`). See [`--downloads`](reference/cli.md#--downloads).
 
 ### Does it install Claude Code plugins?
 

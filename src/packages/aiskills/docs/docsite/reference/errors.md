@@ -111,6 +111,23 @@ unknown command: <name>
 
 **Cause:** an `-a` pattern matched none of the agents `npx skills` supports. **Fix:** adjust the pattern, or use names from `valid agents`.
 
+### No agents recorded (`--last-agents`)
+
+```text
+[aiskills] --last-agents: no agents recorded in <lock file>
+  pick them once with 'aiskills install -i' (or 'npx skills add'), or use -a <agents>
+```
+
+**Cause:** `--last-agents` reads `lastSelectedAgents` from the lock file `npx skills` keeps (`$XDG_STATE_HOME/skills/.skill-lock.json`, else `~/.agents/.skill-lock.json`), and it has none: the agent picker of `npx skills add` was never used. **Fix:** run `aiskills install -i` once and pick the agents, or name them with `-a`.
+
+### Interactive install needs a terminal
+
+```text
+[aiskills] -i/--interactive needs a terminal; pick with -s/-G/-a instead
+```
+
+**Cause:** `-i` lets `npx skills add` ask which skills and agents to use, and there is no terminal to ask in (a script, CI, an agent). Nothing is installed. **Fix:** drop `-i` and choose with `-s`, `-G`, `-a` or `-l`/`--last-agents`.
+
 ### Could not read the agent list
 
 ```text
@@ -260,6 +277,73 @@ Install <n> external skill(s) from the registry? [y/N] n
 ```
 
 **Cause:** the package was built without `layout.json`. **Fix:** use `--flat`, or reinstall the published package.
+
+## Releases and downloads
+
+### Invalid number of releases
+
+```text
+[aiskills] invalid number of releases '<value>' (use a whole number of 1 or more, or all)
+```
+
+**Cause:** the number after `aiskills releases` or `-L`/`--last` isn't a whole number of 1 or more, or `all`. **Fix:** `aiskills rel 10`, `aiskills rel all`.
+
+### Invalid period
+
+```text
+[aiskills] invalid period '<value>'
+  use all, <N><d|w|m|y> (7d, 2w, 1m = 30 days, 1y = 365 days), <YYYY-MM-DD>:<YYYY-MM-DD> or <YYYY-MM-DD>:
+```
+
+**Cause:** the value of `--downloads` isn't one of the [period forms](cli.md#--downloads): for example `7days`, `1.5m`, `0d`, an impossible date, or a range whose start is after its end. Checked before any network call. **Fix:** use one of the listed forms.
+
+### No download counts after a date
+
+```text
+[aiskills] npm has no download counts after <date>; pick a period that starts on or before it
+```
+
+**Cause:** a `--downloads` range starts after npm's latest day of data (usually yesterday). **Fix:** start the range earlier, or use `<N>d`.
+
+### `--chart` and `--table` together
+
+```text
+[aiskills] --chart and --table can't be used together
+```
+
+**Cause:** both were given. **Fix:** pick one; `--chart` is the default.
+
+### Bad `--by` value
+
+```text
+[aiskills] --by takes day, week or month; got '<value>'
+```
+
+**Cause:** `--by` was given something else, or nothing. **Fix:** `--by day`, `--by week` or `--by month`.
+
+### Could not read the releases
+
+```text
+[aiskills] could not read the releases of @sugatoray-ai/aiskills from <registry>: <npm's reason>
+```
+
+**Cause:** `npm view` failed: no network, a registry (or company mirror) that doesn't have the package or refuses the request, or npm missing from `PATH` (then `<registry>` reads `npm`). `<registry>` is what `npm config get registry` reports, so you can see which one was asked. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`). Behind a mirror, ask whoever runs it to proxy the public npm registry for `@sugatoray-ai/aiskills`.
+
+### Could not reach api.npmjs.org
+
+```text
+[aiskills] could not reach api.npmjs.org: <reason>
+```
+
+**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). Registry mirrors (Artifactory, Nexus, Verdaccio) don't serve download counts, so a network that only allows a mirror can't use `--downloads`. Behind a TLS-inspecting proxy, `npm` uses its `cafile`/`ca` settings but these requests run in Node, which reads extra certificates from `NODE_EXTRA_CA_CERTS` (a PEM file); without it the reason is a certificate error such as `SELF_SIGNED_CERT_IN_CHAIN` or `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`. **Fix:** run without `--downloads`; allow `api.npmjs.org`; set `NODE_EXTRA_CA_CERTS` to your company's CA bundle; or, if your company proxies api.npmjs.org, point [`AISKILLS_NPM_API_URL`](environment.md#aiskills_npm_api_url) at it.
+
+### Bad `AISKILLS_TODAY`
+
+```text
+[aiskills] AISKILLS_TODAY must be a date (YYYY-MM-DD); got '<value>'
+```
+
+**Cause:** [`AISKILLS_TODAY`](environment.md#aiskills_today) is set to something that isn't a real date. **Fix:** a date like `2026-11-12`, or unset it.
 
 ## Running `npx skills`
 

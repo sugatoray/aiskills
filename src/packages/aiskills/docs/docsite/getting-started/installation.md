@@ -16,7 +16,7 @@ The first command only installs the package and its commands. It runs no install
 `aiskills install`:
 
 1. saves the skills to `~/.config/sugatoray/aiskills/skills/`, replacing any older copy, and
-2. runs `npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, which installs every skill for every agent `npx skills` detects.
+2. runs `npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill '*' --yes`, which installs every skill for every agent `npx skills` detects (see [which agents](../faq.md#does-aiskills-install-put-the-skills-in-every-agents-folder)). To pick the skills and agents from a list instead, run `aiskills install -i`.
 
 To choose, pass options. For example, only the scrolls group, only for Claude Code:
 
@@ -37,7 +37,7 @@ aiskills path
 ```
 
 ```text
-0.7.0
+0.8.0
 ~/.config/sugatoray/aiskills
 ```
 

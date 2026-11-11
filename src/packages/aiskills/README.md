@@ -103,7 +103,7 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [--stats|--no-stats] [-- <extra npx skills args>]   # alias: i
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [-i] [-l] [--copy] [--route] [-y] [-n] [--nested|--flat] [--stats|--no-stats] [-- <extra npx skills args>]   # alias: i
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--route] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills   (alias: ls)
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills   (alias: g)
@@ -115,6 +115,8 @@ aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/
 aiskills sync [--nested|--flat] [--stats|--no-stats]   # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
+aiskills info [--full] [--json]   # this setup: versions, folders, settings and their sources (offline)
+aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|--table] [--by day|week|month] [--ascii] [--json]   # latest releases on npm (alias: rel)
 ```
 
 Short aliases, mostly following `npm`'s own:
@@ -126,6 +128,7 @@ Short aliases, mostly following `npm`'s own:
 | `ls` | `installed` | `npm ls` |
 | `g` | `groups` | |
 | `f` | `find` | |
+| `rel` | `releases` | |
 | `p` | `path` | |
 | `h` (also `-h`, `--help`) | `help` | |
 
@@ -142,6 +145,8 @@ aiskills install -s scrolls-setup,scrolls-help # only these skills
 aiskills install --project                     # into the current project
 aiskills install --group scrolls --global --agent claude-code
 aiskills install -n -G stata                   # preview: what would be installed, and the commands
+aiskills install -i                            # pick skills and agents from a list (npx skills' own pickers)
+aiskills install -l                            # only the agents you picked last time (--last-agents)
 aiskills sync                                  # only save the skills; don't register them
 ```
 

@@ -11,11 +11,11 @@
 //     what the page shows.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
-import { PKG_SRC, REPO_ROOT, sandbox, tempDir } from "./helpers.mjs";
+import { PKG_SRC, REPO_ROOT, SAMPLE_API, SAMPLE_VIEW, sandbox, tempDir } from "./helpers.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const SKILL_SCRIPTS = join(REPO_ROOT, "skills", "docs", "create-lib-docs", "scripts");
@@ -235,6 +235,10 @@ describe("reference pages cover the code", () => {
  * `list=` sets what the stand-in `npx skills list --json` reports as installed
  * (a bare name comes from the install folder, owner/repo@name from GitHub);
  * `find=` sets the lines `npx skills find` prints.
+ * Every example sees the sample registry data and download counts in helpers.mjs
+ * (SAMPLE_VIEW, SAMPLE_API), with AISKILLS_TODAY=2026-11-12.
+ * `last=` sets the agents `npx skills` recorded as last picked (`lastSelectedAgents`
+ * in ~/.agents/.skill-lock.json), for `install -l`; without it there is no lock file.
  */
 function examples() {
   const out = [];
@@ -288,8 +292,10 @@ function linesMatch(expected, actual) {
 
 describe("examples in the docs print what the docs show", () => {
   const box = { current: null };
-  before(() => {
+  before(async () => {
     box.current = sandbox({ realSkills: true, stats: true });
+    // `aiskills releases` / `info --full` examples: sample registry data and download counts.
+    await box.current.startApi();
   });
   after(() => box.current?.cleanup());
 
@@ -332,13 +338,21 @@ describe("examples in the docs print what the docs show", () => {
           : { name: e, scope: "global", agents: ["Claude Code"], source: b.root, sourceType: "local" };
       });
       b.setList(rows);
+      b.setView(SAMPLE_VIEW);
+      b.setApi(SAMPLE_API);
+      const lock = join(b.home, ".agents", ".skill-lock.json");
+      rmSync(lock, { force: true });
+      if (ex.params.last) {
+        mkdirSync(dirname(lock), { recursive: true });
+        writeFileSync(lock, JSON.stringify({ version: 3, skills: {}, lastSelectedAgents: ex.params.last.split(",") }));
+      }
       b.setFind((ex.params.find ?? "").split(",").filter(Boolean).map((s) => `${s} 1.2K installs`).join("\n") + "\n");
       let out = "";
       for (const line of ex.commands) {
         const text = line.replace(/\s+#.*$/, "").trim();
         if (!text || text.startsWith("#")) continue;
         const w = words(text);
-        const env = {};
+        const env = { AISKILLS_TODAY: "2026-11-12" };
         while (/^\w+=/.test(w[0])) {
           const [k, ...v] = w.shift().split("=");
           env[k] = v.join("=");
@@ -352,7 +366,9 @@ describe("examples in the docs print what the docs show", () => {
         out += res.out;
       }
       const home = b.home;
+      // The sandbox's package folder stands in for a global npm install.
       const actual = out
+        .replaceAll(b.pkg, "/usr/local/lib/node_modules/@sugatoray-ai/aiskills")
         .replaceAll(home, "~")
         .split("\n")
         .map((l) => l.trimEnd());
