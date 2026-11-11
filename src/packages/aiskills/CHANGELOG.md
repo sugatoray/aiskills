@@ -406,7 +406,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
-[0.9.0]: https://github.com/sugatoray/aiskills/pulls?q=head%3Aclaude%2Faiskills-upgrade-v0.9.0
+[0.9.0]: https://github.com/sugatoray/aiskills/pull/193
 [0.8.0]: https://github.com/sugatoray/aiskills/pull/184
 [0.7.0]: https://github.com/sugatoray/aiskills/pull/161
 [0.6.0]: https://github.com/sugatoray/aiskills/pull/162
