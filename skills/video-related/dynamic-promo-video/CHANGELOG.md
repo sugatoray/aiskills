@@ -3,6 +3,18 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.2] - 2026-11-11
+
+### Changed
+
+- SKILL.md: the demo section is a table from each request (`--demo`,
+  `--demo=self`, `--voice`, another voice by API key or MCP connector) to the
+  `demo.py` command. Step 3 covers narration lines of `-` and fixing a
+  mispronounced name with a name-only sample and a splice.
+- README: `--demo --voice` needs no ElevenLabs route (bundled clips), a note on
+  fixing pronunciation, `--demo=self` in the usage list, and the Tests section
+  describes the current tests.
+
 ## [1.6.1] - 2026-11-11
 
 ### Changed

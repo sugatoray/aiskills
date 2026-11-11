@@ -14,6 +14,7 @@ ElevenLabs voiceover, and background music that ducks under the voice.
 /dynamic-promo-video --demo
 /dynamic-promo-video --demo --voice
 /dynamic-promo-video --demo --voice-elevenlabs=<voice-id>
+/dynamic-promo-video --demo=self
 /dynamic-promo-video --demo=self --voice
 ```
 
@@ -38,12 +39,19 @@ ElevenLabs is used through the first route that is available:
 | --- | --- |
 | Real project, no voice flag | Narrated with the default voice if a route exists, else music only. |
 | `--demo`, no voice flag | Music only. |
-| Any voice flag, a route exists | Narrated with that voice. |
-| Any voice flag, no route | The agent says so and asks you to connect the connector, add a key or attach clips. It never drops the voice silently. |
+| `--demo` with `--voice` | Narrated from the bundled clips: no route needed, no credits. |
+| Any other voice flag, a route exists | Narrated with that voice. |
+| Any other voice flag, no route | The agent says so and asks you to connect the connector, add a key or attach clips. It never drops the voice silently. |
 
 Each generated clip costs ElevenLabs credits. Clips are made once per scene and
 never re-generated to retry. If ElevenLabs rejects a voice id, the agent asks for
 another instead of picking one itself.
+
+If the voice says a name wrong, the agent writes it the way it sounds (for
+example `sugatoray` → "Shoo-gaw-doe Ray"), lets you pick from short name-only
+samples, and splices the approved sample into the existing clip instead of
+paying for the whole line again. See
+[`references/voiceover.md`](references/voiceover.md).
 
 ### The demo
 
@@ -127,7 +135,7 @@ The demo:
 python3 SKILL_DIR/scripts/demo.py                          # --demo, music only
 python3 SKILL_DIR/scripts/demo.py --voice                  # --demo --voice (bundled clips)
 python3 SKILL_DIR/scripts/demo.py --variant self --voice   # --demo=self --voice
-python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>    # another voice (API key)
+python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>    # another voice (API key); add --variant self as needed
 python3 SKILL_DIR/scripts/demo.py --clips-dir clips/       # another voice (clips from the MCP connector)
 ```
 
@@ -155,9 +163,11 @@ From the repository root:
 python3 -m unittest discover -s skills/video-related/dynamic-promo-video/tests -p 'test_*.py'
 ```
 
-The tests never call ElevenLabs: the network call is replaced by a fake, and
-the narrated demo uses silent stand-in clips. Tests that need ffmpeg, numpy,
-Node or Playwright are skipped when those are missing.
+The tests never call ElevenLabs: the network call is replaced by a fake. They
+build both demo variants (music only, narrated from the bundled clips, and with
+silent stand-in clips to check that scenes stretch), and check that the bundled
+clips match the narration, are all used and none is stored twice. Tests that
+need ffmpeg, numpy, Node or Playwright are skipped when those are missing.
 
 ## Install
 

@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.6.1"
+  version: "1.6.2"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -45,14 +45,15 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 No research, storyboard or editing. Each variant lives in `assets/demo/<variant>/`: `index.html`, `narration.txt` (one line per scene, `-` = none) and `clips.json`, which maps each scene to its approved recording in the shared `assets/demo/clips/` (default voice).
 - **default** (48s): scenes 1-6 are the generic template, a placeholder for the viewer's own video; scenes 7-9 show how to make one: a bridge ("that was a placeholder"), the three install routes from `sugatoray/aiskills`, get started (music only). The cover is tagged "Demo of Skill /dynamic-promo-video · sugatoray/aiskills".
 - **self** (32s): the skill explaining itself: cover, the problem, the scene engine's code, the three install routes, usage, get started.
-```bash
-python3 SKILL_DIR/scripts/demo.py                               # --demo            (music only)
-python3 SKILL_DIR/scripts/demo.py --voice                       # --demo --voice    (bundled clips)
-python3 SKILL_DIR/scripts/demo.py --variant self --voice        # --demo=self --voice
-python3 SKILL_DIR/scripts/demo.py --variant self --voice-id <voice-id>   # --demo=self --voice-elevenlabs=<voice-id>, API key route
-python3 SKILL_DIR/scripts/demo.py --variant self --clips-dir clips/      # another voice via the MCP connector
-```
-With `--voice` the result is identical every run (same frames, same audio). Another voice needs new clips: for the MCP route, generate one clip per non-`-` line of the variant's `narration.txt` (see references/voiceover.md), save them as `clips/vo<scene>.mp3`, then use `--clips-dir`. Output: `promo-demo/demo_final.mp4` and `thumbnail.png`, checked; deliver as in step 5. The skill icons are simplified drawings.
+| Request | Run |
+| --- | --- |
+| `--demo` / `--demo=default` | `python3 SKILL_DIR/scripts/demo.py` (music only) |
+| `--demo=self` | `python3 SKILL_DIR/scripts/demo.py --variant self` |
+| add `--voice` (or the default voice id) | add `--voice`: the bundled clips, no ElevenLabs route needed, no credits |
+| add `--voice-elevenlabs=<other id>`, API key | add `--voice-id <id>` (generates the clips) |
+| add `--voice-elevenlabs=<other id>`, MCP connector | generate one clip per non-`-` line of the variant's `narration.txt` (see references/voiceover.md), save as `clips/vo<scene>.mp3`, add `--clips-dir clips/` |
+
+With `--voice` the result is identical every run (same frames, same audio). Output: `promo-demo/demo_final.mp4` and `thumbnail.png`, checked; deliver as in step 5. The skill icons are simplified drawings.
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.
@@ -80,7 +81,7 @@ Look at the preview frames before going on. Then produce the voice clips with th
 python3 SKILL_DIR/scripts/tts_elevenlabs.py --script narration.txt --voice <voice-id> --dry-run   # check the plan first
 python3 SKILL_DIR/scripts/tts_elevenlabs.py --script narration.txt --voice <voice-id>
 ```
-With the MCP connector, call `creative_generate_speech` once per scene with that `voice_id`. Then retime:
+With the MCP connector, call `creative_generate_speech` once per scene with that `voice_id`. A scene with no narration gets the line `-` (no clip; pass `-` to timing.py). If the voice says a name wrong, write it the way it sounds, test the name alone (about 15 credits) and splice the approved sample into the clip instead of regenerating the line (references/voiceover.md). Then retime:
 ```bash
 python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3
 ```
