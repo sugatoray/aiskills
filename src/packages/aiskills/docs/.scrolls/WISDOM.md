@@ -89,6 +89,8 @@ Bad patterns or decisions to never take, and why they were rejected.
 Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code.
+- **Answer "what does `npx skills` do?" from its source, not memory.** `npm pack skills@<pinned>` into the scratchpad and grep `dist/cli.mjs`: that is how `--yes` without `--agent` was found to mean "detected agents + universal, or *all* agents if none detected", that `add` has no `--project` flag (so it asks for the scope when `--yes` is dropped), and where `lastSelectedAgents` lives.
+- **A new CLI option or message needs three doc touches or `npm test` fails:** a heading in `reference/cli.md` (every `a === "-x"` flag), every `new Error`/`warn` text in `reference/errors.md`, and the README summary line (`packaging.test.mjs` flag map). Then regenerate `llms-full.txt` (`build_llms_txt.py`) and `npm run docs:html`.
 - **Run `npm test` before every change and after it.** New behaviour gets a test in `src/test/cli.test.mjs` (stand-in `npx` on `PATH`; assert the exact `npx skills` args via `skillsArgs`) or `src/test/unit.test.mjs`. Add a failing test first (Red/Green).
 - Tests must never touch the real `HOME` or write vendored files into the package folder: use `sandbox()` / `repoCopy()` from `src/test/helpers.mjs`.
 - **End-to-end recipe** (now automated as `npm run test:e2e`): `npm pack --pack-destination <tmp>` → `HOME=<tmp>/home npm install -g --prefix <tmp>/prefix <tgz>` → drive `<tmp>/prefix/bin/aiskills` with `HOME=<tmp>/home` → `npm run clean`.
