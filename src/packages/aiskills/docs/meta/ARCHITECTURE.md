@@ -25,7 +25,8 @@ src/packages/aiskills/
     ├── README.md             what each folder is for, and the import rule
     ├── core/                 what ships: the runtime code
     │   ├── cli.mjs           argument parsing and the commands
-    │   └── installer.mjs     all shared logic (no side effects on import)
+    │   ├── installer.mjs     all shared logic (no side effects on import)
+    │   └── releases.mjs      `releases`: npm view, api.npmjs.org counts, periods, chart/table
     ├── pack/                 packaging, run at npm pack (not published)
     │   ├── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
     │   └── skillsignore.mjs  .skillsignore parser/matcher
@@ -46,13 +47,14 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 | `installer.mjs` – `npx skills` | Every call to the `skills` CLI | `runSkills` (the only place `npx` is started; pins `skills@SKILLS_CLI_VERSION` or the `AISKILLS_SKILLS_LIB_VERSION` version/range/interval via `skillsVersionSpec`, checks Windows shell characters via `cmdArgs`, explains npm release-age refusals via `explainReleaseAge`), `skillsAdd`, `skillsRemove`, `listInstalled`, `installedFromRoot`, `isFromRoot` |
 | `installer.mjs` – routing | External skills (`--route`) | `isSourceSpec`, `specSkillName`, `findSkill` (drops results failing `isSafeRegistrySpec`), `resolveExternal` (marks `lookedUp`), `confirm` (the `[y/N]` prompt), `skillsAddExternal` |
 | `installer.mjs` – guards | Not damaging what isn't ours | `assertInstallFolder` (used by `syncSkills`, `purgeRoot`, and `uninstall --purge` up front) |
-| `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups` |
+| `releases.mjs` | `aiskills releases` and its download counts | `npmView` (the only place `npm` is started), `fetchJson` (a child `node` with `NODE_USE_ENV_PROXY=1`, so `HTTPS_PROXY` works), `fetchDownloads` (18-month pieces), `parseCount`, `parsePeriod`, `resolvePeriod`, `releaseRows`, `bucketize`, `pickBy`, `renderReleases`, `renderSeries`, `todayDate` (`AISKILLS_TODAY`) |
+| `cli.mjs` | Commands, aliases, options, help | `main`, `parse`, `uninstall`, `installed`, `groups`, `info`, `parseReleases`, `releases` |
 | `docs/build-skills-docs.mjs` | The Skills pages, from what the package really ships | `bundled` (vendors into a temp folder), `render`, `frontmatter` |
 | `docs/build-docs-html.mjs` | `docs/docsite/index.html` | `collect` (tabs from the landing page's `### Section` lists), `bannerParts`, `skinMenuHtml`, `build` |
 | `docs/create-banner.mjs` | The banner page and `banner_2x.png` | `parseConfig`, `resolveValues` ("auto" values), `render`, `renderPng`, `addPngText` |
 | `docs/themes.mjs` | The 11 themes (default first) | `THEMES`, `DEFAULT_THEME`, `pageSkinCss`, `bannerSkinCss`, `fontsHref` |
 
-The `installer.mjs` and `cli.mjs` rows are `core/`. All
+The `installer.mjs`, `releases.mjs` and `cli.mjs` rows are `core/`. All
 `docs/` builders write only under `docs/`; `src/scripts/README.md` has the
 same map in short.
 

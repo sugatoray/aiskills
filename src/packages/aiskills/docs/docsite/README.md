@@ -35,6 +35,7 @@ aiskills install -G scrolls -a claude-code
 - **Clean uninstall**: full, partial, per agent or per project, with `--dry-run` and `--purge`.
 - **External skills too**: `--route` (or the `aix` command) looks up and installs skills that aren't bundled.
 - **Two layouts**: flat (one folder per skill) or `--nested` (the repo's own folders).
+- **Check your setup and new releases**: `aiskills info` shows versions, folders and every setting with where it comes from; `aiskills rel` lists the latest releases on npm, with download counts and a chart via `--downloads`.
 - **Short commands**: `ais` is `aiskills`; `aix` is `aiskills --route`; `i`, `r`, `ls`, `g`, `f`, `p`, `h` are aliases.
 - **Safe by default**: a pinned `skills` CLI, checked registry results, and no runtime dependencies.
 

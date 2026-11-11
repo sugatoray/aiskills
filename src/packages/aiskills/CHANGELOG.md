@@ -22,8 +22,8 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [0.8.0] - 2026-11-11
 
-Interactive installs: pick the skills and agents from a list, or reuse the
-agents you picked last time.
+Interactive installs (pick the skills and agents from a list, or reuse the
+agents you picked last time), plus `aiskills info` and `aiskills releases`.
 
 ### Added
 
@@ -34,6 +34,21 @@ agents you picked last time.
 - **`aiskills install -l` / `--last-agents`**: installs for the agents you last
   picked in `npx skills add` (its `lastSelectedAgents`), instead of every
   agent it detects.
+- **`aiskills info`**: shows this setup, like `conda info`: the versions, the
+  install folder and what was saved there, every setting with where its value
+  comes from, the `npx skills` lock file and last-picked agents, and the
+  `AISKILLS_*` variables that are set. Offline; `--full` also asks npm for the
+  latest version and `npx skills` for what is installed; `--json` for scripts.
+- **`aiskills releases`** (alias **`rel`**): the latest releases on npm (5 by
+  default; `rel 10`, `rel all`, `-L`/`--last`), with publish dates, ages,
+  dist-tags, the installed one marked and an update hint. `--downloads [period]`
+  adds a 7-day downloads column per version (the only per-version counts npm
+  keeps), the package total over a period (`all` by default, or `7d`, `2w`,
+  `1m`, `1y`, `<date>:<date>`, `<date>:`) and a breakdown by day, week or month
+  as a bar chart (`--chart`, the default) or table (`--table`); `--by`,
+  `--ascii`, `--json`.
+- New environment variables `AISKILLS_TODAY` (fixes "today" for reproducible
+  output) and `AISKILLS_NPM_API_URL` (the download counts API, for tests).
 
 ### Changed
 

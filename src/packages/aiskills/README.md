@@ -115,6 +115,8 @@ aiskills skills <args...>    # passthrough to `npx skills`; `:root` = ~/.config/
 aiskills sync [--nested|--flat] [--stats|--no-stats]   # only refresh ~/.config/sugatoray/aiskills/skills
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
+aiskills info [--full] [--json]   # this setup: versions, folders, settings and their sources (offline)
+aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|--table] [--by day|week|month] [--ascii] [--json]   # latest releases on npm (alias: rel)
 ```
 
 Short aliases, mostly following `npm`'s own:
@@ -126,6 +128,7 @@ Short aliases, mostly following `npm`'s own:
 | `ls` | `installed` | `npm ls` |
 | `g` | `groups` | |
 | `f` | `find` | |
+| `rel` | `releases` | |
 | `p` | `path` | |
 | `h` (also `-h`, `--help`) | `help` | |
 

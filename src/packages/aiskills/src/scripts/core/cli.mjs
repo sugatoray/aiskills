@@ -32,9 +32,29 @@ import {
   skillsRemove,
   syncSkills,
   warn,
+  OLD_SKILLS_LIB_VERSION_VAR,
+  SKILLS_LIB_VERSION_VAR,
+  readJson,
+  resolveLayout,
+  skillNamesIn,
+  skillsVersionSpec,
 } from "./installer.mjs";
+import {
+  CHANGELOG_URL,
+  DEFAULT_COUNT,
+  fetchDownloads,
+  bucketize,
+  npmView,
+  parseCount,
+  parsePeriod,
+  pickBy,
+  releaseRows,
+  renderReleases,
+  renderSeries,
+  todayDate,
+} from "./releases.mjs";
 
-const { version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
+const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
 const ROOT = installRoot();
 
 const HELP = `aiskills ${version} — Sugato Ray's agent skills
@@ -51,6 +71,9 @@ Commands:
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
   path, p        Print the folder that holds skills/
+  info           Show this setup: versions, folders, settings and where each comes from
+                 (offline); --full also asks npx skills and npm; --json for scripts
+  releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ${ROOT}
   help, h        Show this help
@@ -101,6 +124,18 @@ install only:
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
   -n, --dry-run          Show what would be installed, and the exact commands; install nothing
 
+releases only:
+  <n|all>, -L, --last <n|all>  How many releases to show (default ${DEFAULT_COUNT})
+      --downloads [period]     Add download counts: a 7-day column per version (the only
+                               per-version counts npm keeps), the package total over <period>,
+                               and a breakdown. period: all (default), <N><d|w|m|y> (7d, 2w,
+                               1m = 30 days, 1y = 365 days), <YYYY-MM-DD>:<YYYY-MM-DD> or <YYYY-MM-DD>:
+      --chart                  Show the breakdown as a bar chart (the default)
+      --table                  Show the breakdown as a plain table
+      --by day|week|month      Row size of the breakdown; default: by the period's length
+      --ascii                  Draw the bars with # instead of block characters
+  --chart, --table, --by and --ascii imply --downloads.
+
 uninstall only:
       --purge            Also delete ${ROOT} (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -127,6 +162,8 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
+  aiskills info                               # this setup, offline
+  aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ${ROOT} -s prodigy -g -y
 
@@ -173,6 +210,7 @@ function parse(argv, allowed) {
     else if ((a === "-s" || a === "--skill") && ok("skill")) add("skills", args[++i]);
     else if ((a === "-G" || a === "--group" || a === "--groups") && ok("group")) add("groups", args[++i]);
     else if (a === "--json" && ok("json")) opts.json = true;
+    else if (a === "--full" && ok("full")) opts.full = true;
     else if (a === "--route" && ok("route")) opts.route = true;
     else if ((a === "--nested" || a === "--flat") && ok("layout")) opts.layout = a.slice(2);
     else if ((a === "--stats" || a === "--no-stats") && ok("stats")) opts.stats = a === "--stats";
@@ -300,6 +338,218 @@ function groups(opts) {
   return 0;
 }
 
+const ON = (b) => (b ? "on" : "off");
+
+/** `aiskills info`: this setup, each setting with where it comes from. Offline unless --full. */
+function info(opts) {
+  const e = process.env;
+  const meta = readJson(join(ROOT, "aiskills.json"));
+  const savedDir = join(ROOT, "skills");
+  const tryOr = (fn) => {
+    try {
+      return fn();
+    } catch (err) {
+      return `invalid: ${err.message.split("\n")[0]}`;
+    }
+  };
+  let saved = null;
+  if (meta && existsSync(savedDir)) {
+    const groups = tryOr(() => loadGroups(ROOT).groups.length);
+    saved = {
+      skills: skillNamesIn(savedDir).size,
+      groups: typeof groups === "number" ? groups : 0,
+      layout: meta.layout ?? null,
+      version: meta.version ?? null,
+      savedAt: meta.installedAt ?? null,
+    };
+  }
+  const libVar = e[SKILLS_LIB_VERSION_VAR]?.trim() ? SKILLS_LIB_VERSION_VAR : e[OLD_SKILLS_LIB_VERSION_VAR]?.trim() ? OLD_SKILLS_LIB_VERSION_VAR : null;
+  const statsOff = ["DO_NOT_TRACK", "DISABLE_TELEMETRY", "CI", "GITHUB_ACTIONS"].find((k) => e[k]);
+  const env = envOptions();
+  const data = {
+    aiskills: { version, path: PKG_DIR, node: process.version, platform: `${process.platform}-${process.arch}` },
+    installRoot: { path: ROOT, source: e.AISKILLS_HOME ? "AISKILLS_HOME" : "default", exists: existsSync(ROOT) },
+    saved,
+    settings: {
+      skillsCli: {
+        value: tryOr(() => `skills@${skillsVersionSpec(libVar ? e[libVar].trim() : SKILLS_CLI_VERSION, libVar ?? SKILLS_LIB_VERSION_VAR)}`),
+        source: libVar ?? "pinned, tested",
+      },
+      scope: { value: env.global ? "global" : "project", source: e.AISKILLS_SCOPE ? "AISKILLS_SCOPE" : "default" },
+      layout: {
+        value: tryOr(() => resolveLayout(undefined, ROOT)),
+        source: e.AISKILLS_LAYOUT ? "AISKILLS_LAYOUT" : meta?.layout ? "remembered" : "default",
+      },
+      stats: {
+        value: tryOr(() => ON(resolveStats(undefined, ROOT))),
+        source: statsOff ?? (e.AISKILLS_STATS?.trim() ? "AISKILLS_STATS" : typeof meta?.stats === "boolean" ? "remembered" : "default"),
+      },
+      route: { value: ON(env.route), source: e.AISKILLS_ROUTE ? "AISKILLS_ROUTE" : "default" },
+    },
+    skillsLock: { path: skillsLockPath(), exists: existsSync(skillsLockPath()), lastPickedAgents: lastSelectedAgents() },
+    env: Object.fromEntries(Object.entries(e).filter(([k]) => k.startsWith("AISKILLS_")).sort(([a], [b]) => a.localeCompare(b))),
+  };
+  if (opts.full) {
+    const full = {};
+    try {
+      const view = npmView(PKG_NAME);
+      const latest = view.distTags.latest ?? null;
+      const status = !(version in view.time)
+        ? "not published"
+        : latest === version
+          ? "up to date"
+          : latest && view.time[latest] > view.time[version]
+            ? "update available"
+            : "newer than latest";
+      full.npm = { latest, status };
+    } catch (err) {
+      full.npm = { error: err.message };
+    }
+    const rows = listInstalled({ global: env.global, cwd: env.global ? ROOT : process.cwd() });
+    if (rows) {
+      const ours = rows.filter((r) => isFromRoot(r, ROOT));
+      const perAgent = {};
+      for (const r of ours) for (const a of r.agents ?? []) perAgent[a] = (perAgent[a] ?? 0) + 1;
+      full.installed = { scope: env.global ? "global" : "project", fromRoot: ours.length, other: rows.length - ours.length, perAgent };
+    } else {
+      full.installed = { error: "could not read 'npx skills list'" };
+    }
+    data.full = full;
+  }
+  if (opts.json) {
+    console.log(JSON.stringify(data, null, 2));
+    return 0;
+  }
+
+  const lines = [];
+  const kv = (key, value, source) => lines.push([key, source ? `${value}  (${source})` : value]);
+  const gap = () => lines.push(null);
+  kv("aiskills version", version);
+  kv("package path", PKG_DIR);
+  kv("node version", `${process.version} (${data.aiskills.platform})`);
+  gap();
+  kv("install root", ROOT, data.installRoot.source + (data.installRoot.exists ? "" : "; not created yet"));
+  if (saved) {
+    kv("saved skills", `${saved.skills} skills in ${saved.groups} groups, ${saved.layout ?? "?"} layout`);
+    const when = saved.savedAt ? `, ${saved.savedAt.slice(0, 16).replace("T", " ")} UTC` : "";
+    kv("saved by", `aiskills ${saved.version ?? "?"}${when}`, saved.version === version ? null : "not this version: run aiskills install");
+  } else {
+    kv("saved skills", "none yet", "run aiskills install or aiskills sync");
+  }
+  gap();
+  const st = data.settings;
+  kv("skills CLI", st.skillsCli.value, st.skillsCli.source);
+  kv("scope", st.scope.value, st.scope.source);
+  kv("layout", st.layout.value, st.layout.source);
+  kv("stats", st.stats.value, st.stats.source);
+  kv("route", st.route.value, st.route.source);
+  gap();
+  kv("skills lock file", data.skillsLock.path, data.skillsLock.exists ? null : "not created yet");
+  kv("last-picked agents", data.skillsLock.lastPickedAgents.join(", ") || "none", "used by install -l");
+  gap();
+  const envs = Object.entries(data.env);
+  if (!envs.length) kv("env overrides", "none");
+  envs.forEach(([k, v], i) => kv(i ? "" : "env overrides", `${k}=${v}`));
+  if (data.full) {
+    gap();
+    const { npm, installed: inst } = data.full;
+    if (npm.error) kv("latest on npm", "unavailable", npm.error);
+    else {
+      const hint = { "update available": `update available: npm install -g ${PKG_NAME}@latest`, "not published": `${version} is not published on npm` }[npm.status] ?? npm.status;
+      kv("latest on npm", npm.latest ?? "none", hint);
+    }
+    if (inst.error) kv("installed skills", "unavailable", inst.error);
+    else {
+      kv("installed skills", `${inst.fromRoot} from the install root, ${inst.other} from other sources`, inst.scope);
+      const agents = Object.entries(inst.perAgent).sort(([a], [b]) => a.localeCompare(b));
+      kv("per agent", agents.map(([a, n]) => `${a} ${n}`).join(", ") || "none");
+    }
+  }
+  const w = Math.max(...lines.filter(Boolean).map(([k]) => k.length));
+  for (const l of lines) console.log(l ? `${l[0].padStart(w)}${l[0] ? " : " : "   "}${l[1]}` : "");
+  return 0;
+}
+
+/** Options of `aiskills releases` / `rel`. */
+function parseReleases(argv) {
+  const o = { count: DEFAULT_COUNT, downloads: undefined, view: undefined, by: undefined, ascii: false, json: false };
+  const PERIODISH = /^(all|\d+[a-z]+|\d{4}-\d{2}-\d{2}:.*)$/i;
+  const setView = (v) => {
+    if (o.view && o.view !== v) throw new Error("--chart and --table can't be used together");
+    o.view = v;
+  };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "-L" || a === "--last") {
+      if (argv[i + 1] === undefined) throw new Error(`${a} needs a value`);
+      o.count = parseCount(argv[++i]);
+    } else if (a === "--downloads") {
+      o.downloads = PERIODISH.test(argv[i + 1] ?? "") ? argv[++i] : "all";
+    } else if (a.startsWith("--downloads=")) o.downloads = a.slice("--downloads=".length);
+    else if (a === "--chart") setView("chart");
+    else if (a === "--table") setView("table");
+    else if (a === "--by") {
+      const v = argv[++i];
+      const got = v === undefined ? "" : `; got '${v}'`;
+      if (!["day", "week", "month"].includes(v)) throw new Error(`--by takes day, week or month${got}`);
+      o.by = v;
+    } else if (a === "--ascii") o.ascii = true;
+    else if (a === "--json") o.json = true;
+    else if (!a.startsWith("-")) o.count = parseCount(a);
+    else throw new Error(`unknown option: ${a}`);
+  }
+  if (o.downloads === undefined && (o.view || o.by || o.ascii)) o.downloads = "all";
+  // Check the period before any network call.
+  o.period = o.downloads === undefined ? null : parsePeriod(o.downloads);
+  return o;
+}
+
+/** `aiskills releases` / `rel`: the latest releases on npm, optionally with download counts. */
+function releases(o, command) {
+  const today = todayDate();
+  const view = npmView(PKG_NAME);
+  const rows = releaseRows(view, version);
+  const latest = view.distTags.latest ?? null;
+  const dl = o.period ? fetchDownloads(PKG_NAME, o.period, { created: view.time.created }) : null;
+  const by = dl ? o.by ?? pickBy(dl.days.length) : null;
+  const series = dl ? bucketize(dl.days, by) : null;
+  const hidden = Object.keys(view.time).filter((v) => v !== "created" && v !== "modified" && !rows.some((r) => r.version === v));
+  if (o.json) {
+    const shown = rows.slice(0, o.count).map((r) => (dl ? { ...r, downloadsLastWeek: dl.perVersion[r.version] ?? null } : r));
+    const out = { package: PKG_NAME, installed: version, latest, total: rows.length, releases: shown };
+    if (dl) {
+      out.downloads = {
+        start: dl.start,
+        end: dl.end,
+        label: dl.label,
+        total: dl.total,
+        by,
+        rows: series.map((r) => ({
+          start: r.start,
+          end: r.end,
+          downloads: r.downloads,
+          partial: r.days < r.size,
+          published: rows.filter((x) => x.published.slice(0, 10) >= r.start && x.published.slice(0, 10) <= r.end).map((x) => x.version).reverse(),
+        })),
+      };
+    }
+    console.log(JSON.stringify(out, null, 2));
+    return 0;
+  }
+  console.log(renderReleases({ pkg: PKG_NAME, rows, count: o.count, installed: version, latest, today, perVersion: dl?.perVersion, command: `aiskills ${command}` }));
+  if (dl) {
+    console.log("");
+    console.log(`downloads, all versions: ${dl.total.toLocaleString("en-US")} ${dl.label} (${dl.start} → ${dl.end})`);
+    console.log("per-version counts cover the last 7 days only (npm keeps no older ones); – = no count yet");
+    if (hidden.length) console.log(`the total includes versions not listed here (${hidden.join(", ")})`);
+    console.log("");
+    console.log(renderSeries(series, { by, releases: rows, table: o.view === "table", ascii: o.ascii || process.env.TERM === "dumb" }));
+  }
+  console.log("");
+  console.log(`changelog: ${CHANGELOG_URL}`);
+  return 0;
+}
+
 function main() {
   // '--route', '--nested' and '--flat' may come before the command
   // (aiskills --route install ..., aiskills --nested).
@@ -414,6 +664,11 @@ function main() {
     }
     case "list":
       return skillsAdd(syncSkills({ version }), { list: true });
+    case "info":
+      return info(parse(rest, ["json", "full"]));
+    case "releases":
+    case "rel":
+      return releases(parseReleases(rest), cmd);
     case "path":
     case "p":
       console.log(ROOT);

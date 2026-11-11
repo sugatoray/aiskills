@@ -24,6 +24,8 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 | [`sync`](#sync) | | Only save or refresh the skills folder |
 | [`list`](#list) | | List the skills in the saved folder, via `npx skills` |
 | [`path`](#path) | `p` | Print the install folder |
+| [`info`](#info) | | Show this setup: versions, folders, settings and where each comes from |
+| [`releases`](#releases) | `rel` | Show the latest releases on npm, optionally with download counts |
 | [`skills`](#skills) | | Pass arguments to `npx skills` |
 | [`help`](#help) | `h`, `-h`, `--help` | Show the help |
 | [`-v`, `--version`](#-v---version) | | Print the version |
@@ -193,6 +195,174 @@ aiskills p
 ~/.config/sugatoray/aiskills
 ```
 
+### `info`
+
+Show this setup, like `conda info`: the aiskills version, where npm installed it, Node, the install folder and its saved skills, every setting with where its value comes from, the `npx skills` lock file and the agents last picked in it, and every `AISKILLS_*` variable that is set. It reads local files only: no network, no `npx`, so it is instant and works offline.
+
+```text
+aiskills info [--full] [--json]
+```
+
+| | |
+| --- | --- |
+| Options | [`--full`](#--full), [`--json`](#--json) |
+| Exit code | `0` |
+
+<!-- verify -->
+```bash
+aiskills info
+```
+
+```text
+  aiskills version : 0.8.0
+…
+      install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
+      saved skills : 13 skills in 7 groups, flat layout
+…
+        skills CLI : skills@1.7.6  (pinned, tested)
+             scope : global  (default)
+            layout : flat  (remembered)
+             stats : on  (default)
+             route : off  (default)
+
+  skills lock file : ~/.agents/.skill-lock.json  (not created yet)
+last-picked agents : none  (used by install -l)
+…
+```
+
+(The examples on these pages run with `AISKILLS_HOME` set, so the install root's source shows as `AISKILLS_HOME`; without it, it is `default`.)
+
+What each line means:
+
+| Line | Shows | Where it comes from (in brackets) |
+| --- | --- | --- |
+| `aiskills version`, `package path`, `node version` | This package, the folder npm installed it in, Node and the platform | |
+| `install root` | The install folder; `not created yet` before the first `install` or `sync` | `default` or `AISKILLS_HOME` |
+| `saved skills`, `saved by` | What the last `install`/`sync` saved, and which aiskills version saved it; `not this version` means run `aiskills install` again | `aiskills.json` |
+| `skills CLI` | The `skills` package `npx` runs | `pinned, tested`, or the variable that overrides it |
+| `scope`, `layout`, `stats`, `route` | The defaults `install` would use with no options | `default`, an `AISKILLS_*` variable, `remembered` (in `aiskills.json`), or, for stats, `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` or `GITHUB_ACTIONS` |
+| `skills lock file`, `last-picked agents` | The lock file `npx skills` keeps, and the agents [`-l`](#-l---last-agents) would use | |
+| `env overrides` | Every `AISKILLS_*` variable that is set, one per line | |
+
+With [`--full`](#--full) it also asks npm and `npx skills` (a few seconds; needs network), and adds:
+
+```text
+     latest on npm : 0.8.0  (up to date)
+  installed skills : 13 from the install root, 2 from other sources  (global)
+         per agent : Claude Code 13, Codex 13
+```
+
+`latest on npm` says `up to date`, `update available: npm install -g @sugatoray-ai/aiskills@latest`, or that this version is not published; if npm can't be reached it says `unavailable` and why, and the command still succeeds. `installed skills` counts what `npx skills list` reports for the current scope.
+
+See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md)
+
+### `releases`
+
+Show the package's latest releases on npm, newest first, like the Versions tab on npmjs.com: the version, when it was published (date and age), its dist-tag, and which one you have installed. Read with `npm view`, so your npm registry and proxy settings apply.
+
+```text
+aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|--table] [--by day|week|month] [--ascii] [--json]
+```
+
+| | |
+| --- | --- |
+| Alias | `rel` |
+| Options | [`-L`, `--last`](#-l---last), [`--downloads`](#--downloads), [`--chart`](#--chart), [`--table`](#--table), [`--by`](#--by), [`--ascii`](#--ascii), [`--json`](#--json) |
+| Default | The latest 5 releases, no download counts |
+| Exit code | `1` if the count or period is invalid (checked before any network call), or npm or api.npmjs.org can't be reached; otherwise `0` |
+
+The examples below run against sample registry data, with today set to 2026-11-12.
+
+<!-- verify -->
+```bash
+aiskills rel 3
+```
+
+```text
+@sugatoray-ai/aiskills: latest 3 of 5 releases
+
+  VERSION  PUBLISHED               TAG
+  0.8.0    2026-11-12 (today)      latest  ← installed
+  0.7.0    2026-11-11 (1 day ago)
+  0.6.0    2026-11-11 (1 day ago)
+
+more: aiskills rel all
+
+changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+```
+
+- How many: a number or `all` right after the command (`aiskills rel 10`, `aiskills rel all`), or the same with [`-L`/`--last`](#-l---last). Default: 5.
+- An older installed version gets `update available: <installed> → <latest>  (npm install -g @sugatoray-ai/aiskills@latest)`; one that isn't on npm gets `installed: <version> (not published on npm)`.
+- npm's staged-publish placeholder (`0.0.0-stage`) is not a release and is never listed.
+
+With [`--downloads`](#--downloads), a 7-day download column is added, then the package's total over the period and a breakdown, as a chart by default:
+
+<!-- verify -->
+```bash
+aiskills rel --downloads
+```
+
+```text
+@sugatoray-ai/aiskills: 5 releases
+
+  VERSION  PUBLISHED                TAG     DOWNLOADS (7 DAYS)
+  0.8.0    2026-11-12 (today)       latest                   –  ← installed
+  0.7.0    2026-11-11 (1 day ago)                            –
+  0.6.0    2026-11-11 (1 day ago)                            –
+  0.5.0    2026-11-09 (3 days ago)                         140
+  0.4.0    2026-11-09 (3 days ago)                         162
+
+downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
+per-version counts cover the last 7 days only (npm keeps no older ones); – = no count yet
+the total includes versions not listed here (0.0.0-stage)
+
+  2026-11-09 ██████████████████████████████ 402  0.4.0, 0.5.0 published
+  2026-11-10 █▋                              22
+
+changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+```
+
+How to read it:
+
+- **`DOWNLOADS (7 DAYS)`** is per version, and only for the last 7 days: npm keeps no older per-version counts, so per-version all-time numbers don't exist anywhere. `–` means npm has no count for that version yet (its counts lag a day or two).
+- **The total line** covers the whole package (every version) over the period you chose, `all time` by default. It includes versions the table hides, such as `0.0.0-stage`.
+- **The breakdown** has one row per day for periods up to 31 days, per week up to 183 days, and per month beyond that ([`--by`](#--by) overrides it). Each row names the versions published in it. Bars are scaled to the busiest row; a run of 3 or more empty rows is shortened to its first and last row. A week or month the period only partly covers says `(partial: <n> of <m> days)`. Days after npm's latest data (usually yesterday) are left out.
+
+The same breakdown as a plain table, with [`--table`](#--table):
+
+<!-- verify -->
+```bash
+aiskills rel 1 --downloads 7d --table
+```
+
+```text
+@sugatoray-ai/aiskills: latest 1 of 5 releases
+
+  VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
+  0.8.0    2026-11-12 (today)  latest                   –  ← installed
+
+more: aiskills rel all
+
+downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
+per-version counts cover the last 7 days only (npm keeps no older ones); – = no count yet
+the total includes versions not listed here (0.0.0-stage)
+
+  DAY         DOWNLOADS  RELEASED
+  2026-11-04          0
+  2026-11-05          0
+  2026-11-06          0
+  2026-11-07          0
+  2026-11-08          0
+  2026-11-09        402  0.4.0, 0.5.0
+  2026-11-10         22
+
+changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+```
+
+JSON (`--json`), for scripts: `{ "package", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`, `published` on a release is npm's ISO 8601 timestamp.
+
+See also: [FAQ: Which agents…](../faq.md) · [Errors: Releases and downloads](errors.md#releases-and-downloads)
+
 ### `skills`
 
 Run `npx -y skills@<pinned version> <args>` with every argument unchanged, except that `:root` is replaced by the install folder. Exit code: that of `npx skills`.
@@ -232,6 +402,9 @@ Commands:
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
   path, p        Print the folder that holds skills/
+  info           Show this setup: versions, folders, settings and where each comes from
+                 (offline); --full also asks npx skills and npm; --json for scripts
+  releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ~/.config/sugatoray/aiskills
   help, h        Show this help
@@ -282,6 +455,18 @@ install only:
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
   -n, --dry-run          Show what would be installed, and the exact commands; install nothing
 
+releases only:
+  <n|all>, -L, --last <n|all>  How many releases to show (default 5)
+      --downloads [period]     Add download counts: a 7-day column per version (the only
+                               per-version counts npm keeps), the package total over <period>,
+                               and a breakdown. period: all (default), <N><d|w|m|y> (7d, 2w,
+                               1m = 30 days, 1y = 365 days), <YYYY-MM-DD>:<YYYY-MM-DD> or <YYYY-MM-DD>:
+      --chart                  Show the breakdown as a bar chart (the default)
+      --table                  Show the breakdown as a plain table
+      --by day|week|month      Row size of the breakdown; default: by the period's length
+      --ascii                  Draw the bars with # instead of block characters
+  --chart, --table, --by and --ascii imply --downloads.
+
 uninstall only:
       --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -308,6 +493,8 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ~/.config/sugatoray/aiskills
+  aiskills info                               # this setup, offline
+  aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ~/.config/sugatoray/aiskills -s prodigy -g -y
 
@@ -356,6 +543,8 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `-n` | ✓ | ✓ | | | |
 | `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
+
+`info` takes `--full` and `--json`; `releases` takes `-L`, `--downloads`, `--chart`, `--table`, `--by`, `--ascii` and `--json` (see their headings below).
 | `--` | ✓ | ✓ | | | |
 
 ### `-g`, `--global`
@@ -437,7 +626,47 @@ On install, show what would be installed: the skills a `--route` lookup found (n
 
 ### `--json`
 
-On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json).
+On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json). On [`info`](#info) and [`releases`](#releases), print what they show as JSON (schemas in their sections).
+
+### `--full`
+
+On [`info`](#info), also ask npm for the latest version and `npx skills list` for what is installed (a few seconds; needs network). Without it, `info` is offline.
+
+### `-L`, `--last`
+
+On [`releases`](#releases), how many releases to show: a whole number of 1 or more, or `all`. The same as giving the number right after the command (`aiskills rel 10` = `aiskills rel -L 10`). Default: 5. Anything else stops with [Invalid number of releases](errors.md#invalid-number-of-releases).
+
+### `--downloads`
+
+On [`releases`](#releases), add download counts from api.npmjs.org: a `DOWNLOADS (7 DAYS)` column per version, the package's total over a period, and a breakdown by day, week or month. `--downloads` alone means `all`; a value right after it, or after `=`, is the period:
+
+```text
+period  := all                         since the first publish (the default)
+         | <N><unit>                   the last N units, ending on npm's latest day of data
+         | <YYYY-MM-DD>:<YYYY-MM-DD>   an exact range (npm's own notation)
+         | <YYYY-MM-DD>:               from a date until npm's latest day
+
+unit    := d (days) | w (weeks: 7 days) | m (months: 30 days) | y (years: 365 days)
+N       := a whole number, 1 or more
+```
+
+Examples: `--downloads 7d`, `--downloads 2w`, `--downloads=1m`, `--downloads 1y`, `--downloads 2026-11-01:2026-11-10`, `--downloads 2026-11-01:`. Units ignore case; a month is 30 days and a year 365, matching npm's own "last month" and "last year". A bare number after `--downloads` is not a period, so `aiskills rel --downloads 10` shows 10 releases with all-time counts. Periods longer than npm's 18-month limit are fetched in pieces and added up; npm has counts from 2015-01-10 on. An invalid period stops with [Invalid period](errors.md#invalid-period) before any network call.
+
+### `--chart`
+
+On [`releases`](#releases), show the downloads breakdown as a bar chart (the default). Implies `--downloads` (all time) if it isn't given. Can't be combined with `--table`.
+
+### `--table`
+
+On [`releases`](#releases), show the downloads breakdown as a plain table (`DAY`/`WEEK`/`MONTH`, `DOWNLOADS`, `RELEASED`), with every row and no bars. Implies `--downloads`.
+
+### `--by`
+
+On [`releases`](#releases), the row size of the downloads breakdown: `day`, `week` or `month`. Default: by the period's length (day up to 31 days, week up to 183, month beyond). Weeks run in 7-day steps from the period's first day; months follow the calendar. Implies `--downloads`.
+
+### `--ascii`
+
+On [`releases`](#releases), draw the chart's bars with `#` instead of block characters, for terminals or fonts without them. Also used when `TERM=dumb`. Implies `--downloads`.
 
 ### `--`
 

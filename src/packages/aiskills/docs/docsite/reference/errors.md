@@ -278,6 +278,73 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 **Cause:** the package was built without `layout.json`. **Fix:** use `--flat`, or reinstall the published package.
 
+## Releases and downloads
+
+### Invalid number of releases
+
+```text
+[aiskills] invalid number of releases '<value>' (use a whole number of 1 or more, or all)
+```
+
+**Cause:** the number after `aiskills releases` or `-L`/`--last` isn't a whole number of 1 or more, or `all`. **Fix:** `aiskills rel 10`, `aiskills rel all`.
+
+### Invalid period
+
+```text
+[aiskills] invalid period '<value>'
+  use all, <N><d|w|m|y> (7d, 2w, 1m = 30 days, 1y = 365 days), <YYYY-MM-DD>:<YYYY-MM-DD> or <YYYY-MM-DD>:
+```
+
+**Cause:** the value of `--downloads` isn't one of the [period forms](cli.md#--downloads): for example `7days`, `1.5m`, `0d`, an impossible date, or a range whose start is after its end. Checked before any network call. **Fix:** use one of the listed forms.
+
+### No download counts after a date
+
+```text
+[aiskills] npm has no download counts after <date>; pick a period that starts on or before it
+```
+
+**Cause:** a `--downloads` range starts after npm's latest day of data (usually yesterday). **Fix:** start the range earlier, or use `<N>d`.
+
+### `--chart` and `--table` together
+
+```text
+[aiskills] --chart and --table can't be used together
+```
+
+**Cause:** both were given. **Fix:** pick one; `--chart` is the default.
+
+### Bad `--by` value
+
+```text
+[aiskills] --by takes day, week or month; got '<value>'
+```
+
+**Cause:** `--by` was given something else, or nothing. **Fix:** `--by day`, `--by week` or `--by month`.
+
+### Could not read the releases
+
+```text
+[aiskills] could not read the releases of @sugatoray-ai/aiskills from npm: <npm's reason>
+```
+
+**Cause:** `npm view` failed: no network, a registry that doesn't have the package, or npm missing from `PATH`. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`).
+
+### Could not reach api.npmjs.org
+
+```text
+[aiskills] could not reach api.npmjs.org: <reason>
+```
+
+**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). **Fix:** run without `--downloads`, or allow `api.npmjs.org`.
+
+### Bad `AISKILLS_TODAY`
+
+```text
+[aiskills] AISKILLS_TODAY must be a date (YYYY-MM-DD); got '<value>'
+```
+
+**Cause:** [`AISKILLS_TODAY`](environment.md#aiskills_today) is set to something that isn't a real date. **Fix:** a date like `2026-11-12`, or unset it.
+
 ## Running `npx skills`
 
 ### Bad `AISKILLS_SKILLS_LIB_VERSION`

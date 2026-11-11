@@ -48,7 +48,7 @@ export function readSkillName(file) {
   return m ? m[1].trim() : null;
 }
 
-const readJson = (file) => {
+export const readJson = (file) => {
   try {
     return JSON.parse(readFileSync(file, "utf8"));
   } catch {
@@ -142,7 +142,7 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
 // Also keep npm's release-age settings (min-release-age, its exclude list, and
 // before), so `npm_config_min_release_age=0 aiskills ...` relaxes the rule for one run.
 const KEEP_NPM_CONFIG = /^npm_config_(registry|cache|userconfig|globalconfig|https?_proxy|proxy|noproxy|no_proxy|cafile|ca|strict_ssl|before|min_release_age|min_release_age_exclude|@.*:registry|\/\/.*)$/i;
-function childEnv() {
+export function childEnv() {
   const env = {};
   for (const [k, v] of Object.entries(process.env)) {
     if (/^npm_/i.test(k) && !KEEP_NPM_CONFIG.test(k)) continue;

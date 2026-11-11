@@ -24,6 +24,14 @@ The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` pri
 
 Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, then run `aiskills install` again: it saves the new skills and registers them. If you had picked particular skills or agents, run that `aiskills install ...` command instead.
 
+### How do I see my setup, or check for a newer version?
+
+`aiskills info` shows the aiskills version, the install folder, what was saved there and by which version, and every setting with where its value comes from (a flag's default, an `AISKILLS_*` variable, or remembered). It is offline; `aiskills info --full` also asks npm for the latest version. `aiskills rel` lists the latest releases on npm and marks the one you have; `aiskills rel --downloads` adds download counts. See [`info`](reference/cli.md#info) and [`releases`](reference/cli.md#releases).
+
+### Why are download counts per version only for the last 7 days?
+
+Because npm only keeps per-version counts for the last 7 days; older ones aren't stored anywhere. `aiskills rel --downloads <period>` shows them in a column, and the package's total (all versions together) for any period, from all time (`all`, the default) to a day (`1d`). See [`--downloads`](reference/cli.md#--downloads).
+
 ### Does it install Claude Code plugins?
 
 No. It reads the repo's `.claude-plugin/marketplace.json` only to group the skills. Everything is installed as skills through `npx skills`.

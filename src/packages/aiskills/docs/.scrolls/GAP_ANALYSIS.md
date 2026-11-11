@@ -6,6 +6,8 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - Agent patterns (`-a 'claude*'`) and `--route` lookups depend on parsing `npx skills` text output, not a stable API.
 - `install -i` was only tested with the stand-in `npx` in a pseudo-terminal; the real `npx skills` pickers were never driven through `aiskills`.
 - `--last-agents` reads `lastSelectedAgents` from the `npx skills` lock file, an internal format, not a documented interface.
+- `info --full` can't list the agents `npx skills` would detect (it exposes no such list); it shows per-agent counts of installed skills instead.
+- `releases --downloads` behind a proxy needs Node 22.21+/24+ (`NODE_USE_ENV_PROXY`); older Node ignores `HTTPS_PROXY` for it. `npm view` through `npm.cmd` is untested on Windows.
 - No `-d/--dir <path>` option; project-scope commands only act on the current folder.
 - No CI workflow: nothing runs `npm test` on pull requests, and publishing to npm is manual.
 - Nothing has run on real Windows: the CLI tests are skipped there, `npm run test:e2e` only works in a POSIX shell, and the Windows `cmd.exe` safety checks are only unit-tested.
