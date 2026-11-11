@@ -21,8 +21,8 @@ version, and the steps to reproduce.
 
 | Version | Supported |
 | --- | --- |
-| `0.5.x` | Yes (current) |
-| `0.4.x` | No: upgrade to `0.5.x` |
+| `0.6.x` | Yes (current) |
+| `0.5.x`, `0.4.x` | No: upgrade to `0.6.x` |
 | `0.3.x`, `0.2.x`, `0.1.x` | Never published |
 
 Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
@@ -104,7 +104,14 @@ npx -y skills@1.7.6 add sugatoray/aiskills --skill <each installed skill> --agen
   macOS and Linux; on Windows, see the shell-character check below).
 - npm's own lifecycle variables (`npm_config_global`, `npm_config_prefix`,
   `npm_lifecycle_*`, …) are removed before `npx` runs; registry, proxy and
-  certificate settings are kept.
+  certificate settings are kept, and so are npm's release-age settings
+  (`npm_config_min_release_age`, `npm_config_min_release_age_exclude`,
+  `npm_config_before`), which only make npm stricter or looser about how new
+  a version may be.
+- On Windows, the `skills@<range>` argument is passed to `cmd.exe` in double
+  quotes (it may hold `<`, `>`, `|` or `^`, which `cmd.exe` reads as text
+  there); it was already limited to version characters. Every other argument
+  still may not contain shell characters.
 
 ### Skills are code
 
@@ -142,8 +149,13 @@ Each of these has tests in `src/test/` (`npm test`).
 - **The `skills` CLI version is pinned.** Every call runs
   `npx -y skills@1.7.6` (`SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs`),
   so a new or compromised `skills` release is never used silently. The
-  maintainers bump it after testing. `AISKILLS_SKILLS_VERSION` overrides it
-  (an exact version, `latest` or `next`; anything else is refused).
+  maintainers bump it after testing and after `npm run audit:skills` (no high
+  or critical advisory in its dependency tree, published at least 7 days
+  earlier). `AISKILLS_SKILLS_VERSION` overrides it with an exact version,
+  `latest`, `next`, an npm range or interval notation (`[1.7.4, 1.8.0)`);
+  a range lets npm pick a version nobody tested with `aiskills`. Values are
+  limited to version characters, so they can't name another package, a URL
+  or a path, or carry shell syntax; anything else is refused.
 - **Registry text is checked before use.** Under `--route` / `aix`, an
   `owner/repo@skill` result from `npx skills find` is used only if every part
   is made of letters, digits, `.`, `_` and `-`. Other results are ignored with

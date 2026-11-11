@@ -218,7 +218,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.5.0 — Sugato Ray's agent skills
+aiskills 0.6.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -308,6 +308,11 @@ Environment:
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_SKILLS_VERSION       The skills CLI version npx runs (default 1.7.6, tested): a version,
+                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval:
+                                [1.7.4, …) >=1.7.4   (1.7.4, …) >1.7.4   [1.7.4, 1.8.0) >=1.7.4 <1.8.0
+                                (…, 1.7.6] <=1.7.6. With a range, npm picks the newest version its rules
+                                (e.g. min-release-age) allow. Quote it: AISKILLS_SKILLS_VERSION='(…, 1.7.6]'
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```
@@ -322,7 +327,7 @@ ais -v
 ```
 
 ```text
-0.5.0
+0.6.0
 ```
 
 ## Options

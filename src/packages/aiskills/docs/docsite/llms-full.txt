@@ -190,7 +190,7 @@ aiskills path
 ```
 
 ```text
-0.5.0
+0.6.0
 ~/.config/sugatoray/aiskills
 ```
 
@@ -1937,9 +1937,9 @@ See also: [CLI reference](../reference/cli.md) · [Errors and exit codes](../ref
 <!-- source: guides/choose-the-skills-cli-version.md -->
 # How to choose the `skills` CLI version
 
-Use this when you need a newer or different release of the `skills` CLI than the one `aiskills` pins.
+Use this when you need a different release of the `skills` CLI than the one `aiskills` pins, or when npm's release-age rule (`min-release-age`, `before`) refuses the pinned one.
 
-Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_VERSION` overrides it.
+Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_VERSION` overrides it with a version, a tag, an npm range or an interval.
 
 ## Steps
 
@@ -1954,31 +1954,77 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
    [aiskills] running: npx -y skills@latest --version
    ```
 
-2. Or for every command, in your shell profile:
+2. Or give a range, and npm picks the newest version in it that its own rules allow. Interval notation is turned into an npm range:
+
+   <!-- verify -->
+   ```bash
+   AISKILLS_SKILLS_VERSION='[1.7.4, 1.8.0)' aiskills skills --version
+   ```
+
+   ```text
+   [aiskills] running: npx -y 'skills@>=1.7.4 <1.8.0' --version
+   ```
+
+3. Or set it for every command, in your shell profile:
 
    ```bash
-   export AISKILLS_SKILLS_VERSION=1.7.6
+   export AISKILLS_SKILLS_VERSION='(…, 1.7.6]'
    ```
 
 ## Variations
 
-Accepted values are an exact version (`1.7.6`, `1.8.0-beta.1`), `latest` or `next`. Anything else is refused before `npx` runs, so a typo can't turn into a different package:
+| Form | Example | npm gets | Means |
+| --- | --- | --- | --- |
+| Exact version (the default) | `1.7.6`, `1.8.0-beta.1` | the same | Exactly this release |
+| Tag | `latest`, `next` | the same | Whatever the tag points at now |
+| npm range | `~1.7.4`, `^1.7.0`, `1.7.x`, `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `~1.7.4 \|\| 2.x` | the same | The newest version in the range |
+| `[x, …)` | `[1.7.4, …)` | `>=1.7.4` | x or newer |
+| `(x, …)` | `(1.7.4, …)` | `>1.7.4` | Newer than x |
+| `[x, y)` | `[1.7.4, 1.8.0)` | `>=1.7.4 <1.8.0` | From x, up to but not including y |
+| `(x, y]`, `[x, y]` | `(1.7.0, 1.7.6]` | `>1.7.0 <=1.7.6` | `[`/`]` include the bound, `(`/`)` exclude it |
+| `(…, x]` | `(…, 1.7.6]` | `<=1.7.6` | x or older |
+| `(…, x)` | `(…, 1.7.6)` | `<1.7.6` | Older than x |
+
+`…` and `...` both mean an open end, which takes `(` or `)`. Quote the value in your shell: brackets, `<`, `>` and `|` mean something to it.
+
+Anything else is refused before `npx` runs, so a typo can't turn into a different package or a shell command:
 
 <!-- verify -->
 ```bash
-AISKILLS_SKILLS_VERSION='^1' aiskills find pdf
+AISKILLS_SKILLS_VERSION='1.7 && calc' aiskills find pdf
 ```
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '^1'
+[aiskills] AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '1.7 && calc'
 ```
+
+An interval that no version fits, such as `[1.8.0, 1.7.0)`, is refused too.
+
+On Windows, `npx` runs through `cmd.exe`. A range's package argument (`skills@>=1.7.4 <1.8.0`) is passed in double quotes, where `cmd.exe` reads `<`, `>`, `|` and `^` as plain text; every other argument still may not contain them.
+
+## When npm's release-age rule blocks the pinned version
+
+With `min-release-age=7` (or `before=<date>`) in your `.npmrc`, npm refuses a version published more recently than that. If the pinned `skills` CLI is that new, every command that runs `npx` fails, and `aiskills` adds what to do after npm's own error:
+
+```text
+[aiskills] npm's release-age rule (min-release-age or before) blocked skills@1.7.6: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer.
+[aiskills]   - wait until it is old enough ('npm view skills time' shows when each version came out), or
+[aiskills]   - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or
+[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(…, 1.7.6]' (npm picks the newest it may)
+```
+
+- **Wait.** The pinned version qualifies once it's old enough.
+- **Relax the rule for one run:** `npm_config_min_release_age=0 aiskills installed`. `aiskills` passes `npm_config_min_release_age`, `npm_config_min_release_age_exclude` and `npm_config_before` on to `npx`.
+- **Allow an older version:** `AISKILLS_SKILLS_VERSION='(…, 1.7.6]'` lets npm fall back to the newest version your rule allows.
+
+`min-release-age-exclude[]=skills` in `.npmrc` doesn't help here: `npm install` honours it, but `npx` (npm 11.21 and 12.2 tested) ignores it.
 
 ## Troubleshooting
 
-- **`-a` patterns or `--route` stop working on a newer version**: `aiskills` reads two pieces of `npx skills` text output (the "Valid agents:" list and `find` results). If a release changes them, go back to the pinned version and report it.
+- **`-a` patterns or `--route` stop working on another version**: `aiskills` reads two pieces of `npx skills` text output (the "Valid agents:" list and `find` results). If a release changes them, go back to the pinned version and report it.
 
 > [!WARNING]
-> `latest` gives up the protection of the pinned version. Use it to try a release, not as a permanent setting.
+> `latest`, ranges and intervals give up the protection of the pinned, tested version: npm may pick a release nobody has tested with `aiskills`. Use them to try a release or to get past an age rule, not as a permanent setting.
 
 See also: [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) · [Security model](../concepts/security.md)
 
@@ -2252,7 +2298,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 Each one is covered by the test suite.
 
 - **No install step.** The package has no `preinstall`, `install` or `postinstall` script, so `npm install` (or pnpm, or bun) only puts files in npm's own folder: no network calls, nothing written to your home folder, no agent changed. Your agents change only when you run `aiskills install`.
-- **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it, and only accepts an exact version, `latest` or `next`.
+- **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_VERSION`](../reference/environment.md#aiskills_skills_version) overrides it with a version, `latest`, `next`, an npm range or an interval (`[1.7.4, 1.8.0)`), and refuses anything that isn't made of version characters. Before a new version is pinned, `npm run audit:skills` checks it has no high or critical advisory and is at least 7 days old.
 - **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
 - **Found skills are confirmed.** A skill the registry lookup chose is shown (source, install count) and installed only after you answer `y`, or pass `-y`. Without a terminal and without `-y`, nothing is installed. Pinned `owner/repo@skill` specs aren't asked about. See [`-y`](../reference/cli.md#-y---yes).
 - **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
@@ -2548,7 +2594,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.5.0 — Sugato Ray's agent skills
+aiskills 0.6.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -2638,6 +2684,11 @@ Environment:
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_SKILLS_VERSION       The skills CLI version npx runs (default 1.7.6, tested): a version,
+                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval:
+                                [1.7.4, …) >=1.7.4   (1.7.4, …) >1.7.4   [1.7.4, 1.8.0) >=1.7.4 <1.8.0
+                                (…, 1.7.6] <=1.7.6. With a range, npm picks the newest version its rules
+                                (e.g. min-release-age) allow. Quote it: AISKILLS_SKILLS_VERSION='(…, 1.7.6]'
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```
@@ -2652,7 +2703,7 @@ ais -v
 ```
 
 ```text
-0.5.0
+0.6.0
 ```
 
 ## Options
@@ -2880,7 +2931,7 @@ The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is 
 
 ### `AISKILLS_SKILLS_VERSION`
 
-The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest` or `next`; anything else is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
+The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation: `[x, …)` is `>=x`, `(x, …)` is `>x`, `[x, y)` is `>=x <y`, `(…, x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. Anything else, or an interval no version fits, is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
 
 ## Read by `npx skills`, passed through
 
@@ -2890,6 +2941,7 @@ The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tes
 | --- | --- |
 | `DISABLE_TELEMETRY`, `DO_NOT_TRACK` | Turn off its anonymous usage data to `skills.sh`, and the [skills.sh install count](../concepts/install-count.md) (any value) |
 | `CI`, `GITHUB_ACTIONS` | Read by `aiskills`: when set, the skills.sh install count is off |
+| `npm_config_min_release_age`, `npm_config_min_release_age_exclude`, `npm_config_before` | npm's release-age rule, passed on to `npx` (other `npm_config_*` variables except registry, proxy and certificate settings are not). `npm_config_min_release_age=0 aiskills <command>` relaxes it for one run. See [When npm's release-age rule blocks the pinned version](../guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version) |
 
 See also: [Set default choices](../guides/set-defaults.md) · [CLI reference](cli.md)
 
@@ -2917,7 +2969,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```json
 {
   "package": "@sugatoray-ai/aiskills",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "layout": "flat",
   "installedAt": "2026-11-06T10:26:01.152Z",
   "skills": "/home/me/.config/sugatoray/aiskills/skills"
@@ -3334,10 +3386,30 @@ Install <n> external skill(s) from the registry? [y/N] n
 ### Bad `AISKILLS_SKILLS_VERSION`
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '<value>'
+[aiskills] AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
 ```
 
-**Cause:** ranges, tags other than `latest`/`next`, and other text are refused. **Fix:** use an exact version, or unset it for the pinned one.
+**Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
+
+### Empty `AISKILLS_SKILLS_VERSION` interval
+
+```text
+[aiskills] AISKILLS_SKILLS_VERSION '<value>' is an empty interval: no version fits it
+```
+
+**Cause:** the lower bound is above the upper one, or they're equal and not both inclusive (`[1.7.6, 1.7.6)`). **Fix:** swap or widen the bounds; `[1.7.6, 1.7.6]` means exactly `1.7.6`.
+
+### npm's release-age rule blocked the `skills` CLI
+
+```text
+npm error notarget No matching version found for skills@1.7.6 with a date before 11/2/2026, 9:53:24 AM.
+[aiskills] npm's release-age rule (min-release-age or before) blocked skills@1.7.6: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer.
+[aiskills]   - wait until it is old enough ('npm view skills time' shows when each version came out), or
+[aiskills]   - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or
+[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(…, 1.7.6]' (npm picks the newest it may)
+```
+
+**Cause:** your `.npmrc` (or environment) sets `min-release-age` or `before`, and the `skills` CLI version `aiskills` runs was published more recently. npm's `min-release-age-exclude` doesn't apply to `npx`. With a range in `AISKILLS_SKILLS_VERSION`, the last line instead suggests a wider range. **Fix:** one of the three lines; see [When npm's release-age rule blocks the pinned version](../guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 ### Shell characters on Windows
 
@@ -3345,7 +3417,7 @@ Install <n> external skill(s) from the registry? [y/N] n
 [aiskills] refusing to pass shell characters to cmd.exe: <arguments>
 ```
 
-**Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. **Fix:** remove those characters; skill names and specs never need them.
+**Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. The `skills@<range>` argument from `AISKILLS_SKILLS_VERSION` is the one exception: it's already limited to version characters and is passed in double quotes. **Fix:** remove those characters; skill names and specs never need them.
 
 ## Packaging errors (maintainers)
 
@@ -3552,6 +3624,10 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 ### Does aiskills send any data?
 
 `aiskills` sends nothing itself. After `aiskills install`, it runs `npx skills add sugatoray/aiskills` once more in a temp folder, in the background, so the install is counted on skills.sh (off with `--no-stats` or `AISKILLS_STATS=0`); see [The skills.sh install count](concepts/install-count.md). The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set, and either one also turns the count off. See [Security model](concepts/security.md#telemetry).
+
+### `aiskills` fails with "No matching version found for skills@… with a date before …"
+
+Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and the `skills` CLI version `aiskills` runs is newer than it allows. `aiskills` prints the options after npm's error: wait, run once with `npm_config_min_release_age=0 aiskills <command>`, or set `AISKILLS_SKILLS_VERSION='(…, 1.7.6]'` so npm can fall back to an older version. See [When npm's release-age rule blocks the pinned version](guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 ### Why don't my installs show up on skills.sh?
 

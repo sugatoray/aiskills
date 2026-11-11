@@ -219,11 +219,20 @@ code:
 `SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs` is the `skills` version
 every `npx` call runs. To move to a newer one:
 
-1. `AISKILLS_SKILLS_VERSION=<new> npm run test:e2e` to try it.
-2. Read the new version's changes, especially the output of `find`, the
+1. `npm run audit:skills <new>`: it resolves the version and its dependency
+   tree (without installing), and fails if the version is **less than 7 days
+   old** or has a **high or critical advisory** anywhere in the tree. Pick a
+   version that passes. The age rule matters: users with npm's
+   `min-release-age=7` can't run a younger pinned version at all (every
+   `aiskills` command that runs `npx` fails), and a week gives the registry
+   time to flag a bad release. `--min-age <days>` changes the threshold.
+2. `AISKILLS_SKILLS_VERSION=<new> npm run test:e2e` to try it.
+3. Read the new version's changes, especially the output of `find`, the
    "Valid agents:" message and `list --json`, which `aiskills` parses.
-3. Update `SKILLS_CLI_VERSION`, run `npm test` and `npm run test:e2e`, and add
+4. Update `SKILLS_CLI_VERSION`, run `npm test` and `npm run test:e2e`, and add
    a CHANGELOG line.
+5. Run `npm run audit:skills` (no argument: the new pin) once more right
+   before `npm publish`; advisories can appear after you picked the version.
 
 ## Releasing
 
