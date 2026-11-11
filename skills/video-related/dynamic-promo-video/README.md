@@ -48,7 +48,9 @@ another instead of picking one itself.
 ### The demo
 
 `--demo` runs [`scripts/demo.py`](scripts/demo.py). There are two variants,
-each in `assets/demo/<variant>/` with its page, narration and bundled voice clips.
+each in `assets/demo/<variant>/` with its page, narration and `clips.json`. The
+voice clips live once in [`assets/demo/clips/`](assets/demo/clips/) and both
+variants share them.
 
 With `--voice` (the default voice), the narration comes from the bundled clips:
 the approved takes, including the corrected "Shoo-gaw-doe Ray" and "A.I.
@@ -96,8 +98,9 @@ clips (if narrated) and frames to check in `check/`.
 | --- | --- |
 | [`SKILL.md`](SKILL.md) | The workflow the agent follows. |
 | [`assets/template/index.html`](assets/template/index.html) | Deterministic 6-scene starter (cover, problem, product camera, install, usage, end card). |
-| [`assets/demo/default/`](assets/demo/default/) | `--demo`: page (template scenes, then installing and using this skill), narration, bundled clips. |
-| [`assets/demo/self/`](assets/demo/self/) | `--demo=self`: page about the skill itself, narration, bundled clips. |
+| [`assets/demo/default/`](assets/demo/default/) | `--demo`: page (template scenes, then installing and using this skill), narration, `clips.json`. |
+| [`assets/demo/self/`](assets/demo/self/) | `--demo=self`: page about the skill itself, narration, `clips.json`. |
+| [`assets/demo/clips/`](assets/demo/clips/) | The approved narration, one recording per line, shared by both variants. |
 | [`scripts/demo.py`](scripts/demo.py) | `--demo` in one command: demo page, music, optional narration, render, mix, verify. |
 | [`scripts/render.js`](scripts/render.js) | Preview frames, thumbnail, full frame render and silent MP4 encode. |
 | [`scripts/tts_elevenlabs.py`](scripts/tts_elevenlabs.py) | One narration clip per scene via the ElevenLabs API; `--dry-run`, skips existing clips, never retries. |

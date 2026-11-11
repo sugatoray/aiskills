@@ -13,14 +13,17 @@ For people developing this skill — not read as part of a
   standard library, except `music.py` (numpy). `tts_elevenlabs.py` uses urllib only; its
   tests replace the network call and never spend credits. The default voice id
   lives in `DEFAULT_VOICE` and in SKILL.md / references/voiceover.md; change all three together. `render.js` needs Playwright.
-- `../scripts/demo.py` + `../assets/demo/<default|self>/` (`index.html`, `narration.txt`, `clips/`)
+- `../scripts/demo.py` + `../assets/demo/<default|self>/` (`index.html`, `narration.txt`, `clips.json`)
+  + `../assets/demo/clips/` (shared recordings)
   — the `--demo` variants. demo.py reads `OB` from the page. `default`: the
   template's scenes 1-6 (keep them identical to `assets/template/index.html`),
   then scenes 7-9 about this skill. `self`: six scenes about the skill.
-  `clips/` holds the approved narration (voice TABZn6CDfjMNGrsnGzzD, with the
+  `assets/demo/clips/` holds each approved line once (voice TABZn6CDfjMNGrsnGzzD, with the
   spliced "Shoo-gaw-doe Ray" / "A.I. skills"); `--voice` reuses them so the
   narrated demos rebuild identically. If you change a narration line, replace
-  its clip too (a test checks that clips match the lines). Keep the install
+  its recording (and `clips/README.md`) and keep `clips.json` in step; a test
+  checks that the maps match the lines, every recording is used and none is
+  stored twice. Keep the install
   commands in step with the repo README.
 - `../tests/test_scripts.py` — unit tests plus an end-to-end run of the
   template; tests skip when ffmpeg, numpy, Node or Playwright is missing.

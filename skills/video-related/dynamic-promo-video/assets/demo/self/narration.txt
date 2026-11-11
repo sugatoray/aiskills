@@ -1,5 +1,5 @@
 # Narration for --demo=self (index.html here): one line per scene, in order.
-# clips/vo<scene>.mp3 are these lines in voice TABZn6CDfjMNGrsnGzzD, as approved; --voice reuses them.
+# clips.json maps each scene to its approved recording in ../clips/ (voice TABZn6CDfjMNGrsnGzzD); --voice reuses them.
 # Spoken spellings approved by the owner: sugatoray -> "Shoo-gaw-doe Ray", aiskills -> "A.I. skills".
 Meet your next launch video, built entirely from code.
 Promo videos take hours of editing, and they go stale with every release.

@@ -3,6 +3,16 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.1] - 2026-11-11
+
+### Changed
+
+- Demo voice clips are stored once in `assets/demo/clips/` (8 recordings,
+  named by what they say) instead of a copy per variant; each variant's
+  `clips.json` maps scenes to them. 672 KB instead of 1.2 MB. The rebuilt
+  narrated demos are still identical to the approved videos.
+- Test: every pooled recording is used and none is stored twice.
+
 ## [1.6.0] - 2026-11-11
 
 ### Added

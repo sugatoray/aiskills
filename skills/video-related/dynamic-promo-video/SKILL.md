@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.6.0"
+  version: "1.6.1"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -42,7 +42,7 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 - A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
 
 ## Demo (`--demo[=default|self]`)
-No research, storyboard or editing. Each variant lives in `assets/demo/<variant>/`: `index.html`, `narration.txt` (one line per scene, `-` = none) and `clips/` (the approved narration in the default voice).
+No research, storyboard or editing. Each variant lives in `assets/demo/<variant>/`: `index.html`, `narration.txt` (one line per scene, `-` = none) and `clips.json`, which maps each scene to its approved recording in the shared `assets/demo/clips/` (default voice).
 - **default** (48s): scenes 1-6 are the generic template, a placeholder for the viewer's own video; scenes 7-9 show how to make one: a bridge ("that was a placeholder"), the three install routes from `sugatoray/aiskills`, get started (music only). The cover is tagged "Demo of Skill /dynamic-promo-video · sugatoray/aiskills".
 - **self** (32s): the skill explaining itself: cover, the problem, the scene engine's code, the three install routes, usage, get started.
 ```bash

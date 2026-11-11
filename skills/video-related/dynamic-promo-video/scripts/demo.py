@@ -8,7 +8,7 @@
     python3 demo.py --clips-dir clips/         # narrated with clips made elsewhere
                                                # (e.g. by the ElevenLabs MCP connector)
 
-Variants (assets/demo/<variant>/: index.html, narration.txt, clips/):
+Variants (assets/demo/<variant>/: index.html, narration.txt, clips.json):
   default  The generic template's six placeholder scenes (standing in for the
            viewer's own video), then three scenes on making such a video with
            /dynamic-promo-video from sugatoray/aiskills: a bridge, the three
@@ -16,7 +16,8 @@ Variants (assets/demo/<variant>/: index.html, narration.txt, clips/):
   self     Six scenes about the skill itself: cover, the problem, the scene
            engine's code, the three install routes, usage, get started. 32s.
 
---voice uses the variant's bundled clips: the default ElevenLabs voice
+--voice uses the bundled clips (assets/demo/clips/, mapped to scenes by the
+variant's clips.json): the default ElevenLabs voice
 (TABZn6CDfjMNGrsnGzzD) with the owner-approved pronunciations, so the narrated
 demo is rebuilt exactly, with no ElevenLabs calls. Narration lines are one per
 scene (`-` = no narration); scenes stretch to fit them. Music and rendering are
@@ -37,6 +38,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 DEMOS = os.path.join(SKILL, "assets", "demo")
+CLIPS = os.path.join(DEMOS, "clips")  # approved narration, shared by the variants
 VARIANTS = ("default", "self")
 DEFAULT_VOICE = "TABZn6CDfjMNGrsnGzzD"
 
@@ -87,14 +89,12 @@ def main(argv=None):
     NARRATION = os.path.join(folder, "narration.txt")
     if a.voice_id == DEFAULT_VOICE:  # same voice as the bundled clips: reuse them
         a.voice, a.voice_id = True, None
-    if a.voice:
-        a.clips_dir = os.path.join(folder, "clips")
     out = os.path.abspath(a.out_dir)
     os.makedirs(out, exist_ok=True)
     shutil.copy(PAGE, os.path.join(out, "index.html"))
     OB = page_ob(PAGE)
     scenes = len(OB) - 1
-    voiced = bool(a.voice_id or a.clips_dir)
+    voiced = bool(a.voice or a.voice_id or a.clips_dir)
     print(f"== demo variant: {a.variant}", flush=True)
     voices = []
     total = OB[-1]
@@ -104,7 +104,15 @@ def main(argv=None):
         if len(lines) != scenes:
             sys.exit(f"demo.py: {NARRATION} has {len(lines)} lines for {scenes} scenes")
         clips = ["-" if text == "-" else f"vo{i}.mp3" for i, text in enumerate(lines)]
-        if a.clips_dir:
+        if a.voice:  # bundled clips: shared pool + this variant's scene -> file map
+            with open(os.path.join(folder, "clips.json"), encoding="utf-8") as f:
+                manifest = json.load(f)
+            want = {c[:-4] for c in clips if c != "-"}
+            if set(manifest) != want:
+                sys.exit(f"demo.py: {folder}/clips.json covers {sorted(manifest)}, narration needs {sorted(want)}")
+            for scene, name in manifest.items():
+                shutil.copy(os.path.join(CLIPS, name), os.path.join(out, f"{scene}.mp3"))
+        elif a.clips_dir:
             missing = [c for c in clips if c != "-" and not os.path.exists(os.path.join(a.clips_dir, c))]
             if missing:
                 sys.exit(f"demo.py: need {len(clips) - clips.count('-')} clips in {a.clips_dir}; missing: {', '.join(missing)}")

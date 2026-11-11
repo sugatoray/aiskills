@@ -361,10 +361,21 @@ class DemoTest(unittest.TestCase):
         self.assertEqual(len(narration("self")), 6)
 
     def test_bundled_clips_match_the_narration(self):
+        import hashlib
+        pool = os.path.join(SKILL, "assets", "demo", "clips")
+        used = set()
         for variant in ("default", "self"):
-            want = {f"vo{i}.mp3" for i, line in enumerate(narration(variant)) if line != "-"}
-            have = set(os.listdir(os.path.join(SKILL, "assets", "demo", variant, "clips")))
-            self.assertEqual(have, want, variant)
+            with open(os.path.join(SKILL, "assets", "demo", variant, "clips.json")) as f:
+                manifest = json.load(f)
+            want = {f"vo{i}" for i, line in enumerate(narration(variant)) if line != "-"}
+            self.assertEqual(set(manifest), want, variant)
+            for name in manifest.values():
+                self.assertTrue(os.path.exists(os.path.join(pool, name)), name)
+            used |= set(manifest.values())
+        files = {f for f in os.listdir(pool) if f.endswith(".mp3")}
+        self.assertEqual(files, used, "every pooled clip is used")
+        digests = [hashlib.md5(open(os.path.join(pool, f), "rb").read()).hexdigest() for f in files]
+        self.assertEqual(len(digests), len(set(digests)), "no duplicate clips")
         for variant in ("default", "self"):
             for line in narration(variant):
                 self.assertNotIn("sugatoray", line, "use the approved spoken spelling")

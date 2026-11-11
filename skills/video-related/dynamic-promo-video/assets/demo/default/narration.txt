@@ -1,5 +1,5 @@
 # Narration for --demo / --demo=default (index.html here): one line per scene, in order.
-# clips/vo<scene>.mp3 are these lines in voice TABZn6CDfjMNGrsnGzzD, as approved; --voice reuses them.
+# clips.json maps each scene to its approved recording in ../clips/ (voice TABZn6CDfjMNGrsnGzzD); --voice reuses them.
 # Scenes 1-6 are the template (a placeholder for the viewer's video); 7-9 are about the skill.
 # A line "-" is a scene with no narration.
 # Spoken spellings approved by the owner: sugatoray -> "Shoo-gaw-doe Ray", aiskills -> "A.I. skills".
