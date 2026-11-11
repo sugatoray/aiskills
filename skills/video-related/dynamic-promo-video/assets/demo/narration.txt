@@ -1,8 +1,8 @@
 # Narration for the --demo video (assets/demo/index.html): one line per scene, in order.
-# "Shoo-gaw-doe Ray" is the spoken spelling of sugatoray (approved by its owner).
+# Spoken spellings approved by the owner: sugatoray -> "Shoo-gaw-doe Ray", aiskills -> "A.I. skills".
 Meet your next launch video, built entirely from code.
 Promo videos take hours of editing, and they go stale with every release.
 Here, every scene is HTML, animated frame by frame, with camera moves over real screenshots.
-Install it from Shoo-gaw-doe Ray slash aiskills: with npx skills, the Claude Code plugin, or the aiskills npm package.
+Install it from Shoo-gaw-doe Ray slash A.I. skills: with npx skills, the Claude Code plugin, or the A.I. skills npm package.
 Write the story, add a voice, and the scenes stretch to fit the narration.
 Render, mix, verify, and share. Made with the dynamic promo video skill.

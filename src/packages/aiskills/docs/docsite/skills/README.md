@@ -64,7 +64,7 @@ Alias `video-related`. Install the group with `aiskills install -G video-related
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`dynamic-promo-video`](dynamic-promo-video.md) | 1.4.1 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
+| [`dynamic-promo-video`](dynamic-promo-video.md) | 1.4.2 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 

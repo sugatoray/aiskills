@@ -3,6 +3,13 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.2] - 2026-11-11
+
+### Changed
+
+- Demo narration says "aiskills" as "A.I. skills" (both places in the install
+  line), as approved by the owner.
+
 ## [1.4.1] - 2026-11-11
 
 ### Changed
