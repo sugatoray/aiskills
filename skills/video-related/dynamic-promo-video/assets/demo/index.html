@@ -92,6 +92,12 @@
   .route-line .prompt { color: var(--accent2); }
   .rcur { display: inline-block; width: 13px; height: 27px; background: var(--fg); vertical-align: -4px; }
 
+  /* cover: demo tag (demo page only) */
+  .demo-tag { margin-top: 40px; padding: 10px 22px; border-radius: 999px; background: var(--card); border: 1px solid #30363d;
+    font-size: 22px; color: var(--muted); }
+  .demo-tag .demo-cmd { color: var(--fg); font-weight: 600; margin-left: 6px; }
+  .demo-tag .demo-repo { font-family: var(--mono); color: var(--fg); font-size: 20px; }
+
   /* bridge */
   .ph-note { font-size: 24px; color: var(--muted); font-family: var(--mono); margin-bottom: 26px; }
   .ph-note b { color: var(--accent2); font-weight: 600; }
@@ -121,6 +127,7 @@
     <div class="logo" id="cover-logo">P</div>
     <h1 id="cover-title">Project<span class="accent">Name</span></h1>
     <p class="sub" id="cover-sub">One line that says what it does.</p>
+    <div class="demo-tag" id="cover-demo">Demo of Skill <span class="demo-cmd"><span class="accent">/</span>dynamic-promo-video</span> · <span class="demo-repo">sugatoray/aiskills</span></div>
   </div></section>
 
   <!-- 2. the problem -->

@@ -3,6 +3,14 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.1] - 2026-11-11
+
+### Changed
+
+- Demo cover (frame 0, also `thumbnail.png`) adds a tag: "Demo of Skill
+  /dynamic-promo-video · sugatoray/aiskills", so a social preview says what
+  the video is. The generic template's cover is unchanged.
+
 ## [1.5.0] - 2026-11-11
 
 ### Changed

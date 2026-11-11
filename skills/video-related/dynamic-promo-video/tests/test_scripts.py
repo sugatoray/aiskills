@@ -332,6 +332,7 @@ class DemoTest(unittest.TestCase):
             html = f.read()
         for text in ("One line that says what it does.", "github.com/owner/repo",  # the placeholder video comes first
                      "placeholder", "Make a video like this for your project",
+                     "Demo of Skill", 'id="cover-demo"',
                      "dynamic-promo-video", "sugatoray/aiskills",
                      "npx skills add sugatoray/aiskills --skill dynamic-promo-video",
                      "/plugin marketplace add sugatoray/aiskills",

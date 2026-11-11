@@ -50,7 +50,8 @@ another instead of picking one itself.
 generic template, a placeholder for the viewer's own video; the second part shows
 how to make one.
 
-1. Cover: ProjectName, "One line that says what it does."
+1. Cover: ProjectName, "One line that says what it does.", and a tag "Demo of Skill
+   `/dynamic-promo-video` · `sugatoray/aiskills`" (also the thumbnail).
 2. The problem: three placeholder pain points.
 3. The product: camera moves over a placeholder screenshot.
 4. Install: `npm install project-name` types itself out.
