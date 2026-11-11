@@ -103,7 +103,7 @@ AISKILLS_LAYOUT=nested npm i -g @sugatoray-ai/aiskills
 
 ```text
 # -a/-s/-G accept comma-separated names and glob patterns ('scrolls-*', 'claude*')
-aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [--stats|--no-stats] [-- <extra npx skills args>]   # alias: i
+aiskills install   [-g|-p] [-a agents] [-s skills] [-G groups] [-i] [--last-agents] [--copy] [--route] [-y] [-n] [--nested|--flat] [--stats|--no-stats] [-- <extra npx skills args>]   # alias: i
 aiskills uninstall [-g|-p] [-a agents] [-s skills] [-G groups] [--route] [--purge] [-f] [-n] [-- <extra args>]   # aliases: r, rm, remove
 aiskills installed [-g|-p]   # skills currently installed from ~/.config/sugatoray/aiskills   (alias: ls)
 aiskills groups [--json]     # skill groups (from marketplace.json) and their skills   (alias: g)

@@ -9,6 +9,7 @@ import {
   installRoot,
   installedFromRoot,
   isFromRoot,
+  lastSelectedAgents,
   listInstalled,
   confirm,
   countInstall,
@@ -26,6 +27,7 @@ import {
   runSkills,
   selectedSkills,
   skillsAdd,
+  skillsLockPath,
   skillsPackageSpec,
   skillsRemove,
   syncSkills,
@@ -81,6 +83,13 @@ Layout of ${ROOT}/skills (install, sync; may also go before the command):
                          'npx skills add' installs the same skills.
 
 install only:
+  -i, --interactive      Let 'npx skills add' ask which skills and agents to install for
+                         (its own pickers; agents you picked last time are pre-checked,
+                         and it remembers this pick). -s/-G/-a skip the matching picker.
+                         Needs a terminal.
+      --last-agents      Install for the agents you last picked in 'npx skills add'
+                         (its lastSelectedAgents), instead of every detected agent.
+                         Combines with -a.
       --copy             Copy files into agent dirs instead of symlinking
       --no-stats         Don't add this install to the skills.sh install count. By default, after
                          installing bundled skills, aiskills runs 'npx skills add ${STATS_SOURCE}' for
@@ -103,6 +112,8 @@ Examples:
   aiskills groups                             # what groups exist
   aiskills install --group scrolls --global --agent claude-code
   aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
+  aiskills install -i                         # pick skills and agents interactively
+  aiskills install --last-agents              # only the agents picked last time
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'
@@ -166,6 +177,8 @@ function parse(argv, allowed) {
     else if ((a === "--nested" || a === "--flat") && ok("layout")) opts.layout = a.slice(2);
     else if ((a === "--stats" || a === "--no-stats") && ok("stats")) opts.stats = a === "--stats";
     else if (a === "--copy" && ok("copy")) opts.copy = true;
+    else if ((a === "-i" || a === "--interactive") && ok("interactive")) opts.interactive = true;
+    else if (a === "--last-agents" && ok("lastAgents")) opts.lastAgents = true;
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
     else if ((a === "-n" || a === "--dry-run") && ok("dryRun")) opts.dryRun = true;
@@ -301,7 +314,21 @@ function main() {
   switch (cmd) {
     case "install":
     case "i": {
-      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout", "dryRun", "yes", "stats"]);
+      const opts = parse(rest, ["scope", "agent", "skill", "group", "copy", "route", "layout", "dryRun", "yes", "stats", "interactive", "lastAgents"]);
+      if (opts.interactive && !opts.dryRun && !process.stdin.isTTY) {
+        throw new Error("-i/--interactive needs a terminal; pick with -s/-G/-a instead");
+      }
+      if (opts.lastAgents) {
+        const last = lastSelectedAgents();
+        if (!last.length) {
+          throw new Error(
+            `--last-agents: no agents recorded in ${skillsLockPath()}\n` +
+              `  pick them once with 'aiskills install -i' (or 'npx skills add'), or use -a <agents>`,
+          );
+        }
+        log(`last-picked agents: ${last.join(", ")}`);
+        opts.agents = [...new Set([...opts.agents, ...last])];
+      }
       const root = syncSkills({ version, layout: opts.layout, stats: opts.stats });
       const picked = selectedSkills(opts, root);
       const external = picked?.unknown ?? [];
@@ -347,7 +374,13 @@ function main() {
         status = skillsAdd(root, { ...opts, agents, skills: bundled ?? ["*"], cwd });
         // Add it to the skills.sh install count (best effort; see countInstall).
         if (status === 0 && resolveStats(opts.stats, root)) {
-          countInstall(bundled ?? [...packageSkillNames(root)].sort(), { agents, dryRun: opts.dryRun });
+          let counted = bundled ?? [...packageSkillNames(root)].sort();
+          if (opts.interactive && !bundled && !opts.dryRun) {
+            // The picker chose the skills: count the ones now installed from root.
+            const rows = listInstalled({ global: opts.global, cwd });
+            if (rows) counted = rows.filter((r) => isFromRoot(r, root)).map((r) => r.name).sort();
+          }
+          if (counted.length) countInstall(counted, { agents, dryRun: opts.dryRun });
         }
       }
       for (const { spec } of routed) {

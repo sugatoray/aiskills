@@ -169,7 +169,8 @@ describe("npm pack", () => {
   test("the README's CLI summary lists every option install and uninstall accept", () => {
     const cli = readFileSync(join(PKG_SRC, "src", "scripts", "core", "cli.mjs"), "utf8");
     const flags = { scope: ["-g", "-p"], agent: ["-a"], skill: ["-s"], group: ["-G"], copy: ["--copy"], route: ["--route"], layout: ["--nested", "--flat"],
-                    dryRun: ["-n"], yes: ["-y"], purge: ["--purge"], force: ["-f"], stats: ["--stats", "--no-stats"] };
+                    dryRun: ["-n"], yes: ["-y"], purge: ["--purge"], force: ["-f"], stats: ["--stats", "--no-stats"],
+                    interactive: ["-i"], lastAgents: ["--last-agents"] };
     const readme = readFileSync(join(PKG_SRC, "README.md"), "utf8");
     for (const [cmd, re] of [["install", /const opts = parse\(rest, \[([^\]]+)\]\);/], ["uninstall", /return uninstall\(parse\(rest, \[([^\]]+)\]\)\);/]]) {
       const allowed = [...cli.match(re)[1].matchAll(/"(\w+)"/g)].map((m) => m[1]);

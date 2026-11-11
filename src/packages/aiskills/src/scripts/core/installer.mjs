@@ -335,19 +335,40 @@ export function runSkills(args, { cwd, capture = false, quiet = false, captureSt
  * opts: { global=true, agents=[], skills=['*'], copy=false, list=false, cwd, extra=[] }
  */
 export function skillsAdd(root = installRoot(), opts = {}) {
-  const { global = true, agents = [], skills = ["*"], copy = false, list = false, cwd, extra = [], dryRun = false } = opts;
+  const { global = true, agents = [], skills = ["*"], copy = false, list = false, cwd, extra = [], dryRun = false, interactive = false } = opts;
   const args = ["add", root];
   if (list) {
     args.push("--list");
   } else {
     if (global) args.push("--global");
-    for (const s of skills) args.push("--skill", s);
+    // Interactive: leave out --yes, and --skill when no skills were picked, so
+    // 'npx skills' shows its own pickers (skills, agents, install method).
+    for (const s of interactive && skills.length === 1 && skills[0] === "*" ? [] : skills) args.push("--skill", s);
     for (const a of agents) args.push("--agent", a);
     if (copy) args.push("--copy");
-    args.push("--yes");
+    if (!interactive) args.push("--yes");
   }
   args.push(...extra);
-  return dryRun ? showDryRun(args) : runSkills(args, { cwd });
+  return dryRun ? showDryRun(args) : runSkills(args, { cwd, interactive });
+}
+
+/**
+ * The global lock file 'npx skills' keeps: $XDG_STATE_HOME/skills/.skill-lock.json,
+ * else ~/.agents/.skill-lock.json (as in skills 1.7.x).
+ */
+export function skillsLockPath(env = process.env) {
+  if (env.XDG_STATE_HOME) return join(env.XDG_STATE_HOME, "skills", ".skill-lock.json");
+  return join(homedir(), ".agents", ".skill-lock.json");
+}
+
+/**
+ * The agents last picked in the 'npx skills add' agent picker (its
+ * "lastSelectedAgents"), or [] if none were ever picked or the lock can't be read.
+ */
+export function lastSelectedAgents(lockPath = skillsLockPath()) {
+  const lock = readJson(lockPath);
+  const agents = lock?.lastSelectedAgents;
+  return Array.isArray(agents) ? agents.filter((a) => typeof a === "string" && a) : [];
 }
 
 /** For install -n: print the exact `npx skills` command instead of running it. */

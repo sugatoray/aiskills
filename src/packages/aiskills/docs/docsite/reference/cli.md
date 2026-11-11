@@ -35,13 +35,13 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 Save the skills to the install folder (see [`sync`](#sync)), then run `npx skills add <install folder>` with the selected skills and agents.
 
 ```text
-aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra>]
+aiskills install [-g|-p] [-a agents] [-s skills] [-G groups] [-i] [--last-agents] [--copy] [--route] [-y] [-n] [--nested|--flat] [-- <extra>]
 ```
 
 | | |
 | --- | --- |
 | Alias | `i` |
-| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`--copy`](#--copy), [`--route`](#--route), [`-y`](#-y---yes), [`-n`](#-n---dry-run), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
+| Options | [`-g`](#-g---global), [`-p`](#-p---project), [`-a`](#-a---agent), [`-s`](#-s---skill), [`-G`](#-g---group---groups), [`-i`](#-i---interactive), [`--last-agents`](#--last-agents), [`--copy`](#--copy), [`--route`](#--route), [`-y`](#-y---yes), [`-n`](#-n---dry-run), [`--nested`](#--nested), [`--flat`](#--flat), [`--`](#--) |
 | Default | Every skill, `--global`, agents detected by `npx skills` |
 | Exit code | `1` if a name, pattern or lookup fails, or an external skill isn't confirmed (nothing is installed); otherwise the exit code of `npx skills add` |
 
@@ -264,6 +264,13 @@ Layout of ~/.config/sugatoray/aiskills/skills (install, sync; may also go before
                          'npx skills add' installs the same skills.
 
 install only:
+  -i, --interactive      Let 'npx skills add' ask which skills and agents to install for
+                         (its own pickers; agents you picked last time are pre-checked,
+                         and it remembers this pick). -s/-G/-a skip the matching picker.
+                         Needs a terminal.
+      --last-agents      Install for the agents you last picked in 'npx skills add'
+                         (its lastSelectedAgents), instead of every detected agent.
+                         Combines with -a.
       --copy             Copy files into agent dirs instead of symlinking
       --no-stats         Don't add this install to the skills.sh install count. By default, after
                          installing bundled skills, aiskills runs 'npx skills add sugatoray/aiskills' for
@@ -286,6 +293,8 @@ Examples:
   aiskills groups                             # what groups exist
   aiskills install --group scrolls --global --agent claude-code
   aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
+  aiskills install -i                         # pick skills and agents interactively
+  aiskills install --last-agents              # only the agents picked last time
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'
@@ -343,7 +352,7 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `--route` | ✓ | ✓ | ✓ | | |
 | `--nested`, `--flat` | ✓ | | | | ✓ |
 | `--stats`, `--no-stats` | ✓ | | | | ✓ |
-| `--copy`, `-y` | ✓ | | | | |
+| `--copy`, `-y`, `-i`, `--last-agents` | ✓ | | | | |
 | `-n` | ✓ | ✓ | | | |
 | `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
@@ -388,6 +397,16 @@ Add installs to the [skills.sh install count](../concepts/install-count.md) (the
 ### `--no-stats`
 
 Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
+
+### `-i`, `--interactive`
+
+Run `npx skills add` without `--yes`, so it shows its own pickers: which skills (all pre-checked), which agents, and how to install (symlink or copy). In the agent picker, the agents you picked last time are pre-checked, and `npx skills` remembers the new pick for next time (see [`--last-agents`](#--last-agents)). `-s`/`-G` and `-a` are still passed on and skip the skill or agent picker. With `-p`, `npx skills` also asks for the scope; pick *Project*. Needs a terminal: without one, `aiskills` stops before installing anything.
+
+Without `-i`, `npx skills add --yes` installs to every agent it detects (an agent counts as detected when its config folder exists, e.g. `~/.claude` or `~/.codex`) plus the universal `.agents/skills` agents, and, when it detects none, to every agent it supports.
+
+### `--last-agents`
+
+Install for the agents you last picked in the agent picker of `npx skills add` (run directly or via [`-i`](#-i---interactive)), instead of every detected agent. They are read from `lastSelectedAgents` in the lock file `npx skills` keeps: `$XDG_STATE_HOME/skills/.skill-lock.json`, else `~/.agents/.skill-lock.json`. Adds to any `-a` agents. If none were ever picked, it stops with [No agents recorded](errors.md#no-agents-recorded---last-agents).
 
 ### `--copy`
 

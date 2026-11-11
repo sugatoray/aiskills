@@ -111,6 +111,23 @@ unknown command: <name>
 
 **Cause:** an `-a` pattern matched none of the agents `npx skills` supports. **Fix:** adjust the pattern, or use names from `valid agents`.
 
+### No agents recorded (`--last-agents`)
+
+```text
+[aiskills] --last-agents: no agents recorded in <lock file>
+  pick them once with 'aiskills install -i' (or 'npx skills add'), or use -a <agents>
+```
+
+**Cause:** `--last-agents` reads `lastSelectedAgents` from the lock file `npx skills` keeps (`$XDG_STATE_HOME/skills/.skill-lock.json`, else `~/.agents/.skill-lock.json`), and it has none: the agent picker of `npx skills add` was never used. **Fix:** run `aiskills install -i` once and pick the agents, or name them with `-a`.
+
+### Interactive install needs a terminal
+
+```text
+[aiskills] -i/--interactive needs a terminal; pick with -s/-G/-a instead
+```
+
+**Cause:** `-i` lets `npx skills add` ask which skills and agents to use, and there is no terminal to ask in (a script, CI, an agent). Nothing is installed. **Fix:** drop `-i` and choose with `-s`, `-G`, `-a` or `--last-agents`.
+
 ### Could not read the agent list
 
 ```text

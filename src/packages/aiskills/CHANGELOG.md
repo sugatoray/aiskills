@@ -20,6 +20,16 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+### Added
+
+- **`aiskills install -i` / `--interactive`**: runs `npx skills add` without
+  `--yes`, so you pick the skills, the agents and the install method in its own
+  pickers. The agents you picked last time are pre-checked. `-s`/`-G`/`-a`
+  still skip the matching picker. Needs a terminal.
+- **`aiskills install --last-agents`**: installs for the agents you last
+  picked in `npx skills add` (its `lastSelectedAgents`), instead of every
+  agent it detects.
+
 ## [0.7.0] - 2026-11-11
 
 ### Added
