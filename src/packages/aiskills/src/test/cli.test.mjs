@@ -538,15 +538,15 @@ describe("security: registry text, folder guard, pinned skills CLI", posixOnly, 
   });
 
   // 3. npx runs a pinned, tested version of the skills CLI.
-  test("npx runs skills@<pinned version>, overridable with AISKILLS_SKILLS_VERSION", () => {
+  test("npx runs skills@<pinned version>, overridable with AISKILLS_SKILLS_LIB_VERSION", () => {
     const pinned = sb.run(["install"]).calls.map(skillsPackage);
     assert.ok(pinned.length > 0);
     for (const p of pinned) assert.match(p, /^skills@\d+\.\d+\.\d+$/);
-    const latest = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "latest" } }).calls.map(skillsPackage);
+    const latest = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "latest" } }).calls.map(skillsPackage);
     for (const p of latest) assert.equal(p, "skills@latest");
-    const bad = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "1.0 && calc" } });
+    const bad = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "1.0 && calc" } });
     assert.equal(bad.status, 1);
-    assert.match(bad.out, /AISKILLS_SKILLS_VERSION/);
+    assert.match(bad.out, /AISKILLS_SKILLS_LIB_VERSION/);
     assert.deepEqual(bad.calls, []);
   });
 });
@@ -602,7 +602,7 @@ describe("aiskills uninstall", posixOnly, () => {
 
   test("--dry-run shows the skills version that would really run", () => {
     sb.setList(installed());
-    const r = sb.run(["uninstall", "-n"], { env: { AISKILLS_SKILLS_VERSION: "latest" } });
+    const r = sb.run(["uninstall", "-n"], { env: { AISKILLS_SKILLS_LIB_VERSION: "latest" } });
     assert.equal(r.status, 0);
     assert.match(r.out, /\[dry-run\] npx -y skills@latest remove a1 beta-one --global --yes/);
   });

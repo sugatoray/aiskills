@@ -19,8 +19,10 @@ import {
   log,
   packageSkillNames,
   purgeRoot,
+  quote,
   resolveStats,
   STATS_SOURCE,
+  SKILLS_CLI_VERSION,
   runSkills,
   selectedSkills,
   skillsAdd,
@@ -123,6 +125,13 @@ Environment:
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
+  AISKILLS_SKILLS_LIB_VERSION   The skills CLI library version npx runs (default ${SKILLS_CLI_VERSION}, tested): a version,
+                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval, where one of
+                                "...", "?" or "*" is an open end: [1.7.4, ...) >=1.7.4   (1.7.4, *) >1.7.4
+                                [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
+                                the newest version its rules (e.g. min-release-age) allow.
+                                Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
+                                (AISKILLS_SKILLS_VERSION, its old name, still works until 1.0.0)
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 `;
@@ -225,7 +234,7 @@ function uninstall(opts) {
     log(picked ? `nothing to remove (${scope}).` : `no ${scope} skills installed from ${ROOT}.`);
   } else if (opts.dryRun) {
     log(`[dry-run] would remove (${scope}): ${names.join(", ")}`);
-    log(`[dry-run] npx -y ${skillsPackageSpec()} remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
+    log(`[dry-run] npx -y ${quote(skillsPackageSpec())} remove ${names.join(" ")}${opts.global ? " --global" : ""}` +
       `${agents.map((a) => ` --agent '${a}'`).join("")} --yes ${opts.extra.join(" ")}`.trimEnd());
   } else {
     const status = skillsRemove(names, { ...opts, agents, cwd });
@@ -363,7 +372,8 @@ function main() {
       return groups(parse(rest, ["json"]));
     case "skills":
       // Piggyback on any 'npx skills' command; ':root' -> install root.
-      return runSkills(rest.map((a) => (a === ":root" ? ROOT : a)));
+      // Interactive: npx skills may prompt, so its stderr stays on the terminal.
+      return runSkills(rest.map((a) => (a === ":root" ? ROOT : a)), { interactive: true });
     case "sync": {
       const { layout, stats } = parse(rest, ["layout", "stats"]);
       syncSkills({ version, layout, stats });

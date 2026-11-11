@@ -73,6 +73,13 @@ const args = process.argv.slice(2);
 if (process.env.FAKE_NPX_LOG) fs.appendFileSync(process.env.FAKE_NPX_LOG, JSON.stringify({ args, cwd: process.cwd(), npmEnv: Object.keys(process.env).filter((k) => /^npm_/i.test(k)) }) + "\\n");
 const at = args.findIndex((x) => x === "skills" || x.startsWith("skills@"));
 const a = args.slice(at + 1);
+// FAKE_NOTARGET=<date>: npm's min-release-age / before rule refusing the requested skills version.
+if (process.env.FAKE_NOTARGET) {
+  console.error("npm error code ETARGET");
+  console.error("npm error notarget No matching version found for " + args[at] + " with a date before " + process.env.FAKE_NOTARGET + ".");
+  console.error("npm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.");
+  process.exit(1);
+}
 const read = (k, d) => (process.env[k] ? fs.readFileSync(process.env[k], "utf8") : d);
 if (a[0] === "list" && a.includes("--json")) { process.stdout.write(read("FAKE_LIST_FILE", "[]")); process.exit(0); }
 if (a[0] === "add" && a.includes("__aiskills_probe__")) {

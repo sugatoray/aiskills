@@ -139,7 +139,9 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
 // npm_config_global, npm_config_prefix, npm_lifecycle_* etc. Passing those on
 // can make the nested `npx` resolve into the wrong prefix ("skills: not found"). Keep only the
 // settings that describe how to reach the registry.
-const KEEP_NPM_CONFIG = /^npm_config_(registry|cache|userconfig|globalconfig|https?_proxy|proxy|noproxy|no_proxy|cafile|ca|strict_ssl|@.*:registry|\/\/.*)$/i;
+// Also keep npm's release-age settings (min-release-age, its exclude list, and
+// before), so `npm_config_min_release_age=0 aiskills ...` relaxes the rule for one run.
+const KEEP_NPM_CONFIG = /^npm_config_(registry|cache|userconfig|globalconfig|https?_proxy|proxy|noproxy|no_proxy|cafile|ca|strict_ssl|before|min_release_age|min_release_age_exclude|@.*:registry|\/\/.*)$/i;
 function childEnv() {
   const env = {};
   for (const [k, v] of Object.entries(process.env)) {
@@ -149,7 +151,8 @@ function childEnv() {
   return env;
 }
 
-const quote = (a) => (/[\s*'"]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
+/** Quote an argument for a POSIX shell when it has spaces, quotes or shell syntax (for printed commands). */
+export const quote = (a) => (/[\s*'"<>|&;()$`]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
 
 /**
  * Run `npx -y skills <args...>` with inherited stdio; returns the exit code.
@@ -157,18 +160,103 @@ const quote = (a) => (/[\s*'"]/.test(a) ? `'${a.replace(/'/g, "'\\''")}'` : a);
  */
 // The `skills` CLI version every npx call runs. Pinned so a new (or
 // compromised) release is never picked up silently; bump it after testing
-// (npm test && npm run test:e2e). AISKILLS_SKILLS_VERSION overrides it,
-// e.g. "latest".
+// (npm test && npm run test:e2e && npm run audit:skills <version>).
+// AISKILLS_SKILLS_LIB_VERSION (the old name AISKILLS_SKILLS_VERSION still works,
+// deprecated) overrides it with a version, "latest"/"next", an npm
+// range or an interval (see skillsVersionSpec).
 export const SKILLS_CLI_VERSION = "1.7.6";
-const VERSION_SPEC = /^(latest|next|\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$/;
+/** The variable that overrides it ("LIB": the skills CLI library, not the bundled skills). */
+export const SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_LIB_VERSION";
+/** Its name in 0.4.0 - 0.5.0; still read, with a deprecation warning, until 1.0.0 removes it. */
+export const OLD_SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_VERSION";
 
-/** "skills@<version>" for npx; throws on a malformed AISKILLS_SKILLS_VERSION. */
-export function skillsPackageSpec() {
-  const v = process.env.AISKILLS_SKILLS_VERSION?.trim() || SKILLS_CLI_VERSION;
-  if (!VERSION_SPEC.test(v)) {
-    throw new Error(`AISKILLS_SKILLS_VERSION must be an exact version (e.g. 1.7.6), "latest" or "next"; got '${v}'`);
+// npm range grammar, limited to version characters: comparators (<, <=, >, >=,
+// =, ~, ^), x-ranges (1.7.x, 1.x, *), hyphen ranges (a - b) and || between sets.
+const PART = "(?:0|[1-9]\\d*|[xX*])";
+const PRE = "(?:-[0-9A-Za-z.-]+)?";
+const VER = `v?${PART}(?:\\.${PART}){0,2}${PRE}`;
+const COMPARATOR = `(?:[<>]=?|=|~|\\^)?${VER}`;
+// Parts are separated by plain ASCII spaces only: tabs, newlines and Unicode
+// spaces would be passed to npx (and on Windows to cmd.exe) as typed.
+const SET = `(?:${VER} +- +${VER}|${COMPARATOR}(?: +${COMPARATOR})*)`;
+const NPM_RANGE = new RegExp(`^${SET}(?: *\\|\\| *${SET})*$`);
+// Interval notation: [x, ...) >=x, (x, ...) >x, [x, y) >=x <y, (..., x] <=x,
+// and the other mixes of [ ( ) ]. Exactly one of "...", "?" or "*" is an open
+// end, never a combination like "?*" (plain ASCII, so it types the same in
+// every shell and Windows console); "…" is read as "...".
+const BOUND = "(\\d+(?:\\.\\d+){0,2}|\\.\\.\\.|\\?|\\*|…)";
+const INTERVAL = new RegExp(`^([\\[(]) *${BOUND} *, *${BOUND} *([\\])])$`);
+const OPEN = new Set(["...", "?", "*", "…"]);
+
+/** Compare two dotted numeric versions, padding missing parts with 0. */
+const compareVersions = (a, b) => {
+  const pa = a.split(".").map(Number);
+  const pb = b.split(".").map(Number);
+  for (let i = 0; i < 3; i++) if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) - (pb[i] ?? 0);
+  return 0;
+};
+
+/**
+ * What npx is asked for, from AISKILLS_SKILLS_LIB_VERSION: an exact version,
+ * "latest", "next", an npm range (passed on as is), or interval notation
+ * (turned into an npm range). Throws on anything else; <name> is the
+ * variable the value came from, for the error message.
+ */
+export function skillsVersionSpec(input, name = SKILLS_LIB_VERSION_VAR) {
+  const v = String(input).trim();
+  const bad = () =>
+    new Error(
+      `${name} must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) ` +
+        `or an interval (e.g. [1.7.4, 1.8.0)); got '${v}'`,
+    );
+  if (v === "latest" || v === "next") return v;
+  const m = INTERVAL.exec(v);
+  if (m) {
+    const [, open, lo, hi, close] = m;
+    const loOpen = OPEN.has(lo);
+    const hiOpen = OPEN.has(hi);
+    // An open end can only be exclusive, and at least one end needs a version.
+    if ((loOpen && open !== "(") || (hiOpen && close !== ")") || (loOpen && hiOpen)) throw bad();
+    if (!loOpen && !hiOpen) {
+      const c = compareVersions(lo, hi);
+      if (c > 0 || (c === 0 && !(open === "[" && close === "]"))) {
+        throw new Error(`${name} '${v}' is an empty interval: no version fits it`);
+      }
+    }
+    const parts = [];
+    if (!loOpen) parts.push(`${open === "[" ? ">=" : ">"}${lo}`);
+    if (!hiOpen) parts.push(`${close === "]" ? "<=" : "<"}${hi}`);
+    return parts.join(" ");
   }
-  return `skills@${v}`;
+  if (NPM_RANGE.test(v)) return v;
+  throw bad();
+}
+
+let announced = false;
+let deprecationShown = false;
+
+/**
+ * "skills@<version or range>" for npx; throws on a malformed
+ * AISKILLS_SKILLS_LIB_VERSION. The old name, AISKILLS_SKILLS_VERSION (0.4.0 -
+ * 0.5.0), still works with a deprecation warning; the new one wins when both
+ * are set. When the value overrides the pinned version, says so once per
+ * command (next to the `running: npx ...` lines), so a downgrade set by a
+ * profile, .envrc or CI variable can't happen silently.
+ */
+export function skillsPackageSpec() {
+  const current = process.env[SKILLS_LIB_VERSION_VAR]?.trim();
+  const old = process.env[OLD_SKILLS_LIB_VERSION_VAR]?.trim();
+  if (old && !deprecationShown) {
+    deprecationShown = true;
+    warn(`${OLD_SKILLS_LIB_VERSION_VAR} is deprecated and will be removed in 1.0.0: use ${SKILLS_LIB_VERSION_VAR} (the version of the skills CLI library, not of the bundled skills)`);
+  }
+  const name = current ? SKILLS_LIB_VERSION_VAR : OLD_SKILLS_LIB_VERSION_VAR;
+  const spec = skillsVersionSpec(current || old || SKILLS_CLI_VERSION, name);
+  if (spec !== SKILLS_CLI_VERSION && !announced) {
+    announced = true;
+    log(`using skills@${spec} from ${name}, not the tested ${SKILLS_CLI_VERSION}`);
+  }
+  return `skills@${spec}`;
 }
 
 // On Windows, npx.cmd has to run through cmd.exe, which interprets these.
@@ -180,18 +268,53 @@ export const unsafeForWindowsShell = (args) => args.filter((a) => WINDOWS_SHELL_
 /** cmd.exe splits on spaces: quote arguments that contain whitespace (they can't contain '"'). */
 export const quoteForCmd = (args) => args.map((a) => (/\s/.test(a) ? `"${a}"` : a));
 
-export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false, timeout } = {}) {
+/**
+ * npx's arguments for cmd.exe. The `skills@<range>` spec was already limited
+ * to version characters by skillsVersionSpec; it may hold < > | ^, which
+ * cmd.exe reads as text inside double quotes, so it is quoted. Every other
+ * argument is refused if it holds a shell character.
+ */
+export function cmdArgs(full) {
+  const isSpec = (a) => a.startsWith("skills@");
+  const bad = unsafeForWindowsShell(full.filter((a) => !isSpec(a)));
+  if (bad.length) throw new Error(`refusing to pass shell characters to cmd.exe: ${bad.join(" ")}`);
+  return full.map((a) => (isSpec(a) ? (/[\s<>|^]/.test(a) ? `"${a}"` : a) : quoteForCmd([a])[0]));
+}
+
+/**
+ * If npm refused the skills CLI because of its release-age rule
+ * (min-release-age or before), say so and what to do. <stderr> is npx's.
+ */
+export function explainReleaseAge(stderr) {
+  const m = /No matching version found for (skills@.+?) with a date before (.+?)\.?\s*$/m.exec(stderr ?? "");
+  if (!m) return false;
+  const [, spec, cutoff] = m;
+  const exact = /^skills@(\d+\.\d+\.\d+)$/.exec(spec)?.[1];
+  warn(`npm's release-age rule (min-release-age or before) blocked ${spec}: npm only installs versions published before ${cutoff}, and this one is newer.`);
+  warn("  - wait until it is old enough ('npm view skills time' shows when each version came out), or");
+  warn("  - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or");
+  warn(
+    exact
+      ? `  - allow an older, untested skills CLI: AISKILLS_SKILLS_LIB_VERSION='(..., ${exact}]' (npm picks the newest it may)`
+      : "  - allow an older, untested skills CLI with a wider AISKILLS_SKILLS_LIB_VERSION range",
+  );
+  return true;
+}
+
+/**
+ * Run `npx -y skills@<version> <args...>`; returns the exit code, or with
+ * capture { status, stdout, stderr }. npx's stderr is read (and then shown,
+ * unless captureStderr) so an npm release-age refusal can be explained;
+ * interactive=true leaves it on the terminal (the `skills` passthrough).
+ */
+export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false, timeout, interactive = false } = {}) {
   const win = process.platform === "win32";
   const npx = win ? "npx.cmd" : "npx";
   const full = ["-y", skillsPackageSpec(), ...args];
-  if (win) {
-    const bad = unsafeForWindowsShell(full);
-    if (bad.length) throw new Error(`refusing to pass shell characters to cmd.exe: ${bad.join(" ")}`);
-  }
+  const argv = win ? cmdArgs(full) : full;
   if (!quiet) log(`running: npx ${full.map(quote).join(" ")}`);
-  const argv = win ? quoteForCmd(full) : full;
   const res = spawnSync(npx, argv, {
-    stdio: capture ? ["ignore", "pipe", captureStderr ? "pipe" : "inherit"] : "inherit",
+    stdio: [capture ? "ignore" : "inherit", capture ? "pipe" : "inherit", interactive ? "inherit" : "pipe"],
     encoding: "utf8",
     // The install root may not exist (e.g. after --purge); run from $HOME then.
     cwd: cwd && existsSync(cwd) ? cwd : cwd ? homedir() : process.cwd(),
@@ -202,6 +325,8 @@ export function runSkills(args, { cwd, capture = false, quiet = false, captureSt
   });
   if (res.error) throw res.error;
   const status = res.status ?? 1;
+  if (!interactive && !captureStderr && res.stderr) process.stderr.write(res.stderr);
+  if (status !== 0) explainReleaseAge(res.stderr);
   return capture ? { status, stdout: res.stdout ?? "", stderr: res.stderr ?? "" } : status;
 }
 
@@ -227,7 +352,7 @@ export function skillsAdd(root = installRoot(), opts = {}) {
 
 /** For install -n: print the exact `npx skills` command instead of running it. */
 function showDryRun(args) {
-  log(`[dry-run] npx -y ${skillsPackageSpec()} ${args.join(" ")}`);
+  log(`[dry-run] npx -y ${quote(skillsPackageSpec())} ${args.join(" ")}`);
   return 0;
 }
 
@@ -677,7 +802,7 @@ export function statsArgs(skills, agents = []) {
 export function countInstall(skills, { agents = [], dryRun = false } = {}) {
   const args = statsArgs(skills, agents);
   if (dryRun) {
-    log(`[dry-run] skills.sh count: npx -y ${skillsPackageSpec()} ${args.join(" ")} (in a temp folder; turn off: --no-stats)`);
+    log(`[dry-run] skills.sh count: npx -y ${quote(skillsPackageSpec())} ${args.join(" ")} (in a temp folder; turn off: --no-stats)`);
     return;
   }
   log("adding this install to the skills.sh count in the background (turn off: --no-stats)");

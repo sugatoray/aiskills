@@ -209,7 +209,7 @@ describe("npm pack", () => {
     const list = (rel) => readdirSync(join(PKG_SRC, "src", "scripts", rel), { withFileTypes: true }).map((e) => (e.isDirectory() ? e.name + "/" : e.name)).sort();
     assert.deepEqual(list("."), ["README.md", "core/", "docs/", "pack/"]);
     assert.deepEqual(list("core"), ["cli.mjs", "installer.mjs"]);
-    assert.deepEqual(list("pack"), ["skillsignore.mjs", "vendor-skills.mjs"]);
+    assert.deepEqual(list("pack"), ["audit-skills.mjs", "skillsignore.mjs", "vendor-skills.mjs"]);
     assert.deepEqual(list("docs"), ["build-docs-html.mjs", "build-skills-docs.mjs", "create-banner.mjs", "templates/", "themes.mjs"]);
     assert.deepEqual(list("docs/templates"), ["banner-template.html", "docs-template.html"]);
     // Imports only point "down": docs/ -> pack/ -> core/. core/ ships alone, so it may import neither.

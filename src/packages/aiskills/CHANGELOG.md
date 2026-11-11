@@ -20,6 +20,58 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-11
+
+### Added
+
+- **`AISKILLS_SKILLS_LIB_VERSION` takes a range.** Besides an exact version,
+  `latest` and `next`, it accepts an npm range (`~1.7.4`, `1.7.x`,
+  `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `||`) and interval notation, turned into
+  an npm range: `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`,
+  `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]` (exactly one of `...`,
+  `?` or `*` for an open end, never a combination like `?*`; all plain
+  ASCII, so they type the same in every shell). With a range, npm picks the newest version its own rules allow,
+  so `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` gets past a `min-release-age`
+  rule that refuses the pinned version. The default stays the exact, tested
+  `skills@1.7.6`. Values are still limited to version characters, and an
+  interval no version fits is refused. Only plain spaces may separate a
+  range's parts (tabs, line breaks and Unicode spaces are refused), and a
+  typographic `…` is read as `...`. Whenever it overrides the pinned
+  version, every command says so once:
+  `using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6`.
+  On Windows, the `skills@<range>` argument is passed to `cmd.exe` in double
+  quotes.
+- **npm's release-age rule is explained.** When `npx` fails with
+  "No matching version found for skills@… with a date before …" (npm's
+  `min-release-age` or `before`), `aiskills` says the `skills` CLI version is
+  newer than the rule allows, and how to proceed: wait, relax the rule for one
+  run, or allow an older version with `AISKILLS_SKILLS_LIB_VERSION`. To spot it,
+  `aiskills` now reads `npx`'s error output and prints it when `npx` ends,
+  instead of letting it stream (the `aiskills skills ...` passthrough still
+  streams, since it can be interactive).
+- **`npm run audit:skills [version|range|interval]`** (maintainers): resolves
+  a `skills` CLI version and its dependency tree into a lockfile without
+  installing, and fails if it was published less than 7 days ago
+  (`--min-age <days>`) or has a high or critical advisory. MAINTAINERS now
+  runs it before changing the pinned version and before publishing.
+
+### Deprecated
+
+- **`AISKILLS_SKILLS_VERSION` is now `AISKILLS_SKILLS_LIB_VERSION`.** The old
+  name read as if it set the version of the bundled skills; it sets the
+  version of the `skills` CLI library that `npx` runs. The old name still
+  works, with a warning (`AISKILLS_SKILLS_VERSION is deprecated and will be
+  removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION ...`); the new one wins
+  when both are set. `AISKILLS_SKILLS_VERSION` will be removed in 1.0.0.
+
+### Changed
+
+- **npm's release-age settings reach `npx`.** `npm_config_min_release_age`,
+  `npm_config_min_release_age_exclude` and `npm_config_before` are no longer
+  removed from the environment, so `npm_config_min_release_age=0 aiskills
+  installed` relaxes the rule for one run. Other `npm_config_*` variables are
+  still removed, except registry, proxy and certificate settings.
+
 ## [0.5.0] - 2026-11-09
 
 ### Added

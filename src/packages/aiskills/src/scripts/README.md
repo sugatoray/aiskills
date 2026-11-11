@@ -5,7 +5,7 @@ The code of `@sugatoray-ai/aiskills`, in three folders by when it runs and wheth
 | Folder | Runs | Published to npm |
 | --- | --- | --- |
 | [`core/`](#core) | On the user's machine: the `aiskills`, `ais` and `aix` commands (the package has no install step) | **Yes**, and nothing else from `src/` is |
-| [`pack/`](#pack) | On a maintainer's machine, at `npm pack` / `npm publish` | No |
+| [`pack/`](#pack) | On a maintainer's machine, at `npm pack` / `npm publish`, and before a release (`npm run audit:skills`) | No |
 | [`docs/`](#docs) | On a maintainer's machine, when building the docs and the banner | No |
 
 ## Rules
@@ -27,12 +27,13 @@ What ships. The entry points in `bin/` (`aiskills.mjs`, `aix.mjs`) only import `
 
 ## `pack/`
 
-Builds the package's contents from the repo. `npm pack` and `npm publish` run it through the `prepack` script, and `npm run vendor` / `npm run clean` run it by hand.
+Builds the package's contents from the repo, and checks what it depends on before a release. `npm pack` and `npm publish` run the vendor step through the `prepack` script; `npm run vendor`, `npm run clean` and `npm run audit:skills` run by hand.
 
 | File | What it does |
 | --- | --- |
 | `vendor-skills.mjs` | Copies the repo's `skills/` into the package, flattened to `skills/<name>/`, writes `.aiskills/layout.json` and `.aiskills/nested/`, and copies `marketplace.json` and `LICENSE`. Refuses duplicate or unsafe skill names and skills inside skills. |
 | `skillsignore.mjs` | The `.skillsignore` rules (`.gitignore` syntax) that `vendor-skills.mjs` applies. |
+| `audit-skills.mjs` | `npm run audit:skills [version\|range\|interval] [--min-age <days>]`: resolves the `skills` CLI version (default: the pinned one) and its dependency tree into a lockfile without installing, then fails if it was published less than 7 days ago or has a high or critical advisory. Run it before changing `SKILLS_CLI_VERSION`. |
 
 ## `docs/`
 

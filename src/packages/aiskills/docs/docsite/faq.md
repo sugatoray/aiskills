@@ -32,6 +32,10 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 
 `aiskills` sends nothing itself. After `aiskills install`, it runs `npx skills add sugatoray/aiskills` once more in a temp folder, in the background, so the install is counted on skills.sh (off with `--no-stats` or `AISKILLS_STATS=0`); see [The skills.sh install count](concepts/install-count.md). The `skills` CLI sends anonymous usage data to `skills.sh` unless `DISABLE_TELEMETRY` or `DO_NOT_TRACK` is set, and either one also turns the count off. See [Security model](concepts/security.md#telemetry).
 
+### `aiskills` fails with "No matching version found for skills@… with a date before …"
+
+Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and the `skills` CLI version `aiskills` runs is newer than it allows. `aiskills` prints the options after npm's error: wait, run once with `npm_config_min_release_age=0 aiskills <command>`, or set `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` so npm can fall back to an older version. See [When npm's release-age rule blocks the pinned version](guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
+
 ### Why don't my installs show up on skills.sh?
 
 The count needs github.com and api.github.com: without them it's skipped silently. It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
