@@ -1,4 +1,4 @@
-# Examples
+# Examples: `/artwallbg`
 
 List of example prompts and their outputs for the usage of `/artwallbg` skill.
 
@@ -9,10 +9,10 @@ List of example prompts and their outputs for the usage of `/artwallbg` skill.
 ```prompt
 ## ---
 ## metadata:
-##   date: 2026-11-08
-##   model: gpt-6.1-terra
-##   effort: medium
-##   app: chatgpt::chat
+##   date: "2026-11-08"
+##   model: "gpt-6.1-terra"
+##   effort: "medium"
+##   app: "chatgpt::chat"
 ## ---
 
 /artwallbg [[
@@ -37,10 +37,10 @@ a girl in front of a huge wall painted with spray paint
 ```prompt
 ## ---
 ## metadata:
-##   date: 2026-11-08
-##   model: gpt-6.1-terra
-##   effort: medium
-##   app: chatgpt::chat
+##   date: "2026-11-08"
+##   model: "gpt-6.1-terra"
+##   effort: "medium"
+##   app: "chatgpt::chat"
 ## ---
 
 /artwallbg [[
@@ -67,10 +67,10 @@ futuristic city, painted as a vibrant comic-book graffiti mural
 
 ## ---
 ## metadata:
-##   date: 2026-11-08
-##   model: gpt-6.1-terra
-##   effort: medium
-##   app: chatgpt::chat
+##   date: "2026-11-08"
+##   model: "gpt-6.1-terra"
+##   effort: "medium"
+##   app: "chatgpt::chat"
 ## ---
 
 /artwallbg [[
