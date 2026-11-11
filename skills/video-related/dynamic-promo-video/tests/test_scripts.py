@@ -89,6 +89,7 @@ class MixCommandTest(unittest.TestCase):
         self.assertIn("amix=inputs=2:normalize=0[v]", graph)
         self.assertIn("[3:a]", graph)  # music is the input after the two voices
         self.assertIn("sidechaincompress", graph)
+        self.assertIn("[v]apad=whole_dur=10.000,asplit", graph, "voice padded so the music is not cut off")
         self.assertIn("alimiter=limit=0.95", graph)
         self.assertEqual(cmd[cmd.index("-t") + 1], "10.000")
         self.assertIn("copy", cmd)
@@ -241,6 +242,7 @@ class MixAndVerifyTest(unittest.TestCase):
                     "--frames", "2", "--frames-dir", j("check"))
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
             self.assertIn("duration gap: 0.0", r.stdout)
+            self.assertNotIn("silent windows", r.stdout, "music continues after the voice ends")
             self.assertEqual(len(os.listdir(j("check"))), 3)  # first, 2s, last
 
 

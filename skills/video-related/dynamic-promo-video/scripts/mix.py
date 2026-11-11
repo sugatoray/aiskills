@@ -62,7 +62,10 @@ def build_command(video, out, voices, music=None, music_volume=0.3, total=None, 
     if music:
         parts.append(f"[{len(voices) + 1}:a]{fmt},volume={music_volume}[m]")
     if voices and music:
-        parts.append("[v]asplit[v1][v2]")
+        # pad the voice track to the full length: sidechaincompress ends with its
+        # shortest input, which would cut the music off when the last line ends
+        pad = f"apad=whole_dur={total:.3f}" if total else "apad"
+        parts.append(f"[v]{pad},asplit[v1][v2]")
         parts.append("[m][v1]sidechaincompress=threshold=0.03:ratio=8:attack=15:release=350[md]")
         parts.append("[md][v2]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95,apad[a]")
     elif voices:

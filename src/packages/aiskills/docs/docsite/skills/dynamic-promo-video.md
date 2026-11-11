@@ -5,7 +5,7 @@ Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, mus
 | Property | Value |
 | --- | --- |
 | Group | `video-related-skills` (alias `video-related`) |
-| Version | 1.3.0 |
+| Version | 1.3.1 |
 | Starts | When you type `/dynamic-promo-video`, or your agent uses it when a task fits its description |
 | License | MIT |
 | Source | [skills/video-related/dynamic-promo-video](https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video) |

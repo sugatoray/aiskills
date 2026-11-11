@@ -3,6 +3,15 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.1] - 2026-11-11
+
+### Fixed
+
+- `mix.py`: the music stopped when the last voice line ended, leaving the end
+  of a narrated video silent (the ducking filter ends with its shortest input).
+  The voice track is now padded to the full video length first. Found on the
+  first real `--demo --voice` run; the mix test now fails on a cut-off.
+
 ## [1.3.0] - 2026-11-11
 
 ### Added
