@@ -6,13 +6,24 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.0.0"
+  version: "1.1.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
 # Dynamic promo video (HTML scenes + voiceover + music)
 
-Produces a 1280x720, ~25-45s MP4: animated scenes built in HTML, rendered frame by frame with Playwright, encoded with ffmpeg, narrated with a TTS voice (e.g. ElevenLabs), with ducked background music.
+Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered frame by frame with Playwright, encoded with ffmpeg, narrated with a TTS voice (e.g. ElevenLabs), with ducked background music.
+
+`SKILL_DIR` below means this skill's folder. Only the template is copied into the work folder; the scripts run from `SKILL_DIR/scripts/` (each has `--help`). Needs Node + Playwright/Chromium (preinstalled in cloud sessions; do not reinstall), ffmpeg/ffprobe, Python 3 with numpy.
+
+| Step | Use |
+| --- | --- |
+| Scenes | `assets/template/index.html` · details: [references/scene-engine.md](references/scene-engine.md) |
+| Real page screenshots | [references/screenshots.md](references/screenshots.md) |
+| Voiceover | [references/voiceover.md](references/voiceover.md) · `scripts/timing.py` |
+| Render + encode | `scripts/render.js` |
+| Music, mix | `scripts/music.py`, `scripts/mix.py` · [references/music-and-mix.md](references/music-and-mix.md) |
+| Check | `scripts/verify.py` |
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.
@@ -21,64 +32,40 @@ Produces a 1280x720, ~25-45s MP4: animated scenes built in HTML, rendered frame 
 - Make a task list. Last task: check frames and audio, then deliver.
 
 ## 1. Storyboard (write the narration first)
-Typical 6 scenes: (1) cover/title, (2) the problem, (3) the product in action, (4) install commands, (5) editor/extension usage, (6) end card with commands and links.
+Typical 6 scenes: (1) cover/title, (2) the problem, (3) the product in action, (4) install commands, (5) editor/extension usage, (6) end card with commands and links. The template has exactly these.
 Write one narration line per scene (about 2.5-3 words per second). Scene length is set by the narration, not the other way round.
 
-## 2. Scene engine (deterministic, one HTML file)
-All scenes are `position:absolute` layers in one `index.html`. A global `window.setT(t)` sets every element's opacity/transform from time `t`. Rendering never relies on CSS animation or real time.
-- Helpers: `cl`, `ease = 1-(1-x)^3`, `seg(t,a,b)` = clamped progress, `tf(el,p,dy)` = fade + rise.
-- Scene visibility with 0.5s crossfade from a list `SC=[[id,start,end],...]`.
-- **Frame 0 must be a finished cover**, not an empty fade-in. Social platforms use the first frame as the preview. Scene 1 is fully visible at t=0 and only fades out. Export that frame as `thumbnail.png` too.
-- Retiming: keep animation authored in "old" time and map real time with a piecewise-linear warp: `NB` (new scene boundaries from audio lengths) to `OB` (authored boundaries). `window.setT=function(tt){const t=warp(tt);...}`.
-- Dynamic camera on screenshots: wrap a window in a `perspective(1500px)` container, animate `rotateY/rotateX/rotateZ`, `scale` (1 to 1.4), `transform-origin`, and scroll the inner image with `translateY` along keyframes with smoothstep. Keep zoom away from neighbouring text columns.
-- Typing effect: slice a command string by `seg(t,a,b)`. Blinking cursor with `Math.floor(t*2)%2`.
-- Icons (npm, Homebrew, VS Code, etc.): inline `<symbol>` SVGs used via `<use>`. State they are simplified drawings, not official logos, unless official files are supplied.
-- Pitfall: do not reuse a class name that a script queries with `querySelectorAll` (e.g. `.chip`), or those elements get hidden. Use unique class names.
+## 2. Build the scenes
+Copy `SKILL_DIR/assets/template/index.html` into the work folder and edit it: brand CSS variables, scene text, real screenshots, camera keyframes. Rules that matter most:
+- Everything is a function of `t` through `window.setT(t)`; no CSS animation, no timers.
+- **Frame 0 is a finished cover** (social platforms use it as the preview). Scene 1 only fades out.
+- Icons are simplified drawings, not official logos; say so unless official files are supplied.
+- Do not reuse a class name a script queries with `querySelectorAll`.
 
-## 3. Render
-```js
-const {chromium}=require('playwright');
-(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1280,height:720}});
-await p.goto('file://'+process.cwd()+'/index.html');const FPS=24,D=DURATION;
-for(let i=0;i<FPS*D;i++){await p.evaluate(t=>setT(t),i/FPS);await p.screenshot({path:`frames/f_${String(i).padStart(4,'0')}.png`});}
-await b.close();})();
+## 3. Preview, then voice, then retime
+```bash
+node SKILL_DIR/scripts/render.js index.html --preview 0,6,12,17,23,29 --thumbnail thumbnail.png
 ```
-- Always `rm -f frames/*` before a full render (stale frames get encoded otherwise).
-- Render preview frames at chosen times first (`node render.js 2,7,11`) and look at them before the full render. Chromium and Playwright are preinstalled; do not reinstall.
-- Encode: `ffmpeg -framerate 24 -i frames/f_%04d.png -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p out.mp4`.
-
-## 4. Real page screenshots (GitHub, marketplace, docs)
-- Shell and WebFetch usually cannot render those pages. Use the built-in browser (Claude_Browser tools) if the session is linked to the user's computer: load the tools with ToolSearch, call request_access for each site, navigate.
-- Screenshots are saved as files on the container (path shown in the tool result under `tool-results/`); copy them into the video assets. Pass scale 1.
-- Set a tall viewport (e.g. 1100x1727) with resize_window so one screenshot covers a lot at 800px wide; scroll with `window.scrollTo` and capture several shots (e.g. y=0,1650,3300). Stitch with PIL: paste later shots from row 55 on (to skip sticky headers) at offset `y*0.727`. Reset the viewport with preset desktop afterwards.
-- If no browser is available, say so and ask the user to connect one; do not fake screenshots of live pages.
-
-## 5. Voiceover (TTS connector)
-- Create one flow, then one generation per scene (`generations_count:1`, same flow, voice id from the user). Never re-run a generation to retry: it costs credits.
-- Read each clip's `duration_secs` from creative_get_flow_run_status. If the narration is longer than the scenes, retime the scenes (warp) with 0.3-0.6s padding; do not speed the voice up.
-- The shell usually cannot download from the TTS provider's storage (403). Do not try workarounds. Give the user the flow link and the script with start times, and ask them to download and attach the clips in scene order; verify each clip's duration matches expectation with ffprobe.
-- Voice start times: scene start + 0.3s.
-
-## 6. Music
-If no licensed track is supplied, synthesize one with numpy and write a WAV (mention it is synthesized and simple):
-- Calm: pad chords + soft plucked arpeggio with echo, fade in 2s / out 2.5s.
-- Energetic: ~124 BPM, four-on-the-floor kick (sine sweep), offbeat hats (differenced noise), claps on 2 and 4, offbeat bass, 16th-note arpeggio, chord pad (Am-F-C-G); build in softly before the beat drops.
-- Normalize peaks to about 0.85. Match the final video duration.
-
-## 7. Mix and mux
+Look at the preview frames before going on. Then produce the voice clips (see references/voiceover.md: one generation per scene, never re-run a paid generation) and retime:
+```bash
+python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3
 ```
-ffmpeg -i silent.mp4 -i vo0.mp3 ... -i vo5.mp3 -i music.wav -filter_complex \
-"[1]adelay=300|300[a1];...;[a1]...[a6]amix=inputs=6:normalize=0,aformat=sample_rates=44100:channel_layouts=mono[v]; \
-[7]aformat=sample_rates=44100:channel_layouts=mono,volume=0.3[m];[v]asplit[v1][v2]; \
-[m][v1]sidechaincompress=threshold=0.03:ratio=8:attack=15:release=350[md]; \
-[md][v2]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]" \
--map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -t DURATION final.mp4
-```
-adelay values are milliseconds per scene start. To change only visuals later, re-render silent frames and copy the audio track from the previous final: `-map 0:v -map 1:a -c copy`.
+Paste the printed `const NB = [...]` into index.html. Scenes stretch to fit; the voice is never sped up.
 
-## 8. Verify and deliver
-- `ffprobe` must show both a video and an audio stream with near-equal durations; run `volumedetect` and check a few 1s windows (voice present, music dipping).
-- Look at frame 0, one frame per scene, and the last frame. Confirm no overlaps or clipped text.
-- Say clearly which file has sound. A silent preview file is easy to confuse with the final one: name files `..._silent` or `..._final`.
-- Send with SendUserFile (display render). Also send `thumbnail.png`. Summarize in a few lines: what each scene shows, what is real vs. drawn, and what you could not verify (you have not listened to the audio).
+## 4. Render, music, mix
+```bash
+node SKILL_DIR/scripts/render.js index.html --encode promo_silent.mp4
+python3 SKILL_DIR/scripts/music.py --style energetic --duration <total> --out music.wav
+python3 SKILL_DIR/scripts/mix.py --video promo_silent.mp4 --music music.wav --voice 0.3:vo0.mp3 ... --out promo_final.mp4
+```
+Use a licensed track instead of `music.py` when the user supplies one; if synthesized, say it is simple and synthesized. Copy the `--voice` arguments from timing.py's output. If only visuals change later, re-render and run `mix.py --audio-from <previous final>`.
+
+## 5. Verify and deliver
+```bash
+python3 SKILL_DIR/scripts/verify.py promo_final.mp4 --frames <one time per scene>
+```
+- It must report both streams with near-equal durations; read the per-second dB line (voice present, music dipping under it).
+- Look at frame 0, one frame per scene and the last frame in `check/`. Confirm no overlaps or clipped text.
+- Say clearly which file has sound: keep the `_silent` / `_final` names.
+- Send with SendUserFile (display render), plus `thumbnail.png`. Summarize in a few lines: what each scene shows, what is real vs. drawn, and what you could not verify (you have not listened to the audio).
 - Offer a LinkedIn/social post note only if asked; keep claims to what the README documents (for example "early development").

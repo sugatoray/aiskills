@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Promo video scenes</title>
+<!--
+  Deterministic scene engine for dynamic-promo-video.
+  - Every element's look is a pure function of time t (seconds): window.setT(t).
+  - No CSS animations/transitions and no real-time clocks: scripts/render.js
+    calls setT(i/FPS) and screenshots each frame.
+  - Edit: CSS variables (brand), the text inside each .scene, SC / OB / NB,
+    and the per-scene blocks inside draw(). See references/scene-engine.md.
+-->
+<style>
+  :root {
+    --bg: #0d1117;          /* brand background */
+    --fg: #e6edf3;          /* main text */
+    --muted: #8b949e;       /* secondary text */
+    --accent: #58a6ff;      /* brand accent */
+    --accent2: #3fb950;     /* second accent (success, prompts) */
+    --card: #161b22;        /* panels / windows */
+    --font: "Inter", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: var(--bg); }
+  body { font-family: var(--font); color: var(--fg); }
+  #stage { position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background: radial-gradient(1200px 600px at 20% 0%, #1f2a3a 0%, var(--bg) 60%); }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+  h1 { font-size: 84px; font-weight: 800; letter-spacing: -2px; }
+  h2 { font-size: 52px; font-weight: 750; letter-spacing: -1px; }
+  .sub { font-size: 28px; color: var(--muted); margin-top: 18px; }
+  .accent { color: var(--accent); }
+  .logo { width: 120px; height: 120px; border-radius: 28px; margin-bottom: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; font-size: 64px; font-weight: 800; color: var(--bg); }
+
+  /* problem scene */
+  .pain-list { margin-top: 36px; display: flex; flex-direction: column; gap: 18px; }
+  .pain-item { font-size: 30px; color: var(--muted); }
+  .pain-item b { color: #f85149; }
+
+  /* camera over a screenshot (product scene) */
+  .cam-wrap { position: absolute; left: 215px; top: 50px; width: 850px; height: 500px; perspective: 1500px; }
+  .cam { width: 100%; height: 100%; transform-style: preserve-3d; }
+  .window { width: 100%; height: 100%; border-radius: 14px; overflow: hidden; background: var(--card);
+    box-shadow: 0 30px 80px rgba(0,0,0,.55); border: 1px solid #30363d; }
+  .window-bar { height: 34px; background: #21262d; display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+  .window-bar i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .viewport { position: relative; height: calc(100% - 34px); overflow: hidden; }
+  .shot { position: absolute; left: 0; top: 0; width: 100%; }
+  /* Placeholder "screenshot" until a real image is supplied: <img class="shot" src="assets/shot.png"> */
+  .shot-ph { padding: 34px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .shot-ph .row { height: 22px; border-radius: 6px; background: #30363d; }
+  .shot-ph .row.hl { background: var(--accent); opacity: .8; }
+  .caption { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; z-index: 2; }
+  .caption span { display: inline-block; padding: 10px 24px; border-radius: 999px; background: rgba(13,17,23,.85);
+    border: 1px solid #30363d; font-size: 26px; color: var(--fg); }
+
+  /* terminal (install scene) */
+  .term { position: absolute; left: 190px; top: 170px; width: 900px; border-radius: 14px; overflow: hidden;
+    background: #010409; border: 1px solid #30363d; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .term-body { padding: 26px 30px; font-family: var(--mono); font-size: 26px; line-height: 1.7; min-height: 220px; }
+  .prompt { color: var(--accent2); }
+  .out { color: var(--muted); }
+  .cursor { display: inline-block; width: 13px; height: 28px; background: var(--fg); vertical-align: -5px; }
+  .pm-badges { position: absolute; left: 0; right: 0; top: 440px; display: flex; justify-content: center; gap: 22px; }
+  .pm-badge { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px;
+    background: var(--card); border: 1px solid #30363d; font-size: 22px; }
+  .pm-badge svg { width: 26px; height: 26px; }
+
+  /* usage scene */
+  .steps { position: absolute; left: 140px; right: 140px; top: 210px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .step-card { background: var(--card); border: 1px solid #30363d; border-radius: 16px; padding: 28px; }
+  .step-card .n { font-size: 20px; color: var(--accent); font-weight: 700; }
+  .step-card .t { font-size: 28px; font-weight: 700; margin-top: 10px; }
+  .step-card .d { font-size: 20px; color: var(--muted); margin-top: 10px; line-height: 1.4; }
+
+  /* end card */
+  .end-cmds { margin-top: 34px; display: flex; flex-direction: column; gap: 14px; font-family: var(--mono); font-size: 26px; }
+  .end-cmd { background: var(--card); border: 1px solid #30363d; border-radius: 10px; padding: 12px 22px; }
+  .end-link { margin-top: 28px; font-size: 24px; color: var(--accent); }
+</style>
+</head>
+<body>
+<!-- Simplified icon drawings (not official logos). Use with <svg><use href="#ic-term"/></svg>. -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="ic-term" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 9l3 3-3 3M11 15h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="ic-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z M3 7l9 4 9-4 M12 11v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<div id="stage">
+  <!-- 1. cover: fully visible at t=0 (it is the thumbnail) -->
+  <section class="scene" id="s-cover"><div class="center">
+    <div class="logo" id="cover-logo">P</div>
+    <h1 id="cover-title">Project<span class="accent">Name</span></h1>
+    <p class="sub" id="cover-sub">One line that says what it does.</p>
+  </div></section>
+
+  <!-- 2. the problem -->
+  <section class="scene" id="s-problem"><div class="center">
+    <h2 id="prob-title">The problem</h2>
+    <div class="pain-list">
+      <div class="pain-item"><b>✕</b> First real pain point</div>
+      <div class="pain-item"><b>✕</b> Second real pain point</div>
+      <div class="pain-item"><b>✕</b> Third real pain point</div>
+    </div>
+  </div></section>
+
+  <!-- 3. product in action: camera moves over a (real) screenshot -->
+  <section class="scene" id="s-product">
+    <div class="cam-wrap"><div class="cam" id="cam">
+      <div class="window">
+        <div class="window-bar"><i style="background:#f85149"></i><i style="background:#d29922"></i><i style="background:#3fb950"></i></div>
+        <div class="viewport">
+          <div class="shot shot-ph" id="shot">
+            <div class="row" style="width:60%"></div><div class="row" style="width:85%"></div>
+            <div class="row hl" style="width:45%"></div><div class="row" style="width:75%"></div>
+            <div class="row" style="width:90%"></div><div class="row" style="width:55%"></div>
+            <div class="row hl" style="width:70%"></div><div class="row" style="width:80%"></div>
+            <div class="row" style="width:65%"></div><div class="row" style="width:88%"></div>
+            <div class="row" style="width:50%"></div><div class="row hl" style="width:62%"></div>
+            <div class="row" style="width:77%"></div><div class="row" style="width:83%"></div>
+            <div class="row" style="width:58%"></div><div class="row" style="width:72%"></div>
+            <div class="row" style="width:66%"></div><div class="row" style="width:90%"></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption" id="prod-cap"><span>What the product does, in one short line.</span></div>
+  </section>
+
+  <!-- 4. install -->
+  <section class="scene" id="s-install">
+    <div class="term"><div class="window-bar"><i style="background:#f85149"></i><i style="background:#d29922"></i><i style="background:#3fb950"></i></div>
+      <div class="term-body"><span class="prompt">$ </span><span id="type1"></span><span class="cursor" id="cur1"></span><br><span class="out" id="out1">✔ installed project-name</span></div>
+    </div>
+    <div class="pm-badges">
+      <div class="pm-badge" id="b1"><svg><use href="#ic-box"/></svg>package manager</div>
+      <div class="pm-badge" id="b2"><svg><use href="#ic-term"/></svg>CLI</div>
+      <div class="pm-badge" id="b3"><svg><use href="#ic-code"/></svg>editor</div>
+    </div>
+  </section>
+
+  <!-- 5. usage -->
+  <section class="scene" id="s-usage">
+    <h2 style="position:absolute;top:100px;width:100%;text-align:center" id="use-title">How you use it</h2>
+    <div class="steps">
+      <div class="step-card" id="st1"><div class="n">01</div><div class="t">Step one</div><div class="d">Short, real description.</div></div>
+      <div class="step-card" id="st2"><div class="n">02</div><div class="t">Step two</div><div class="d">Short, real description.</div></div>
+      <div class="step-card" id="st3"><div class="n">03</div><div class="t">Step three</div><div class="d">Short, real description.</div></div>
+    </div>
+  </section>
+
+  <!-- 6. end card -->
+  <section class="scene" id="s-end"><div class="center">
+    <h2 id="end-title">Get started</h2>
+    <div class="end-cmds">
+      <div class="end-cmd" id="ec1"><span class="prompt">$ </span>install command one</div>
+      <div class="end-cmd" id="ec2"><span class="prompt">$ </span>install command two</div>
+    </div>
+    <div class="end-link" id="end-link">github.com/owner/repo</div>
+  </div></section>
+</div>
+
+<script>
+// ---------- helpers ----------
+const $ = (id) => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = (x) => 1 - Math.pow(1 - cl(x), 3);                 // ease-out cubic
+const smooth = (x) => { x = cl(x); return x * x * (3 - 2 * x); };  // smoothstep
+const seg = (t, a, b) => cl((t - a) / (b - a));                   // clamped progress of t in [a,b]
+const lerp = (a, b, p) => a + (b - a) * p;
+// fade + rise: p in [0,1], dy = starting offset in px
+function tf(el, p, dy = 24) { const e = ease(p); el.style.opacity = e; el.style.transform = `translateY(${(1 - e) * dy}px)`; }
+// keyframe interpolation: keys = [[t, value], ...] sorted by t, smoothstep between keys
+function kf(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) { const [t0, v0] = keys[i - 1], [t1, v1] = keys[i]; return lerp(v0, v1, smooth((t - t0) / (t1 - t0))); }
+  }
+  return keys[keys.length - 1][1];
+}
+// typing effect: show the first part of str as t goes from a to b
+const typed = (str, t, a, b) => str.slice(0, Math.round(str.length * seg(t, a, b)));
+
+// ---------- timeline ----------
+// OB: authored scene boundaries (animation below is written in this time).
+// NB: real boundaries, e.g. from scripts/timing.py once the voice clips exist.
+// Keep both the same length; until you retime, NB = OB.
+const OB = [0, 4, 9, 15, 21, 26, 31];
+const NB = OB.slice();
+window.DURATION = NB[NB.length - 1];
+
+// piecewise-linear warp real time -> authored time
+function warp(tt) {
+  if (tt <= NB[0]) return OB[0];
+  for (let i = 1; i < NB.length; i++) {
+    if (tt <= NB[i]) return lerp(OB[i - 1], OB[i], (tt - NB[i - 1]) / (NB[i] - NB[i - 1]));
+  }
+  return OB[OB.length - 1];
+}
+
+// scenes in authored time [id, start, end]; 0.5s crossfade at each boundary
+const SC = [
+  ["s-cover",   OB[0], OB[1]],
+  ["s-problem", OB[1], OB[2]],
+  ["s-product", OB[2], OB[3]],
+  ["s-install", OB[3], OB[4]],
+  ["s-usage",   OB[4], OB[5]],
+  ["s-end",     OB[5], OB[6]],
+];
+const XF = 0.5;
+function sceneOpacity(t, a, b, first, last) {
+  const fin = first ? 1 : seg(t, a - XF / 2, a + XF / 2);
+  const fout = last ? 1 : 1 - seg(t, b - XF / 2, b + XF / 2);
+  return Math.min(fin, fout);
+}
+
+// ---------- draw ----------
+function draw(t) {
+  SC.forEach(([id, a, b], i) => {
+    const el = $(id);
+    const o = sceneOpacity(t, a, b, i === 0, i === SC.length - 1);
+    el.style.opacity = o;
+    el.style.visibility = o > 0.001 ? "visible" : "hidden";
+  });
+
+  // 1. cover: finished at t=0, slow push-in only (no fade-in!)
+  const s0 = OB[0];
+  $("s-cover").querySelector(".center").style.transform = `scale(${1 + 0.04 * seg(t, s0, OB[1])})`;
+
+  // 2. problem
+  const s1 = OB[1];
+  tf($("prob-title"), seg(t, s1 + 0.2, s1 + 0.8));
+  document.querySelectorAll("#s-problem .pain-item").forEach((el, i) => tf(el, seg(t, s1 + 0.9 + i * 0.7, s1 + 1.5 + i * 0.7), 18));
+
+  // 3. product: camera tilt/zoom + scroll the screenshot
+  const s2 = OB[2], e2 = OB[3];
+  const ry = kf(t, [[s2, -14], [s2 + 2, -6], [s2 + 4, 4], [e2, 8]]);
+  const rx = kf(t, [[s2, 6], [s2 + 3, 2], [e2, 0]]);
+  const sc = kf(t, [[s2, 1.0], [s2 + 2.5, 1.2], [s2 + 4.5, 1.2], [e2, 1.3]]);
+  const ox = kf(t, [[s2, 50], [s2 + 3, 30], [e2, 45]]);
+  const oy = kf(t, [[s2, 30], [s2 + 3, 45], [e2, 60]]);
+  $("cam").style.transformOrigin = `${ox}% ${oy}%`;
+  $("cam").style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) scale(${sc})`;
+  $("shot").style.transform = `translateY(${-kf(t, [[s2 + 1, 0], [s2 + 4, 120], [e2, 260]])}px)`;
+  tf($("prod-cap"), seg(t, s2 + 0.6, s2 + 1.2));
+
+  // 4. install: typing + blinking cursor + badges
+  const s3 = OB[3];
+  const cmd = "npm install project-name";
+  $("type1").textContent = typed(cmd, t, s3 + 0.6, s3 + 2.4);
+  const typing = t > s3 + 0.6 && t < s3 + 2.4;
+  $("cur1").style.opacity = typing || Math.floor(t * 2) % 2 === 0 ? 1 : 0;
+  tf($("out1"), seg(t, s3 + 2.7, s3 + 3.1), 8);
+  ["b1", "b2", "b3"].forEach((id, i) => tf($(id), seg(t, s3 + 3.2 + i * 0.3, s3 + 3.7 + i * 0.3)));
+
+  // 5. usage
+  const s4 = OB[4];
+  tf($("use-title"), seg(t, s4 + 0.2, s4 + 0.8));
+  ["st1", "st2", "st3"].forEach((id, i) => tf($(id), seg(t, s4 + 0.8 + i * 0.6, s4 + 1.4 + i * 0.6), 30));
+
+  // 6. end card
+  const s5 = OB[5];
+  tf($("end-title"), seg(t, s5 + 0.2, s5 + 0.8));
+  tf($("ec1"), seg(t, s5 + 0.8, s5 + 1.3));
+  tf($("ec2"), seg(t, s5 + 1.1, s5 + 1.6));
+  tf($("end-link"), seg(t, s5 + 1.6, s5 + 2.1));
+}
+
+window.setT = function (tt) { draw(warp(tt)); };
+window.setT(0);
+</script>
+</body>
+</html>

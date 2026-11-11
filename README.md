@@ -317,4 +317,4 @@ with every skill twice — pick one.
 
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
-| [Video Related](skills/video-related/README.md) | `dynamic-promo-video` | Builds a short (~25-45s) narrated promo or intro video for a library, app or product: animated HTML scenes with zoom/tilt camera moves over real screenshots, rendered with Playwright and ffmpeg, a TTS voiceover, and ducked background music. See [skill](skills/video-related/dynamic-promo-video/SKILL.md). |
+| [Video Related](skills/video-related/README.md) | `dynamic-promo-video` | Builds a short (~25-45s) narrated promo or intro video for a library, app or product: animated HTML scenes with zoom/tilt camera moves over real screenshots, rendered with Playwright and ffmpeg, a TTS voiceover, and ducked background music. See [usage](skills/video-related/dynamic-promo-video/README.md). |
