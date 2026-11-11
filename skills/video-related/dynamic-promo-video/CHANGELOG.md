@@ -3,6 +3,15 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.1] - 2026-11-11
+
+### Changed
+
+- Demo narration says "sugatoray" as "Shoo-gaw-doe Ray", the spelling its
+  owner approved.
+- `references/voiceover.md`: how to fix a name the voice gets wrong with few
+  credits (name-only samples, then splice the approved sample into the clip).
+
 ## [1.4.0] - 2026-11-11
 
 ### Changed
