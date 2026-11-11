@@ -35,7 +35,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 
 ## Known issues / open threads
 - **Next:** merge #184, then publish `0.8.0`: `npm run audit:skills`, `npm test` + `npm run test:e2e`, `npm run pack:dry`, `npm publish`, `npm stage approve`; then update SPEC's release note and re-date `[0.8.0]` if it ships later than 2026-11-11.
-- **#184's title/description** were written by the Claude Code UI before most of this work; check they cover 0.8.0, `info` and `releases` before merging.
+- **Issues filed** (create-issues-update-pr, by hand): epic [#185](https://github.com/sugatoray/aiskills/issues/185) with children #186 (`-i`/`-l`), #187 (docs), #188 (0.8.0 bump), #189 (`info`), #190 (`releases`), #191 (mirrors, Bug), #192 (scrolls). #184 retitled to match the epic; its body (Summary/Details/Issues) closes all eight on merge.
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
 - **Windows is untested** (incl. `npm.cmd` for `releases`): run `aiskills skills --version` with `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` in PowerShell and `set "AISKILLS_SKILLS_LIB_VERSION=(..., 1.7.6]"` in Command Prompt.
