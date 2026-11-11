@@ -3,6 +3,26 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.0] - 2026-11-11
+
+### Changed
+
+- `--demo` is now about the skill itself, not the bare template's
+  placeholders. New `assets/demo/index.html`: cover with `/dynamic-promo-video`
+  from `sugatoray/aiskills`, the problem, the scene engine's real code under the
+  camera, an install slide that types the three routes (`npx skills add`, the
+  Claude Code plugin, the `@sugatoray-ai/aiskills` npm package), usage steps,
+  and an end card with the real commands and repo link. The install scene is 7s,
+  so the demo is 32s.
+- `demo.py` reads the scene boundaries (`OB`) from the page instead of a
+  hard-coded list.
+- Demo narration line 4 now names the three install routes.
+
+### Added
+
+- Test that the demo page shows the skill name, repo and every install command,
+  and has one narration line per scene.
+
 ## [1.3.1] - 2026-11-11
 
 ### Fixed

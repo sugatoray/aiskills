@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.3.1"
+  version: "1.4.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -28,7 +28,7 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 ## Inputs
 | Flag | Meaning |
 | --- | --- |
-| `--demo` | Build the demo video from the bare template instead of a real project; see **Demo** below. |
+| `--demo` | Build the demo video about this skill instead of a real project; see **Demo** below. |
 | `--voice` | Narrate with the default ElevenLabs voice `TABZn6CDfjMNGrsnGzzD`. |
 | `--voice-elevenlabs=<voice-id>` | Narrate with that ElevenLabs voice. A bare `--voice-elevenlabs` = `--voice`. |
 
@@ -41,14 +41,14 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 - A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
 
 ## Demo (`--demo`)
-No research, storyboard or editing: the template's six placeholder scenes, an energetic synthesized track, and (with a voice) the lines in `assets/demo/narration.txt`.
+No research, storyboard or editing: `assets/demo/index.html` (six scenes about this skill: what it is, the problem, how it works, the three install routes from `sugatoray/aiskills`, usage, get started), an energetic synthesized track, and (with a voice) the lines in `assets/demo/narration.txt`. The demo is 32s; scenes stretch if a line runs long.
 ```bash
 python3 SKILL_DIR/scripts/demo.py                                   # --demo
 python3 SKILL_DIR/scripts/demo.py --voice-id TABZn6CDfjMNGrsnGzzD   # --demo --voice, API key route
 python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>             # --demo --voice-elevenlabs=<voice-id>
 python3 SKILL_DIR/scripts/demo.py --clips-dir clips/                # narrated, clips made with the MCP connector
 ```
-For the MCP route, generate one clip per line of `assets/demo/narration.txt` (see references/voiceover.md), get them as `clips/vo0.mp3` ... `vo5.mp3`, then run the last command. It writes `promo-demo/demo_final.mp4` and `thumbnail.png` and runs the checks; deliver as in step 5, and say the scenes are placeholders.
+For the MCP route, generate one clip per line of `assets/demo/narration.txt` (see references/voiceover.md), get them as `clips/vo0.mp3` ... `vo5.mp3`, then run the last command. It writes `promo-demo/demo_final.mp4` and `thumbnail.png` and runs the checks; deliver as in step 5. The skill icons are simplified drawings.
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.

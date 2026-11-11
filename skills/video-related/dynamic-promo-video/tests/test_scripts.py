@@ -299,7 +299,7 @@ class DemoTest(unittest.TestCase):
             for f in ("demo_final.mp4", "demo_silent.mp4", "thumbnail.png", "music.wav"):
                 self.assertTrue(os.path.exists(os.path.join(d, f)), f)
             self.assertFalse(any(f.startswith("vo") for f in os.listdir(d)))
-            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 31, delta=0.6)
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 32, delta=0.6)
 
     def test_narrated_demo_from_clips(self):
         with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:
@@ -310,9 +310,23 @@ class DemoTest(unittest.TestCase):
             out = self.demo(d, "--clips-dir", clips)
             self.assertIn("narrated", out)
             with open(os.path.join(d, "index.html")) as f:
-                m = re.search(r"const NB = \[0, 4, 9, 15, 21, 26, (33\.7\d*)\];", f.read())
-            self.assertIsNotNone(m, "last scene stretched to ~33.7s (7s clip + padding)")
-            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 33.7, delta=0.6)
+                m = re.search(r"const NB = \[0, 4, 9, 15, 22, 27, (34\.7\d*)\];", f.read())
+            self.assertIsNotNone(m, "last scene stretched to ~34.7s (7s clip + padding)")
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 34.7, delta=0.6)
+
+    def test_demo_page_shows_the_skill_and_its_install_routes(self):
+        with open(os.path.join(SKILL, "assets", "demo", "index.html")) as f:
+            html = f.read()
+        for text in ("dynamic-promo-video", "sugatoray/aiskills",
+                     "npx skills add sugatoray/aiskills --skill dynamic-promo-video",
+                     "/plugin marketplace add sugatoray/aiskills",
+                     "/plugin install video-related-skills@sugatoray",
+                     "npm install -g @sugatoray-ai/aiskills",
+                     "aiskills install -s dynamic-promo-video"):
+            self.assertIn(text, html)
+        with open(os.path.join(SKILL, "assets", "demo", "narration.txt")) as f:
+            lines = [l for l in f if l.strip() and not l.startswith("#")]
+        self.assertEqual(len(lines), 6, "one narration line per demo scene")
 
     def test_needs_all_clips(self):
         with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:

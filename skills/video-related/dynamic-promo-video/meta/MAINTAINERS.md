@@ -13,9 +13,11 @@ For people developing this skill — not read as part of a
   standard library, except `music.py` (numpy). `tts_elevenlabs.py` uses urllib only; its
   tests replace the network call and never spend credits. The default voice id
   lives in `DEFAULT_VOICE` and in SKILL.md / references/voiceover.md; change all three together. `render.js` needs Playwright.
-- `../scripts/demo.py` + `../assets/demo/narration.txt` — the `--demo` video.
-  The narration has one line per template scene; keep them in step with the
-  template (and `OB` in demo.py) when scenes change.
+- `../scripts/demo.py` + `../assets/demo/index.html` + `../assets/demo/narration.txt`
+  — the `--demo` video about this skill. demo.py reads `OB` from the page. Keep
+  one narration line per scene, and keep the install commands on the page in
+  step with the repo README (a test checks them). The generic template stays
+  free of project names.
 - `../tests/test_scripts.py` — unit tests plus an end-to-end run of the
   template; tests skip when ffmpeg, numpy, Node or Playwright is missing.
 - `../CHANGELOG.md` — update together with `metadata.version` in SKILL.md.

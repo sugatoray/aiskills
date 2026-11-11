@@ -6,8 +6,9 @@
     python3 demo.py --clips-dir clips/               # narrated with clips made elsewhere
                                                      # (e.g. by the ElevenLabs MCP connector)
 
-The demo is the template's six placeholder scenes with an energetic
-synthesized track. With a voice, the lines in assets/demo/narration.txt are
+The demo is assets/demo/index.html: six scenes about the /dynamic-promo-video
+skill itself (what it is, how it works, the three ways to install it from
+sugatoray/aiskills), with an energetic synthesized track. With a voice, the lines in assets/demo/narration.txt are
 spoken (one per scene) and the scenes are stretched to fit them.
 
 Output in --out-dir (default ./promo-demo): index.html, thumbnail.png,
@@ -16,6 +17,7 @@ demo_silent.mp4, music.wav, vo*.mp3 (if narrated), demo_final.mp4, check/.
 import argparse
 import glob
 import json
+import re
 import os
 import shutil
 import subprocess
@@ -23,9 +25,17 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
-TEMPLATE = os.path.join(SKILL, "assets", "template", "index.html")
+PAGE = os.path.join(SKILL, "assets", "demo", "index.html")
 NARRATION = os.path.join(SKILL, "assets", "demo", "narration.txt")
-OB = [0, 4, 9, 15, 21, 26, 31]  # the template's authored scene boundaries
+
+
+def page_ob(path):
+    """The page's authored scene boundaries (`const OB = [...]`)."""
+    with open(path, encoding="utf-8") as f:
+        m = re.search(r"const OB = \[([^\]]*)\];", f.read())
+    if not m:
+        sys.exit(f"demo.py: no `const OB = [...]` in {path}")
+    return [float(x) for x in m.group(1).split(",")]
 
 
 def step(title, cmd, cwd):
@@ -53,7 +63,8 @@ def main(argv=None):
 
     out = os.path.abspath(a.out_dir)
     os.makedirs(out, exist_ok=True)
-    shutil.copy(TEMPLATE, os.path.join(out, "index.html"))
+    shutil.copy(PAGE, os.path.join(out, "index.html"))
+    OB = page_ob(PAGE)
     scenes = len(OB) - 1
     voiced = bool(a.voice_id or a.clips_dir)
     voices = []
@@ -71,7 +82,7 @@ def main(argv=None):
                  py("tts_elevenlabs.py", "--script", NARRATION, "--voice", a.voice_id, "--out-dir", out), out)
         clips = [f"vo{i}.mp3" for i in range(scenes)]
         print("== retime scenes to the narration", flush=True)
-        r = subprocess.run(py("timing.py", "--authored", ",".join(map(str, OB)), "--clips", *clips,
+        r = subprocess.run(py("timing.py", "--authored", ",".join(f"{x:g}" for x in OB), "--clips", *clips,
                               "--write-html", "index.html", "--json"), cwd=out, capture_output=True, text=True)
         if r.returncode != 0:
             sys.exit(f"demo.py: timing failed: {r.stderr.strip()}")
