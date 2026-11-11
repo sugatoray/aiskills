@@ -2,8 +2,13 @@
 
 ## Choose the voice
 
-- `--voice-elevenlabs=<voice-id>` sets the voice. Without it (or with a bare
-  `--voice-elevenlabs`) use the default `TABZn6CDfjMNGrsnGzzD`.
+- `--voice-elevenlabs=<voice-id>` sets the voice. `--voice` (or a bare
+  `--voice-elevenlabs`) means the default `TABZn6CDfjMNGrsnGzzD`; so does no
+  flag at all for a real project.
+- `--demo` without a voice flag is music only. With one, the demo speaks the
+  lines in `assets/demo/narration.txt`: via the MCP connector, generate one clip
+  per line and pass them with `demo.py --clips-dir`; via an API key, run
+  `demo.py --voice-id <voice-id>`, which calls tts_elevenlabs.py itself.
 - Say which voice id you used when you deliver.
 - If ElevenLabs rejects the id (unknown voice, no access), stop and ask the user
   for another id. Do not swap in a different voice on your own.
@@ -63,10 +68,10 @@ music-only video: skip retiming and run `mix.py` with `--music` only.
 Check each clip with ffprobe, then:
 
 ```bash
-python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3
+python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3 --write-html index.html
 ```
 
-It prints the `const NB = [...]` line for index.html, the total duration, and
+`--write-html` writes the new boundaries into the page. It also prints the `const NB = [...]` line for index.html, the total duration, and
 the `--voice START:FILE` arguments for mix.py. Each clip starts at its scene
 start + 0.3s (`--pad-before`) and keeps at least 0.4s after it
 (`--pad-after`). Scenes stretch to fit; never speed the voice up.

@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.2.0"
+  version: "1.3.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -26,11 +26,29 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 | Check | `scripts/verify.py` |
 
 ## Inputs
-- `--voice-elevenlabs=<voice-id>` (optional): the ElevenLabs voice for the narration. Default voice id: `TABZn6CDfjMNGrsnGzzD` (also used for a bare `--voice-elevenlabs`). A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
+| Flag | Meaning |
+| --- | --- |
+| `--demo` | Build the demo video from the bare template instead of a real project; see **Demo** below. |
+| `--voice` | Narrate with the default ElevenLabs voice `TABZn6CDfjMNGrsnGzzD`. |
+| `--voice-elevenlabs=<voice-id>` | Narrate with that ElevenLabs voice. A bare `--voice-elevenlabs` = `--voice`. |
+
 - Narration uses ElevenLabs only if one route is available, checked in this order:
   1. the **ElevenLabs MCP connector** (its `creative_generate_speech` tool can be loaded with ToolSearch), or
   2. an **API key**: `ELEVENLABS_API_KEY` is set, or the session's network secrets hold one for `api.elevenlabs.io` (then run `scripts/tts_elevenlabs.py`).
-- If neither is available, say so once, offer the user the choice to connect one or attach their own clips, and otherwise make a music-only video (skip timing.py; no `--voice` in mix.py). Never invent a voice id and never fake narration.
+- Real project, no voice flag: narrate with the default voice if a route exists, else music only.
+- `--demo` without a voice flag: music only (no narration).
+- A voice flag was given but no route exists: say so, offer to connect the connector, add a key or attach clips; do not silently drop the voice. Never invent a voice id and never fake narration.
+- A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
+
+## Demo (`--demo`)
+No research, storyboard or editing: the template's six placeholder scenes, an energetic synthesized track, and (with a voice) the lines in `assets/demo/narration.txt`.
+```bash
+python3 SKILL_DIR/scripts/demo.py                                   # --demo
+python3 SKILL_DIR/scripts/demo.py --voice-id TABZn6CDfjMNGrsnGzzD   # --demo --voice, API key route
+python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>             # --demo --voice-elevenlabs=<voice-id>
+python3 SKILL_DIR/scripts/demo.py --clips-dir clips/                # narrated, clips made with the MCP connector
+```
+For the MCP route, generate one clip per line of `assets/demo/narration.txt` (see references/voiceover.md), get them as `clips/vo0.mp3` ... `vo5.mp3`, then run the last command. It writes `promo-demo/demo_final.mp4` and `thumbnail.png` and runs the checks; deliver as in step 5, and say the scenes are placeholders.
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.
@@ -62,7 +80,7 @@ With the MCP connector, call `creative_generate_speech` once per scene with that
 ```bash
 python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3
 ```
-Paste the printed `const NB = [...]` into index.html. Scenes stretch to fit; the voice is never sped up.
+Add `--write-html index.html` to write the new `const NB = [...]` into the page (or paste the printed line). Scenes stretch to fit; the voice is never sped up.
 
 ## 4. Render, music, mix
 ```bash

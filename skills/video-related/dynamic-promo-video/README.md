@@ -8,12 +8,19 @@ TTS voiceover, and background music that ducks under the voice.
 ```text
 /dynamic-promo-video make a 30s launch video for <repo or product>
 /dynamic-promo-video --voice-elevenlabs=<voice-id> make a launch video for <repo>
+/dynamic-promo-video --demo                              # template demo, music only
+/dynamic-promo-video --demo --voice                      # demo narrated with the default voice
+/dynamic-promo-video --demo --voice-elevenlabs=<voice-id> # demo narrated with that voice
 ```
 
 Narration uses ElevenLabs when its MCP connector is connected or an API key is
 available (`ELEVENLABS_API_KEY`, or a network secret for `api.elevenlabs.io`).
-`--voice-elevenlabs=<voice-id>` picks the voice; the default is
-`TABZn6CDfjMNGrsnGzzD`. Without either route, the video gets music only.
+`--voice` uses the default voice `TABZn6CDfjMNGrsnGzzD`;
+`--voice-elevenlabs=<voice-id>` picks another. Without a route, a real project
+gets music only; an explicit voice flag makes the agent ask you to connect
+ElevenLabs instead. `--demo` builds the template demo with
+[`scripts/demo.py`](scripts/demo.py) and the narration in
+[`assets/demo/narration.txt`](assets/demo/narration.txt).
 
 ## What's inside
 
@@ -21,6 +28,8 @@ available (`ELEVENLABS_API_KEY`, or a network secret for `api.elevenlabs.io`).
 | --- | --- |
 | [`SKILL.md`](SKILL.md) | The workflow the agent follows. |
 | [`assets/template/index.html`](assets/template/index.html) | Deterministic 6-scene starter (cover, problem, product camera, install, usage, end card). |
+| [`scripts/demo.py`](scripts/demo.py) | `--demo` in one command: template, music, optional narration, render, mix, verify. |
+| [`assets/demo/narration.txt`](assets/demo/narration.txt) | The demo's six narration lines. |
 | [`scripts/render.js`](scripts/render.js) | Preview frames, thumbnail, full frame render and silent MP4 encode. |
 | [`scripts/tts_elevenlabs.py`](scripts/tts_elevenlabs.py) | One narration clip per scene via the ElevenLabs API (default voice `TABZn6CDfjMNGrsnGzzD`); skips existing clips, never retries. |
 | [`scripts/timing.py`](scripts/timing.py) | Retimes scenes to fit the voice clips; prints `NB` and the mix arguments. |

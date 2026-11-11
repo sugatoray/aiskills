@@ -3,6 +3,22 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-11-11
+
+### Added
+
+- `--demo`: builds the template demo video in one command
+  (`scripts/demo.py`): music only by default, narrated with a voice flag
+  (API key via `--voice-id`, or MCP-made clips via `--clips-dir`).
+- `--voice`: narrate with the default ElevenLabs voice `TABZn6CDfjMNGrsnGzzD`.
+- `assets/demo/narration.txt`: six narration lines for the demo.
+- `timing.py --write-html`: writes the new `const NB = [...]` into the page.
+
+### Changed
+
+- An explicit voice flag with no ElevenLabs route now makes the agent ask
+  instead of falling back to music only.
+
 ## [1.2.0] - 2026-11-11
 
 ### Added

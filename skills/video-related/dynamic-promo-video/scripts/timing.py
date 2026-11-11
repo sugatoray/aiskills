@@ -11,10 +11,12 @@ is never sped up.
 
 Prints the `const NB = [...]` line for index.html, each clip's start time, the
 total duration, and the matching `--voice START:FILE` arguments for mix.py.
-Use --json for machine-readable output.
+Use --json for machine-readable output. --write-html index.html replaces the
+page's `const NB = ...;` line with the new boundaries.
 """
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -50,6 +52,17 @@ def plan(authored, durations, pad_before=0.3, pad_after=0.4):
     return nb, starts
 
 
+def write_nb(page, nb):
+    with open(page, encoding="utf-8") as f:
+        html = f.read()
+    line = "const NB = [" + ", ".join(f"{x:g}" for x in nb) + "];"
+    new, n = re.subn(r"const NB = [^;]*;", lambda _: line, html, count=1)
+    if n != 1:
+        raise SystemExit(f"timing.py: no `const NB = ...;` line in {page}")
+    with open(page, "w", encoding="utf-8") as f:
+        f.write(new)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--authored", required=True, help="comma-separated authored boundaries OB, e.g. 0,4,9,15")
@@ -59,6 +72,7 @@ def main(argv=None):
     p.add_argument("--pad-before", type=float, default=0.3, help="silence before each clip (default 0.3)")
     p.add_argument("--pad-after", type=float, default=0.4, help="minimum silence after each clip (default 0.4)")
     p.add_argument("--json", action="store_true", help="print JSON")
+    p.add_argument("--write-html", metavar="PAGE", help="replace the `const NB = ...;` line in this page")
     a = p.parse_args(argv)
 
     authored = numbers(a.authored)
@@ -68,6 +82,8 @@ def main(argv=None):
     except ValueError as e:
         p.error(str(e))
 
+    if a.write_html:
+        write_nb(a.write_html, nb)
     names = a.clips or [f"vo{i}.mp3" for i in range(len(durations))]
     if a.json:
         print(json.dumps({"OB": authored, "NB": nb, "starts": starts, "durations": durations,

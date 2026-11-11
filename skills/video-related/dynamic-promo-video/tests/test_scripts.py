@@ -9,6 +9,7 @@ missing. The pipeline test renders the real template (about 2s of frames).
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -60,6 +61,16 @@ class TimingTest(unittest.TestCase):
     def test_needs_one_clip_per_scene(self):
         with self.assertRaises(ValueError):
             self.t.plan([0, 4, 9], [1.0])
+
+    def test_write_html_replaces_nb_line(self):
+        with tempfile.TemporaryDirectory() as d:
+            page = os.path.join(d, "index.html")
+            shutil.copy(TEMPLATE, page)
+            self.t.write_nb(page, [0, 4.5, 9.25])
+            with open(page) as f:
+                html = f.read()
+            self.assertIn("const NB = [0, 4.5, 9.25];", html)
+            self.assertNotIn("OB.slice()", html)
 
     def test_boundaries_must_increase(self):
         with self.assertRaises(ValueError):
@@ -264,6 +275,48 @@ class RenderTemplateTest(unittest.TestCase):
             r = run("node", "-e", script, os.path.join(d, "index.html"))
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertEqual(r.stdout.strip(), '["1","0",31]')
+
+
+@unittest.skipUnless(HAS_FFMPEG and HAS_NUMPY and has_playwright(), "ffmpeg, numpy, node or playwright missing")
+class DemoTest(unittest.TestCase):
+    """Runs scripts/demo.py end to end at 2 fps so it stays quick."""
+
+    def demo(self, d, *args):
+        r = run(sys.executable, os.path.join(SCRIPTS, "demo.py"), "--out-dir", d, "--fps", "2", *args)
+        self.assertEqual(r.returncode, 0, r.stdout[-2000:] + r.stderr[-2000:])
+        return r.stdout
+
+    def duration(self, f):
+        r = run("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", f)
+        return float(r.stdout)
+
+    def test_music_only_demo(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = self.demo(d)
+            self.assertIn("music only", out)
+            for f in ("demo_final.mp4", "demo_silent.mp4", "thumbnail.png", "music.wav"):
+                self.assertTrue(os.path.exists(os.path.join(d, f)), f)
+            self.assertFalse(any(f.startswith("vo") for f in os.listdir(d)))
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 31, delta=0.6)
+
+    def test_narrated_demo_from_clips(self):
+        with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:
+            for i in range(6):  # scene 6 gets a long clip, so the video must stretch
+                secs = 7 if i == 5 else 2
+                run("ffmpeg", "-v", "error", "-f", "lavfi", "-i", f"anullsrc=r=44100:cl=mono",
+                    "-t", str(secs), os.path.join(clips, f"vo{i}.mp3"))
+            out = self.demo(d, "--clips-dir", clips)
+            self.assertIn("narrated", out)
+            with open(os.path.join(d, "index.html")) as f:
+                m = re.search(r"const NB = \[0, 4, 9, 15, 21, 26, (33\.7\d*)\];", f.read())
+            self.assertIsNotNone(m, "last scene stretched to ~33.7s (7s clip + padding)")
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 33.7, delta=0.6)
+
+    def test_needs_all_clips(self):
+        with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:
+            r = run(sys.executable, os.path.join(SCRIPTS, "demo.py"), "--out-dir", d, "--clips-dir", clips)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("need 6 clips", r.stderr)
 
 
 if __name__ == "__main__":
