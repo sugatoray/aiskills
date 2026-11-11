@@ -170,7 +170,7 @@ describe("npm pack", () => {
     const cli = readFileSync(join(PKG_SRC, "src", "scripts", "core", "cli.mjs"), "utf8");
     const flags = { scope: ["-g", "-p"], agent: ["-a"], skill: ["-s"], group: ["-G"], copy: ["--copy"], route: ["--route"], layout: ["--nested", "--flat"],
                     dryRun: ["-n"], yes: ["-y"], purge: ["--purge"], force: ["-f"], stats: ["--stats", "--no-stats"],
-                    interactive: ["-i"], lastAgents: ["--last-agents"] };
+                    interactive: ["-i"], lastAgents: ["-l"] };
     const readme = readFileSync(join(PKG_SRC, "README.md"), "utf8");
     for (const [cmd, re] of [["install", /const opts = parse\(rest, \[([^\]]+)\]\);/], ["uninstall", /return uninstall\(parse\(rest, \[([^\]]+)\]\)\);/]]) {
       const allowed = [...cli.match(re)[1].matchAll(/"(\w+)"/g)].map((m) => m[1]);

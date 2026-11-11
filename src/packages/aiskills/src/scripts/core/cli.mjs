@@ -87,7 +87,7 @@ install only:
                          (its own pickers; agents you picked last time are pre-checked,
                          and it remembers this pick). -s/-G/-a skip the matching picker.
                          Needs a terminal.
-      --last-agents      Install for the agents you last picked in 'npx skills add'
+  -l, --last-agents      Install for the agents you last picked in 'npx skills add'
                          (its lastSelectedAgents), instead of every detected agent.
                          Combines with -a.
       --copy             Copy files into agent dirs instead of symlinking
@@ -113,7 +113,7 @@ Examples:
   aiskills install --group scrolls --global --agent claude-code
   aiskills install -G scrolls,personas -s create-lib-docs -a claude-code,codex
   aiskills install -i                         # pick skills and agents interactively
-  aiskills install --last-agents              # only the agents picked last time
+  aiskills install -l                         # only the agents picked last time (--last-agents)
   aiskills uninstall                          # remove every skill this package installed
   aiskills uninstall -G stata                 # remove one group
   aiskills install -G 'scroll*,d*' -a 'claude*,codex'
@@ -178,7 +178,7 @@ function parse(argv, allowed) {
     else if ((a === "--stats" || a === "--no-stats") && ok("stats")) opts.stats = a === "--stats";
     else if (a === "--copy" && ok("copy")) opts.copy = true;
     else if ((a === "-i" || a === "--interactive") && ok("interactive")) opts.interactive = true;
-    else if (a === "--last-agents" && ok("lastAgents")) opts.lastAgents = true;
+    else if ((a === "-l" || a === "--last-agents") && ok("lastAgents")) opts.lastAgents = true;
     else if (a === "--purge" && ok("purge")) opts.purge = true;
     else if ((a === "-f" || a === "--force") && ok("force")) opts.force = true;
     else if ((a === "-n" || a === "--dry-run") && ok("dryRun")) opts.dryRun = true;

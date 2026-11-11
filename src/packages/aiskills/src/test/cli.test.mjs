@@ -163,7 +163,8 @@ describe("aiskills sync / install (bundled)", posixOnly, () => {
     const state = join(sb.dir, "state");
     mkdirSync(join(state, "skills"), { recursive: true });
     writeFileSync(join(state, "skills", ".skill-lock.json"), JSON.stringify({ lastSelectedAgents: ["qoder"] }));
-    const x = sb.run(["install", "--last-agents"], { env: { XDG_STATE_HOME: state } });
+    // -l is the short form.
+    const x = sb.run(["install", "-l"], { env: { XDG_STATE_HOME: state } });
     assert.deepEqual(changes(x.calls), [["add", sb.root, "--global", "--skill", "*", "--agent", "qoder", "--yes"]]);
   });
 

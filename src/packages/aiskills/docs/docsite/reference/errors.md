@@ -126,7 +126,7 @@ unknown command: <name>
 [aiskills] -i/--interactive needs a terminal; pick with -s/-G/-a instead
 ```
 
-**Cause:** `-i` lets `npx skills add` ask which skills and agents to use, and there is no terminal to ask in (a script, CI, an agent). Nothing is installed. **Fix:** drop `-i` and choose with `-s`, `-G`, `-a` or `--last-agents`.
+**Cause:** `-i` lets `npx skills add` ask which skills and agents to use, and there is no terminal to ask in (a script, CI, an agent). Nothing is installed. **Fix:** drop `-i` and choose with `-s`, `-G`, `-a` or `-l`/`--last-agents`.
 
 ### Could not read the agent list
 
