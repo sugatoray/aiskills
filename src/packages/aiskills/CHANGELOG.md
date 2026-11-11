@@ -20,6 +20,26 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-11
+
+### Added
+
+- **New bundled skill: `dynamic-promo-video`**, in a new group,
+  `video-related-skills` (alias `video-related`). It builds a short narrated
+  promo or intro video for a library, app or product: animated HTML scenes
+  rendered frame by frame with Playwright, encoded with ffmpeg, an ElevenLabs
+  voiceover and synthesized background music that ducks under the voice. It
+  ships its scripts, a scene template, two ready-made demos (`--demo`,
+  `--demo=self`) and their approved voice recordings (about 670 KB of MP3s).
+  The package now bundles 13 skills in 7 groups:
+  `aiskills install -G video-related` or `aiskills install -s dynamic-promo-video`.
+  See the skill's own `CHANGELOG.md` for its history.
+
+### Changed
+
+- The README, the docs' skill and group lists, the banner and the generated
+  docs pages list the new group and skill.
+
 ## [0.6.0] - 2026-11-11
 
 ### Added

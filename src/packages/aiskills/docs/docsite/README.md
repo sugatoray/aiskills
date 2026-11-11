@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 12 skills in 6 groups, at the version you installed.
+- **Skills in one package**: 13 skills in 7 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
