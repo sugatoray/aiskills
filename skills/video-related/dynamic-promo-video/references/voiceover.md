@@ -31,8 +31,11 @@ Write the name the way it sounds in the narration text (e.g. `sugatoray` →
 `Shoo-gaw-doe Ray`). To find the spelling cheaply, generate the name alone
 (about 15 credits a try) and let the user pick, instead of regenerating whole
 lines. To fix a clip that is otherwise fine, splice the approved name sample
-into it (find the word by its consonants in a spectrogram, match loudness,
-10 ms crossfades) rather than paying for the whole line again.
+into it rather than paying for the whole line again: find the word by its
+consonants in a spectrogram, match loudness, 10 ms crossfades. Map every
+"s/sh/f" burst of the whole line to its word first; matching only the bursts
+near the guess can cut the wrong word and leave the old one in. Then confirm
+that every burst after the cut is still there, shifted by the same amount.
 
 ## Route A: ElevenLabs MCP connector
 

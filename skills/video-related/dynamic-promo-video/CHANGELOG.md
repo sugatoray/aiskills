@@ -10,7 +10,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Demo narration says "sugatoray" as "Shoo-gaw-doe Ray", the spelling its
   owner approved.
 - `references/voiceover.md`: how to fix a name the voice gets wrong with few
-  credits (name-only samples, then splice the approved sample into the clip).
+  credits (name-only samples, then splice the approved sample into the clip),
+  and how to check that the splice replaced the right word.
 
 ## [1.4.0] - 2026-11-11
 
