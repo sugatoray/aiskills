@@ -1,6 +1,7 @@
 // The `aiskills` command-line interface. bin/aiskills.mjs is the entry point.
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { spawnSync } from "node:child_process";
 import {
   PKG_DIR,
   envOptions,
@@ -12,6 +13,7 @@ import {
   lastSelectedAgents,
   listInstalled,
   confirm,
+  knownAgents,
   countInstall,
   resolveExternal,
   skillsAddExternal,
@@ -54,6 +56,7 @@ import {
   renderSeries,
   todayDate,
 } from "./releases.mjs";
+import { HOW_TO_UPGRADE, detectInstall, installCommand, npmGlobalRoot, pickTarget, refreshPlan, runInstall } from "./upgrade.mjs";
 
 const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
 const ROOT = installRoot();
@@ -75,6 +78,8 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
+  upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
+                 installed skills for the same agents with the new version
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ${ROOT}
   help, h        Show this help
@@ -137,6 +142,14 @@ releases only:
       --ascii                  Draw the bars with # instead of block characters
   --chart, --table, --by and --ascii imply --downloads.
 
+upgrade only:
+  <version|tag>          What to install instead of latest: 0.9.1, next
+      --check            Only say whether an upgrade is available; change nothing (exit 0)
+      --json             With --check: the result as JSON
+      --no-refresh       Upgrade the package only; print how to refresh the skills
+  -n, --dry-run          Print what would run; change nothing
+  -y, --yes              Allow a downgrade without asking
+
 uninstall only:
       --purge            Also delete ${ROOT} (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -165,6 +178,8 @@ Examples:
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
+  aiskills upgrade --check                    # is there a newer aiskills?
+  aiskills upgrade                            # install it, and update the skills your agents have
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ${ROOT} -s prodigy -g -y
 
@@ -456,7 +471,7 @@ function info(opts) {
     const { npm, installed: inst } = data.full;
     if (npm.error) kv("latest on npm", "unavailable", npm.error);
     else {
-      const hint = { "update available": `update available: npm install -g ${PKG_NAME}@latest`, "not published": `${version} is not published on npm` }[npm.status] ?? npm.status;
+      const hint = { "update available": "update available: run aiskills upgrade", "not published": `${version} is not published on npm` }[npm.status] ?? npm.status;
       kv("latest on npm", npm.latest ?? "none", hint);
     }
     if (inst.error) kv("installed skills", "unavailable", inst.error);
@@ -554,6 +569,126 @@ function releases(o, command) {
   if (existsSync(local)) console.log(`changelog: ${local}\n           ${CHANGELOG_URL}`);
   else console.log(`changelog: ${CHANGELOG_URL}`);
   return 0;
+}
+
+/** Options of `aiskills upgrade`. */
+function parseUpgrade(argv) {
+  const o = { target: undefined, check: false, json: false, refresh: true, dryRun: false, yes: false };
+  for (const a of argv) {
+    if (a === "--check") o.check = true;
+    else if (a === "--json") o.json = true;
+    else if (a === "--no-refresh") o.refresh = false;
+    else if (a === "-n" || a === "--dry-run") o.dryRun = true;
+    else if (a === "-y" || a === "--yes") o.yes = true;
+    else if (!a.startsWith("-")) {
+      if (o.target !== undefined) throw new Error(`give one version or tag (got '${o.target}' and '${a}')`);
+      o.target = a;
+    } else throw new Error(`unknown option: ${a}`);
+  }
+  if (o.json && !o.check) throw new Error("--json only works with --check");
+  return o;
+}
+
+const HOW = { npx: "npx", project: "project dependency", source: "source checkout" };
+const csvList = (xs) => xs.join(",");
+
+/**
+ * `aiskills upgrade`: install a newer aiskills globally with the package
+ * manager that installed it, then re-add the skills installed from the
+ * install folder, for the same agents, by running the new version.
+ */
+function upgrade(o) {
+  const view = npmView(PKG_NAME);
+  const versions = [...new Set([...view.versions, ...Object.keys(view.time).filter((v) => v !== "created" && v !== "modified")])];
+  const t = pickTarget({ distTags: view.distTags, versions }, version, o.target);
+  const inst = detectInstall(PKG_DIR, { npmGlobalRoot: npmGlobalRoot() });
+  const published = view.time[t.target]?.slice(0, 10) ?? null;
+  const how = inst.global ? `${inst.method}, global` : HOW[inst.method];
+  const status = `installed: ${version} (${how}) · ${t.tag ?? "requested"}: ${t.target}${published ? ` (published ${published})` : ""}`;
+
+  if (o.check) {
+    if (o.json) {
+      console.log(JSON.stringify({ installed: version, target: t.target, tag: t.tag, change: t.change, upgradable: t.change === "upgrade", method: inst.method, global: inst.global, published }, null, 2));
+      return 0;
+    }
+    log(status);
+    const than = t.tag ? `${t.tag} (${t.target})` : t.target;
+    log(t.change === "upgrade" ? "update available: run 'aiskills upgrade'" : t.change === "none" ? "up to date" : `installed ${version} is newer than ${than}`);
+    return 0;
+  }
+  log(status);
+  if (t.change === "none") {
+    log(`already up to date (${version})`);
+    return 0;
+  }
+  if (!inst.global) throw new Error(`can't upgrade: ${HOW_TO_UPGRADE[inst.method]}`);
+  if (t.change === "downgrade" && !o.yes && !o.dryRun) {
+    if (!process.stdin.isTTY) throw new Error(`not downgrading ${version} → ${t.target} without confirmation: re-run with -y`);
+    if (!confirm(`Downgrade aiskills ${version} → ${t.target}? [y/N] `)) throw new Error("nothing changed: not confirmed");
+  }
+
+  // What to refresh afterwards: the skills installed from the install folder (global), by agents.
+  // (Needed with --no-refresh too, to print the commands that would refresh them.)
+  let plan = null;
+  const rows = listInstalled({ global: true, cwd: ROOT });
+  if (rows) plan = refreshPlan(rows, ROOT, knownAgents());
+  else warn("could not read 'npx skills list'; the skills won't be refreshed");
+  const refreshCmd = (g) => `aiskills install -g -s ${csvList(g.skills)} -a ${csvList(g.agents)}`;
+  const oldNames = skillNamesIn(join(PKG_DIR, "skills"));
+  const [cmd, args] = installCommand(inst.method, `${PKG_NAME}@${t.target}`);
+  log(`changes: ${CHANGELOG_URL}`);
+  if (o.dryRun) {
+    log(`[dry-run] ${cmd} ${args.join(" ")}`);
+    for (const g of plan?.groups ?? []) log(`[dry-run] then: ${refreshCmd(g)}`);
+    return 0;
+  }
+  log(`running: ${cmd} ${args.join(" ")}`);
+  const code = runInstall(cmd, args);
+  if (code !== 0) return code;
+
+  const newPkg = dirname(dirname(inst.entry));
+  const newVersion = JSON.parse(readFileSync(join(newPkg, "package.json"), "utf8")).version;
+  if (newVersion !== t.target) warn(`${cmd} installed ${newVersion}, not ${t.target}`);
+  const newNames = skillNamesIn(join(newPkg, "skills"));
+  const installed = plan?.installed ?? [];
+  const groups = (plan?.groups ?? [])
+    .map((g) => ({ ...g, skills: g.skills.filter((n) => newNames.has(n)) }))
+    .filter((g) => g.skills.length);
+
+  let result = 0;
+  if (!o.refresh) {
+    log(`your agents still have the ${version} skills; to update them:`);
+    for (const g of groups) console.log(`  ${refreshCmd(g)}`);
+    if (!groups.length) console.log("  aiskills install");
+  } else if (plan) {
+    if (!installed.length) log(`no skills installed from ${ROOT} (global); install them with: aiskills install`);
+    for (const g of groups) {
+      const n = g.skills.length;
+      log(`refreshing ${n} skill${n === 1 ? "" : "s"} for ${g.agents.join(", ")} (global) with aiskills ${newVersion}`);
+      // The new version does the work; the count on skills.sh isn't bumped for a refresh.
+      const res = spawnSync(process.execPath, [inst.entry, "install", "-g", "-s", csvList(g.skills), "-a", csvList(g.agents)], {
+        stdio: "inherit",
+        env: { ...process.env, AISKILLS_STATS: "0" },
+      });
+      if ((res.status ?? 1) !== 0) result = res.status ?? 1;
+    }
+    for (const u of plan.unknownAgents) warn(`couldn't tell which agent '${u}' is; re-add its skills with: aiskills install -s <skills> -a <agent id>`);
+  }
+  const added = [...newNames].filter((n) => !oldNames.has(n)).sort();
+  if (added.length) {
+    const agents = [...new Set(groups.flatMap((g) => g.agents))].sort();
+    log(`new in ${newVersion}, not installed: ${added.join(", ")}`);
+    console.log(`  to install them:      aiskills install -s ${csvList(added)}${agents.length ? ` -a ${csvList(agents)}` : ""}`);
+    console.log("  or pick from a list:  aiskills install -i");
+  }
+  const dropped = installed.filter((n) => !newNames.has(n));
+  if (dropped.length) {
+    log(`no longer in ${newVersion} but still installed: ${dropped.join(", ")}`);
+    console.log(`  to remove:  aiskills uninstall -s ${csvList(dropped)}`);
+  }
+  if (o.refresh) log("project installs aren't refreshed: run 'aiskills install -p' in each project that uses them");
+  log(`${t.change === "downgrade" ? "downgraded" : "upgraded"} ${version} → ${newVersion}`);
+  return result;
 }
 
 function main() {
@@ -672,6 +807,8 @@ function main() {
       return skillsAdd(syncSkills({ version }), { list: true });
     case "info":
       return info(parse(rest, ["json", "full"]));
+    case "upgrade":
+      return upgrade(parseUpgrade(rest));
     case "releases":
     case "rel":
       return releases(parseReleases(rest), cmd);

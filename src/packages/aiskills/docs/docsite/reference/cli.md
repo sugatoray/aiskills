@@ -26,6 +26,7 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 | [`path`](#path) | `p` | Print the install folder |
 | [`info`](#info) | | Show this setup: versions, folders, settings and where each comes from |
 | [`releases`](#releases) | `rel` | Show the latest releases on npm, optionally with download counts |
+| [`upgrade`](#upgrade) | | Install the latest aiskills globally and update the skills your agents have |
 | [`skills`](#skills) | | Pass arguments to `npx skills` |
 | [`help`](#help) | `h`, `-h`, `--help` | Show the help |
 | [`-v`, `--version`](#-v---version) | | Print the version |
@@ -214,7 +215,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 0.8.0
+  aiskills version : 0.9.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
       saved skills : 13 skills in 7 groups, flat layout
@@ -271,7 +272,7 @@ aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|
 | Default | The latest 5 releases, no download counts |
 | Exit code | `1` if the count or period is invalid (checked before any network call), or npm or api.npmjs.org can't be reached; otherwise `0` |
 
-The examples below run against sample registry data, with today set to 2026-11-12.
+The examples below run against sample registry data, with today set to 2026-11-21.
 
 <!-- verify -->
 ```bash
@@ -279,12 +280,12 @@ aiskills rel 3
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 3 of 5 releases
+@sugatoray-ai/aiskills: latest 3 of 6 releases
 
-  VERSION  PUBLISHED               TAG
-  0.8.0    2026-11-12 (today)      latest  ← installed
-  0.7.0    2026-11-11 (1 day ago)
-  0.6.0    2026-11-11 (1 day ago)
+  VERSION  PUBLISHED                 TAG
+  0.9.0    2026-11-20 (1 day ago)    latest  ← installed
+  0.8.0    2026-11-12 (9 days ago)
+  0.7.0    2026-11-11 (10 days ago)
 
 more: aiskills rel all
 
@@ -306,14 +307,16 @@ aiskills rel --downloads
 ```
 
 ```text
-@sugatoray-ai/aiskills: 5 releases
+@sugatoray-ai/aiskills: latest 5 of 6 releases
 
-  VERSION  PUBLISHED                TAG     DOWNLOADS (7 DAYS)
-  0.8.0    2026-11-12 (today)       latest                   –  ← installed
-  0.7.0    2026-11-11 (1 day ago)                            –
-  0.6.0    2026-11-11 (1 day ago)                            –
-  0.5.0    2026-11-09 (3 days ago)                         140
-  0.4.0    2026-11-09 (3 days ago)                         162
+  VERSION  PUBLISHED                 TAG     DOWNLOADS (7 DAYS)
+  0.9.0    2026-11-20 (1 day ago)    latest                   –  ← installed
+  0.8.0    2026-11-12 (9 days ago)                            –
+  0.7.0    2026-11-11 (10 days ago)                           –
+  0.6.0    2026-11-11 (10 days ago)                           –
+  0.5.0    2026-11-09 (12 days ago)                         140
+
+more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
 per-version counts cover the last 7 days only (npm keeps no older ones); – = no count yet
@@ -340,10 +343,10 @@ aiskills rel 1 --downloads 7d --table
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 1 of 5 releases
+@sugatoray-ai/aiskills: latest 1 of 6 releases
 
-  VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
-  0.8.0    2026-11-12 (today)  latest                   –  ← installed
+  VERSION  PUBLISHED               TAG     DOWNLOADS (7 DAYS)
+  0.9.0    2026-11-20 (1 day ago)  latest                   –  ← installed
 
 more: aiskills rel all
 
@@ -367,6 +370,97 @@ changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
 JSON (`--json`), for scripts: `{ "package", "registry", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`; `published` on a release is npm's ISO 8601 timestamp, or `null` when the registry doesn't report it. `registry` is the registry `npm view` asked (`npm config get registry`).
 
 See also: [FAQ: Which agents…](../faq.md) · [Errors: Releases and downloads](errors.md#releases-and-downloads)
+
+### `upgrade`
+
+Install a newer aiskills (the latest, or the version or tag you name) with the package manager that installed it globally, then re-add the skills installed from the install folder, for the same agents, by running the new version. Without that second step your agents would keep the old skills: `npx skills` copies each skill into its own folder.
+
+```text
+aiskills upgrade [<version>|<tag>] [--check [--json]] [--no-refresh] [-n] [-y]
+```
+
+| | |
+| --- | --- |
+| Options | [`--check`](#--check), [`--json`](#--json), [`--no-refresh`](#--no-refresh), [`-n`](#-n---dry-run), [`-y`](#-y---yes) |
+| Default | Upgrade to the `latest` tag, then refresh the skills (global) |
+| Exit code | `0` if upgraded, already up to date, or with `--check` (whatever it finds); `1` if aiskills can't upgrade itself, the version is unknown, or a downgrade isn't confirmed; otherwise the package manager's exit code |
+
+Check first, without changing anything (the examples here run with 0.8.0 installed and 0.9.0 on the registry):
+
+<!-- verify: version=0.8.0 -->
+```bash
+aiskills upgrade --check
+```
+
+```text
+[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] update available: run 'aiskills upgrade'
+```
+
+Then upgrade:
+
+<!-- verify: version=0.8.0 list=scrolls-setup,scrolls-update -->
+```bash
+aiskills upgrade
+```
+
+```text
+[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+[aiskills] running: npm install -g @sugatoray-ai/aiskills@0.9.0
+changed 1 package in 1s
+[aiskills] refreshing 2 skills for claude-code (global) with aiskills 0.9.0
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-setup, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --skill scrolls-update --agent claude-code --yes
+[aiskills] project installs aren't refreshed: run 'aiskills install -p' in each project that uses them
+[aiskills] upgraded 0.8.0 → 0.9.0
+```
+
+What it does, in order:
+
+1. **Picks the target** from `npm view` (your npm config applies): `latest`, or the `<version>` or `<tag>` you give (`aiskills upgrade 0.9.1`, `aiskills upgrade next`). If you already have it: `already up to date (<version>)`, and nothing changes.
+2. **Finds out how aiskills was installed**, from where its files are. Only a global install can upgrade itself:
+
+   | Installed with | `upgrade` runs |
+   | --- | --- |
+   | `npm install -g` | `npm install -g @sugatoray-ai/aiskills@<version>` |
+   | `pnpm add -g` | `pnpm add -g @sugatoray-ai/aiskills@<version>` |
+   | `bun add -g` | `bun add -g @sugatoray-ai/aiskills@<version>` |
+   | `yarn global add` | `yarn global add @sugatoray-ai/aiskills@<version>` |
+   | `npx @sugatoray-ai/aiskills …` | nothing; says to run `npx @sugatoray-ai/aiskills@latest install` |
+   | a project's dependency | nothing; says to run `npm install -D @sugatoray-ai/aiskills@latest` |
+   | a source checkout | nothing; says to `git pull` or install the package |
+
+3. **Installs it**, showing the package manager's output. A permission error gets a hint (don't use `sudo`; give npm a folder you own); npm's release-age refusal gets the [usual explanation](errors.md#npms-release-age-rule-blocked-the-skills-cli).
+4. **Refreshes the skills**: for each set of agents, runs the new version's `aiskills install -g -s <skills> -a <agents>` for the skills `npx skills list` reports as installed from the install folder. Agent names are mapped to ids (`Claude Code` → `claude-code`); one that can't be mapped is reported with the command to use, never guessed. The refresh doesn't add to the [skills.sh count](../concepts/install-count.md).
+5. **Tells you what changed in the bundle:** skills new in this version are listed, not installed, with the commands to add them; skills the new version no longer has are listed with the command to remove them:
+
+   ```text
+   [aiskills] new in 0.9.0, not installed: gamma
+     to install them:      aiskills install -s gamma -a claude-code,codex
+     or pick from a list:  aiskills install -i
+   [aiskills] no longer in 0.9.0 but still installed: old-skill
+     to remove:  aiskills uninstall -s old-skill
+   ```
+
+Only global installs from the install folder are refreshed; skills installed into a project (`-p`) are not, as aiskills can't know every project: run `aiskills install -p` in each. A **downgrade** (`aiskills upgrade 0.7.0`) asks `[y/N]` first, or needs [`-y`](#-y---yes); without a terminal it stops. Preview everything with [`-n`](#-n---dry-run):
+
+<!-- verify: version=0.8.0 list=scrolls-setup,scrolls-update -->
+```bash
+aiskills upgrade -n
+```
+
+```text
+[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@0.9.0
+[aiskills] [dry-run] then: aiskills install -g -s scrolls-setup,scrolls-update -a claude-code
+```
+
+JSON (`--check --json`), for scripts: `{ "installed", "target", "tag": string|null, "change": "upgrade"|"downgrade"|"none", "upgradable": boolean, "method": "npm"|"pnpm"|"bun"|"yarn"|"npx"|"project"|"source", "global": boolean, "published": "YYYY-MM-DD"|null }`. The exit code is `0` either way, so read `upgradable`.
+
+See also: [FAQ: How do I update the skills?](../faq.md#how-do-i-update-the-skills) · [Errors: Upgrade](errors.md#upgrade)
 
 ### `skills`
 
@@ -393,7 +487,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.8.0 — Sugato Ray's agent skills
+aiskills 0.9.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -410,6 +504,8 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
+  upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
+                 installed skills for the same agents with the new version
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ~/.config/sugatoray/aiskills
   help, h        Show this help
@@ -472,6 +568,14 @@ releases only:
       --ascii                  Draw the bars with # instead of block characters
   --chart, --table, --by and --ascii imply --downloads.
 
+upgrade only:
+  <version|tag>          What to install instead of latest: 0.9.1, next
+      --check            Only say whether an upgrade is available; change nothing (exit 0)
+      --json             With --check: the result as JSON
+      --no-refresh       Upgrade the package only; print how to refresh the skills
+  -n, --dry-run          Print what would run; change nothing
+  -y, --yes              Allow a downgrade without asking
+
 uninstall only:
       --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -500,6 +604,8 @@ Examples:
   aiskills uninstall --purge                  # remove all, then delete ~/.config/sugatoray/aiskills
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
+  aiskills upgrade --check                    # is there a newer aiskills?
+  aiskills upgrade                            # install it, and update the skills your agents have
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ~/.config/sugatoray/aiskills -s prodigy -g -y
 
@@ -530,7 +636,7 @@ ais -v
 ```
 
 ```text
-0.8.0
+0.9.0
 ```
 
 ## Options
@@ -549,7 +655,7 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
 
-`info` takes `--full` and `--json`; `releases` takes `-L`, `--downloads`, `--chart`, `--table`, `--by`, `--ascii` and `--json` (see their headings below).
+`info` takes `--full` and `--json`; `upgrade` takes `--check`, `--json`, `--no-refresh`, `-n` and `-y`; `releases` takes `-L`, `--downloads`, `--chart`, `--table`, `--by`, `--ascii` and `--json` (see their headings below).
 | `--` | ✓ | ✓ | | | |
 
 ### `-g`, `--global`
@@ -615,6 +721,8 @@ On install with [`--route`](#--route), install the skills that a registry lookup
 
 Either way nothing is installed, not even the bundled skills, until the external ones are confirmed. A skill given as `owner/repo@skill`, a URL or a path is never asked about: you named its source. Bundled skills never ask. See [Security model](../concepts/security.md).
 
+On [`upgrade`](#upgrade), allow a downgrade (a target older than the installed version) without asking. Without it, a terminal asks `Downgrade aiskills <installed> → <target>? [y/N]`, and with no terminal it stops with `not downgrading ... without confirmation` (exit `1`). An upgrade never asks.
+
 ### `--purge`
 
 After a full uninstall, delete the install folder. Refused with `-s`/`-G`, and refused for a folder that isn't an aiskills folder (checked before anything is removed).
@@ -627,11 +735,21 @@ On uninstall, pass `-s` names to `npx skills remove` even if this package doesn'
 
 On uninstall, print what would be removed and the exact `npx skills` command, and change nothing.
 
+On [`upgrade`](#upgrade), print the package manager's install command and each `aiskills install` refresh command as `[dry-run]` lines, and change nothing.
+
 On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines, and the [skills.sh count](../concepts/install-count.md) command as a `[dry-run] skills.sh count: ...` line. Nothing is installed or counted. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
 
 ### `--json`
 
-On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json). On [`info`](#info) and [`releases`](#releases), print what they show as JSON (schemas in their sections).
+On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json). On [`info`](#info) and [`releases`](#releases), print what they show as JSON; on [`upgrade`](#upgrade), only with `--check` (schemas in their sections).
+
+### `--check`
+
+On [`upgrade`](#upgrade), only say whether a newer version is available (`update available: run 'aiskills upgrade'`, `up to date`, or `installed <version> is newer than <target>`), and change nothing. Exits `0` whatever it finds; with [`--json`](#--json), read `upgradable`.
+
+### `--no-refresh`
+
+On [`upgrade`](#upgrade), install the new package but leave the skills your agents have as they are, and print the `aiskills install` commands that would update them.
 
 ### `--full`
 

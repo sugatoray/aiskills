@@ -13,6 +13,7 @@ const TODAY = { AISKILLS_TODAY: "2026-11-12" };
 let sb;
 before(async () => {
   sb = sandbox();
+  sb.setVersion("0.8.0"); // the sample data's latest release
   await sb.startApi();
 });
 after(() => sb.cleanup());
@@ -63,7 +64,7 @@ describe("aiskills releases / rel", posixOnly, () => {
     view["dist-tags"].latest = "0.9.0";
     sb.setView(view);
     const r = sb.run(["rel"], { env: TODAY });
-    assert.match(r.out, /^update available: 0\.8\.0 → 0\.9\.0 {2}\(npm install -g @sugatoray-ai\/aiskills@latest\)$/m);
+    assert.match(r.out, /^update available: 0\.8\.0 → 0\.9\.0 {2}\(aiskills upgrade\)$/m);
   });
 
   test("a version that isn't on npm says so", () => {
@@ -263,6 +264,7 @@ describe("aiskills info", posixOnly, () => {
   test("before the first install it says so", () => {
     const fresh = sandbox();
     try {
+      fresh.setVersion("0.8.0");
       const r = fresh.run(["info"]);
       assert.equal(r.status, 0, r.out);
       assert.match(r.out, /install root : .* {2}\(AISKILLS_HOME; not created yet\)$/m);
@@ -289,7 +291,7 @@ describe("aiskills info", posixOnly, () => {
     old.time["0.9.0"] = "2026-11-12T12:00:00.000Z";
     old["dist-tags"].latest = "0.9.0";
     sb.setView(old);
-    assert.match(sb.run(["info", "--full"]).out, /latest on npm : 0\.9\.0 {2}\(update available: npm install -g @sugatoray-ai\/aiskills@latest\)$/m);
+    assert.match(sb.run(["info", "--full"]).out, /latest on npm : 0\.9\.0 {2}\(update available: run aiskills upgrade\)$/m);
     assert.match(sb.run(["info", "--full"], { env: { FAKE_NPM_VIEW_ERROR: "1" } }).out, /latest on npm : unavailable {2}\(could not read the releases/m);
   });
 

@@ -103,6 +103,31 @@ if (a[0] === "config" && a[1] === "get" && a[2] === "registry") {
   console.log(process.env.FAKE_NPM_REGISTRY || "https://registry.npmjs.org/");
   process.exit(0);
 }
+if (a[0] === "root" && a[1] === "-g") {
+  console.log(process.env.FAKE_NPM_ROOT || "/nonexistent/lib/node_modules");
+  process.exit(0);
+}
+// npm install -g <pkg>@<version> (aiskills upgrade): logs the call, then acts like
+// npm replacing the package: sets its version, and adds or drops a skill.
+if (a[0] === "install" && a[1] === "-g") {
+  if (process.env.FAKE_NPM_LOG) fs.appendFileSync(process.env.FAKE_NPM_LOG, JSON.stringify(a) + "\\n");
+  if (process.env.FAKE_NPM_INSTALL_ERROR) {
+    console.error("npm error code EACCES");
+    console.error("npm error Error: EACCES: permission denied, mkdir '/usr/lib/node_modules/@sugatoray-ai'");
+    process.exit(243);
+  }
+  const pkgDir = process.env.FAKE_NPM_PKG;
+  const version = a[2].slice(a[2].lastIndexOf("@") + 1);
+  const pj = pkgDir + "/package.json";
+  fs.writeFileSync(pj, JSON.stringify({ ...JSON.parse(fs.readFileSync(pj, "utf8")), version }, null, 2));
+  if (process.env.FAKE_NPM_NEW_SKILL) {
+    fs.mkdirSync(pkgDir + "/skills/" + process.env.FAKE_NPM_NEW_SKILL, { recursive: true });
+    fs.writeFileSync(pkgDir + "/skills/" + process.env.FAKE_NPM_NEW_SKILL + "/SKILL.md", "---\\nname: " + process.env.FAKE_NPM_NEW_SKILL + "\\n---\\n");
+  }
+  if (process.env.FAKE_NPM_DROP_SKILL) fs.rmSync(pkgDir + "/skills/" + process.env.FAKE_NPM_DROP_SKILL, { recursive: true, force: true });
+  console.log("changed 1 package in 1s");
+  process.exit(0);
+}
 if (a[0] !== "view") process.exit(1);
 if (process.env.FAKE_NPM_VIEW_ERROR) {
   console.error("npm error code E404");
@@ -155,6 +180,12 @@ export const SAMPLE_VIEW = {
   "dist-tags": { latest: "0.8.0" },
 };
 
+/** SAMPLE_VIEW plus a 0.9.0 release (latest), for the docs' examples of the current version. */
+export const DOCS_VIEW = {
+  time: { ...SAMPLE_VIEW.time, modified: "2026-11-20T10:00:00.000Z", "0.9.0": "2026-11-20T10:00:00.000Z" },
+  "dist-tags": { latest: "0.9.0" },
+};
+
 /** Sample download counts (the real ones up to 2026-11-10). */
 export const SAMPLE_API = {
   lastDay: "2026-11-10",
@@ -187,9 +218,12 @@ child.on("close", (code) => { process.stdout.write(out); process.exit(code ?? 1)
  * The skills.sh install count is off (AISKILLS_STATS=0) unless { stats: true },
  * so a background `npx skills add sugatoray/aiskills` never lands in another test's calls.
  */
-export function sandbox({ realSkills = false, stats = false } = {}) {
+export function sandbox({ realSkills = false, stats = false, globalNpm = false } = {}) {
   const dir = tempDir();
-  const pkg = join(dir, "pkg");
+  // globalNpm: laid out like `npm install -g` (<prefix>/lib/node_modules/@sugatoray-ai/aiskills).
+  const npmRoot = join(dir, "prefix", "lib", "node_modules");
+  const pkg = globalNpm ? join(npmRoot, "@sugatoray-ai", "aiskills") : join(dir, "pkg");
+  const npmLog = join(dir, "npm.log");
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
@@ -227,6 +261,9 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
       AISKILLS_HOME: root,
       ...(stats ? {} : { AISKILLS_STATS: "0" }),
       FAKE_NPX_LOG: log,
+      FAKE_NPM_LOG: npmLog,
+      FAKE_NPM_PKG: pkg,
+      ...(globalNpm ? { FAKE_NPM_ROOT: npmRoot } : {}),
       ...(existsSync(listFile) ? { FAKE_LIST_FILE: listFile } : {}),
       ...(existsSync(findFile) ? { FAKE_FIND_FILE: findFile } : {}),
       ...(existsSync(viewFile) ? { FAKE_NPM_VIEW: viewFile } : {}),
@@ -268,6 +305,17 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
     calls,
     setList: (rows) => writeFileSync(listFile, JSON.stringify(rows)),
     setFind: (text) => writeFileSync(findFile, text),
+    /** The `npm install -g` calls the stand-in npm got since the last call. */
+    npmCalls: () => {
+      const lines = existsSync(npmLog) ? readFileSync(npmLog, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+      rmSync(npmLog, { force: true });
+      return lines;
+    },
+    /** Set the package's version (as if that version were installed). */
+    setVersion: (v) => {
+      const pj = join(pkg, "package.json");
+      writeFileSync(pj, JSON.stringify({ ...JSON.parse(readFileSync(pj, "utf8")), version: v }, null, 2));
+    },
     /** What the stand-in `npm view` answers (an object in npm view --json's shape). */
     setView: (view) => writeFileSync(viewFile, JSON.stringify(view)),
     /** What the stand-in api.npmjs.org answers: { lastDay, perVersion, daily: {day: n}, down }. */

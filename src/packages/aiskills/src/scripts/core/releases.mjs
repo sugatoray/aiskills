@@ -352,7 +352,7 @@ export function renderReleases({ pkg, rows, count, installed, latest, today, per
   const published = rows.some((r) => r.version === installed);
   if (!published && installed) notes.push(`installed: ${installed} (not published on npm)`);
   else if (latest && installed && latest !== installed && rows.findIndex((r) => r.version === latest) < rows.findIndex((r) => r.version === installed)) {
-    notes.push(`update available: ${installed} → ${latest}  (npm install -g ${pkg}@latest)`);
+    notes.push(`update available: ${installed} → ${latest}  (aiskills upgrade)`);
   }
   if (shown.length < rows.length) notes.push(`more: ${command} all`);
   if (notes.length) lines.push("", ...notes);

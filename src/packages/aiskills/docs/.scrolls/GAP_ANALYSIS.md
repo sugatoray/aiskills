@@ -8,6 +8,8 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - `--last-agents` reads `lastSelectedAgents` from the `npx skills` lock file, an internal format, not a documented interface.
 - `info --full` can't list the agents `npx skills` would detect (it exposes no such list); it shows per-agent counts of installed skills instead.
 - `releases --downloads` behind a proxy needs Node 22.21+/24+ (`NODE_USE_ENV_PROXY`); older Node ignores `HTTPS_PROXY` for it. `npm view` through `npm.cmd` is untested on Windows.
+- `aiskills upgrade` was only run against a stand-in npm in a global-npm layout; pnpm/bun/yarn detection is from their default global folder paths and never ran for real, and a real `npm install -g` replacing the running package was not exercised.
+- `upgrade` refreshes global installs only; project (`-p`) installs need `aiskills install -p` in each project.
 - No `-d/--dir <path>` option; project-scope commands only act on the current folder.
 - No CI workflow: nothing runs `npm test` on pull requests, and publishing to npm is manual.
 - Nothing has run on real Windows: the CLI tests are skipped there, `npm run test:e2e` only works in a POSIX shell, and the Windows `cmd.exe` safety checks are only unit-tested.

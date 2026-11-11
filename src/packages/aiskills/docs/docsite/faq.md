@@ -22,7 +22,7 @@ The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` pri
 
 ### How do I update the skills?
 
-Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, then run `aiskills install` again: it saves the new skills and registers them. If you had picked particular skills or agents, run that `aiskills install ...` command instead.
+Run `aiskills upgrade`. It installs the latest aiskills with the package manager you installed it with, then updates the skills your agents have, for the same agents. Skills that are new in that version are listed with the commands to add them. `aiskills upgrade --check` only says whether there is a newer version. (Before 0.9.0: `npm install -g @sugatoray-ai/aiskills@latest`, then `aiskills install` again.) See [`upgrade`](reference/cli.md#upgrade).
 
 ### How do I see my setup, or check for a newer version?
 
