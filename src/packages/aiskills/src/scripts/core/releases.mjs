@@ -99,28 +99,44 @@ export function relativeAge(published, today) {
 
 // ------------------------------------------------------------- npm + api
 
-/** `npm view <pkg> time dist-tags --json`, through the user's npm config. */
-export function npmView(pkg) {
+function runNpm(args) {
   const win = process.platform === "win32";
-  const res = spawnSync(win ? "npm.cmd" : "npm", ["view", pkg, "time", "dist-tags", "--json"], {
+  return spawnSync(win ? "npm.cmd" : "npm", args, {
     encoding: "utf8",
     env: childEnv(),
     shell: win,
     timeout: 60_000,
     maxBuffer: 16 * 1024 * 1024,
   });
+}
+
+/** The registry npm uses (`npm config get registry`): a company mirror, say; null if unknown. */
+export function npmRegistry() {
+  const res = runNpm(["config", "get", "registry"]);
+  const out = res.status === 0 ? (res.stdout ?? "").trim() : "";
+  return out || null;
+}
+
+/**
+ * `npm view <pkg> time dist-tags versions --json`, through the user's npm config.
+ * Errors name the registry asked (`could not read the releases of <pkg> from <registry>: ...`).
+ */
+export function npmView(pkg) {
+  const res = runNpm(["view", pkg, "time", "dist-tags", "versions", "--json"]);
   const why = (res.error?.message ?? res.stderr ?? "")
     .split("\n")
     .map((l) => l.replace(/^npm (error|ERR!)\s*/i, "").trim())
     .find((l) => l && !/^(code|A complete log)/i.test(l));
+  const from = () => (res.error ? "npm" : npmRegistry() ?? "npm");
   if (res.error || res.status !== 0) {
-    throw new Error(`could not read the releases of ${pkg} from npm${why ? `: ${why}` : ""}`);
+    const reason = why ? `: ${why}` : "";
+    throw new Error(`could not read the releases of ${pkg} from ${from()}${reason}`);
   }
   try {
     const data = JSON.parse(res.stdout);
-    return { time: data.time ?? {}, distTags: data["dist-tags"] ?? {} };
+    return { time: data.time ?? {}, distTags: data["dist-tags"] ?? {}, versions: [].concat(data.versions ?? []) };
   } catch {
-    throw new Error(`could not read the releases of ${pkg} from npm: unexpected output from 'npm view'`);
+    throw new Error(`could not read the releases of ${pkg} from ${from()}: unexpected output from 'npm view'`);
   }
 }
 
@@ -181,14 +197,37 @@ export function fetchDownloads(pkg, period, { created } = {}) {
 
 // ------------------------------------------------------------------ shaping
 
-/** Releases newest first: { version, published, tags, installed }; placeholders left out. */
-export function releaseRows({ time, distTags }, installed) {
+/** Compare two versions by number (1.10.0 > 1.9.0); a prerelease sorts before its release. */
+export function compareVersions(a, b) {
+  const [ma, pa = ""] = a.split(/-(.*)/s);
+  const [mb, pb = ""] = b.split(/-(.*)/s);
+  const na = ma.split(".").map(Number);
+  const nb = mb.split(".").map(Number);
+  for (let i = 0; i < Math.max(na.length, nb.length); i++) {
+    const d = (na[i] ?? 0) - (nb[i] ?? 0);
+    if (d) return d;
+  }
+  if (pa === pb) return 0;
+  if (!pa) return 1;
+  if (!pb) return -1;
+  return pa.localeCompare(pb, "en", { numeric: true });
+}
+
+/**
+ * Releases newest first: { version, published, tags, installed }; placeholders
+ * left out. A registry (mirror) that reports no publish times still lists its
+ * versions: published is then null, and they are sorted by version number.
+ */
+export function releaseRows({ time, distTags, versions }, installed) {
   const tagsOf = {};
   for (const [tag, v] of Object.entries(distTags ?? {})) (tagsOf[v] ??= []).push(tag);
-  return Object.entries(time ?? {})
-    .filter(([v]) => v !== "created" && v !== "modified" && !HIDDEN.test(v))
-    .map(([version, published]) => ({ version, published, tags: tagsOf[version] ?? [], installed: version === installed }))
-    .sort((a, b) => b.published.localeCompare(a.published));
+  const all = new Set([...(versions ?? []), ...Object.keys(time ?? {}).filter((v) => v !== "created" && v !== "modified")]);
+  const rows = [...all]
+    .filter((v) => !HIDDEN.test(v))
+    .map((version) => ({ version, published: time?.[version] ?? null, tags: tagsOf[version] ?? [], installed: version === installed }));
+  return rows.every((r) => r.published)
+    ? rows.sort((a, b) => b.published.localeCompare(a.published))
+    : rows.sort((a, b) => compareVersions(b.version, a.version));
 }
 
 /** Row size for a chart of <nDays>: day (≤ 31), week (≤ 183), else month. */
@@ -215,6 +254,7 @@ export function bucketize(days, by) {
 const publishedIn = (row, releases) =>
   releases
     .filter((r) => {
+      if (!r.published) return false;
       const d = iso(Date.parse(r.published));
       return d >= row.start && d <= row.end;
     })
@@ -288,12 +328,12 @@ export function renderSeries(rows, { by, releases = [], table = false, ascii = f
  * The release table. With perVersion (from fetchDownloads), adds the
  * 7-day downloads column ("–" = no count yet).
  */
-export function renderReleases({ pkg, rows, count, installed, latest, today, perVersion, command = "aiskills releases" }) {
+export function renderReleases({ pkg, rows, count, installed, latest, today, perVersion, registry, command = "aiskills releases" }) {
   const shown = rows.slice(0, count);
   const head = shown.length < rows.length ? `latest ${shown.length} of ${plural(rows.length, "release")}` : plural(rows.length, "release");
   const cells = shown.map((r) => ({
     version: r.version,
-    published: `${iso(Date.parse(r.published))} (${relativeAge(r.published, today)})`,
+    published: r.published ? `${iso(Date.parse(r.published))} (${relativeAge(r.published, today)})` : "–",
     tag: r.tags.join(","),
     downloads: perVersion ? (r.version in perVersion ? fmt(perVersion[r.version]) : "–") : null,
     installed: r.installed,
@@ -308,6 +348,7 @@ export function renderReleases({ pkg, rows, count, installed, latest, today, per
   lines.push(row("VERSION", "PUBLISHED", "TAG", dt));
   for (const c of cells) lines.push(row(c.version, c.published, c.tag, c.downloads ?? "", c.installed ? "← installed" : ""));
   const notes = [];
+  if (rows.some((r) => !r.published)) notes.push(`publish dates: not reported by ${registry ?? "the npm registry"}`);
   const published = rows.some((r) => r.version === installed);
   if (!published && installed) notes.push(`installed: ${installed} (not published on npm)`);
   else if (latest && installed && latest !== installed && rows.findIndex((r) => r.version === latest) < rows.findIndex((r) => r.version === installed)) {

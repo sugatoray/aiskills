@@ -5,6 +5,7 @@ import { describe, test } from "node:test";
 
 import {
   bucketize,
+  compareVersions,
   parseCount,
   parsePeriod,
   pickBy,
@@ -104,6 +105,48 @@ describe("releaseRows", () => {
     assert.deepEqual(rows[0].tags, ["latest"]);
     assert.deepEqual(rows.map((r) => r.installed), [false, true, false, false]);
     assert.equal(rows[0].published, "2026-11-11T18:03:58.985Z");
+  });
+});
+
+describe("compareVersions", () => {
+  test("by number, and a prerelease before its release", () => {
+    const sorted = ["0.9.0", "1.0.0-beta.10", "0.10.0", "1.0.0", "1.0.0-beta.2", "0.10.1"].sort(compareVersions);
+    assert.deepEqual(sorted, ["0.9.0", "0.10.0", "0.10.1", "1.0.0-beta.2", "1.0.0-beta.10", "1.0.0"]);
+  });
+});
+
+describe("releaseRows without publish times (a registry mirror that strips them)", () => {
+  const MIRROR = { time: {}, distTags: { latest: "0.10.0" }, versions: ["0.0.0-stage", "0.8.0", "0.9.0", "0.10.0"] };
+
+  test("lists the versions newest first by version number, with no publish date", () => {
+    const rows = releaseRows(MIRROR, "0.9.0");
+    assert.deepEqual(rows.map((r) => r.version), ["0.10.0", "0.9.0", "0.8.0"]);
+    assert.deepEqual(rows.map((r) => r.published), [null, null, null]);
+    assert.deepEqual(rows[0].tags, ["latest"]);
+    assert.equal(rows[1].installed, true);
+  });
+
+  test("the table shows – for the date, says why, and still gives the update hint", () => {
+    const out = renderReleases({
+      pkg: "@sugatoray-ai/aiskills", rows: releaseRows(MIRROR, "0.9.0"), count: 5, installed: "0.9.0", latest: "0.10.0",
+      today: "2026-11-12", registry: "https://npm.corp.example/",
+    });
+    assert.deepEqual(out.split("\n"), [
+      "@sugatoray-ai/aiskills: 3 releases",
+      "",
+      "  VERSION  PUBLISHED  TAG",
+      "  0.10.0   –          latest",
+      "  0.9.0    –                  ← installed",
+      "  0.8.0    –",
+      "",
+      "publish dates: not reported by https://npm.corp.example/",
+      "update available: 0.9.0 → 0.10.0  (npm install -g @sugatoray-ai/aiskills@latest)",
+    ]);
+  });
+
+  test("a version is 'not published' only if the versions list lacks it", () => {
+    const out = renderReleases({ pkg: "p", rows: releaseRows(MIRROR, "0.11.0"), count: 5, installed: "0.11.0", latest: "0.10.0", today: "2026-11-12" });
+    assert.match(out, /^installed: 0\.11\.0 \(not published on npm\)$/m);
   });
 });
 

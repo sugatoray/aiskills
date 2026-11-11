@@ -39,7 +39,8 @@ describe("aiskills releases / rel", posixOnly, () => {
       "  0.5.0    2026-11-09 (3 days ago)",
       "  0.4.0    2026-11-09 (3 days ago)",
       "",
-      "changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md",
+      `changelog: ${sb.pkg}/CHANGELOG.md`,
+      "           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md",
     ]);
     assert.deepEqual(sb.apiCalls(), [], "no download counts asked for");
   });
@@ -93,7 +94,8 @@ describe("aiskills releases / rel", posixOnly, () => {
       "  2026-11-09 ██████████████████████████████ 402  0.4.0, 0.5.0 published",
       "  2026-11-10 █▋                              22",
       "",
-      "changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md",
+      `changelog: ${sb.pkg}/CHANGELOG.md`,
+      "           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md",
     ]);
     assert.deepEqual(sb.apiCalls(), [
       "/downloads/point/last-day/@sugatoray-ai/aiskills",
@@ -179,10 +181,36 @@ describe("aiskills releases / rel", posixOnly, () => {
     assert.match(r.out, /npm has no download counts after 2026-11-10/);
   });
 
+  test("a mirror that doesn't report publish times: versions still listed, and the registry named", () => {
+    sb.setView({ "dist-tags": { latest: "0.8.0" }, versions: ["0.0.0-stage", "0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.8.0"] });
+    const r = sb.run(["rel", "3"], { env: { ...TODAY, FAKE_NPM_REGISTRY: "https://npm.corp.example/" } });
+    assert.equal(r.status, 0, r.out);
+    assert.deepEqual(lines(r.out).slice(0, 9), [
+      "@sugatoray-ai/aiskills: latest 3 of 5 releases",
+      "",
+      "  VERSION  PUBLISHED  TAG",
+      "  0.8.0    –          latest  ← installed",
+      "  0.7.0    –",
+      "  0.6.0    –",
+      "",
+      "publish dates: not reported by https://npm.corp.example/",
+      "more: aiskills rel all",
+    ]);
+    const j = JSON.parse(sb.run(["rel", "1", "--json"], { env: TODAY }).out);
+    assert.equal(j.releases[0].published, null);
+    assert.equal(j.registry, "https://registry.npmjs.org/");
+  });
+
+  test("errors from npm name the registry it asked (e.g. a mirror)", () => {
+    const r = sb.run(["rel"], { env: { ...TODAY, FAKE_NPM_VIEW_ERROR: "1", FAKE_NPM_REGISTRY: "https://npm.corp.example/" } });
+    assert.equal(r.status, 1);
+    assert.match(r.out, /^\[aiskills\] could not read the releases of @sugatoray-ai\/aiskills from https:\/\/npm\.corp\.example\/: 404 Not Found/m);
+  });
+
   test("npm or api.npmjs.org failing is one clear line and exit 1", () => {
     let r = sb.run(["rel"], { env: { ...TODAY, FAKE_NPM_VIEW_ERROR: "1" } });
     assert.equal(r.status, 1);
-    assert.match(r.out, /^\[aiskills\] could not read the releases of @sugatoray-ai\/aiskills from npm: 404 Not Found/m);
+    assert.match(r.out, /^\[aiskills\] could not read the releases of @sugatoray-ai\/aiskills from https:\/\/registry\.npmjs\.org\/: 404 Not Found/m);
     sb.setApi({ down: true });
     r = sb.run(["rel", "--downloads"], { env: TODAY });
     assert.equal(r.status, 1);

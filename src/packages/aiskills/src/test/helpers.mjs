@@ -93,11 +93,16 @@ if (a[0] === "add" && a[1] === "sugatoray/aiskills" && process.env.FAKE_STATS_EX
 process.exit(Number(process.env.FAKE_EXIT || 0));
 `;
 
-// Stand-in for npm: only `npm view` (aiskills releases, info --full), answering
-// with the JSON in $FAKE_NPM_VIEW, or failing like npm does with FAKE_NPM_VIEW_ERROR=1.
+// Stand-in for npm: `npm view` (aiskills releases, info --full), answering
+// with the JSON in $FAKE_NPM_VIEW, or failing like npm does with FAKE_NPM_VIEW_ERROR=1;
+// and `npm config get registry` ($FAKE_NPM_REGISTRY, e.g. a company mirror).
 const FAKE_NPM = `#!/usr/bin/env node
 const fs = require("fs");
 const a = process.argv.slice(2);
+if (a[0] === "config" && a[1] === "get" && a[2] === "registry") {
+  console.log(process.env.FAKE_NPM_REGISTRY || "https://registry.npmjs.org/");
+  process.exit(0);
+}
 if (a[0] !== "view") process.exit(1);
 if (process.env.FAKE_NPM_VIEW_ERROR) {
   console.error("npm error code E404");
@@ -188,6 +193,7 @@ export function sandbox({ realSkills = false, stats = false } = {}) {
   cpSync(join(PKG_SRC, "bin"), join(pkg, "bin"), { recursive: true });
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
+  cpSync(join(PKG_SRC, "CHANGELOG.md"), join(pkg, "CHANGELOG.md"));
   const repo = realSkills ? copyRealSkills(join(dir, "repo")) : writeFixtureTree(join(dir, "repo"));
   vendor({ repoRoot: repo, pkgDir: pkg });
   const home = join(dir, "home");

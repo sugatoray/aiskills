@@ -44,6 +44,7 @@ import {
   DEFAULT_COUNT,
   fetchDownloads,
   bucketize,
+  npmRegistry,
   npmView,
   parseCount,
   parsePeriod,
@@ -513,10 +514,12 @@ function releases(o, command) {
   const dl = o.period ? fetchDownloads(PKG_NAME, o.period, { created: view.time.created }) : null;
   const by = dl ? o.by ?? pickBy(dl.days.length) : null;
   const series = dl ? bucketize(dl.days, by) : null;
-  const hidden = Object.keys(view.time).filter((v) => v !== "created" && v !== "modified" && !rows.some((r) => r.version === v));
+  const hidden = [...new Set([...view.versions, ...Object.keys(view.time)])].filter((v) => v !== "created" && v !== "modified" && !rows.some((r) => r.version === v));
+  // Name the registry (a mirror, say) when it matters: in JSON, and when it reports no publish dates.
+  const registry = o.json || rows.some((r) => !r.published) ? npmRegistry() : null;
   if (o.json) {
     const shown = rows.slice(0, o.count).map((r) => (dl ? { ...r, downloadsLastWeek: dl.perVersion[r.version] ?? null } : r));
-    const out = { package: PKG_NAME, installed: version, latest, total: rows.length, releases: shown };
+    const out = { package: PKG_NAME, registry, installed: version, latest, total: rows.length, releases: shown };
     if (dl) {
       out.downloads = {
         start: dl.start,
@@ -529,14 +532,14 @@ function releases(o, command) {
           end: r.end,
           downloads: r.downloads,
           partial: r.days < r.size,
-          published: rows.filter((x) => x.published.slice(0, 10) >= r.start && x.published.slice(0, 10) <= r.end).map((x) => x.version).reverse(),
+          published: rows.filter((x) => x.published && x.published.slice(0, 10) >= r.start && x.published.slice(0, 10) <= r.end).map((x) => x.version).reverse(),
         })),
       };
     }
     console.log(JSON.stringify(out, null, 2));
     return 0;
   }
-  console.log(renderReleases({ pkg: PKG_NAME, rows, count: o.count, installed: version, latest, today, perVersion: dl?.perVersion, command: `aiskills ${command}` }));
+  console.log(renderReleases({ pkg: PKG_NAME, rows, count: o.count, installed: version, latest, today, perVersion: dl?.perVersion, registry, command: `aiskills ${command}` }));
   if (dl) {
     console.log("");
     console.log(`downloads, all versions: ${dl.total.toLocaleString("en-US")} ${dl.label} (${dl.start} → ${dl.end})`);
@@ -545,8 +548,11 @@ function releases(o, command) {
     console.log("");
     console.log(renderSeries(series, { by, releases: rows, table: o.view === "table", ascii: o.ascii || process.env.TERM === "dumb" }));
   }
+  // The changelog that ships in the package is readable offline; the URL has newer versions.
+  const local = join(PKG_DIR, "CHANGELOG.md");
   console.log("");
-  console.log(`changelog: ${CHANGELOG_URL}`);
+  if (existsSync(local)) console.log(`changelog: ${local}\n           ${CHANGELOG_URL}`);
+  else console.log(`changelog: ${CHANGELOG_URL}`);
   return 0;
 }
 

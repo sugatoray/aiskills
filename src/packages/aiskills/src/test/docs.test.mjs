@@ -366,7 +366,9 @@ describe("examples in the docs print what the docs show", () => {
         out += res.out;
       }
       const home = b.home;
+      // The sandbox's package folder stands in for a global npm install.
       const actual = out
+        .replaceAll(b.pkg, "/usr/local/lib/node_modules/@sugatoray-ai/aiskills")
         .replaceAll(home, "~")
         .split("\n")
         .map((l) => l.trimEnd());

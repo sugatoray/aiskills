@@ -324,10 +324,10 @@ Install <n> external skill(s) from the registry? [y/N] n
 ### Could not read the releases
 
 ```text
-[aiskills] could not read the releases of @sugatoray-ai/aiskills from npm: <npm's reason>
+[aiskills] could not read the releases of @sugatoray-ai/aiskills from <registry>: <npm's reason>
 ```
 
-**Cause:** `npm view` failed: no network, a registry that doesn't have the package, or npm missing from `PATH`. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`).
+**Cause:** `npm view` failed: no network, a registry (or company mirror) that doesn't have the package or refuses the request, or npm missing from `PATH` (then `<registry>` reads `npm`). `<registry>` is what `npm config get registry` reports, so you can see which one was asked. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`). Behind a mirror, ask whoever runs it to proxy the public npm registry for `@sugatoray-ai/aiskills`.
 
 ### Could not reach api.npmjs.org
 
@@ -335,7 +335,7 @@ Install <n> external skill(s) from the registry? [y/N] n
 [aiskills] could not reach api.npmjs.org: <reason>
 ```
 
-**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). **Fix:** run without `--downloads`, or allow `api.npmjs.org`.
+**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). Registry mirrors (Artifactory, Nexus, Verdaccio) don't serve download counts, so a network that only allows a mirror can't use `--downloads`. Behind a TLS-inspecting proxy, `npm` uses its `cafile`/`ca` settings but these requests run in Node, which reads extra certificates from `NODE_EXTRA_CA_CERTS` (a PEM file); without it the reason is a certificate error such as `SELF_SIGNED_CERT_IN_CHAIN` or `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`. **Fix:** run without `--downloads`; allow `api.npmjs.org`; set `NODE_EXTRA_CA_CERTS` to your company's CA bundle; or, if your company proxies api.npmjs.org, point [`AISKILLS_NPM_API_URL`](environment.md#aiskills_npm_api_url) at it.
 
 ### Bad `AISKILLS_TODAY`
 

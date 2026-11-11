@@ -2833,12 +2833,15 @@ aiskills rel 3
 
 more: aiskills rel all
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
 - How many: a number or `all` right after the command (`aiskills rel 10`, `aiskills rel all`), or the same with [`-L`/`--last`](#-l---last). Default: 5.
 - An older installed version gets `update available: <installed> → <latest>  (npm install -g @sugatoray-ai/aiskills@latest)`; one that isn't on npm gets `installed: <version> (not published on npm)`.
 - npm's staged-publish placeholder (`0.0.0-stage`) is not a release and is never listed.
+- The last line points to the changelog twice: the copy inside the installed package (readable offline, and behind a firewall that blocks GitHub) and the one on GitHub (which also covers newer versions).
+- **Behind a registry mirror** (Artifactory, Nexus, Verdaccio, …) the list comes from the mirror, because `npm view` uses your npm config. A mirror that doesn't pass on npm's publish times still gets every version, newest first by version number, with `–` as the date and the note `publish dates: not reported by <registry>`. [`--downloads`](#--downloads) needs api.npmjs.org itself, which registry mirrors don't serve. See [FAQ: firewalls and mirrors](../faq.md#does-aiskills-work-behind-a-firewall-or-with-an-npm-mirror).
 
 With [`--downloads`](#--downloads), a 7-day download column is added, then the package's total over the period and a breakdown, as a chart by default:
 
@@ -2864,7 +2867,8 @@ the total includes versions not listed here (0.0.0-stage)
   2026-11-09 ██████████████████████████████ 402  0.4.0, 0.5.0 published
   2026-11-10 █▋                              22
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
 How to read it:
@@ -2901,10 +2905,11 @@ the total includes versions not listed here (0.0.0-stage)
   2026-11-09        402  0.4.0, 0.5.0
   2026-11-10         22
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
-JSON (`--json`), for scripts: `{ "package", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`, `published` on a release is npm's ISO 8601 timestamp.
+JSON (`--json`), for scripts: `{ "package", "registry", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`; `published` on a release is npm's ISO 8601 timestamp, or `null` when the registry doesn't report it. `registry` is the registry `npm view` asked (`npm config get registry`).
 
 See also: [FAQ: Which agents…](../faq.md) · [Errors: Releases and downloads](errors.md#releases-and-downloads)
 
@@ -3881,10 +3886,10 @@ Install <n> external skill(s) from the registry? [y/N] n
 ### Could not read the releases
 
 ```text
-[aiskills] could not read the releases of @sugatoray-ai/aiskills from npm: <npm's reason>
+[aiskills] could not read the releases of @sugatoray-ai/aiskills from <registry>: <npm's reason>
 ```
 
-**Cause:** `npm view` failed: no network, a registry that doesn't have the package, or npm missing from `PATH`. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`).
+**Cause:** `npm view` failed: no network, a registry (or company mirror) that doesn't have the package or refuses the request, or npm missing from `PATH` (then `<registry>` reads `npm`). `<registry>` is what `npm config get registry` reports, so you can see which one was asked. If npm answered with something other than JSON, the reason is `unexpected output from 'npm view'` (`... from npm: unexpected output from 'npm view'`). On `info --full` the same message appears as `latest on npm : unavailable` and `info` still succeeds. **Fix:** check `npm view @sugatoray-ai/aiskills version` works, and your registry setting (`npm config get registry`). Behind a mirror, ask whoever runs it to proxy the public npm registry for `@sugatoray-ai/aiskills`.
 
 ### Could not reach api.npmjs.org
 
@@ -3892,7 +3897,7 @@ Install <n> external skill(s) from the registry? [y/N] n
 [aiskills] could not reach api.npmjs.org: <reason>
 ```
 
-**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). **Fix:** run without `--downloads`, or allow `api.npmjs.org`.
+**Cause:** `--downloads` couldn't get an answer from the download counts API: no network, a firewall or proxy that blocks the host, an HTTP error (`HTTP 503`), or an answer it can't use (`could not reach api.npmjs.org: the answer was not JSON`, `could not reach api.npmjs.org: no latest day in its answer`). A proxy in `HTTPS_PROXY` is used on Node versions that support `NODE_USE_ENV_PROXY` (22.21+, 24+). Registry mirrors (Artifactory, Nexus, Verdaccio) don't serve download counts, so a network that only allows a mirror can't use `--downloads`. Behind a TLS-inspecting proxy, `npm` uses its `cafile`/`ca` settings but these requests run in Node, which reads extra certificates from `NODE_EXTRA_CA_CERTS` (a PEM file); without it the reason is a certificate error such as `SELF_SIGNED_CERT_IN_CHAIN` or `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`. **Fix:** run without `--downloads`; allow `api.npmjs.org`; set `NODE_EXTRA_CA_CERTS` to your company's CA bundle; or, if your company proxies api.npmjs.org, point [`AISKILLS_NPM_API_URL`](environment.md#aiskills_npm_api_url) at it.
 
 ### Bad `AISKILLS_TODAY`
 
@@ -4157,6 +4162,22 @@ Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, the
 ### How do I see my setup, or check for a newer version?
 
 `aiskills info` shows the aiskills version, the install folder, what was saved there and by which version, and every setting with where its value comes from (a flag's default, an `AISKILLS_*` variable, or remembered). It is offline; `aiskills info --full` also asks npm for the latest version. `aiskills rel` lists the latest releases on npm and marks the one you have; `aiskills rel --downloads` adds download counts. See [`info`](reference/cli.md#info) and [`releases`](reference/cli.md#releases).
+
+### Does aiskills work behind a firewall or with an npm mirror?
+
+Yes, except for download counts. Everything goes through npm and your npm config (`registry=`, proxy, `cafile`), so a company mirror (Artifactory, Nexus, Verdaccio, …) works:
+
+| Command | Needs | With only an npm mirror |
+| --- | --- | --- |
+| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, through `npx` | works |
+| `info` | nothing (local files) | works |
+| `info --full` | `npm view`, and `skills` through `npx` | works |
+| `releases` / `rel` | `npm view` | works; a mirror that strips publish times shows `–` as the date and says so |
+| `rel --downloads` | api.npmjs.org | fails with `could not reach api.npmjs.org`; mirrors don't serve download counts ([fixes](reference/errors.md#could-not-reach-apinpmjsorg)) |
+| the skills.sh install count | github.com | skipped silently; the install is unaffected |
+| `--route` / `aix` lookups | skills.sh | fail with an error; bundled skills don't need them |
+
+The `changelog:` line of `aiskills rel` is only printed, never fetched; its first path is the copy inside the installed package, readable offline. A TLS-inspecting proxy needs `NODE_EXTRA_CA_CERTS` for `--downloads` (npm itself uses `cafile`).
 
 ### Why are download counts per version only for the last 7 days?
 

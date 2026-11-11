@@ -47,6 +47,12 @@ agents you picked last time), plus `aiskills info` and `aiskills releases`.
   `1m`, `1y`, `<date>:<date>`, `<date>:`) and a breakdown by day, week or month
   as a bar chart (`--chart`, the default) or table (`--table`); `--by`,
   `--ascii`, `--json`.
+- **Firewalls and npm mirrors:** `aiskills rel` reads the releases through
+  your npm config, lists every version even when a mirror doesn't report
+  publish times (`–` and a `publish dates: not reported by <registry>` note),
+  names the registry in its errors and `--json`, and points to the changelog
+  inside the installed package as well as on GitHub. The docs say what works
+  behind a firewall, and how to use `--downloads` behind a TLS-inspecting proxy.
 - New environment variables `AISKILLS_TODAY` (fixes "today" for reproducible
   output) and `AISKILLS_NPM_API_URL` (the download counts API, for tests).
 

@@ -288,12 +288,15 @@ aiskills rel 3
 
 more: aiskills rel all
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
 - How many: a number or `all` right after the command (`aiskills rel 10`, `aiskills rel all`), or the same with [`-L`/`--last`](#-l---last). Default: 5.
 - An older installed version gets `update available: <installed> → <latest>  (npm install -g @sugatoray-ai/aiskills@latest)`; one that isn't on npm gets `installed: <version> (not published on npm)`.
 - npm's staged-publish placeholder (`0.0.0-stage`) is not a release and is never listed.
+- The last line points to the changelog twice: the copy inside the installed package (readable offline, and behind a firewall that blocks GitHub) and the one on GitHub (which also covers newer versions).
+- **Behind a registry mirror** (Artifactory, Nexus, Verdaccio, …) the list comes from the mirror, because `npm view` uses your npm config. A mirror that doesn't pass on npm's publish times still gets every version, newest first by version number, with `–` as the date and the note `publish dates: not reported by <registry>`. [`--downloads`](#--downloads) needs api.npmjs.org itself, which registry mirrors don't serve. See [FAQ: firewalls and mirrors](../faq.md#does-aiskills-work-behind-a-firewall-or-with-an-npm-mirror).
 
 With [`--downloads`](#--downloads), a 7-day download column is added, then the package's total over the period and a breakdown, as a chart by default:
 
@@ -319,7 +322,8 @@ the total includes versions not listed here (0.0.0-stage)
   2026-11-09 ██████████████████████████████ 402  0.4.0, 0.5.0 published
   2026-11-10 █▋                              22
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
 How to read it:
@@ -356,10 +360,11 @@ the total includes versions not listed here (0.0.0-stage)
   2026-11-09        402  0.4.0, 0.5.0
   2026-11-10         22
 
-changelog: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
+changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
+           https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
 ```
 
-JSON (`--json`), for scripts: `{ "package", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`, `published` on a release is npm's ISO 8601 timestamp.
+JSON (`--json`), for scripts: `{ "package", "registry", "installed", "latest", "total", "releases": [{ "version", "published", "tags": [string], "installed": boolean, "downloadsLastWeek"?: number|null }], "downloads"?: { "start", "end", "label", "total", "by", "rows": [{ "start", "end", "downloads", "partial": boolean, "published": [string] }] } }`. Dates are `YYYY-MM-DD`; `published` on a release is npm's ISO 8601 timestamp, or `null` when the registry doesn't report it. `registry` is the registry `npm view` asked (`npm config get registry`).
 
 See also: [FAQ: Which agents…](../faq.md) · [Errors: Releases and downloads](errors.md#releases-and-downloads)
 

@@ -28,6 +28,22 @@ Install a newer package with `npm install -g @sugatoray-ai/aiskills@latest`, the
 
 `aiskills info` shows the aiskills version, the install folder, what was saved there and by which version, and every setting with where its value comes from (a flag's default, an `AISKILLS_*` variable, or remembered). It is offline; `aiskills info --full` also asks npm for the latest version. `aiskills rel` lists the latest releases on npm and marks the one you have; `aiskills rel --downloads` adds download counts. See [`info`](reference/cli.md#info) and [`releases`](reference/cli.md#releases).
 
+### Does aiskills work behind a firewall or with an npm mirror?
+
+Yes, except for download counts. Everything goes through npm and your npm config (`registry=`, proxy, `cafile`), so a company mirror (Artifactory, Nexus, Verdaccio, …) works:
+
+| Command | Needs | With only an npm mirror |
+| --- | --- | --- |
+| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, through `npx` | works |
+| `info` | nothing (local files) | works |
+| `info --full` | `npm view`, and `skills` through `npx` | works |
+| `releases` / `rel` | `npm view` | works; a mirror that strips publish times shows `–` as the date and says so |
+| `rel --downloads` | api.npmjs.org | fails with `could not reach api.npmjs.org`; mirrors don't serve download counts ([fixes](reference/errors.md#could-not-reach-apinpmjsorg)) |
+| the skills.sh install count | github.com | skipped silently; the install is unaffected |
+| `--route` / `aix` lookups | skills.sh | fail with an error; bundled skills don't need them |
+
+The `changelog:` line of `aiskills rel` is only printed, never fetched; its first path is the copy inside the installed package, readable offline. A TLS-inspecting proxy needs `NODE_EXTRA_CA_CERTS` for `--downloads` (npm itself uses `cafile`).
+
 ### Why are download counts per version only for the last 7 days?
 
 Because npm only keeps per-version counts for the last 7 days; older ones aren't stored anywhere. `aiskills rel --downloads <period>` shows them in a column, and the package's total (all versions together) for any period, from all time (`all`, the default) to a day (`1d`). See [`--downloads`](reference/cli.md#--downloads).
