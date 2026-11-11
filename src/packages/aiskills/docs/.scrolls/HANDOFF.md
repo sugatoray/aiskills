@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 `@sugatoray-ai/aiskills` **`0.7.0` is published on npm** (dist-tag `latest`; checked with `npm view` on 2026-11-11). It bundles **13 skills in 7 groups**. Source in `src/packages/aiskills/`. **Two open PRs, to merge in order:**
 1. **[#184](https://github.com/sugatoray/aiskills/pull/184)** (`claude/happy-ramanujan-yf66t0`) is **`0.8.0`**: `install -i`/`-l` (AIS-13), `aiskills info` and `aiskills releases`/`rel` with `--downloads` (AIS-14), mirror/firewall hardening; issues #185–#192.
-2. **[#193](https://github.com/sugatoray/aiskills/pull/193)** (`claude/aiskills-upgrade-v0.9.0`, based on #184's branch; GitHub retargets it to `master` once #184 merges and its branch is deleted) is **`0.9.0`**: `aiskills upgrade` (AIS-15). No issues filed for it yet (offered).
+2. **[#193](https://github.com/sugatoray/aiskills/pull/193)** (`claude/aiskills-upgrade-v0.9.0`, based on #184's branch; GitHub retargets it to `master` once #184 merges and its branch is deleted) is **`0.9.0`**: `aiskills upgrade` (AIS-15); epic #194 with #195 (`upgrade`), #196 (hints), #197 (0.9.0 release + docs), #198 (scrolls). Its `Closes` lines only take effect once it targets `master` (after #184 merges).
 
 On the 0.9.0 branch `npm test` runs 418 offline tests, all pass. Docs live at https://sugatoray.github.io/aiskills/, redeployed by `.github/workflows/aiskills-docs.yml` on pushes to `master`.
 
