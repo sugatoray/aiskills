@@ -1,6 +1,6 @@
 // Which `skills` CLI version npx runs, and living with npm's release-age rules.
 //
-// 1. AISKILLS_SKILLS_VERSION takes an exact version, "latest"/"next", an npm
+// 1. AISKILLS_SKILLS_LIB_VERSION takes an exact version, "latest"/"next", an npm
 //    range (~1.7.4, 1.7.x, >=1.7.4 <1.8.0), or interval notation, where exactly
 //    one of "...", "?" or "*" is an open end (plain ASCII, so it types the same
 //    in every shell; no combinations like "?*"):
@@ -24,7 +24,7 @@ import { PKG_SRC, sandbox, skillsArgs, skillsPackage } from "./helpers.mjs";
 import { SKILLS_CLI_VERSION, cmdArgs, skillsVersionSpec } from "../scripts/core/installer.mjs";
 import { auditSkills } from "../scripts/pack/audit-skills.mjs";
 
-describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", () => {
+describe("skillsVersionSpec: AISKILLS_SKILLS_LIB_VERSION -> what npx is asked for", () => {
   test("exact versions and the latest/next tags pass through", () => {
     for (const v of ["1.7.6", "1.8.0-beta.1", "latest", "next"]) assert.equal(skillsVersionSpec(v), v);
   });
@@ -59,7 +59,7 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
     for (const [input, want] of Object.entries(cases)) assert.equal(skillsVersionSpec(input), want, input);
   });
 
-  test("anything else is refused, naming AISKILLS_SKILLS_VERSION", () => {
+  test("anything else is refused, naming AISKILLS_SKILLS_LIB_VERSION", () => {
     for (const v of [
       "1.0 && calc", "1.7.6; rm -rf ~", "file:../skills", "github:vercel-labs/skills", "beta", "1.7.6 %PATH%",
       "[1.7.4, ...]", "[1.7.4, ?]", // an open end needs ")"
@@ -72,7 +72,7 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
       "[1.7.6, 1.7.6)", // empty
       "[1.7.4)", "[1.7.4, 1.8.0", "[a, b)",
     ]) {
-      assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_VERSION/, v);
+      assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_LIB_VERSION/, v);
     }
   });
 });
@@ -83,7 +83,7 @@ describe("skillsVersionSpec: only plain spaces separate range parts", () => {
       "1.7.4\n1.7.5", "1.7.4\r\n<1.8.0", ">=1.7.4\t<1.8.0", ">=1.7.4\u2028<1.8.0", ">=1.7.4\u00a0<1.8.0",
       ">=1.7.4\u3000<1.8.0", "1.7.4\n-\n1.7.6", "~1.7.4\n||\n2.x", "[1.7.4,\t1.8.0)", "(...,\n1.7.6]", "(\u00a0?, 1.7.6]",
     ]) {
-      assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_VERSION/, JSON.stringify(v));
+      assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_LIB_VERSION/, JSON.stringify(v));
     }
   });
 
@@ -95,7 +95,7 @@ describe("skillsVersionSpec: only plain spaces separate range parts", () => {
 
   test("a typographic ellipsis (as autocorrect makes it) is read as \"...\", and lookalike digits are refused", () => {
     assert.equal(skillsVersionSpec("(…, 1.7.6]"), "<=1.7.6");
-    for (const v of ["(…?, 1.7.6]", "１.7.6", "(…, １.7.6]"]) assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_VERSION/, v);
+    for (const v of ["(…?, 1.7.6]", "１.7.6", "(…, １.7.6]"]) assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_LIB_VERSION/, v);
   });
 });
 
@@ -117,13 +117,13 @@ describe("cmdArgs: npx arguments for cmd.exe on Windows", () => {
   });
 });
 
-describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
+describe("aiskills with AISKILLS_SKILLS_LIB_VERSION", () => {
   const sb = sandbox();
   after(() => sb.cleanup());
 
   test("a range or interval reaches npx as the matching npm range", () => {
     for (const [input, spec] of [["~1.7.4", "skills@~1.7.4"], ["[1.7.4, 1.8.0)", "skills@>=1.7.4 <1.8.0"], ["(..., 1.7.6]", "skills@<=1.7.6"], ["(?, 1.7.6]", "skills@<=1.7.6"], ["(*, 1.7.6]", "skills@<=1.7.6"]]) {
-      const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: input } });
+      const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: input } });
       assert.equal(r.status, 0, r.out);
       assert.ok(r.calls.length > 0);
       for (const c of r.calls) assert.equal(skillsPackage(c), spec, input);
@@ -131,35 +131,59 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
   });
 
   test("the logged command quotes a range that has spaces", () => {
-    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "[1.7.4, 1.8.0)" } });
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "[1.7.4, 1.8.0)" } });
     assert.match(r.out, /running: npx -y 'skills@>=1\.7\.4 <1\.8\.0' add /);
-    const dry = sb.run(["install", "-n"], { env: { AISKILLS_SKILLS_VERSION: "[1.7.4, 1.8.0)" } });
+    const dry = sb.run(["install", "-n"], { env: { AISKILLS_SKILLS_LIB_VERSION: "[1.7.4, 1.8.0)" } });
     assert.match(dry.out, /\[dry-run\] npx -y 'skills@>=1\.7\.4 <1\.8\.0' add /);
   });
 
   test("a bad value stops before anything runs", () => {
-    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "[1.8.0, 1.7.0)" } });
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "[1.8.0, 1.7.0)" } });
     assert.equal(r.status, 1);
-    assert.match(r.out, /AISKILLS_SKILLS_VERSION/);
+    assert.match(r.out, /AISKILLS_SKILLS_LIB_VERSION/);
     assert.deepEqual(r.calls, []);
   });
 
   test("an override is announced once per command, even where npx's command isn't printed", () => {
-    const NOTE = "[aiskills] using skills@<=1.7.6 from AISKILLS_SKILLS_VERSION, not the tested " + SKILLS_CLI_VERSION;
-    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
+    const NOTE = "[aiskills] using skills@<=1.7.6 from AISKILLS_SKILLS_LIB_VERSION, not the tested " + SKILLS_CLI_VERSION;
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "(..., 1.7.6]" } });
     assert.equal(r.status, 0, r.out);
     assert.equal(r.out.split(NOTE).length - 1, 1, r.out);
     sb.setList([]);
-    const ls = sb.run(["installed"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
+    const ls = sb.run(["installed"], { env: { AISKILLS_SKILLS_LIB_VERSION: "(..., 1.7.6]" } });
     assert.ok(ls.out.includes(NOTE), ls.out);
-    const dry = sb.run(["install", "-n"], { env: { AISKILLS_SKILLS_VERSION: "latest" } });
-    assert.ok(dry.out.includes("[aiskills] using skills@latest from AISKILLS_SKILLS_VERSION, not the tested " + SKILLS_CLI_VERSION), dry.out);
+    const dry = sb.run(["install", "-n"], { env: { AISKILLS_SKILLS_LIB_VERSION: "latest" } });
+    assert.ok(dry.out.includes("[aiskills] using skills@latest from AISKILLS_SKILLS_LIB_VERSION, not the tested " + SKILLS_CLI_VERSION), dry.out);
+  });
+
+  test("the old name AISKILLS_SKILLS_VERSION still works, with a deprecation warning naming the new one", () => {
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
+    assert.equal(r.status, 0, r.out);
+    for (const c of r.calls) assert.equal(skillsPackage(c), "skills@<=1.7.6");
+    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated: use AISKILLS_SKILLS_LIB_VERSION \(the version of the skills CLI library, not of the bundled skills\)/);
+    assert.equal(r.out.split("is deprecated").length - 1, 1, "warned once");
+    assert.match(r.out, /using skills@<=1\.7\.6 from AISKILLS_SKILLS_VERSION, not the tested/);
+  });
+
+  test("AISKILLS_SKILLS_LIB_VERSION wins when both are set, and the old one is still flagged", () => {
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "~1.7.4", AISKILLS_SKILLS_VERSION: "latest" } });
+    assert.equal(r.status, 0, r.out);
+    for (const c of r.calls) assert.equal(skillsPackage(c), "skills@~1.7.4");
+    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated/);
+    assert.match(r.out, /using skills@~1\.7\.4 from AISKILLS_SKILLS_LIB_VERSION/);
+  });
+
+  test("a bad value under the old name is refused, naming the variable that was used", () => {
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "1.0 && calc" } });
+    assert.equal(r.status, 1);
+    assert.match(r.out, /AISKILLS_SKILLS_VERSION must be a version/);
+    assert.deepEqual(r.calls, []);
   });
 
   test("no announcement for the pinned version, set or not", () => {
-    for (const env of [{}, { AISKILLS_SKILLS_VERSION: SKILLS_CLI_VERSION }]) {
+    for (const env of [{}, { AISKILLS_SKILLS_LIB_VERSION: SKILLS_CLI_VERSION }]) {
       const r = sb.run(["install"], { env });
-      assert.doesNotMatch(r.out, /from AISKILLS_SKILLS_VERSION/, JSON.stringify(env));
+      assert.doesNotMatch(r.out, /from AISKILLS_SKILLS_LIB_VERSION/, JSON.stringify(env));
     }
   });
 
@@ -169,9 +193,9 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
     }
   });
 
-  test("--help documents AISKILLS_SKILLS_VERSION with its forms", () => {
+  test("--help documents AISKILLS_SKILLS_LIB_VERSION with its forms", () => {
     const { out } = sb.run(["--help"]);
-    assert.match(out, /AISKILLS_SKILLS_VERSION/);
+    assert.match(out, /AISKILLS_SKILLS_LIB_VERSION/);
     assert.match(out, /\[1\.7\.4, \.\.\.\)/);
     assert.match(out, /"\.\.\.", "\?" or "\*"/);
     assert.doesNotMatch(out, /…/, "help shows only plain ASCII forms");
@@ -211,7 +235,7 @@ describe("when npm's release-age rule blocks the skills CLI", () => {
     assert.match(r.out, new RegExp(`npm's release-age rule \\(min-release-age or before\\) blocked ${PINNED}: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer`));
     assert.match(r.out, /wait until it is old enough/);
     assert.match(r.out, /npm_config_min_release_age=0 aiskills/);
-    assert.match(r.out, new RegExp(`AISKILLS_SKILLS_VERSION='\\(\\.\\.\\., ${SKILLS_CLI_VERSION.replace(/\./g, "\\.")}\\]'`));
+    assert.match(r.out, new RegExp(`AISKILLS_SKILLS_LIB_VERSION='\\(\\.\\.\\., ${SKILLS_CLI_VERSION.replace(/\./g, "\\.")}\\]'`));
     assert.doesNotMatch(r.out, /…/, "the suggestion can be copied as is, on any OS");
   });
 

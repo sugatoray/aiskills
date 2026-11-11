@@ -263,26 +263,34 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 ## Running `npx skills`
 
-### Bad `AISKILLS_SKILLS_VERSION`
+### Bad `AISKILLS_SKILLS_LIB_VERSION`
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
+[aiskills] AISKILLS_SKILLS_LIB_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
 ```
 
 **Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax, tabs, line breaks or Unicode spaces between a range's parts, and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
 
+### `AISKILLS_SKILLS_VERSION` is deprecated
+
+```text
+[aiskills] AISKILLS_SKILLS_VERSION is deprecated: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
+```
+
+**Cause:** a warning, not an error: the old name of the variable is set (it still works; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
+
 ### `skills` CLI version overridden
 
 ```text
-[aiskills] using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6
+[aiskills] using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6
 ```
 
-**Cause:** a notice, not an error: `AISKILLS_SKILLS_VERSION` is set to something other than the pinned version, so `npx` runs a `skills` CLI nobody tested with `aiskills`. **Fix:** if you didn't set it, look for it in your shell profile, a project's `.envrc`/`.env`, or CI variables, and unset it.
+**Cause:** a notice, not an error: `AISKILLS_SKILLS_LIB_VERSION` is set to something other than the pinned version, so `npx` runs a `skills` CLI nobody tested with `aiskills`. **Fix:** if you didn't set it, look for it in your shell profile, a project's `.envrc`/`.env`, or CI variables, and unset it.
 
-### Empty `AISKILLS_SKILLS_VERSION` interval
+### Empty `AISKILLS_SKILLS_LIB_VERSION` interval
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION '<value>' is an empty interval: no version fits it
+[aiskills] AISKILLS_SKILLS_LIB_VERSION '<value>' is an empty interval: no version fits it
 ```
 
 **Cause:** the lower bound is above the upper one, or they're equal and not both inclusive (`[1.7.6, 1.7.6)`). **Fix:** swap or widen the bounds; `[1.7.6, 1.7.6]` means exactly `1.7.6`.
@@ -294,10 +302,10 @@ npm error notarget No matching version found for skills@1.7.6 with a date before
 [aiskills] npm's release-age rule (min-release-age or before) blocked skills@1.7.6: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer.
 [aiskills]   - wait until it is old enough ('npm view skills time' shows when each version came out), or
 [aiskills]   - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or
-[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(..., 1.7.6]' (npm picks the newest it may)
+[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]' (npm picks the newest it may)
 ```
 
-**Cause:** your `.npmrc` (or environment) sets `min-release-age` or `before`, and the `skills` CLI version `aiskills` runs was published more recently. npm's `min-release-age-exclude` doesn't apply to `npx`. With a range in `AISKILLS_SKILLS_VERSION`, the last line instead suggests a wider range. **Fix:** one of the three lines; see [When npm's release-age rule blocks the pinned version](../guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
+**Cause:** your `.npmrc` (or environment) sets `min-release-age` or `before`, and the `skills` CLI version `aiskills` runs was published more recently. npm's `min-release-age-exclude` doesn't apply to `npx`. With a range in `AISKILLS_SKILLS_LIB_VERSION`, the last line instead suggests a wider range. **Fix:** one of the three lines; see [When npm's release-age rule blocks the pinned version](../guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 ### Shell characters on Windows
 
@@ -305,7 +313,7 @@ npm error notarget No matching version found for skills@1.7.6 with a date before
 [aiskills] refusing to pass shell characters to cmd.exe: <arguments>
 ```
 
-**Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. The `skills@<range>` argument from `AISKILLS_SKILLS_VERSION` is the one exception: it's already limited to version characters and is passed in double quotes. **Fix:** remove those characters; skill names and specs never need them.
+**Cause:** on Windows, an argument contains one of `& | < > ^ % ! " ( )`, which `cmd.exe` would interpret. The `skills@<range>` argument from `AISKILLS_SKILLS_LIB_VERSION` is the one exception: it's already limited to version characters and is passed in double quotes. **Fix:** remove those characters; skill names and specs never need them.
 
 ## Packaging errors (maintainers)
 

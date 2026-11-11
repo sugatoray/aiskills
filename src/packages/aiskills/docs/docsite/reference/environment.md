@@ -57,9 +57,13 @@ Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` t
 
 The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is resolved from the current folder. If the folder exists, it must be empty or an aiskills folder (it has `aiskills.json`); otherwise `aiskills` refuses to replace or delete it.
 
+### `AISKILLS_SKILLS_LIB_VERSION`
+
+The version of the `skills` CLI library that every `npx` call runs (not the version of the bundled skills). Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where exactly one of `...`, `?` or `*` is an open end (no combinations): `[x, ...)` (or `[x, ?)`, `[x, *)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. A typographic `…` (as autocorrect makes it) is read as `...`. Only plain spaces may separate a range's parts; tabs, line breaks and Unicode spaces are refused. Anything else, or an interval no version fits, is refused. When it overrides the pinned version, every command says so once: `using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6`. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
+
 ### `AISKILLS_SKILLS_VERSION`
 
-The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where exactly one of `...`, `?` or `*` is an open end (no combinations): `[x, ...)` (or `[x, ?)`, `[x, *)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. A typographic `…` (as autocorrect makes it) is read as `...`. Only plain spaces may separate a range's parts; tabs, line breaks and Unicode spaces are refused. Anything else, or an interval no version fits, is refused. When it overrides the pinned version, every command says so once: `using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6`. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
+Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
 
 ## Read by `npx skills`, passed through
 

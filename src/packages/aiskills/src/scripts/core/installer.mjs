@@ -161,9 +161,14 @@ export const quote = (a) => (/[\s*'"<>|&;()$`]/.test(a) ? `'${a.replace(/'/g, "'
 // The `skills` CLI version every npx call runs. Pinned so a new (or
 // compromised) release is never picked up silently; bump it after testing
 // (npm test && npm run test:e2e && npm run audit:skills <version>).
-// AISKILLS_SKILLS_VERSION overrides it with a version, "latest"/"next", an npm
+// AISKILLS_SKILLS_LIB_VERSION (the old name AISKILLS_SKILLS_VERSION still works,
+// deprecated) overrides it with a version, "latest"/"next", an npm
 // range or an interval (see skillsVersionSpec).
 export const SKILLS_CLI_VERSION = "1.7.6";
+/** The variable that overrides it ("LIB": the skills CLI library, not the bundled skills). */
+export const SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_LIB_VERSION";
+/** Its name in 0.4.0 - 0.5.0; still read, with a deprecation warning. */
+export const OLD_SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_VERSION";
 
 // npm range grammar, limited to version characters: comparators (<, <=, >, >=,
 // =, ~, ^), x-ranges (1.7.x, 1.x, *), hyphen ranges (a - b) and || between sets.
@@ -192,15 +197,16 @@ const compareVersions = (a, b) => {
 };
 
 /**
- * What npx is asked for, from AISKILLS_SKILLS_VERSION: an exact version,
+ * What npx is asked for, from AISKILLS_SKILLS_LIB_VERSION: an exact version,
  * "latest", "next", an npm range (passed on as is), or interval notation
- * (turned into an npm range). Throws on anything else.
+ * (turned into an npm range). Throws on anything else; <name> is the
+ * variable the value came from, for the error message.
  */
-export function skillsVersionSpec(input) {
+export function skillsVersionSpec(input, name = SKILLS_LIB_VERSION_VAR) {
   const v = String(input).trim();
   const bad = () =>
     new Error(
-      `AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) ` +
+      `${name} must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) ` +
         `or an interval (e.g. [1.7.4, 1.8.0)); got '${v}'`,
     );
   if (v === "latest" || v === "next") return v;
@@ -214,7 +220,7 @@ export function skillsVersionSpec(input) {
     if (!loOpen && !hiOpen) {
       const c = compareVersions(lo, hi);
       if (c > 0 || (c === 0 && !(open === "[" && close === "]"))) {
-        throw new Error(`AISKILLS_SKILLS_VERSION '${v}' is an empty interval: no version fits it`);
+        throw new Error(`${name} '${v}' is an empty interval: no version fits it`);
       }
     }
     const parts = [];
@@ -227,18 +233,28 @@ export function skillsVersionSpec(input) {
 }
 
 let announced = false;
+let deprecationShown = false;
 
 /**
  * "skills@<version or range>" for npx; throws on a malformed
- * AISKILLS_SKILLS_VERSION. When it overrides the pinned version, says so once
- * per command (next to the `running: npx ...` lines), so a downgrade set by a profile, .envrc or CI
- * variable can't happen silently.
+ * AISKILLS_SKILLS_LIB_VERSION. The old name, AISKILLS_SKILLS_VERSION (0.4.0 -
+ * 0.5.0), still works with a deprecation warning; the new one wins when both
+ * are set. When the value overrides the pinned version, says so once per
+ * command (next to the `running: npx ...` lines), so a downgrade set by a
+ * profile, .envrc or CI variable can't happen silently.
  */
 export function skillsPackageSpec() {
-  const spec = skillsVersionSpec(process.env.AISKILLS_SKILLS_VERSION?.trim() || SKILLS_CLI_VERSION);
+  const current = process.env[SKILLS_LIB_VERSION_VAR]?.trim();
+  const old = process.env[OLD_SKILLS_LIB_VERSION_VAR]?.trim();
+  if (old && !deprecationShown) {
+    deprecationShown = true;
+    warn(`${OLD_SKILLS_LIB_VERSION_VAR} is deprecated: use ${SKILLS_LIB_VERSION_VAR} (the version of the skills CLI library, not of the bundled skills)`);
+  }
+  const name = current ? SKILLS_LIB_VERSION_VAR : OLD_SKILLS_LIB_VERSION_VAR;
+  const spec = skillsVersionSpec(current || old || SKILLS_CLI_VERSION, name);
   if (spec !== SKILLS_CLI_VERSION && !announced) {
     announced = true;
-    log(`using skills@${spec} from AISKILLS_SKILLS_VERSION, not the tested ${SKILLS_CLI_VERSION}`);
+    log(`using skills@${spec} from ${name}, not the tested ${SKILLS_CLI_VERSION}`);
   }
   return `skills@${spec}`;
 }
@@ -279,8 +295,8 @@ export function explainReleaseAge(stderr) {
   warn("  - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or");
   warn(
     exact
-      ? `  - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(..., ${exact}]' (npm picks the newest it may)`
-      : "  - allow an older, untested skills CLI with a wider AISKILLS_SKILLS_VERSION range",
+      ? `  - allow an older, untested skills CLI: AISKILLS_SKILLS_LIB_VERSION='(..., ${exact}]' (npm picks the newest it may)`
+      : "  - allow an older, untested skills CLI with a wider AISKILLS_SKILLS_LIB_VERSION range",
   );
   return true;
 }

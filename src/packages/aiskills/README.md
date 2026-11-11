@@ -490,7 +490,8 @@ a count fails.
 | `AISKILLS_COPY=1` | Pass `--copy` to `npx skills add` |
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route` |
-| `AISKILLS_SKILLS_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version). Also `latest`, `next`, an npm range (`~1.7.4`) or an interval (one of `...`, `?` or `*` is an open end): `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`. With a range, npm picks the newest version its rules (e.g. `min-release-age`) allow |
+| `AISKILLS_SKILLS_LIB_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version). Also `latest`, `next`, an npm range (`~1.7.4`) or an interval (one of `...`, `?` or `*` is an open end): `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`. With a range, npm picks the newest version its rules (e.g. `min-release-age`) allow |
+| `AISKILLS_SKILLS_VERSION` | Deprecated old name of `AISKILLS_SKILLS_LIB_VERSION`; still works, with a warning |
 | `npm_config_min_release_age`, `npm_config_before` | npm's release-age rule, passed on to `npx`: `npm_config_min_release_age=0 aiskills installed` relaxes it for one run |
 | `AISKILLS_STATS=0\|1` | Same as `--no-stats` / `--stats` for one command, not remembered (see [The skills.sh install count](#the-skillssh-install-count)) |
 | `AISKILLS_STATS_FOREGROUND=1` | Wait for the skills.sh count and show its output |
@@ -504,7 +505,7 @@ while it's that new. `aiskills` then explains it after npm's error, and you can:
 
 ```sh
 npm_config_min_release_age=0 aiskills installed          # relax the rule for one run
-AISKILLS_SKILLS_VERSION='(..., 1.7.6]' aiskills installed  # let npm fall back to an older, untested version
+AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]' aiskills installed  # let npm fall back to an older, untested version
 ```
 
 or wait until the version is old enough. `min-release-age-exclude[]=skills`
@@ -644,7 +645,7 @@ npm run test:e2e    # also a real install with the real `npx skills` (needs netw
 | --- | --- |
 | `src/test/unit.test.mjs` | The pure helpers: glob matching, pattern expansion, reading skill names, groups and aliases, skill selection, `--route` spec parsing, `AISKILLS_*` env parsing. |
 | `src/test/cli.test.mjs` | `bin/aiskills.mjs` → `src/scripts/core/cli.mjs` (the `aiskills` command), run as real processes against a small fixture package. A stand-in `npx` placed first on `PATH` records every call and returns canned `list`, `find` and agent-list output, so the tests check the exact `npx skills` commands issued. The `aix` confirmation is tested without a terminal and, through util-linux `script`, in a real pseudo-terminal answering the `[y/N]` prompt. |
-| `src/test/skills-version.test.mjs` | `AISKILLS_SKILLS_VERSION`: exact versions, tags, npm ranges and interval notation (`[x, ...)`, `(x, y]`, `(..., x]`, …) turned into npm ranges, and everything else refused; the `skills@<range>` argument quoted for `cmd.exe`; npm's release-age variables passed to `npx`; the explanation when npm's age rule blocks the `skills` CLI; and `npm run audit:skills` (resolution, age and advisory checks, with a stand-in `npm`). |
+| `src/test/skills-version.test.mjs` | `AISKILLS_SKILLS_LIB_VERSION`: exact versions, tags, npm ranges and interval notation (`[x, ...)`, `(x, y]`, `(..., x]`, …) turned into npm ranges, and everything else refused; the `skills@<range>` argument quoted for `cmd.exe`; npm's release-age variables passed to `npx`; the explanation when npm's age rule blocks the `skills` CLI; and `npm run audit:skills` (resolution, age and advisory checks, with a stand-in `npm`). |
 | `src/test/stats.test.mjs` | The skills.sh install count: `resolveStats` (flag, `AISKILLS_STATS`, remembered choice, default on; `DO_NOT_TRACK`, `DISABLE_TELEMETRY` and CI always off), the exact `npx skills add sugatoray/aiskills` command, that it runs after a successful bundled install in a temp folder that is then removed (in the foreground and in the background), only for the installed skills and chosen agents, never for failed installs, `-n`, `--route` externals or `sync`, and that a failing count (github.com unreachable) is silent and leaves the exit status alone. |
 | `src/test/skillsignore.test.mjs` | The `.skillsignore` parser and matcher, and how the vendor step applies it (nested files, `!`, dropped skills, refused `SKILL.md`, `--nested`). |
 | `src/test/packaging.test.mjs` | `npm run vendor` / `clean` and `npm pack --dry-run`: `skills/` is flat with a `SKILL.md` in every folder; mapped back through `layout.json`, the shipped files equal every git-tracked file under the repo's `skills/` that no `.skillsignore` excludes, byte for byte (with `.gitignore` files renamed); only `bin/` and the two runtime files in `src/scripts/core/` ship as code, and `package.json` has no install-time script: `src/scripts/pack/`, `src/scripts/docs/`, `src/scripts/README.md`, `src/test/`, `docs/` and the scrolls files don't. It also pins the `src/scripts/` layout (`core/`, `pack/`, `docs/`), the rule that imports only point down, and that `src/scripts/README.md` describes every file. |

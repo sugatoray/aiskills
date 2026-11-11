@@ -151,7 +151,7 @@ Each of these has tests in `src/test/` (`npm test`).
   so a new or compromised `skills` release is never used silently. The
   maintainers bump it after testing and after `npm run audit:skills` (no high
   or critical advisory in its dependency tree, published at least 7 days
-  earlier). `AISKILLS_SKILLS_VERSION` overrides it with an exact version,
+  earlier). `AISKILLS_SKILLS_LIB_VERSION` overrides it with an exact version,
   `latest`, `next`, an npm range or interval notation (`[1.7.4, 1.8.0)`);
   a range lets npm pick a version nobody tested with `aiskills`. Values are
   limited to version characters and plain spaces (no tabs, line breaks or
@@ -160,7 +160,7 @@ Each of these has tests in `src/test/` (`npm test`).
   interval is read as `...`, and the npm range passed on is rebuilt from the
   version numbers, so it never reaches `npx`. Whenever the variable
   overrides the pin, every command says so once
-  (`using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6`),
+  (`using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6`),
   so a downgrade set by a profile, `.envrc` or CI variable isn't silent.
 - **Registry text is checked before use.** Under `--route` / `aix`, an
   `owner/repo@skill` result from `npx skills find` is used only if every part
@@ -178,7 +178,7 @@ Each of these has tests in `src/test/` (`npm test`).
 
 ## Remaining caveats
 
-- Setting `AISKILLS_SKILLS_VERSION=latest` gives up the pinning above.
+- Setting `AISKILLS_SKILLS_LIB_VERSION=latest` gives up the pinning above.
 - An `owner/repo@skill` you type yourself is passed to `npx skills add` as you
   typed it (on Windows, still subject to the shell-character check).
 - Anything already in an aiskills folder's `skills/` is replaced on every

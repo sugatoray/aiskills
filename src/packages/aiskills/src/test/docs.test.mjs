@@ -142,7 +142,7 @@ describe("reference pages cover the code", () => {
       ...[...code.matchAll(/\bAISKILLS_[A-Z_]*[A-Z]\b/g)].map((m) => m[0]),
       ...[...code.matchAll(/process\.env\.([A-Z_]+)/g)].map((m) => m[1]),
     ]);
-    assert.ok(names.has("AISKILLS_HOME") && names.has("AISKILLS_SKILLS_VERSION"), [...names].join(", "));
+    assert.ok(names.has("AISKILLS_HOME") && names.has("AISKILLS_SKILLS_LIB_VERSION"), [...names].join(", "));
     for (const n of names) assert.ok(hasHeadingWith(env, n), `no heading for \`${n}\` in reference/environment.md`);
   });
 

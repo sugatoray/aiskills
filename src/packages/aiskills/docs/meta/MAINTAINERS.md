@@ -226,7 +226,7 @@ every `npx` call runs. To move to a newer one:
    `min-release-age=7` can't run a younger pinned version at all (every
    `aiskills` command that runs `npx` fails), and a week gives the registry
    time to flag a bad release. `--min-age <days>` changes the threshold.
-2. `AISKILLS_SKILLS_VERSION=<new> npm run test:e2e` to try it.
+2. `AISKILLS_SKILLS_LIB_VERSION=<new> npm run test:e2e` to try it.
 3. Read the new version's changes, especially the output of `find`, the
    "Valid agents:" message and `list --json`, which `aiskills` parses.
 4. Update `SKILLS_CLI_VERSION`, run `npm test` and `npm run test:e2e`, and add
