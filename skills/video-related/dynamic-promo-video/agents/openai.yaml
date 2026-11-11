@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dynamic-Promo-Video"
+  short_description: "Builds a short narrated promo video from HTML scenes, real screenshots, TTS voiceover and ducked music."
+policy:
+  allow_implicit_invocation: true

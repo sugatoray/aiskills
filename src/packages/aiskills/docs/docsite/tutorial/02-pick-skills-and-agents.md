@@ -46,7 +46,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups

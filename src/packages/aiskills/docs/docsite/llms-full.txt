@@ -28,7 +28,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 12 skills in 6 groups, at the version you installed.
+- **Skills in one package**: 13 skills in 7 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`).
@@ -53,6 +53,7 @@ aiskills install -G scrolls -a claude-code
 - [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
+- [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.
 - [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
 - [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
 - [scrolls-help](skills/scrolls-help.md): Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,…
@@ -190,7 +191,7 @@ aiskills path
 ```
 
 ```text
-0.6.0
+0.7.0
 ~/.config/sugatoray/aiskills
 ```
 
@@ -306,7 +307,7 @@ See also: [CLI reference](../reference/cli.md)
 <!-- source: skills/README.md -->
 # Bundled skills
 
-Every skill in this version of the package (12 skills in 6 groups), with what it does and how to install it.
+Every skill in this version of the package (13 skills in 7 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -363,6 +364,14 @@ Alias `personas`. Install the group with `aiskills install -G personas`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`prodigy`](prodigy.md) | 1.0.0 | Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and… |
+
+## video-related-skills
+
+Alias `video-related`. Install the group with `aiskills install -G video-related`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`dynamic-promo-video`](dynamic-promo-video.md) | 1.6.2 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 
@@ -481,6 +490,88 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/crea
 - `tests/test_scripts.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/dynamic-promo-video.md -->
+# dynamic-promo-video
+
+Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. Use for explainer or launch videos made from code, real screenshots and TTS.
+
+| Property | Value |
+| --- | --- |
+| Group | `video-related-skills` (alias `video-related`) |
+| Version | 1.6.2 |
+| Starts | When you type `/dynamic-promo-video`, or your agent uses it when a task fits its description |
+| License | MIT |
+| Source | [skills/video-related/dynamic-promo-video](https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s dynamic-promo-video -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: dynamic-promo-video
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill dynamic-promo-video --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `video-related-skills` group:
+
+```bash
+aiskills install -G video-related -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s dynamic-promo-video
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/dynamic-promo-video/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/claude-code.yaml`
+- `agents/openai.yaml`
+- `assets/demo/clips/README.md`
+- `assets/demo/clips/install-commands.mp3`
+- `assets/demo/clips/install-skill.mp3`
+- `assets/demo/clips/launch-video.mp3`
+- `assets/demo/clips/placeholder-bridge.mp3`
+- `assets/demo/clips/problem.mp3`
+- `assets/demo/clips/render-share.mp3`
+- `assets/demo/clips/scene-engine.mp3`
+- `assets/demo/clips/story.mp3`
+- `assets/demo/default/clips.json`
+- `assets/demo/default/index.html`
+- `assets/demo/default/narration.txt`
+- `assets/demo/self/clips.json`
+- `assets/demo/self/index.html`
+- `assets/demo/self/narration.txt`
+- `assets/template/index.html`
+- `meta/MAINTAINERS.md`
+- `references/music-and-mix.md`
+- `references/scene-engine.md`
+- `references/screenshots.md`
+- `references/voiceover.md`
+- `scripts/demo.py`
+- `scripts/mix.py`
+- `scripts/music.py`
+- `scripts/render.js`
+- `scripts/timing.py`
+- `scripts/tts_elevenlabs.py`
+- `scripts/verify.py`
+- `tests/test_scripts.py`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/video-related/dynamic-promo-video/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/video-related/dynamic-promo-video/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
 <!-- source: skills/network-flow.md -->
 # network-flow
@@ -1132,6 +1223,10 @@ personas-skills  (alias: personas)
   Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems,...
   skills: prodigy
 
+video-related-skills  (alias: video-related)
+  Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...
+  skills: dynamic-promo-video
+
 Install a group:  aiskills install --group <name|alias> --global --agent <agent>
 ```
 
@@ -1230,7 +1325,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -1350,7 +1445,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: create-issues-update-pr, create-lib-docs, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 
@@ -1876,7 +1971,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    ```text
    [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
    [aiskills] no group matches: nope
-     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), all
+     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), all
      see 'aiskills groups'
    ```
 
@@ -2190,7 +2285,8 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
-| `all` (built in) | | all 12 skills |
+| `video-related-skills` | `video-related` | dynamic-promo-video |
+| `all` (built in) | | all 13 skills |
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 
@@ -2620,7 +2716,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.6.0 — Sugato Ray's agent skills
+aiskills 0.7.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -2731,7 +2827,7 @@ ais -v
 ```
 
 ```text
-0.6.0
+0.7.0
 ```
 
 ## Options
@@ -3001,7 +3097,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```json
 {
   "package": "@sugatoray-ai/aiskills",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "layout": "flat",
   "installedAt": "2026-11-06T10:26:01.152Z",
   "skills": "/home/me/.config/sugatoray/aiskills/skills"
@@ -3754,12 +3850,13 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-12 skills, sorted by name.
+13 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |
 | [`create-lib-docs`](skills/create-lib-docs.md) | docs | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/SKILL.md) |
+| [`dynamic-promo-video`](skills/dynamic-promo-video.md) | video-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/video-related/dynamic-promo-video/SKILL.md) |
 | [`network-flow`](skills/network-flow.md) | diagrams | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/SKILL.md) |
 | [`prodigy`](skills/prodigy.md) | personas | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/SKILL.md) |
 | [`scrolls-help`](skills/scrolls-help.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/SKILL.md) |

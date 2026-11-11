@@ -3,7 +3,7 @@
 # @sugatoray-ai/aiskills
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
-(scrolls, stata, personas, diagrams, docs, development), packaged
+(scrolls, stata, personas, diagrams, docs, development, video), packaged
 for npm. Every file under the repo's `skills/` folder ships, except what a
 [`.skillsignore`](#leaving-files-out-skillsignore) leaves out. The skills are
 flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
@@ -204,6 +204,7 @@ installed version. At the time of writing:
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
+| `video-related-skills` | `video-related` | dynamic-promo-video |
 | `all` (built in) | | every skill |
 
 `newsletter-ai` isn't in the package: `skills/newsletters/.skillsignore`

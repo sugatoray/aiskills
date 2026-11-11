@@ -90,6 +90,20 @@
         "career",
         "learning-plan"
       ]
+    },
+    {
+      "name": "video-related-skills",
+      "source": "./video-related",
+      "description": "Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt, real screenshots, TTS voiceover, ducked music) for a library, app or product.",
+      "category": "productivity",
+      "keywords": [
+        "video",
+        "promo",
+        "explainer",
+        "voiceover",
+        "playwright",
+        "ffmpeg"
+      ]
     }
   ]
 }

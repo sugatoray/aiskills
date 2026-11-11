@@ -1,0 +1,196 @@
+# Changelog
+
+All notable changes to this skill are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [1.6.2] - 2026-11-11
+
+### Changed
+
+- SKILL.md: the demo section is a table from each request (`--demo`,
+  `--demo=self`, `--voice`, another voice by API key or MCP connector) to the
+  `demo.py` command. Step 3 covers narration lines of `-` and fixing a
+  mispronounced name with a name-only sample and a splice.
+- README: `--demo --voice` needs no ElevenLabs route (bundled clips), a note on
+  fixing pronunciation, `--demo=self` in the usage list, and the Tests section
+  describes the current tests.
+
+## [1.6.1] - 2026-11-11
+
+### Changed
+
+- Demo voice clips are stored once in `assets/demo/clips/` (8 recordings,
+  named by what they say) instead of a copy per variant; each variant's
+  `clips.json` maps scenes to them. 672 KB instead of 1.2 MB. The rebuilt
+  narrated demos are still identical to the approved videos.
+- Test: every pooled recording is used and none is stored twice.
+
+## [1.6.0] - 2026-11-11
+
+### Added
+
+- `--demo=self`: the skill-explaining-itself demo (the v1.4.2 video, cover
+  "/dynamic-promo-video") is back as a variant. `--demo` / `--demo=default` is
+  the placeholder-then-how-to demo.
+- `demo.py --variant default|self` and `--voice`: narrate with the variant's
+  bundled clips (`assets/demo/<variant>/clips/`, the approved narration in the
+  default voice). No ElevenLabs calls; the rebuilt videos are identical to the
+  approved ones (checked frame by frame and sample by sample). `--voice-id`
+  with the default voice also uses the bundled clips.
+- Tests: self page, bundled clips match the narration and use the approved
+  spellings, narrated builds of both variants from the bundled clips.
+
+### Changed
+
+- Demo files moved to `assets/demo/default/` and `assets/demo/self/`.
+
+## [1.5.1] - 2026-11-11
+
+### Changed
+
+- Demo cover (frame 0, also `thumbnail.png`) adds a tag: "Demo of Skill
+  /dynamic-promo-video · sugatoray/aiskills", so a social preview says what
+  the video is. The generic template's cover is unchanged.
+
+## [1.5.0] - 2026-11-11
+
+### Changed
+
+- `--demo` is now the template video as a placeholder for the viewer's own
+  video (scenes 1-6, unchanged, with the original narration), followed by how
+  to make one with the skill: a bridge ("that was a placeholder"), the three
+  install routes from `sugatoray/aiskills`, and get started (music only). 48s.
+
+### Added
+
+- Scenes without narration: a narration line `-` (and `-` in `timing.py
+  --clips` / `--durations`) keeps the scene's authored length with no voice;
+  `tts_elevenlabs.py` skips it and numbers clips by scene.
+- Tests for scenes without narration and for the new demo structure.
+
+## [1.4.2] - 2026-11-11
+
+### Changed
+
+- Demo narration says "aiskills" as "A.I. skills" (both places in the install
+  line), as approved by the owner.
+
+## [1.4.1] - 2026-11-11
+
+### Changed
+
+- Demo narration says "sugatoray" as "Shoo-gaw-doe Ray", the spelling its
+  owner approved.
+- `references/voiceover.md`: how to fix a name the voice gets wrong with few
+  credits (name-only samples, then splice the approved sample into the clip),
+  and how to check that the splice replaced the right word.
+
+## [1.4.0] - 2026-11-11
+
+### Changed
+
+- `--demo` is now about the skill itself, not the bare template's
+  placeholders. New `assets/demo/index.html`: cover with `/dynamic-promo-video`
+  from `sugatoray/aiskills`, the problem, the scene engine's real code under the
+  camera, an install slide that types the three routes (`npx skills add`, the
+  Claude Code plugin, the `@sugatoray-ai/aiskills` npm package), usage steps,
+  and an end card with the real commands and repo link. The install scene is 7s,
+  so the demo is 32s.
+- `demo.py` reads the scene boundaries (`OB`) from the page instead of a
+  hard-coded list.
+- Demo narration line 4 now names the three install routes.
+
+### Added
+
+- Test that the demo page shows the skill name, repo and every install command,
+  and has one narration line per scene.
+
+## [1.3.1] - 2026-11-11
+
+### Fixed
+
+- `mix.py`: the music stopped when the last voice line ended, leaving the end
+  of a narrated video silent (the ducking filter ends with its shortest input).
+  The voice track is now padded to the full video length first. Found on the
+  first real `--demo --voice` run; the mix test now fails on a cut-off.
+
+## [1.3.0] - 2026-11-11
+
+### Added
+
+- `--demo` flag: builds the demo video from the bare template in one command
+  with `scripts/demo.py`. Music only by default (energetic track, music level
+  0.6); narrated when a voice flag is given, at music level 0.3 with ducking.
+  The API-key route uses `demo.py --voice-id`; clips made with the MCP connector
+  go in with `--clips-dir`.
+- `--voice` flag: narrate with the default ElevenLabs voice
+  `TABZn6CDfjMNGrsnGzzD`.
+- `assets/demo/narration.txt`: six narration lines for the demo, one per
+  template scene.
+- `timing.py --write-html PAGE`: writes the new `const NB = [...]` line into
+  the page instead of pasting it by hand.
+- Tests for `--write-html` and for `demo.py`, both music-only and narrated with
+  stand-in clips (checks that a long clip stretches its scene). 24 tests in all.
+
+### Changed
+
+- A voice flag with no ElevenLabs route available now makes the agent ask
+  (connect the connector, add a key or attach clips) instead of falling back to
+  music only. Without a voice flag, a real project still falls back to music only.
+- SKILL.md: an Inputs table for the three flags and a Demo section.
+- README: flags table, narration routes, demo outputs, quick run for the demo,
+  and a Tests section.
+
+## [1.2.0] - 2026-11-11
+
+### Added
+
+- `--voice-elevenlabs=<voice-id>` flag; default voice `TABZn6CDfjMNGrsnGzzD`.
+- Narration route selection: the ElevenLabs MCP connector, else an API key
+  (`ELEVENLABS_API_KEY` or a network secret for `api.elevenlabs.io`), else a
+  music-only video.
+- `scripts/tts_elevenlabs.py`: one clip per scene from a narration file;
+  `--dry-run`, skips existing clips, `--force` to redo chosen scenes, never
+  retries a paid request, stops at once on 401/403/404.
+- Tests for the TTS script that replace the network call, so they spend no
+  credits.
+
+### Changed
+
+- `references/voiceover.md` rewritten around the routes: MCP connector, API
+  key, neither.
+
+## [1.1.0] - 2026-11-11
+
+### Added
+
+- `assets/template/index.html`: deterministic 6-scene starter with the
+  helpers, time warp, crossfades, perspective camera and typing effect.
+- `scripts/render.js` (preview, thumbnail, render, encode), `scripts/timing.py`
+  (retime scenes to the voice clips), `scripts/music.py` (calm / energetic
+  synthesized track), `scripts/mix.py` (voice + ducked music, `--audio-from`,
+  `--dry-run`), `scripts/verify.py` (streams, durations, loudness per second,
+  frames).
+- `references/` for the scene engine, screenshots, voiceover, music and mix.
+- `tests/test_scripts.py`, README, CHANGELOG, maintainer notes and agent
+  metadata.
+
+### Changed
+
+- `SKILL.md` is now the workflow only; details moved to `references/` and
+  inline code to `scripts/`.
+
+### Fixed
+
+- Template product scene: the zoomed window no longer covers the caption.
+- `verify.py`: a short tail of audio is no longer reported as a silent second,
+  and the last frame of short or low-fps clips is extracted reliably.
+
+## [1.0.0] - 2026-11-10
+
+### Added
+
+- `/dynamic-promo-video` skill: storyboard, HTML scene engine, Playwright
+  render, ffmpeg encode, TTS voiceover, music, mix and verification steps.
+- Repository frontmatter (MIT license, metadata), the `video-related-skills`
+  plugin and marketplace entry.
