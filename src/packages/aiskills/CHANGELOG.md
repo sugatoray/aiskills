@@ -20,6 +20,14 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+### Added
+
+- `aiskills scan [path]`: security-scans skills with [NVIDIA SkillSpector](https://github.com/NVIDIA/skillspector)
+  and writes a report (`--format terminal|json|markdown|sarif`, `--output`, `--baseline`). Report-only
+  by default (exit `0`); `--fail-on-findings` exits `1` on findings. Static-only by default (`--llm` opts
+  in to SkillSpector's LLM analysis). Runs `skillspector` from `PATH`, else `uvx` at a pinned commit, so
+  it needs [uv](https://docs.astral.sh/uv/) and Python 3.12+ only for this command.
+
 ## [0.6.0] - 2026-11-11
 
 ### Added

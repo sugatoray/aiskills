@@ -10,6 +10,7 @@ Errors and warnings go to stderr and start with `[aiskills]`. Parts in `<angle b
 | --- | --- |
 | `0` | Success. `uninstall` also exits `0` when there was nothing to remove. |
 | `1` | `aiskills` stopped with one of the errors below, or `installed` couldn't read `npx skills list`. No skill was installed or removed. |
+| `2` | `aiskills scan` could not run SkillSpector, or SkillSpector itself failed. |
 | any other | The exit code of the `npx skills` command it ran, passed through. |
 
 <!-- verify -->
@@ -260,6 +261,48 @@ Install <n> external skill(s) from the registry? [y/N] n
 ```
 
 **Cause:** the package was built without `layout.json`. **Fix:** use `--flat`, or reinstall the published package.
+
+## Scanning (`scan`)
+
+### Unknown format
+
+```text
+[aiskills] unknown format '<format>' (use one of: terminal, json, markdown, sarif)
+```
+
+**Cause:** `--format` got a value SkillSpector has no report for. **Fix:** use `terminal`, `json`, `markdown` or `sarif`.
+
+### Path not found
+
+```text
+[aiskills] not found: <path>
+```
+
+**Cause:** the `scan` path doesn't exist. **Fix:** check the path; with none, run `aiskills sync` so the default folder exists.
+
+### No skills found
+
+```text
+[aiskills] no skills (SKILL.md) found under <path>
+```
+
+**Cause:** no folder under the path holds a `SKILL.md`. Nothing was scanned. **Fix:** point `scan` at a skills folder or a single skill.
+
+### SkillSpector is not installed
+
+```text
+[aiskills] skillspector is not installed, and neither uvx nor uv is available to run it.
+```
+
+**Cause:** there is no `skillspector`, `uvx` or `uv` on `PATH`; exit `2`. **Fix:** install [uv](https://docs.astral.sh/uv/), or `uv tool install git+https://github.com/NVIDIA/skillspector@<commit>`. SkillSpector needs Python 3.12+.
+
+### Could not run SkillSpector
+
+```text
+[aiskills] could not run <command>: <reason>
+```
+
+**Cause:** the operating system couldn't start the command; exit `2`. A SkillSpector exit code of `2` (its own error) is also passed on as `2`. **Fix:** run the printed command yourself to see the cause.
 
 ## Running `npx skills`
 
