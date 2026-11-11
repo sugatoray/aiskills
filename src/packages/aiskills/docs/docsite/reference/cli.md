@@ -309,8 +309,8 @@ Environment:
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
   AISKILLS_SKILLS_VERSION       The skills CLI version npx runs (default 1.7.6, tested): a version,
-                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval, where "..." or "?"
-                                is an open end: [1.7.4, ...) >=1.7.4   (1.7.4, ?) >1.7.4
+                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval, where one of
+                                "...", "?" or "*" is an open end: [1.7.4, ...) >=1.7.4   (1.7.4, *) >1.7.4
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_VERSION='(..., 1.7.6]'

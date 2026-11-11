@@ -174,11 +174,12 @@ const COMPARATOR = `(?:[<>]=?|=|~|\\^)?${VER}`;
 const SET = `(?:${VER}\\s+-\\s+${VER}|${COMPARATOR}(?:\\s+${COMPARATOR})*)`;
 const NPM_RANGE = new RegExp(`^${SET}(?:\\s*\\|\\|\\s*${SET})*$`);
 // Interval notation: [x, ...) >=x, (x, ...) >x, [x, y) >=x <y, (..., x] <=x,
-// and the other mixes of [ ( ) ]. "..." or "?" is an open end (plain ASCII, so
-// it types the same in every shell and Windows console); "…" is read as "...".
-const BOUND = "(\\d+(?:\\.\\d+){0,2}|\\.\\.\\.|\\?|…)";
+// and the other mixes of [ ( ) ]. Exactly one of "...", "?" or "*" is an open
+// end, never a combination like "?*" (plain ASCII, so it types the same in
+// every shell and Windows console); "…" is read as "...".
+const BOUND = "(\\d+(?:\\.\\d+){0,2}|\\.\\.\\.|\\?|\\*|…)";
 const INTERVAL = new RegExp(`^([\\[(])\\s*${BOUND}\\s*,\\s*${BOUND}\\s*([\\])])$`);
-const OPEN = new Set(["...", "?", "…"]);
+const OPEN = new Set(["...", "?", "*", "…"]);
 
 /** Compare two dotted numeric versions, padding missing parts with 0. */
 const compareVersions = (a, b) => {

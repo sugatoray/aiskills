@@ -1,8 +1,9 @@
 // Which `skills` CLI version npx runs, and living with npm's release-age rules.
 //
 // 1. AISKILLS_SKILLS_VERSION takes an exact version, "latest"/"next", an npm
-//    range (~1.7.4, 1.7.x, >=1.7.4 <1.8.0), or interval notation, where "..."
-//    or "?" is an open end (plain ASCII, so it types the same in every shell):
+//    range (~1.7.4, 1.7.x, >=1.7.4 <1.8.0), or interval notation, where exactly
+//    one of "...", "?" or "*" is an open end (plain ASCII, so it types the same
+//    in every shell; no combinations like "?*"):
 //    [x, ...) >=x   (x, ?) >x   [x, y) >=x <y   (..., x] <=x   (and the other mixes).
 //    With a range, npm picks the newest version that its own rules allow, so a
 //    min-release-age setting no longer blocks aiskills while the pinned
@@ -40,6 +41,10 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
       "[1.7.4, ?)": ">=1.7.4",
       "(1.7.4, ...)": ">1.7.4",
       "(1.7.4,?)": ">1.7.4",
+      "[1.7.4, *)": ">=1.7.4",
+      "(1.7.4, *)": ">1.7.4",
+      "(*, 1.7.6]": "<=1.7.6",
+      "(*,1.7.6)": "<1.7.6",
       "[1.7.4, 1.8.0)": ">=1.7.4 <1.8.0",
       "[1.7.4,1.8.0)": ">=1.7.4 <1.8.0",
       "(1.7.0, 1.7.6]": ">1.7.0 <=1.7.6",
@@ -60,7 +65,9 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
       "[1.7.4, ...]", "[1.7.4, ?]", // an open end needs ")"
       "[..., 1.7.6]", "[?, 1.7.6]", // an open start needs "("
       "(..., ...)", "(?, ?)", "(?, ...)", // no bounds at all: use "latest"
-      "[1.7.4, ..)", "[1.7.4, ??)", // two dots or two question marks aren't an open end
+      "[1.7.4, ..)", "[1.7.4, ??)", "[1.7.4, **)", // two dots, two ? or two * aren't an open end
+      "[1.7.4, ?*)", "[1.7.4, *?)", "[1.7.4, *...)", "(...?, 1.7.6]", "(?..., 1.7.6]", "(* ?, 1.7.6]", // only one of ..., ?, * at a time
+      "[1.7.4, *]", "[*, 1.7.6]", "(*, *)", "(*, ?)", "(..., *)",
       "[1.8.0, 1.7.0)", // empty
       "[1.7.6, 1.7.6)", // empty
       "[1.7.4)", "[1.7.4, 1.8.0", "[a, b)",
@@ -93,7 +100,7 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
   after(() => sb.cleanup());
 
   test("a range or interval reaches npx as the matching npm range", () => {
-    for (const [input, spec] of [["~1.7.4", "skills@~1.7.4"], ["[1.7.4, 1.8.0)", "skills@>=1.7.4 <1.8.0"], ["(..., 1.7.6]", "skills@<=1.7.6"], ["(?, 1.7.6]", "skills@<=1.7.6"]]) {
+    for (const [input, spec] of [["~1.7.4", "skills@~1.7.4"], ["[1.7.4, 1.8.0)", "skills@>=1.7.4 <1.8.0"], ["(..., 1.7.6]", "skills@<=1.7.6"], ["(?, 1.7.6]", "skills@<=1.7.6"], ["(*, 1.7.6]", "skills@<=1.7.6"]]) {
       const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: input } });
       assert.equal(r.status, 0, r.out);
       assert.ok(r.calls.length > 0);
@@ -119,7 +126,7 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
     const { out } = sb.run(["--help"]);
     assert.match(out, /AISKILLS_SKILLS_VERSION/);
     assert.match(out, /\[1\.7\.4, \.\.\.\)/);
-    assert.match(out, /"\.\.\." or "\?"/);
+    assert.match(out, /"\.\.\.", "\?" or "\*"/);
     assert.doesNotMatch(out, /…/, "help shows only plain ASCII forms");
   });
 });

@@ -1978,14 +1978,14 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
 | Exact version (the default) | `1.7.6`, `1.8.0-beta.1` | the same | Exactly this release |
 | Tag | `latest`, `next` | the same | Whatever the tag points at now |
 | npm range | `~1.7.4`, `^1.7.0`, `1.7.x`, `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `~1.7.4 \|\| 2.x` | the same | The newest version in the range |
-| `[x, ...)` | `[1.7.4, ...)`, `[1.7.4, ?)` | `>=1.7.4` | x or newer |
+| `[x, ...)` | `[1.7.4, ...)`, `[1.7.4, ?)`, `[1.7.4, *)` | `>=1.7.4` | x or newer |
 | `(x, ...)` | `(1.7.4, ...)` | `>1.7.4` | Newer than x |
 | `[x, y)` | `[1.7.4, 1.8.0)` | `>=1.7.4 <1.8.0` | From x, up to but not including y |
 | `(x, y]`, `[x, y]` | `(1.7.0, 1.7.6]` | `>1.7.0 <=1.7.6` | `[`/`]` include the bound, `(`/`)` exclude it |
-| `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]` | `<=1.7.6` | x or older |
+| `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]`, `(*, 1.7.6]` | `<=1.7.6` | x or older |
 | `(..., x)` | `(..., 1.7.6)` | `<1.7.6` | Older than x |
 
-`...` (three plain dots) or `?` is an open end, which takes `(` or `)`. Both are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `<`, `>` and `|` mean something to it.
+An open end is exactly one of `...` (three plain dots), `?` or `*`, and takes `(` or `)`. They can't be combined: `?*` or `*...` is refused. All three are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `*`, `<`, `>` and `|` mean something to it.
 
 Anything else is refused before `npx` runs, so a typo can't turn into a different package or a shell command:
 
@@ -2695,8 +2695,8 @@ Environment:
   AISKILLS_ROUTE=1              Same as --route
   AISKILLS_LAYOUT=flat|nested   Same as --flat / --nested
   AISKILLS_SKILLS_VERSION       The skills CLI version npx runs (default 1.7.6, tested): a version,
-                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval, where "..." or "?"
-                                is an open end: [1.7.4, ...) >=1.7.4   (1.7.4, ?) >1.7.4
+                                latest, next, an npm range (~1.7.4, 1.7.x) or an interval, where one of
+                                "...", "?" or "*" is an open end: [1.7.4, ...) >=1.7.4   (1.7.4, *) >1.7.4
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_VERSION='(..., 1.7.6]'
@@ -2942,7 +2942,7 @@ The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is 
 
 ### `AISKILLS_SKILLS_VERSION`
 
-The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where `...` or `?` is an open end: `[x, ...)` (or `[x, ?)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. Anything else, or an interval no version fits, is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
+The `skills` CLI version every `npx` call runs. Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where exactly one of `...`, `?` or `*` is an open end (no combinations): `[x, ...)` (or `[x, ?)`, `[x, *)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. Anything else, or an interval no version fits, is refused. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
 
 ## Read by `npx skills`, passed through
 

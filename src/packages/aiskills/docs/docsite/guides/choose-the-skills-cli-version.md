@@ -41,14 +41,14 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
 | Exact version (the default) | `1.7.6`, `1.8.0-beta.1` | the same | Exactly this release |
 | Tag | `latest`, `next` | the same | Whatever the tag points at now |
 | npm range | `~1.7.4`, `^1.7.0`, `1.7.x`, `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `~1.7.4 \|\| 2.x` | the same | The newest version in the range |
-| `[x, ...)` | `[1.7.4, ...)`, `[1.7.4, ?)` | `>=1.7.4` | x or newer |
+| `[x, ...)` | `[1.7.4, ...)`, `[1.7.4, ?)`, `[1.7.4, *)` | `>=1.7.4` | x or newer |
 | `(x, ...)` | `(1.7.4, ...)` | `>1.7.4` | Newer than x |
 | `[x, y)` | `[1.7.4, 1.8.0)` | `>=1.7.4 <1.8.0` | From x, up to but not including y |
 | `(x, y]`, `[x, y]` | `(1.7.0, 1.7.6]` | `>1.7.0 <=1.7.6` | `[`/`]` include the bound, `(`/`)` exclude it |
-| `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]` | `<=1.7.6` | x or older |
+| `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]`, `(*, 1.7.6]` | `<=1.7.6` | x or older |
 | `(..., x)` | `(..., 1.7.6)` | `<1.7.6` | Older than x |
 
-`...` (three plain dots) or `?` is an open end, which takes `(` or `)`. Both are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `<`, `>` and `|` mean something to it.
+An open end is exactly one of `...` (three plain dots), `?` or `*`, and takes `(` or `)`. They can't be combined: `?*` or `*...` is refused. All three are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `*`, `<`, `>` and `|` mean something to it.
 
 Anything else is refused before `npx` runs, so a typo can't turn into a different package or a shell command:
 
