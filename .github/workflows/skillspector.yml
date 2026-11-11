@@ -1,0 +1,73 @@
+# Scans the repo's skills with NVIDIA SkillSpector (https://github.com/NVIDIA/skillspector),
+# through this repo's own `aiskills scan` (src/packages/aiskills/src/scripts/core/scan.mjs).
+#
+# REPORT-ONLY: findings never fail this workflow (no --fail-on-findings yet). Read the report in
+# the job summary, or download the "skillspector-reports" artifact. Once the findings are triaged
+# (accepted ones go in a SkillSpector baseline, `skillspector baseline`), add --fail-on-findings
+# and --baseline to the scan steps to turn this into a gate.
+#
+# STATIC-ONLY: no --llm, so no skill content is sent to an LLM provider. (SkillSpector's
+# dependency check still asks OSV.dev for package names and versions.)
+#
+# SkillSpector is pinned to one commit (SKILLSPECTOR_REF in scan.mjs). The weekly run catches new
+# advisories in the skills' dependencies without any change to the repo.
+#
+# src/packages/aiskills/src/test/scan-workflow.test.mjs keeps this file pointing at real paths.
+name: skillspector
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "src/packages/aiskills/src/scripts/core/scan.mjs"
+      - ".github/workflows/skillspector.yml"
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: skillspector-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: astral-sh/setup-uv@v5
+      - name: Scan skills (SARIF)
+        run: node src/packages/aiskills/bin/aiskills.mjs scan skills --format sarif --output skillspector.sarif
+      - name: Scan skills (markdown report)
+        run: node src/packages/aiskills/bin/aiskills.mjs scan skills --format markdown --output skillspector.md
+      - name: Show the report in the job summary
+        if: always()
+        run: |
+          if [ -f skillspector.md ]; then
+            { echo "## SkillSpector report (report-only)"; echo; cat skillspector.md; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skillspector-reports
+          path: |
+            skillspector.sarif
+            skillspector.md
+          if-no-files-found: ignore
+      # Code scanning refuses uploads from forks and can reject a SARIF file with several runs;
+      # the reports above are the source of truth, so this must never fail the job.
+      - name: Upload SARIF to code scanning
+        if: always() && hashFiles('skillspector.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: skillspector.sarif
+          category: skillspector

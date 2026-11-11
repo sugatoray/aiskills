@@ -23,6 +23,7 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 | [`find`](#find) | `f` | Search the skills registry |
 | [`sync`](#sync) | | Only save or refresh the skills folder |
 | [`list`](#list) | | List the skills in the saved folder, via `npx skills` |
+| [`scan`](#scan) | | Security-scan skills with SkillSpector and write a report |
 | [`path`](#path) | `p` | Print the install folder |
 | [`skills`](#skills) | | Pass arguments to `npx skills` |
 | [`help`](#help) | `h`, `-h`, `--help` | Show the help |
@@ -176,6 +177,25 @@ aiskills list
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --list
 ```
 
+### `scan`
+
+```text
+aiskills scan [path] [-f <format>] [-o <file>] [--llm] [--fail-on-findings] [-b <baseline>] [-n] [-- <skillspector args>]
+```
+
+Security-scan skills with [NVIDIA SkillSpector](https://github.com/NVIDIA/skillspector) and produce a report. `path` is a skills folder (any depth) or a single skill; it defaults to `~/.config/sugatoray/aiskills/skills`, else `./skills`. Every folder holding a `SKILL.md` is scanned.
+
+- **Report-only by default:** findings print or are written to the report, and the command still exits `0`. Add `--fail-on-findings` to exit `1` when SkillSpector reports findings.
+- **Static-only by default:** `--no-llm` is passed to SkillSpector, so no skill content goes to an LLM provider. `--llm` turns the LLM analysis on; SkillSpector then needs a provider and key (see its docs). Its dependency check still asks OSV.dev for package names and versions.
+- **How SkillSpector runs:** `skillspector` from `PATH` if there is one, otherwise `uvx` (or `uv tool run`) at a pinned commit. It needs [uv](https://docs.astral.sh/uv/) and Python 3.12+; aiskills itself stays dependency-free.
+- **Formats:** `terminal` (default), `json`, `markdown`, `sarif`.
+
+```bash
+aiskills scan
+aiskills scan ./skills --format sarif --output skillspector.sarif
+aiskills scan ./skills -f markdown -o report.md --fail-on-findings
+```
+
 ### `path`
 
 Print the install folder: `~/.config/sugatoray/aiskills`, or `AISKILLS_HOME` if set. Changes nothing.
@@ -231,6 +251,7 @@ Commands:
   groups, g      List skill groups (from .claude-plugin/marketplace.json) and their skills
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
+  scan [path]    Security-scan skills with NVIDIA SkillSpector and write a report
   path, p        Print the folder that holds skills/
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ~/.config/sugatoray/aiskills
@@ -280,7 +301,17 @@ uninstall only:
   -f, --force            Allow -s names that this package does not provide
   -n, --dry-run          Print what would run; change nothing
 
-Anything after '--' is appended to the underlying 'npx skills' command.
+scan only (aiskills scan [path]; path = a skills folder or one skill, default ~/.config/sugatoray/aiskills/skills):
+  -f, --format <fmt>     terminal (default) | json | markdown | sarif
+  -o, --output <file>    Write the report to <file> instead of the terminal
+      --llm              Also run SkillSpector's LLM analysis (off by default: nothing is sent to an
+                         LLM provider; it needs a provider key, see SkillSpector's docs)
+      --fail-on-findings Exit 1 when SkillSpector reports findings (default: report-only, exit 0)
+  -b, --baseline <file>  Suppress findings already accepted in this SkillSpector baseline file
+  -n, --dry-run          Print the command; scan nothing
+  Runs 'skillspector' from PATH, else 'uvx' at a pinned commit (5f0f73d); needs Python 3.12+ via uv.
+
+Anything after '--' is appended to the underlying 'npx skills' command (or, for scan, to skillspector).
 
 Examples:
   aiskills groups                             # what groups exist
@@ -299,6 +330,9 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ~/.config/sugatoray/aiskills
+  aiskills scan                               # scan the saved skills; report-only
+  aiskills scan ./skills -f sarif -o skillspector.sarif
+  aiskills scan ./skills -f markdown -o report.md --fail-on-findings
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ~/.config/sugatoray/aiskills -s prodigy -g -y
 
@@ -336,18 +370,19 @@ ais -v
 
 Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patterns.md), and accumulate when the option is repeated: `-s a,b` = `-s a -s b`. Options on the command line replace the matching [`AISKILLS_*`](environment.md) default.
 
-| Option | install | uninstall | installed | groups | sync |
-| --- | --- | --- | --- | --- | --- |
-| `-g`, `-p` | ✓ | ✓ | ✓ | | |
-| `-a`, `-s`, `-G` | ✓ | ✓ | | | |
-| `--route` | ✓ | ✓ | ✓ | | |
-| `--nested`, `--flat` | ✓ | | | | ✓ |
-| `--stats`, `--no-stats` | ✓ | | | | ✓ |
-| `--copy`, `-y` | ✓ | | | | |
-| `-n` | ✓ | ✓ | | | |
-| `--purge`, `-f` | | ✓ | | | |
-| `--json` | | | | ✓ | |
-| `--` | ✓ | ✓ | | | |
+| Option | install | uninstall | installed | groups | sync | scan |
+| --- | --- | --- | --- | --- | --- | --- |
+| `-g`, `-p` | ✓ | ✓ | ✓ | | |  |
+| `-a`, `-s`, `-G` | ✓ | ✓ | | | |  |
+| `--route` | ✓ | ✓ | ✓ | | |  |
+| `--nested`, `--flat` | ✓ | | | | ✓ |  |
+| `--stats`, `--no-stats` | ✓ | | | | ✓ |  |
+| `--copy`, `-y` | ✓ | | | | |  |
+| `-n` | ✓ | ✓ | | | | ✓ |
+| `--purge`, `-f` | | ✓ | | | |  |
+| `--json` | | | | ✓ | | |
+| `-f`, `-o`, `-b`, `--llm`, `--fail-on-findings` | | | | | | ✓ |
+| `--` | ✓ | ✓ | | | | ✓ |
 
 ### `-g`, `--global`
 
@@ -416,12 +451,32 @@ On uninstall, print what would be removed and the exact `npx skills` command, an
 
 On install, show what would be installed: the skills a `--route` lookup found (no confirmation is asked) and each exact `npx skills add` command, as `[dry-run] npx -y skills@1.7.6 add ...` lines, and the [skills.sh count](../concepts/install-count.md) command as a `[dry-run] skills.sh count: ...` line. Nothing is installed or counted. The saved copy in the install folder is still refreshed, as [`sync`](#sync) does.
 
+### `-f`, `--format`
+
+On `scan`, the report format: `terminal` (default), `json`, `markdown` or `sarif`. Anything else is an error.
+
+### `-o`, `--output`
+
+On `scan`, write the report to this file instead of the terminal.
+
+### `-b`, `--baseline`
+
+On `scan`, pass a SkillSpector baseline file so findings already accepted in it are suppressed. Create one with `skillspector baseline`.
+
+### `--llm`
+
+On `scan`, also run SkillSpector's LLM analysis. Off by default, so nothing about your skills leaves your machine.
+
+### `--fail-on-findings`
+
+On `scan`, exit `1` when SkillSpector reports findings, for CI. Without it `scan` is report-only and exits `0`.
+
 ### `--json`
 
 On `groups`, print the groups as JSON. Schema: [Files and schemas](files.md#aiskills-groups---json).
 
 ### `--`
 
-Everything after `--` is appended to the `npx skills add` (install) or `npx skills remove` (uninstall) command. See [Run any `npx skills` command](../guides/run-npx-skills-directly.md#extra-flags-on-install-and-uninstall).
+Everything after `--` is appended to the `npx skills add` (install) or `npx skills remove` (uninstall) command, or to the `skillspector scan` command (scan). See [Run any `npx skills` command](../guides/run-npx-skills-directly.md#extra-flags-on-install-and-uninstall).
 
 See also: [Environment variables](environment.md) · [Errors and exit codes](errors.md) · [Patterns](patterns.md)

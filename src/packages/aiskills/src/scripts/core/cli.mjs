@@ -31,6 +31,7 @@ import {
   syncSkills,
   warn,
 } from "./installer.mjs";
+import { scan, SKILLSPECTOR_REF } from "./scan.mjs";
 
 const { version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
 const ROOT = installRoot();
@@ -48,6 +49,7 @@ Commands:
   groups, g      List skill groups (from .claude-plugin/marketplace.json) and their skills
   sync           Only save/refresh the skills folder; do not run 'npx skills add'
   list           List the skills available in the saved folder
+  scan [path]    Security-scan skills with NVIDIA SkillSpector and write a report
   path, p        Print the folder that holds skills/
   find, f <q>    Search the skills registry (= npx skills find <query>)
   skills <args>  Pass <args> straight to 'npx skills'; ':root' is replaced by ${ROOT}
@@ -97,7 +99,17 @@ uninstall only:
   -f, --force            Allow -s names that this package does not provide
   -n, --dry-run          Print what would run; change nothing
 
-Anything after '--' is appended to the underlying 'npx skills' command.
+scan only (aiskills scan [path]; path = a skills folder or one skill, default ${ROOT}/skills):
+  -f, --format <fmt>     terminal (default) | json | markdown | sarif
+  -o, --output <file>    Write the report to <file> instead of the terminal
+      --llm              Also run SkillSpector's LLM analysis (off by default: nothing is sent to an
+                         LLM provider; it needs a provider key, see SkillSpector's docs)
+      --fail-on-findings Exit 1 when SkillSpector reports findings (default: report-only, exit 0)
+  -b, --baseline <file>  Suppress findings already accepted in this SkillSpector baseline file
+  -n, --dry-run          Print the command; scan nothing
+  Runs 'skillspector' from PATH, else 'uvx' at a pinned commit (${SKILLSPECTOR_REF.slice(0, 7)}); needs Python 3.12+ via uv.
+
+Anything after '--' is appended to the underlying 'npx skills' command (or, for scan, to skillspector).
 
 Examples:
   aiskills groups                             # what groups exist
@@ -116,6 +128,9 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
+  aiskills scan                               # scan the saved skills; report-only
+  aiskills scan ./skills -f sarif -o skillspector.sarif
+  aiskills scan ./skills -f markdown -o report.md --fail-on-findings
   aiskills skills list -g                     # = npx skills list -g
   aiskills skills add :root -s prodigy -g -y  # = npx skills add ${ROOT} -s prodigy -g -y
 
@@ -139,7 +154,10 @@ Environment:
 const split = (v) => (v ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
 function parse(argv, allowed) {
-  const opts = { ...envOptions(), purge: false, force: false, dryRun: false, yes: false, json: false };
+  const opts = {
+    ...envOptions(), purge: false, force: false, dryRun: false, yes: false, json: false,
+    path: undefined, format: undefined, output: undefined, baseline: undefined, llm: false, failOnFindings: false,
+  };
   // Values from the command line replace the env defaults, then accumulate.
   const seen = new Set();
   const add = (key, v) => {
@@ -162,6 +180,12 @@ function parse(argv, allowed) {
     else if ((a === "-s" || a === "--skill") && ok("skill")) add("skills", args[++i]);
     else if ((a === "-G" || a === "--group" || a === "--groups") && ok("group")) add("groups", args[++i]);
     else if (a === "--json" && ok("json")) opts.json = true;
+    else if ((a === "--format" || (a === "-f" && allowed.includes("format"))) && ok("format")) opts.format = args[++i];
+    else if ((a === "-o" || a === "--output") && ok("output")) opts.output = args[++i];
+    else if ((a === "-b" || a === "--baseline") && ok("baseline")) opts.baseline = args[++i];
+    else if (a === "--llm" && ok("llm")) opts.llm = true;
+    else if (a === "--fail-on-findings" && ok("failOnFindings")) opts.failOnFindings = true;
+    else if (!a.startsWith("-") && allowed.includes("path") && opts.path === undefined) opts.path = a;
     else if (a === "--route" && ok("route")) opts.route = true;
     else if ((a === "--nested" || a === "--flat") && ok("layout")) opts.layout = a.slice(2);
     else if ((a === "--stats" || a === "--no-stats") && ok("stats")) opts.stats = a === "--stats";
@@ -171,7 +195,7 @@ function parse(argv, allowed) {
     else if ((a === "-n" || a === "--dry-run") && ok("dryRun")) opts.dryRun = true;
     else if ((a === "-y" || a === "--yes") && ok("yes")) opts.yes = true;
     else throw new Error(`unknown option: ${a}`);
-    if (["-a", "--agent", "-s", "--skill", "-G", "--group", "--groups"].includes(a) && args[i] === undefined) {
+    if (["-a", "--agent", "-s", "--skill", "-G", "--group", "--groups", "-f", "--format", "-o", "--output", "-b", "--baseline"].includes(a) && args[i] === undefined) {
       throw new Error(`${a} needs a value`);
     }
   }
@@ -381,6 +405,11 @@ function main() {
     }
     case "list":
       return skillsAdd(syncSkills({ version }), { list: true });
+    case "scan": {
+      const opts = parse(rest, ["path", "format", "output", "baseline", "llm", "failOnFindings", "dryRun"]);
+      const path = opts.path ?? (existsSync(join(ROOT, "skills")) ? join(ROOT, "skills") : "skills");
+      return scan({ ...opts, path, extra: opts.extra });
+    }
     case "path":
     case "p":
       console.log(ROOT);

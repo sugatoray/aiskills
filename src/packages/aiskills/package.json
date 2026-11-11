@@ -34,6 +34,7 @@
     "bin/",
     "src/scripts/core/cli.mjs",
     "src/scripts/core/installer.mjs",
+    "src/scripts/core/scan.mjs",
     "skills/",
     ".claude-plugin/marketplace.json",
     ".aiskills/",
