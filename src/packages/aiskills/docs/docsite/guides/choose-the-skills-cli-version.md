@@ -2,7 +2,7 @@
 
 Use this when you need a different release of the `skills` CLI than the one `aiskills` pins, or when npm's release-age rule (`min-release-age`, `before`) refuses the pinned one.
 
-Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, still works but is deprecated.
+Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, still works but is deprecated, and is removed in 1.0.0.
 
 ## Steps
 

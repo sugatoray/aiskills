@@ -314,7 +314,7 @@ Environment:
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
-                                (AISKILLS_SKILLS_VERSION, its old name, still works but is deprecated)
+                                (AISKILLS_SKILLS_VERSION, its old name, still works until 1.0.0)
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```

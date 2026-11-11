@@ -491,7 +491,7 @@ a count fails.
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route` |
 | `AISKILLS_SKILLS_LIB_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version). Also `latest`, `next`, an npm range (`~1.7.4`) or an interval (one of `...`, `?` or `*` is an open end): `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`. With a range, npm picks the newest version its rules (e.g. `min-release-age`) allow |
-| `AISKILLS_SKILLS_VERSION` | Deprecated old name of `AISKILLS_SKILLS_LIB_VERSION`; still works, with a warning |
+| `AISKILLS_SKILLS_VERSION` | Deprecated old name of `AISKILLS_SKILLS_LIB_VERSION`; still works, with a warning, and is removed in 1.0.0 |
 | `npm_config_min_release_age`, `npm_config_before` | npm's release-age rule, passed on to `npx`: `npm_config_min_release_age=0 aiskills installed` relaxes it for one run |
 | `AISKILLS_STATS=0\|1` | Same as `--no-stats` / `--stats` for one command, not remembered (see [The skills.sh install count](#the-skillssh-install-count)) |
 | `AISKILLS_STATS_FOREGROUND=1` | Wait for the skills.sh count and show its output |

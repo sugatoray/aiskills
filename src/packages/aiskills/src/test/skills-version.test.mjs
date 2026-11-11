@@ -160,7 +160,7 @@ describe("aiskills with AISKILLS_SKILLS_LIB_VERSION", () => {
     const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
     assert.equal(r.status, 0, r.out);
     for (const c of r.calls) assert.equal(skillsPackage(c), "skills@<=1.7.6");
-    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated: use AISKILLS_SKILLS_LIB_VERSION \(the version of the skills CLI library, not of the bundled skills\)/);
+    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1\.0\.0: use AISKILLS_SKILLS_LIB_VERSION \(the version of the skills CLI library, not of the bundled skills\)/);
     assert.equal(r.out.split("is deprecated").length - 1, 1, "warned once");
     assert.match(r.out, /using skills@<=1\.7\.6 from AISKILLS_SKILLS_VERSION, not the tested/);
   });
@@ -178,6 +178,12 @@ describe("aiskills with AISKILLS_SKILLS_LIB_VERSION", () => {
     assert.equal(r.status, 1);
     assert.match(r.out, /AISKILLS_SKILLS_VERSION must be a version/);
     assert.deepEqual(r.calls, []);
+  });
+
+  test("the docs say the old name is removed in 1.0.0", () => {
+    for (const page of ["docs/docsite/reference/environment.md", "CHANGELOG.md", "README.md"]) {
+      assert.match(readFileSync(join(PKG_SRC, page), "utf8"), /AISKILLS_SKILLS_VERSION[\s\S]{0,400}?removed in 1\.0\.0/, page);
+    }
   });
 
   test("no announcement for the pinned version, set or not", () => {

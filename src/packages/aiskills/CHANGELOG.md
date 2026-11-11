@@ -60,8 +60,9 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 - **`AISKILLS_SKILLS_VERSION` is now `AISKILLS_SKILLS_LIB_VERSION`.** The old
   name read as if it set the version of the bundled skills; it sets the
   version of the `skills` CLI library that `npx` runs. The old name still
-  works, with a warning (`AISKILLS_SKILLS_VERSION is deprecated: use
-  AISKILLS_SKILLS_LIB_VERSION ...`); the new one wins when both are set.
+  works, with a warning (`AISKILLS_SKILLS_VERSION is deprecated and will be
+  removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION ...`); the new one wins
+  when both are set. `AISKILLS_SKILLS_VERSION` will be removed in 1.0.0.
 
 ### Changed
 

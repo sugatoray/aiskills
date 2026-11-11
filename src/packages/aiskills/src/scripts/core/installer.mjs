@@ -167,7 +167,7 @@ export const quote = (a) => (/[\s*'"<>|&;()$`]/.test(a) ? `'${a.replace(/'/g, "'
 export const SKILLS_CLI_VERSION = "1.7.6";
 /** The variable that overrides it ("LIB": the skills CLI library, not the bundled skills). */
 export const SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_LIB_VERSION";
-/** Its name in 0.4.0 - 0.5.0; still read, with a deprecation warning. */
+/** Its name in 0.4.0 - 0.5.0; still read, with a deprecation warning, until 1.0.0 removes it. */
 export const OLD_SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_VERSION";
 
 // npm range grammar, limited to version characters: comparators (<, <=, >, >=,
@@ -248,7 +248,7 @@ export function skillsPackageSpec() {
   const old = process.env[OLD_SKILLS_LIB_VERSION_VAR]?.trim();
   if (old && !deprecationShown) {
     deprecationShown = true;
-    warn(`${OLD_SKILLS_LIB_VERSION_VAR} is deprecated: use ${SKILLS_LIB_VERSION_VAR} (the version of the skills CLI library, not of the bundled skills)`);
+    warn(`${OLD_SKILLS_LIB_VERSION_VAR} is deprecated and will be removed in 1.0.0: use ${SKILLS_LIB_VERSION_VAR} (the version of the skills CLI library, not of the bundled skills)`);
   }
   const name = current ? SKILLS_LIB_VERSION_VAR : OLD_SKILLS_LIB_VERSION_VAR;
   const spec = skillsVersionSpec(current || old || SKILLS_CLI_VERSION, name);

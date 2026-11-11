@@ -63,7 +63,7 @@ The version of the `skills` CLI library that every `npx` call runs (not the vers
 
 ### `AISKILLS_SKILLS_VERSION`
 
-Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
+Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning, and is removed in 1.0.0; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
 
 ## Read by `npx skills`, passed through
 

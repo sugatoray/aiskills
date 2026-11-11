@@ -1939,7 +1939,7 @@ See also: [CLI reference](../reference/cli.md) · [Errors and exit codes](../ref
 
 Use this when you need a different release of the `skills` CLI than the one `aiskills` pins, or when npm's release-age rule (`min-release-age`, `before`) refuses the pinned one.
 
-Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, still works but is deprecated.
+Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, still works but is deprecated, and is removed in 1.0.0.
 
 ## Steps
 
@@ -2716,7 +2716,7 @@ Environment:
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
-                                (AISKILLS_SKILLS_VERSION, its old name, still works but is deprecated)
+                                (AISKILLS_SKILLS_VERSION, its old name, still works until 1.0.0)
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```
@@ -2963,7 +2963,7 @@ The version of the `skills` CLI library that every `npx` call runs (not the vers
 
 ### `AISKILLS_SKILLS_VERSION`
 
-Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
+Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning, and is removed in 1.0.0; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
 
 ## Read by `npx skills`, passed through
 
@@ -3426,10 +3426,10 @@ Install <n> external skill(s) from the registry? [y/N] n
 ### `AISKILLS_SKILLS_VERSION` is deprecated
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION is deprecated: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
+[aiskills] AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
 ```
 
-**Cause:** a warning, not an error: the old name of the variable is set (it still works; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
+**Cause:** a warning, not an error: the old name of the variable is set (it still works until 1.0.0; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). From 1.0.0 it's ignored, so the pinned version would run instead. **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
 
 ### `skills` CLI version overridden
 

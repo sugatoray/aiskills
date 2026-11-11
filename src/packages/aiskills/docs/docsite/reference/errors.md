@@ -274,10 +274,10 @@ Install <n> external skill(s) from the registry? [y/N] n
 ### `AISKILLS_SKILLS_VERSION` is deprecated
 
 ```text
-[aiskills] AISKILLS_SKILLS_VERSION is deprecated: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
+[aiskills] AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
 ```
 
-**Cause:** a warning, not an error: the old name of the variable is set (it still works; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
+**Cause:** a warning, not an error: the old name of the variable is set (it still works until 1.0.0; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). From 1.0.0 it's ignored, so the pinned version would run instead. **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
 
 ### `skills` CLI version overridden
 
