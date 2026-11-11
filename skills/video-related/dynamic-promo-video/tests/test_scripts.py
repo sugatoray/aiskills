@@ -72,6 +72,11 @@ class TimingTest(unittest.TestCase):
             self.assertIn("const NB = [0, 4.5, 9.25];", html)
             self.assertNotIn("OB.slice()", html)
 
+    def test_scene_without_narration_keeps_its_length(self):
+        nb, starts = self.t.plan([0, 4, 9, 14], [5.0, None, 1.0])
+        self.assertEqual(nb, [0, 5.7, 10.7, 15.7])
+        self.assertEqual(starts, [0.3, None, 11.0])
+
     def test_boundaries_must_increase(self):
         with self.assertRaises(ValueError):
             self.t.plan([0, 4, 4], [1.0, 1.0])
@@ -140,6 +145,14 @@ class ElevenLabsTTSTest(unittest.TestCase):
         self.assertTrue(all(c[1] == "TABZn6CDfjMNGrsnGzzD" for c in self.calls))
         for i in range(3):
             self.assertTrue(os.path.exists(os.path.join(self.d, f"vo{i}.mp3")))
+
+    def test_dash_line_is_a_scene_without_narration(self):
+        with open(self.script, "w") as f:
+            f.write("One.\n-\nThree.\n")
+        self.main()
+        self.assertEqual([c[0] for c in self.calls], ["One.", "Three."])
+        self.assertTrue(os.path.exists(os.path.join(self.d, "vo2.mp3")), "clips are numbered by scene")
+        self.assertFalse(os.path.exists(os.path.join(self.d, "vo1.mp3")))
 
     def test_voice_override(self):
         self.main("--voice", "abc123")
@@ -299,25 +312,27 @@ class DemoTest(unittest.TestCase):
             for f in ("demo_final.mp4", "demo_silent.mp4", "thumbnail.png", "music.wav"):
                 self.assertTrue(os.path.exists(os.path.join(d, f)), f)
             self.assertFalse(any(f.startswith("vo") for f in os.listdir(d)))
-            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 32, delta=0.6)
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 48, delta=0.6)
 
     def test_narrated_demo_from_clips(self):
         with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:
-            for i in range(6):  # scene 6 gets a long clip, so the video must stretch
-                secs = 7 if i == 5 else 2
+            for i in range(8):  # scene 9 has no narration; scene 8 gets a long clip, so it must stretch
+                secs = 8 if i == 7 else 2
                 run("ffmpeg", "-v", "error", "-f", "lavfi", "-i", f"anullsrc=r=44100:cl=mono",
                     "-t", str(secs), os.path.join(clips, f"vo{i}.mp3"))
             out = self.demo(d, "--clips-dir", clips)
             self.assertIn("narrated", out)
             with open(os.path.join(d, "index.html")) as f:
-                m = re.search(r"const NB = \[0, 4, 9, 15, 22, 27, (34\.7\d*)\];", f.read())
-            self.assertIsNotNone(m, "last scene stretched to ~34.7s (7s clip + padding)")
-            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 34.7, delta=0.6)
+                m = re.search(r"const NB = \[0, 4, 9, 15, 21, 26, 31, 36, (44\.7\d*), (49\.7\d*)\];", f.read())
+            self.assertIsNotNone(m, "install scene stretched to ~8.7s (8s clip + padding); silent last scene keeps 5s")
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 49.7, delta=0.6)
 
-    def test_demo_page_shows_the_skill_and_its_install_routes(self):
+    def test_demo_page_is_the_placeholder_video_then_the_skill(self):
         with open(os.path.join(SKILL, "assets", "demo", "index.html")) as f:
             html = f.read()
-        for text in ("dynamic-promo-video", "sugatoray/aiskills",
+        for text in ("One line that says what it does.", "github.com/owner/repo",  # the placeholder video comes first
+                     "placeholder", "Make a video like this for your project",
+                     "dynamic-promo-video", "sugatoray/aiskills",
                      "npx skills add sugatoray/aiskills --skill dynamic-promo-video",
                      "/plugin marketplace add sugatoray/aiskills",
                      "/plugin install video-related-skills@sugatoray",
@@ -326,13 +341,14 @@ class DemoTest(unittest.TestCase):
             self.assertIn(text, html)
         with open(os.path.join(SKILL, "assets", "demo", "narration.txt")) as f:
             lines = [l for l in f if l.strip() and not l.startswith("#")]
-        self.assertEqual(len(lines), 6, "one narration line per demo scene")
+        self.assertEqual(len(lines), 9, "one narration line per demo scene")
+        self.assertEqual(lines[-1].strip(), "-", "the last scene has no narration")
 
     def test_needs_all_clips(self):
         with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:
             r = run(sys.executable, os.path.join(SCRIPTS, "demo.py"), "--out-dir", d, "--clips-dir", clips)
             self.assertNotEqual(r.returncode, 0)
-            self.assertIn("need 6 clips", r.stderr)
+            self.assertIn("missing: vo0.mp3", r.stderr)
 
 
 if __name__ == "__main__":

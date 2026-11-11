@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <title>dynamic-promo-video demo</title>
 <!--
-  The --demo page: the template's engine with scenes about the
-  /dynamic-promo-video skill itself (sugatoray/aiskills). Used by scripts/demo.py.
+  The --demo page. Scenes 1-6 are the generic template, unchanged: a
+  placeholder for the viewer's own video. Scenes 7-9 then show how to make such
+  a video with /dynamic-promo-video from sugatoray/aiskills. Used by scripts/demo.py.
   Deterministic scene engine for dynamic-promo-video.
   - Every element's look is a pure function of time t (seconds): window.setT(t).
   - No CSS animations/transitions and no real-time clocks: scripts/render.js
@@ -80,10 +81,6 @@
   .step-card .t { font-size: 28px; font-weight: 700; margin-top: 10px; }
   .step-card .d { font-size: 20px; color: var(--muted); margin-top: 10px; line-height: 1.4; }
 
-  /* product: real code in the window */
-  .code { margin: 0; padding: 26px 32px; font-family: var(--mono); font-size: 19px; line-height: 1.65; color: var(--fg); white-space: pre; }
-  .code .k { color: #ff7b72; } .code .f { color: #d2a8ff; } .code .c { color: var(--muted); } .code .s { color: #a5d6ff; }
-
   /* install: three routes */
   .inst-title { position: absolute; top: 46px; width: 100%; text-align: center; }
   .inst-sub { position: absolute; top: 118px; width: 100%; text-align: center; font-size: 22px; color: var(--muted); }
@@ -95,8 +92,16 @@
   .route-line .prompt { color: var(--accent2); }
   .rcur { display: inline-block; width: 13px; height: 27px; background: var(--fg); vertical-align: -4px; }
 
+  /* bridge */
+  .ph-note { font-size: 24px; color: var(--muted); font-family: var(--mono); margin-bottom: 26px; }
+  .ph-note b { color: var(--accent2); font-weight: 600; }
+  /* get started (skill) */
+  .gs-steps { display: flex; gap: 18px; margin-top: 30px; }
+  .gs-step { background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 14px 20px; font-size: 21px; text-align: left; }
+  .gs-step .n { color: var(--accent); font-weight: 700; margin-right: 8px; }
+  .gs-cmds { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; align-items: stretch; text-align: left; font-family: var(--mono); font-size: 24px; }
+
   /* end card */
-  #s-end .end-cmds { align-items: stretch; text-align: left; }
   .end-cmds { margin-top: 34px; display: flex; flex-direction: column; gap: 14px; font-family: var(--mono); font-size: 26px; }
   .end-cmd { background: var(--card); border: 1px solid #30363d; border-radius: 10px; padding: 12px 22px; }
   .end-link { margin-top: 28px; font-size: 24px; color: var(--accent); }
@@ -113,19 +118,18 @@
 <div id="stage">
   <!-- 1. cover: fully visible at t=0 (it is the thumbnail) -->
   <section class="scene" id="s-cover"><div class="center">
-    <div class="logo" id="cover-logo">▶</div>
-    <h1 id="cover-title"><span class="accent">/</span>dynamic-promo-video</h1>
-    <p class="sub" id="cover-sub">Narrated promo videos, built from code.</p>
-    <p class="sub" style="font-size:22px;margin-top:26px;font-family:var(--mono)">sugatoray/aiskills</p>
+    <div class="logo" id="cover-logo">P</div>
+    <h1 id="cover-title">Project<span class="accent">Name</span></h1>
+    <p class="sub" id="cover-sub">One line that says what it does.</p>
   </div></section>
 
   <!-- 2. the problem -->
   <section class="scene" id="s-problem"><div class="center">
-    <h2 id="prob-title">Promo videos are slow to make</h2>
+    <h2 id="prob-title">The problem</h2>
     <div class="pain-list">
-      <div class="pain-item"><b>✕</b> Hours in a video editor</div>
-      <div class="pain-item"><b>✕</b> Stale after every release</div>
-      <div class="pain-item"><b>✕</b> Voiceover and music lined up by hand</div>
+      <div class="pain-item"><b>✕</b> First real pain point</div>
+      <div class="pain-item"><b>✕</b> Second real pain point</div>
+      <div class="pain-item"><b>✕</b> Third real pain point</div>
     </div>
   </div></section>
 
@@ -135,37 +139,65 @@
       <div class="window">
         <div class="window-bar"><i style="background:#f85149"></i><i style="background:#d29922"></i><i style="background:#3fb950"></i></div>
         <div class="viewport">
-          <pre class="shot code" id="shot"><span class="c">// index.html: every frame is a pure function of t</span>
-<span class="k">const</span> OB = [<span class="s">0, 4, 9, 15, 22, 27, 32</span>];  <span class="c">// authored scenes</span>
-<span class="k">const</span> NB = OB.<span class="f">slice</span>();               <span class="c">// retimed to the voice</span>
-
-<span class="k">function</span> <span class="f">warp</span>(tt) {
-  <span class="k">for</span> (<span class="k">let</span> i = <span class="s">1</span>; i &lt; NB.length; i++)
-    <span class="k">if</span> (tt &lt;= NB[i]) <span class="k">return</span> <span class="f">lerp</span>(OB[i-1], OB[i],
-      (tt - NB[i-1]) / (NB[i] - NB[i-1]));
-}
-
-<span class="k">function</span> <span class="f">draw</span>(t) {
-  <span class="c">// camera: tilt, zoom, scroll</span>
-  cam.style.transform =
-    <span class="s">`rotateY(${ry}deg) scale(${sc})`</span>;
-  <span class="c">// typing effect</span>
-  cmd.textContent = <span class="f">typed</span>(line, t, a, b);
-}
-
-window.<span class="f">setT</span> = (tt) =&gt; <span class="f">draw</span>(<span class="f">warp</span>(tt));
-
-<span class="c">// render.js: setT(i / 24), screenshot, repeat</span>
-<span class="c">// ffmpeg: frames -&gt; demo_silent.mp4</span>
-<span class="c">// mix.py: voice + ducked music -&gt; demo_final.mp4</span></pre>
+          <div class="shot shot-ph" id="shot">
+            <div class="row" style="width:60%"></div><div class="row" style="width:85%"></div>
+            <div class="row hl" style="width:45%"></div><div class="row" style="width:75%"></div>
+            <div class="row" style="width:90%"></div><div class="row" style="width:55%"></div>
+            <div class="row hl" style="width:70%"></div><div class="row" style="width:80%"></div>
+            <div class="row" style="width:65%"></div><div class="row" style="width:88%"></div>
+            <div class="row" style="width:50%"></div><div class="row hl" style="width:62%"></div>
+            <div class="row" style="width:77%"></div><div class="row" style="width:83%"></div>
+            <div class="row" style="width:58%"></div><div class="row" style="width:72%"></div>
+            <div class="row" style="width:66%"></div><div class="row" style="width:90%"></div>
+          </div>
         </div>
       </div>
     </div></div>
-    <div class="caption" id="prod-cap"><span>Every scene is HTML, rendered frame by frame.</span></div>
+    <div class="caption" id="prod-cap"><span>What the product does, in one short line.</span></div>
   </section>
 
-  <!-- 4. install: three routes -->
+  <!-- 4. install -->
   <section class="scene" id="s-install">
+    <div class="term"><div class="window-bar"><i style="background:#f85149"></i><i style="background:#d29922"></i><i style="background:#3fb950"></i></div>
+      <div class="term-body"><span class="prompt">$ </span><span id="type1"></span><span class="cursor" id="cur1"></span><br><span class="out" id="out1">✔ installed project-name</span></div>
+    </div>
+    <div class="pm-badges">
+      <div class="pm-badge" id="b1"><svg><use href="#ic-box"/></svg>package manager</div>
+      <div class="pm-badge" id="b2"><svg><use href="#ic-term"/></svg>CLI</div>
+      <div class="pm-badge" id="b3"><svg><use href="#ic-code"/></svg>editor</div>
+    </div>
+  </section>
+
+  <!-- 5. usage -->
+  <section class="scene" id="s-usage">
+    <h2 style="position:absolute;top:100px;width:100%;text-align:center" id="use-title">How you use it</h2>
+    <div class="steps">
+      <div class="step-card" id="st1"><div class="n">01</div><div class="t">Step one</div><div class="d">Short, real description.</div></div>
+      <div class="step-card" id="st2"><div class="n">02</div><div class="t">Step two</div><div class="d">Short, real description.</div></div>
+      <div class="step-card" id="st3"><div class="n">03</div><div class="t">Step three</div><div class="d">Short, real description.</div></div>
+    </div>
+  </section>
+
+  <!-- 6. end card -->
+  <section class="scene" id="s-end"><div class="center">
+    <h2 id="end-title">Get started</h2>
+    <div class="end-cmds">
+      <div class="end-cmd" id="ec1"><span class="prompt">$ </span>install command one</div>
+      <div class="end-cmd" id="ec2"><span class="prompt">$ </span>install command two</div>
+    </div>
+    <div class="end-link" id="end-link">github.com/owner/repo</div>
+  </div></section>
+
+  <!-- 7. bridge: the video so far was a placeholder -->
+  <section class="scene" id="s-bridge"><div class="center">
+    <div class="ph-note" id="br-note">↑ that was a <b>placeholder</b> for your video</div>
+    <div class="logo" id="br-logo">▶</div>
+    <h2 id="br-title">Make a video like this for your project</h2>
+    <p class="sub" id="br-sub"><span class="accent">/</span>dynamic-promo-video · <span style="font-family:var(--mono)">sugatoray/aiskills</span></p>
+  </div></section>
+
+  <!-- 8. install the skill: three routes -->
+  <section class="scene" id="s-skill-install">
     <h2 class="inst-title" id="inst-title">Install</h2>
     <div class="inst-sub" id="inst-sub">from <span style="font-family:var(--mono);color:var(--fg)">sugatoray/aiskills</span> · pick one route</div>
     <div class="routes">
@@ -180,24 +212,19 @@ window.<span class="f">setT</span> = (tt) =&gt; <span class="f">draw</span>(<spa
     </div>
   </section>
 
-  <!-- 5. usage -->
-  <section class="scene" id="s-usage">
-    <h2 style="position:absolute;top:100px;width:100%;text-align:center" id="use-title">How you use it</h2>
-    <div class="steps">
-      <div class="step-card" id="st1"><div class="n">01</div><div class="t">Ask for a video</div><div class="d"><code>/dynamic-promo-video</code> make a launch video for your repo.</div></div>
-      <div class="step-card" id="st2"><div class="n">02</div><div class="t">Add a voice</div><div class="d"><code>--voice</code> narrates with ElevenLabs; scenes stretch to fit.</div></div>
-      <div class="step-card" id="st3"><div class="n">03</div><div class="t">Get the MP4</div><div class="d">Rendered, mixed and checked: video, audio and a cover image.</div></div>
+  <!-- 9. get started with the skill -->
+  <section class="scene" id="s-skill-start"><div class="center">
+    <h2 id="gs-title">Get started</h2>
+    <div class="gs-steps">
+      <div class="gs-step" id="gs1"><span class="n">1</span>Install the skill</div>
+      <div class="gs-step" id="gs2"><span class="n">2</span>Ask for a video</div>
+      <div class="gs-step" id="gs3"><span class="n">3</span>Add <code>--voice</code> for narration</div>
     </div>
-  </section>
-
-  <!-- 6. end card -->
-  <section class="scene" id="s-end"><div class="center">
-    <h2 id="end-title">Get started</h2>
-    <div class="end-cmds">
-      <div class="end-cmd" id="ec1"><span class="prompt">$ </span>npx skills add sugatoray/aiskills --skill dynamic-promo-video</div>
-      <div class="end-cmd" id="ec2"><span class="prompt">&gt; </span>/dynamic-promo-video --demo --voice</div>
+    <div class="gs-cmds">
+      <div class="end-cmd" id="gc1"><span class="prompt">&gt; </span>/dynamic-promo-video make a launch video for &lt;your repo&gt;</div>
+      <div class="end-cmd" id="gc2"><span class="prompt">&gt; </span>/dynamic-promo-video --demo --voice</div>
     </div>
-    <div class="end-link" id="end-link">github.com/sugatoray/aiskills</div>
+    <div class="end-link" id="gs-link">github.com/sugatoray/aiskills</div>
   </div></section>
 </div>
 
@@ -226,7 +253,7 @@ const typed = (str, t, a, b) => str.slice(0, Math.round(str.length * seg(t, a, b
 // OB: authored scene boundaries (animation below is written in this time).
 // NB: real boundaries, e.g. from scripts/timing.py once the voice clips exist.
 // Keep both the same length; until you retime, NB = OB.
-const OB = [0, 4, 9, 15, 22, 27, 32];
+const OB = [0, 4, 9, 15, 21, 26, 31, 36, 43, 48];
 const NB = OB.slice();
 window.DURATION = NB[NB.length - 1];
 
@@ -247,6 +274,9 @@ const SC = [
   ["s-install", OB[3], OB[4]],
   ["s-usage",   OB[4], OB[5]],
   ["s-end",     OB[5], OB[6]],
+  ["s-bridge",        OB[6], OB[7]],
+  ["s-skill-install", OB[7], OB[8]],
+  ["s-skill-start",   OB[8], OB[9]],
 ];
 const XF = 0.5;
 function sceneOpacity(t, a, b, first, last) {
@@ -285,25 +315,14 @@ function draw(t) {
   $("shot").style.transform = `translateY(${-kf(t, [[s2 + 1, 0], [s2 + 4, 120], [e2, 260]])}px)`;
   tf($("prod-cap"), seg(t, s2 + 0.6, s2 + 1.2));
 
-  // 4. install: three routes, typed one after another
+  // 4. install: typing + blinking cursor + badges
   const s3 = OB[3];
-  tf($("inst-title"), seg(t, s3 + 0.1, s3 + 0.6));
-  tf($("inst-sub"), seg(t, s3 + 0.3, s3 + 0.8));
-  const lines = [
-    ["r1l1", "npx skills add sugatoray/aiskills --skill dynamic-promo-video", 0.6, 1.8],
-    ["r2l1", "/plugin marketplace add sugatoray/aiskills", 2.1, 2.9],
-    ["r2l2", "/plugin install video-related-skills@sugatoray", 2.95, 3.75],
-    ["r3l1", "npm install -g @sugatoray-ai/aiskills", 4.05, 4.75],
-    ["r3l2", "aiskills install -s dynamic-promo-video", 4.8, 5.5],
-  ];
-  lines.forEach(([id, str, a, b]) => { $(id).textContent = typed(str, t, s3 + a, s3 + b); });
-  tf($("r1"), seg(t, s3 + 0.4, s3 + 0.8), 16);
-  tf($("r2"), seg(t, s3 + 1.9, s3 + 2.3), 16);
-  tf($("r3"), seg(t, s3 + 3.85, s3 + 4.25), 16);
-  const blink = Math.floor(t * 2) % 2 === 0 ? 1 : 0;
-  $("r1c").style.opacity = t < s3 + 2.1 ? (t < s3 + 1.8 ? 1 : blink) : 0;
-  $("r2c").style.opacity = t >= s3 + 2.1 && t < s3 + 4.05 ? (t < s3 + 3.75 ? 1 : blink) : 0;
-  $("r3c").style.opacity = t >= s3 + 4.05 ? (t < s3 + 5.5 ? 1 : blink) : 0;
+  const cmd = "npm install project-name";
+  $("type1").textContent = typed(cmd, t, s3 + 0.6, s3 + 2.4);
+  const typing = t > s3 + 0.6 && t < s3 + 2.4;
+  $("cur1").style.opacity = typing || Math.floor(t * 2) % 2 === 0 ? 1 : 0;
+  tf($("out1"), seg(t, s3 + 2.7, s3 + 3.1), 8);
+  ["b1", "b2", "b3"].forEach((id, i) => tf($(id), seg(t, s3 + 3.2 + i * 0.3, s3 + 3.7 + i * 0.3)));
 
   // 5. usage
   const s4 = OB[4];
@@ -316,6 +335,41 @@ function draw(t) {
   tf($("ec1"), seg(t, s5 + 0.8, s5 + 1.3));
   tf($("ec2"), seg(t, s5 + 1.1, s5 + 1.6));
   tf($("end-link"), seg(t, s5 + 1.6, s5 + 2.1));
+
+  // 7. bridge
+  const s6 = OB[6];
+  tf($("br-note"), seg(t, s6 + 0.1, s6 + 0.6), 12);
+  tf($("br-logo"), seg(t, s6 + 0.5, s6 + 1.0));
+  tf($("br-title"), seg(t, s6 + 0.7, s6 + 1.3));
+  tf($("br-sub"), seg(t, s6 + 1.1, s6 + 1.7));
+
+  // 8. install the skill: three routes, typed one after another
+  const s7 = OB[7];
+  tf($("inst-title"), seg(t, s7 + 0.1, s7 + 0.6));
+  tf($("inst-sub"), seg(t, s7 + 0.3, s7 + 0.8));
+  const lines = [
+    ["r1l1", "npx skills add sugatoray/aiskills --skill dynamic-promo-video", 0.6, 1.8],
+    ["r2l1", "/plugin marketplace add sugatoray/aiskills", 2.1, 2.9],
+    ["r2l2", "/plugin install video-related-skills@sugatoray", 2.95, 3.75],
+    ["r3l1", "npm install -g @sugatoray-ai/aiskills", 4.05, 4.75],
+    ["r3l2", "aiskills install -s dynamic-promo-video", 4.8, 5.5],
+  ];
+  lines.forEach(([id, str, a, b]) => { $(id).textContent = typed(str, t, s7 + a, s7 + b); });
+  tf($("r1"), seg(t, s7 + 0.4, s7 + 0.8), 16);
+  tf($("r2"), seg(t, s7 + 1.9, s7 + 2.3), 16);
+  tf($("r3"), seg(t, s7 + 3.85, s7 + 4.25), 16);
+  const blink = Math.floor(t * 2) % 2 === 0 ? 1 : 0;
+  $("r1c").style.opacity = t < s7 + 2.1 ? (t < s7 + 1.8 ? 1 : blink) : 0;
+  $("r2c").style.opacity = t >= s7 + 2.1 && t < s7 + 4.05 ? (t < s7 + 3.75 ? 1 : blink) : 0;
+  $("r3c").style.opacity = t >= s7 + 4.05 ? (t < s7 + 5.5 ? 1 : blink) : 0;
+
+  // 9. get started with the skill
+  const s8 = OB[8];
+  tf($("gs-title"), seg(t, s8 + 0.1, s8 + 0.6));
+  ["gs1", "gs2", "gs3"].forEach((id, i) => tf($(id), seg(t, s8 + 0.5 + i * 0.3, s8 + 1.0 + i * 0.3), 18));
+  tf($("gc1"), seg(t, s8 + 1.5, s8 + 2.0));
+  tf($("gc2"), seg(t, s8 + 1.8, s8 + 2.3));
+  tf($("gs-link"), seg(t, s8 + 2.3, s8 + 2.8));
 }
 
 window.setT = function (tt) { draw(warp(tt)); };

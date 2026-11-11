@@ -3,6 +3,22 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.0] - 2026-11-11
+
+### Changed
+
+- `--demo` is now the template video as a placeholder for the viewer's own
+  video (scenes 1-6, unchanged, with the original narration), followed by how
+  to make one with the skill: a bridge ("that was a placeholder"), the three
+  install routes from `sugatoray/aiskills`, and get started (music only). 48s.
+
+### Added
+
+- Scenes without narration: a narration line `-` (and `-` in `timing.py
+  --clips` / `--durations`) keeps the scene's authored length with no voice;
+  `tts_elevenlabs.py` skips it and numbers clips by scene.
+- Tests for scenes without narration and for the new demo structure.
+
 ## [1.4.2] - 2026-11-11
 
 ### Changed

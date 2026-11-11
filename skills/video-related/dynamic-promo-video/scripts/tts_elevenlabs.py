@@ -11,7 +11,8 @@ references/voiceover.md); this script is not needed then.
     python3 tts_elevenlabs.py --script narration.txt --dry-run       # show the plan, spend nothing
 
 narration.txt: one line per scene, in scene order (blank lines and lines
-starting with # are skipped). Writes vo0.mp3, vo1.mp3, ... to --out-dir.
+starting with # are skipped; a line `-` is a scene with no narration). Writes
+vo0.mp3, vo1.mp3, ... to --out-dir, numbered by scene.
 
 Every request costs credits, so: an existing clip is never regenerated unless
 --force names it, and a failed request is reported, not retried.
@@ -65,6 +66,8 @@ def main(argv=None):
 
     plan = []
     for i, text in enumerate(lines):
+        if text == "-":  # scene without narration
+            continue
         out = os.path.join(a.out_dir, f"{a.prefix}{i}.mp3")
         skip = os.path.exists(out) and i not in force
         plan.append((i, text, out, skip))

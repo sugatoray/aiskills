@@ -6,10 +6,11 @@
     python3 demo.py --clips-dir clips/               # narrated with clips made elsewhere
                                                      # (e.g. by the ElevenLabs MCP connector)
 
-The demo is assets/demo/index.html: six scenes about the /dynamic-promo-video
-skill itself (what it is, how it works, the three ways to install it from
-sugatoray/aiskills), with an energetic synthesized track. With a voice, the lines in assets/demo/narration.txt are
-spoken (one per scene) and the scenes are stretched to fit them.
+The demo is assets/demo/index.html: the generic template's six placeholder
+scenes (standing in for the viewer's own video), then three scenes on how to
+make such a video with /dynamic-promo-video from sugatoray/aiskills (a bridge,
+the three install routes, get started), with an energetic synthesized track. With a voice, the lines in assets/demo/narration.txt are
+spoken (one per scene; `-` = no narration) and scenes are stretched to fit them.
 
 Output in --out-dir (default ./promo-demo): index.html, thumbnail.png,
 demo_silent.mp4, music.wav, vo*.mp3 (if narrated), demo_final.mp4, check/.
@@ -27,6 +28,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 PAGE = os.path.join(SKILL, "assets", "demo", "index.html")
 NARRATION = os.path.join(SKILL, "assets", "demo", "narration.txt")
+
+
+def read_narration(path):
+    with open(path, encoding="utf-8") as f:
+        return [ln.strip() for ln in f if ln.strip() and not ln.lstrip().startswith("#")]
 
 
 def page_ob(path):
@@ -71,16 +77,20 @@ def main(argv=None):
     total = OB[-1]
 
     if voiced:
+        lines = read_narration(NARRATION)
+        if len(lines) != scenes:
+            sys.exit(f"demo.py: {NARRATION} has {len(lines)} lines for {scenes} scenes")
+        clips = ["-" if text == "-" else f"vo{i}.mp3" for i, text in enumerate(lines)]
         if a.clips_dir:
-            clips = sorted(glob.glob(os.path.join(a.clips_dir, "vo*.mp3")))
-            if len(clips) != scenes:
-                sys.exit(f"demo.py: need {scenes} clips vo0.mp3..vo{scenes - 1}.mp3 in {a.clips_dir}, found {len(clips)}")
+            missing = [c for c in clips if c != "-" and not os.path.exists(os.path.join(a.clips_dir, c))]
+            if missing:
+                sys.exit(f"demo.py: need {len(clips) - clips.count('-')} clips in {a.clips_dir}; missing: {', '.join(missing)}")
             for c in clips:
-                shutil.copy(c, out)
+                if c != "-":
+                    shutil.copy(os.path.join(a.clips_dir, c), out)
         else:
             step(f"narration (ElevenLabs voice {a.voice_id})",
                  py("tts_elevenlabs.py", "--script", NARRATION, "--voice", a.voice_id, "--out-dir", out), out)
-        clips = [f"vo{i}.mp3" for i in range(scenes)]
         print("== retime scenes to the narration", flush=True)
         r = subprocess.run(py("timing.py", "--authored", ",".join(f"{x:g}" for x in OB), "--clips", *clips,
                               "--write-html", "index.html", "--json"), cwd=out, capture_output=True, text=True)
@@ -88,7 +98,7 @@ def main(argv=None):
             sys.exit(f"demo.py: timing failed: {r.stderr.strip()}")
         plan = json.loads(r.stdout)
         total = plan["total"]
-        voices = [arg for s, c in zip(plan["starts"], clips) for arg in ("--voice", f"{s:g}:{c}")]
+        voices = [arg for s, c in zip(plan["starts"], clips) if s is not None for arg in ("--voice", f"{s:g}:{c}")]
         print(f"   scenes: {plan['NB']}  total {total:g}s")
 
     step("render frames + silent video",

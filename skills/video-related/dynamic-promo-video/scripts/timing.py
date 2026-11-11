@@ -11,7 +11,8 @@ is never sped up.
 
 Prints the `const NB = [...]` line for index.html, each clip's start time, the
 total duration, and the matching `--voice START:FILE` arguments for mix.py.
-Use --json for machine-readable output. --write-html index.html replaces the
+A clip or duration of `-` marks a scene with no narration (it keeps its
+authored length). Use --json for machine-readable output. --write-html index.html replaces the
 page's `const NB = ...;` line with the new boundaries.
 """
 import argparse
@@ -38,6 +39,10 @@ def numbers(s):
     return [float(x) for x in s.split(",") if x.strip()]
 
 
+def durations_arg(s):
+    return [None if x.strip() == "-" else float(x) for x in s.split(",") if x.strip()]
+
+
 def plan(authored, durations, pad_before=0.3, pad_after=0.4):
     if len(authored) != len(durations) + 1:
         raise ValueError(f"need one clip per scene: {len(authored) - 1} scenes, {len(durations)} clips")
@@ -46,8 +51,12 @@ def plan(authored, durations, pad_before=0.3, pad_after=0.4):
     nb = [authored[0]]
     starts = []
     for i, d in enumerate(durations):
-        length = max(authored[i + 1] - authored[i], pad_before + d + pad_after)
-        starts.append(round(nb[-1] + pad_before, 3))
+        if d is None:  # no narration in this scene
+            length = authored[i + 1] - authored[i]
+            starts.append(None)
+        else:
+            length = max(authored[i + 1] - authored[i], pad_before + d + pad_after)
+            starts.append(round(nb[-1] + pad_before, 3))
         nb.append(round(nb[-1] + length, 3))
     return nb, starts
 
@@ -76,7 +85,7 @@ def main(argv=None):
     a = p.parse_args(argv)
 
     authored = numbers(a.authored)
-    durations = [probe_duration(c) for c in a.clips] if a.clips else numbers(a.durations)
+    durations = [None if c == "-" else probe_duration(c) for c in a.clips] if a.clips else durations_arg(a.durations)
     try:
         nb, starts = plan(authored, durations, a.pad_before, a.pad_after)
     except ValueError as e:
@@ -93,9 +102,12 @@ def main(argv=None):
     print(f"const NB = [{fmt(nb)}];   // paste into index.html (OB = [{fmt(authored)}])")
     print(f"total duration: {nb[-1]:g}s")
     for i, (s, d, n) in enumerate(zip(starts, durations, names)):
+        if d is None:
+            print(f"scene {i + 1}: {nb[i]:g}-{nb[i + 1]:g}s  (no narration)")
+            continue
         stretched = " (stretched)" if nb[i + 1] - nb[i] > authored[i + 1] - authored[i] + 1e-9 else ""
         print(f"scene {i + 1}: {nb[i]:g}-{nb[i + 1]:g}s  voice {n} at {s:g}s ({d:.2f}s){stretched}")
-    print("mix.py args: " + " ".join(f"--voice {s:g}:{n}" for s, n in zip(starts, names)))
+    print("mix.py args: " + " ".join(f"--voice {s:g}:{n}" for s, n in zip(starts, names) if s is not None))
 
 
 if __name__ == "__main__":
