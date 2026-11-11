@@ -77,6 +77,28 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
   });
 });
 
+describe("skillsVersionSpec: only plain spaces separate range parts", () => {
+  test("tabs, newlines and Unicode spaces between parts are refused", () => {
+    for (const v of [
+      "1.7.4\n1.7.5", "1.7.4\r\n<1.8.0", ">=1.7.4\t<1.8.0", ">=1.7.4\u2028<1.8.0", ">=1.7.4\u00a0<1.8.0",
+      ">=1.7.4\u3000<1.8.0", "1.7.4\n-\n1.7.6", "~1.7.4\n||\n2.x", "[1.7.4,\t1.8.0)", "(...,\n1.7.6]", "(\u00a0?, 1.7.6]",
+    ]) {
+      assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_VERSION/, JSON.stringify(v));
+    }
+  });
+
+  test("plain spaces still work, and a value's leading/trailing whitespace is trimmed (never passed on)", () => {
+    assert.equal(skillsVersionSpec(">=1.7.4  <1.8.0"), ">=1.7.4  <1.8.0");
+    assert.equal(skillsVersionSpec("[ 1.7.4 ,  1.8.0 )"), ">=1.7.4 <1.8.0");
+    assert.equal(skillsVersionSpec("  1.7.6\n"), "1.7.6");
+  });
+
+  test("a typographic ellipsis (as autocorrect makes it) is read as \"...\", and lookalike digits are refused", () => {
+    assert.equal(skillsVersionSpec("(…, 1.7.6]"), "<=1.7.6");
+    for (const v of ["(…?, 1.7.6]", "１.7.6", "(…, １.7.6]"]) assert.throws(() => skillsVersionSpec(v), /AISKILLS_SKILLS_VERSION/, v);
+  });
+});
+
 describe("cmdArgs: npx arguments for cmd.exe on Windows", () => {
   test("wraps a range's package spec in double quotes, where cmd.exe treats < > | ^ as text", () => {
     assert.deepEqual(cmdArgs(["-y", "skills@>=1.7.4 <1.8.0", "add", "C:\\Users\\Jane Doe\\x", "--yes"]), [
@@ -120,6 +142,31 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
     assert.equal(r.status, 1);
     assert.match(r.out, /AISKILLS_SKILLS_VERSION/);
     assert.deepEqual(r.calls, []);
+  });
+
+  test("an override is announced once per command, even where npx's command isn't printed", () => {
+    const NOTE = "[aiskills] using skills@<=1.7.6 from AISKILLS_SKILLS_VERSION, not the tested " + SKILLS_CLI_VERSION;
+    const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
+    assert.equal(r.status, 0, r.out);
+    assert.equal(r.out.split(NOTE).length - 1, 1, r.out);
+    sb.setList([]);
+    const ls = sb.run(["installed"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
+    assert.ok(ls.out.includes(NOTE), ls.out);
+    const dry = sb.run(["install", "-n"], { env: { AISKILLS_SKILLS_VERSION: "latest" } });
+    assert.ok(dry.out.includes("[aiskills] using skills@latest from AISKILLS_SKILLS_VERSION, not the tested " + SKILLS_CLI_VERSION), dry.out);
+  });
+
+  test("no announcement for the pinned version, set or not", () => {
+    for (const env of [{}, { AISKILLS_SKILLS_VERSION: SKILLS_CLI_VERSION }]) {
+      const r = sb.run(["install"], { env });
+      assert.doesNotMatch(r.out, /from AISKILLS_SKILLS_VERSION/, JSON.stringify(env));
+    }
+  });
+
+  test("the docs say a typographic … is read as ...", () => {
+    for (const page of ["docs/docsite/guides/choose-the-skills-cli-version.md", "docs/docsite/reference/environment.md"]) {
+      assert.match(readFileSync(join(PKG_SRC, page), "utf8"), /typographic `…`[^.]*is read as `\.\.\.`/, page);
+    }
   });
 
   test("--help documents AISKILLS_SKILLS_VERSION with its forms", () => {

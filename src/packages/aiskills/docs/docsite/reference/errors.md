@@ -269,7 +269,15 @@ Install <n> external skill(s) from the registry? [y/N] n
 [aiskills] AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
 ```
 
-**Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
+**Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax, tabs, line breaks or Unicode spaces between a range's parts, and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
+
+### `skills` CLI version overridden
+
+```text
+[aiskills] using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6
+```
+
+**Cause:** a notice, not an error: `AISKILLS_SKILLS_VERSION` is set to something other than the pinned version, so `npx` runs a `skills` CLI nobody tested with `aiskills`. **Fix:** if you didn't set it, look for it in your shell profile, a project's `.envrc`/`.env`, or CI variables, and unset it.
 
 ### Empty `AISKILLS_SKILLS_VERSION` interval
 

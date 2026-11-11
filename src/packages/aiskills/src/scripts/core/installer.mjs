@@ -171,14 +171,16 @@ const PART = "(?:0|[1-9]\\d*|[xX*])";
 const PRE = "(?:-[0-9A-Za-z.-]+)?";
 const VER = `v?${PART}(?:\\.${PART}){0,2}${PRE}`;
 const COMPARATOR = `(?:[<>]=?|=|~|\\^)?${VER}`;
-const SET = `(?:${VER}\\s+-\\s+${VER}|${COMPARATOR}(?:\\s+${COMPARATOR})*)`;
-const NPM_RANGE = new RegExp(`^${SET}(?:\\s*\\|\\|\\s*${SET})*$`);
+// Parts are separated by plain ASCII spaces only: tabs, newlines and Unicode
+// spaces would be passed to npx (and on Windows to cmd.exe) as typed.
+const SET = `(?:${VER} +- +${VER}|${COMPARATOR}(?: +${COMPARATOR})*)`;
+const NPM_RANGE = new RegExp(`^${SET}(?: *\\|\\| *${SET})*$`);
 // Interval notation: [x, ...) >=x, (x, ...) >x, [x, y) >=x <y, (..., x] <=x,
 // and the other mixes of [ ( ) ]. Exactly one of "...", "?" or "*" is an open
 // end, never a combination like "?*" (plain ASCII, so it types the same in
 // every shell and Windows console); "…" is read as "...".
 const BOUND = "(\\d+(?:\\.\\d+){0,2}|\\.\\.\\.|\\?|\\*|…)";
-const INTERVAL = new RegExp(`^([\\[(])\\s*${BOUND}\\s*,\\s*${BOUND}\\s*([\\])])$`);
+const INTERVAL = new RegExp(`^([\\[(]) *${BOUND} *, *${BOUND} *([\\])])$`);
 const OPEN = new Set(["...", "?", "*", "…"]);
 
 /** Compare two dotted numeric versions, padding missing parts with 0. */
@@ -224,9 +226,21 @@ export function skillsVersionSpec(input) {
   throw bad();
 }
 
-/** "skills@<version or range>" for npx; throws on a malformed AISKILLS_SKILLS_VERSION. */
+let announced = false;
+
+/**
+ * "skills@<version or range>" for npx; throws on a malformed
+ * AISKILLS_SKILLS_VERSION. When it overrides the pinned version, says so once
+ * per command (next to the `running: npx ...` lines), so a downgrade set by a profile, .envrc or CI
+ * variable can't happen silently.
+ */
 export function skillsPackageSpec() {
-  return `skills@${skillsVersionSpec(process.env.AISKILLS_SKILLS_VERSION?.trim() || SKILLS_CLI_VERSION)}`;
+  const spec = skillsVersionSpec(process.env.AISKILLS_SKILLS_VERSION?.trim() || SKILLS_CLI_VERSION);
+  if (spec !== SKILLS_CLI_VERSION && !announced) {
+    announced = true;
+    log(`using skills@${spec} from AISKILLS_SKILLS_VERSION, not the tested ${SKILLS_CLI_VERSION}`);
+  }
+  return `skills@${spec}`;
 }
 
 // On Windows, npx.cmd has to run through cmd.exe, which interprets these.

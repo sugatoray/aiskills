@@ -154,8 +154,14 @@ Each of these has tests in `src/test/` (`npm test`).
   earlier). `AISKILLS_SKILLS_VERSION` overrides it with an exact version,
   `latest`, `next`, an npm range or interval notation (`[1.7.4, 1.8.0)`);
   a range lets npm pick a version nobody tested with `aiskills`. Values are
-  limited to version characters, so they can't name another package, a URL
-  or a path, or carry shell syntax; anything else is refused.
+  limited to version characters and plain spaces (no tabs, line breaks or
+  Unicode spaces), so they can't name another package, a URL or a path, or
+  carry shell syntax; anything else is refused. A typographic `…` in an
+  interval is read as `...`, and the npm range passed on is rebuilt from the
+  version numbers, so it never reaches `npx`. Whenever the variable
+  overrides the pin, every command says so once
+  (`using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6`),
+  so a downgrade set by a profile, `.envrc` or CI variable isn't silent.
 - **Registry text is checked before use.** Under `--route` / `aix`, an
   `owner/repo@skill` result from `npx skills find` is used only if every part
   is made of letters, digits, `.`, `_` and `-`. Other results are ignored with

@@ -34,8 +34,13 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   so `AISKILLS_SKILLS_VERSION='(..., 1.7.6]'` gets past a `min-release-age`
   rule that refuses the pinned version. The default stays the exact, tested
   `skills@1.7.6`. Values are still limited to version characters, and an
-  interval no version fits is refused. On Windows, the `skills@<range>`
-  argument is passed to `cmd.exe` in double quotes.
+  interval no version fits is refused. Only plain spaces may separate a
+  range's parts (tabs, line breaks and Unicode spaces are refused), and a
+  typographic `…` is read as `...`. Whenever it overrides the pinned
+  version, every command says so once:
+  `using skills@<spec> from AISKILLS_SKILLS_VERSION, not the tested 1.7.6`.
+  On Windows, the `skills@<range>` argument is passed to `cmd.exe` in double
+  quotes.
 - **npm's release-age rule is explained.** When `npx` fails with
   "No matching version found for skills@… with a date before …" (npm's
   `min-release-age` or `before`), `aiskills` says the `skills` CLI version is

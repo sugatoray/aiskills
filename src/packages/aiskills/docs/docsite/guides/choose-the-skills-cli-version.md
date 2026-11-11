@@ -14,6 +14,7 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
    ```
 
    ```text
+   [aiskills] using skills@latest from AISKILLS_SKILLS_VERSION, not the tested 1.7.6
    [aiskills] running: npx -y skills@latest --version
    ```
 
@@ -25,6 +26,7 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
    ```
 
    ```text
+   [aiskills] using skills@>=1.7.4 <1.8.0 from AISKILLS_SKILLS_VERSION, not the tested 1.7.6
    [aiskills] running: npx -y 'skills@>=1.7.4 <1.8.0' --version
    ```
 
@@ -48,7 +50,7 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
 | `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]`, `(*, 1.7.6]` | `<=1.7.6` | x or older |
 | `(..., x)` | `(..., 1.7.6)` | `<1.7.6` | Older than x |
 
-An open end is exactly one of `...` (three plain dots), `?` or `*`, and takes `(` or `)`. They can't be combined: `?*` or `*...` is refused. All three are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `*`, `<`, `>` and `|` mean something to it.
+An open end is exactly one of `...` (three plain dots), `?` or `*`, and takes `(` or `)`. They can't be combined: `?*` or `*...` is refused. A typographic `…`, as autocorrect makes it from three dots, is read as `...`. All three are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `*`, `<`, `>` and `|` mean something to it.
 
 Anything else is refused before `npx` runs, so a typo can't turn into a different package or a shell command:
 
@@ -61,7 +63,21 @@ AISKILLS_SKILLS_VERSION='1.7 && calc' aiskills find pdf
 [aiskills] AISKILLS_SKILLS_VERSION must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '1.7 && calc'
 ```
 
-An interval that no version fits, such as `[1.8.0, 1.7.0)`, is refused too.
+An interval that no version fits, such as `[1.8.0, 1.7.0)`, is refused too, and so are tabs, line breaks and non-ASCII spaces between the parts of a range: only plain spaces separate them, because a range is passed to `npx` (and on Windows to `cmd.exe`) as typed. Spaces or a line break at the very start or end are dropped.
+
+Whenever `AISKILLS_SKILLS_VERSION` overrides the pinned version, `aiskills` says so once per command, even for commands that don't print the `npx` command (`ls`, `find`):
+
+<!-- verify -->
+```bash
+AISKILLS_SKILLS_VERSION='(..., 1.7.6]' aiskills skills --version
+```
+
+```text
+[aiskills] using skills@<=1.7.6 from AISKILLS_SKILLS_VERSION, not the tested 1.7.6
+[aiskills] running: npx -y 'skills@<=1.7.6' --version
+```
+
+So a version set by a shell profile, a project's `.envrc` or a CI variable can't replace the tested one without a trace.
 
 On Windows, set it the way your shell quotes:
 
