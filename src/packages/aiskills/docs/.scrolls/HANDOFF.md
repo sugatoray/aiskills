@@ -33,7 +33,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 
 ## Known issues / open threads
 - **Next:** merge #161, then publish `0.7.0`: `npm run audit:skills`, `npm test` + `npm run test:e2e`, `npm run pack:dry`, `npm publish`, approve the staged release (`npm stage approve`), then update SPEC's release note. The 0.7.0 CHANGELOG section is dated 2026-11-11; re-date it if it ships later.
-- **Windows is untested:** run `aiskills skills --version` with `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` in PowerShell and `set "AISKILLS_SKILLS_LIB_VERSION=(..., 1.7.6]"` in Command Prompt before or soon after publishing 0.6.0.
+- **Windows is untested:** run `aiskills skills --version` with `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` in PowerShell and `set "AISKILLS_SKILLS_LIB_VERSION=(..., 1.7.6]"` in Command Prompt; 0.6.0 is out without that check.
 - **The user's `~/.npmrc`:** `skills` in their `min-release-age-exclude[]` line does nothing for `npx`; they can drop it.
 - **Awaiting the user:** delete the leftover remote branch `claude/focused-faraday-nqvduf` (its only commit is on `master`)? Should the bundled skills move from MIT too (repo-wide; not done)?
 - **1.0.0:** remove the `AISKILLS_SKILLS_VERSION` fallback (AIS-11).
