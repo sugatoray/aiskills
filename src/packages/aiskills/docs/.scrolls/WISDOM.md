@@ -67,6 +67,9 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **A pinned `skills` version younger than ~7 days breaks users with `min-release-age=7`** for every command that runs `npx` (hit with 1.7.6 on 0.5.0's release day). `npm run audit:skills` fails on that; run it before bumping `SKILLS_CLI_VERSION` and before publishing.
 - **The `skills@<range>` argument is the one exception to the Windows shell-character refusal:** `cmdArgs` wraps it in double quotes (cmd.exe reads `< > | ^` as text inside them). That's only safe because `skillsVersionSpec` limits it to version characters (no `% ! " & ( )`). Never widen that grammar without rechecking cmd.exe quoting. Not yet run on real Windows.
 
+- **Adding a bundled skill leaves hand-written lists stale while every test passes.** For `dynamic-promo-video` (#161) the tests forced the generated pages, banner counts and the `aiskills groups`/available-skills doc examples, but not the README's intro group list and group table, `docs/docsite/README.md` ("12 skills in 6 groups") or `concepts/skill-groups.md`'s table; they were caught only at the 0.7.0 bump. When a skill or group is added, grep the package for the old counts and for an existing group name (e.g. `personas-skills`) and update every hit.
+- **Check the registry before calling a version unpublished.** The scrolls said 0.6.0 was "not merged or published" after it had shipped as `latest`; `npm view @sugatoray-ai/aiskills versions dist-tags --json` settles it in one call.
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 
