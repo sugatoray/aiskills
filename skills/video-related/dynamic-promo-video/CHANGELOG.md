@@ -3,6 +3,16 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-11-11
+
+### Added
+
+- `--voice-elevenlabs=<voice-id>` input; default voice `TABZn6CDfjMNGrsnGzzD`.
+- Narration route selection: ElevenLabs MCP connector, else API key
+  (`scripts/tts_elevenlabs.py`), else a music-only video.
+- `scripts/tts_elevenlabs.py`: one clip per scene; `--dry-run`, skips existing
+  clips, `--force`, no retries, stops on 401/403/404.
+
 ## [1.1.0] - 2026-11-11
 
 ### Added

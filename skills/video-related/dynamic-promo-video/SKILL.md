@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.1.0"
+  version: "1.2.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -20,10 +20,17 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 | --- | --- |
 | Scenes | `assets/template/index.html` · details: [references/scene-engine.md](references/scene-engine.md) |
 | Real page screenshots | [references/screenshots.md](references/screenshots.md) |
-| Voiceover | [references/voiceover.md](references/voiceover.md) · `scripts/timing.py` |
+| Voiceover | [references/voiceover.md](references/voiceover.md) · `scripts/tts_elevenlabs.py`, `scripts/timing.py` |
 | Render + encode | `scripts/render.js` |
 | Music, mix | `scripts/music.py`, `scripts/mix.py` · [references/music-and-mix.md](references/music-and-mix.md) |
 | Check | `scripts/verify.py` |
+
+## Inputs
+- `--voice-elevenlabs=<voice-id>` (optional): the ElevenLabs voice for the narration. Default voice id: `TABZn6CDfjMNGrsnGzzD` (also used for a bare `--voice-elevenlabs`). A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
+- Narration uses ElevenLabs only if one route is available, checked in this order:
+  1. the **ElevenLabs MCP connector** (its `creative_generate_speech` tool can be loaded with ToolSearch), or
+  2. an **API key**: `ELEVENLABS_API_KEY` is set, or the session's network secrets hold one for `api.elevenlabs.io` (then run `scripts/tts_elevenlabs.py`).
+- If neither is available, say so once, offer the user the choice to connect one or attach their own clips, and otherwise make a music-only video (skip timing.py; no `--voice` in mix.py). Never invent a voice id and never fake narration.
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.
@@ -46,7 +53,12 @@ Copy `SKILL_DIR/assets/template/index.html` into the work folder and edit it: br
 ```bash
 node SKILL_DIR/scripts/render.js index.html --preview 0,6,12,17,23,29 --thumbnail thumbnail.png
 ```
-Look at the preview frames before going on. Then produce the voice clips (see references/voiceover.md: one generation per scene, never re-run a paid generation) and retime:
+Look at the preview frames before going on. Then produce the voice clips with the voice from **Inputs** (details in references/voiceover.md; one generation per scene, never re-run a paid generation). With an API key:
+```bash
+python3 SKILL_DIR/scripts/tts_elevenlabs.py --script narration.txt --voice <voice-id> --dry-run   # check the plan first
+python3 SKILL_DIR/scripts/tts_elevenlabs.py --script narration.txt --voice <voice-id>
+```
+With the MCP connector, call `creative_generate_speech` once per scene with that `voice_id`. Then retime:
 ```bash
 python3 SKILL_DIR/scripts/timing.py --authored 0,4,9,15,21,26,31 --clips vo0.mp3 vo1.mp3 vo2.mp3 vo3.mp3 vo4.mp3 vo5.mp3
 ```

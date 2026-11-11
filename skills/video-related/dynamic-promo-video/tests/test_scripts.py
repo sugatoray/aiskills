@@ -7,6 +7,7 @@ Tests that need ffmpeg, numpy, Node or Playwright are skipped when those are
 missing. The pipeline test renders the real template (about 2s of frames).
 """
 import importlib.util
+import json
 import os
 import shutil
 import subprocess
@@ -95,6 +96,92 @@ class MixCommandTest(unittest.TestCase):
     def test_nothing_to_mix_is_an_error(self):
         with self.assertRaises(ValueError):
             self.m.build_command("v.mp4", "o.mp4", [])
+
+
+class ElevenLabsTTSTest(unittest.TestCase):
+    """No real requests: synthesize() is replaced by a fake."""
+
+    def setUp(self):
+        self.tts = load("tts_elevenlabs")
+        self.dir = tempfile.TemporaryDirectory()
+        self.d = self.dir.name
+        self.script = os.path.join(self.d, "narration.txt")
+        with open(self.script, "w") as f:
+            f.write("# scene lines\nFirst line.\n\nSecond line here.\nThird.\n")
+        self.calls = []
+
+        def fake(text, voice, model, fmt, key, timeout=120):
+            self.calls.append((text, voice, model, fmt, key))
+            return b"ID3fake"
+        self.tts.synthesize = fake
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def main(self, *args):
+        self.tts.main(["--script", self.script, "--out-dir", self.d, *args])
+
+    def test_default_voice(self):
+        self.assertEqual(self.tts.DEFAULT_VOICE, "TABZn6CDfjMNGrsnGzzD")
+        self.main()
+        self.assertEqual([c[0] for c in self.calls], ["First line.", "Second line here.", "Third."])
+        self.assertTrue(all(c[1] == "TABZn6CDfjMNGrsnGzzD" for c in self.calls))
+        for i in range(3):
+            self.assertTrue(os.path.exists(os.path.join(self.d, f"vo{i}.mp3")))
+
+    def test_voice_override(self):
+        self.main("--voice", "abc123")
+        self.assertTrue(all(c[1] == "abc123" for c in self.calls))
+
+    def test_existing_clips_are_not_regenerated_unless_forced(self):
+        self.main()
+        self.calls.clear()
+        self.main()
+        self.assertEqual(self.calls, [])
+        self.main("--force", "1")
+        self.assertEqual([c[0] for c in self.calls], ["Second line here."])
+
+    def test_dry_run_spends_nothing(self):
+        self.main("--dry-run")
+        self.assertEqual(self.calls, [])
+        self.assertFalse(os.path.exists(os.path.join(self.d, "vo0.mp3")))
+
+    def test_unknown_voice_stops_without_retry(self):
+        import io
+        import urllib.error
+
+        def fail(*a, **k):
+            self.calls.append(a)
+            raise urllib.error.HTTPError("u", 404, "voice not found", {}, io.BytesIO(b"voice_not_found"))
+        self.tts.synthesize = fail
+        with self.assertRaises(SystemExit):
+            self.main("--voice", "nope")
+        self.assertEqual(len(self.calls), 1, "stops after the first 404")
+
+    def test_api_key_is_sent_as_header(self):
+        import urllib.request
+        seen = {}
+
+        class Resp:
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return b"ID3"
+
+        def fake_urlopen(req, timeout=0):
+            seen["url"] = req.full_url
+            seen["key"] = req.get_header("Xi-api-key")
+            seen["body"] = json.loads(req.data)
+            return Resp()
+        orig = urllib.request.urlopen
+        urllib.request.urlopen = fake_urlopen
+        try:
+            tts = load("tts_elevenlabs")
+            self.assertEqual(tts.synthesize("Hi.", "v1", "m1", "mp3_44100_128", "k"), b"ID3")
+        finally:
+            urllib.request.urlopen = orig
+        self.assertEqual(seen["url"], "https://api.elevenlabs.io/v1/text-to-speech/v1?output_format=mp3_44100_128")
+        self.assertEqual(seen["key"], "k")
+        self.assertEqual(seen["body"], {"text": "Hi.", "model_id": "m1"})
 
 
 @unittest.skipUnless(HAS_NUMPY, "numpy not installed")

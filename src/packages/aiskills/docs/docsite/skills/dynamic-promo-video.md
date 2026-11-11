@@ -5,7 +5,7 @@ Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, mus
 | Property | Value |
 | --- | --- |
 | Group | `video-related-skills` (alias `video-related`) |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Starts | When you type `/dynamic-promo-video`, or your agent uses it when a task fits its description |
 | License | MIT |
 | Source | [skills/video-related/dynamic-promo-video](https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video) |
@@ -57,6 +57,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/dyna
 - `scripts/music.py`
 - `scripts/render.js`
 - `scripts/timing.py`
+- `scripts/tts_elevenlabs.py`
 - `scripts/verify.py`
 - `tests/test_scripts.py`
 
