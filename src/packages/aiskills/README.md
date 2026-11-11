@@ -142,6 +142,8 @@ aiskills install -s scrolls-setup,scrolls-help # only these skills
 aiskills install --project                     # into the current project
 aiskills install --group scrolls --global --agent claude-code
 aiskills install -n -G stata                   # preview: what would be installed, and the commands
+aiskills install -i                            # pick skills and agents from a list (npx skills' own pickers)
+aiskills install -l                            # only the agents you picked last time (--last-agents)
 aiskills sync                                  # only save the skills; don't register them
 ```
 

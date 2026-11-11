@@ -21,7 +21,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```json
 {
   "package": "@sugatoray-ai/aiskills",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "layout": "flat",
   "installedAt": "2026-11-06T10:26:01.152Z",
   "skills": "/home/me/.config/sugatoray/aiskills/skills"

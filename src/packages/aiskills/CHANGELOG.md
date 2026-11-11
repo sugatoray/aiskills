@@ -20,6 +20,11 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-11
+
+Interactive installs: pick the skills and agents from a list, or reuse the
+agents you picked last time.
+
 ### Added
 
 - **`aiskills install -i` / `--interactive`**: runs `npx skills add` without
@@ -355,6 +360,10 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.8.0]: https://github.com/sugatoray/aiskills/pull/184
+[0.7.0]: https://github.com/sugatoray/aiskills/pull/161
+[0.6.0]: https://github.com/sugatoray/aiskills/pull/162
+[0.5.0]: https://github.com/sugatoray/aiskills/pull/155
 [0.4.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.3.0]: https://github.com/sugatoray/aiskills/pull/122
 [0.2.0]: https://github.com/sugatoray/aiskills/pull/122

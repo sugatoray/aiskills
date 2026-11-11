@@ -3,7 +3,7 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-`@sugatoray-ai/aiskills` **`0.7.0` is published on npm** (dist-tag `latest`; `0.4.0`–`0.6.0` before it; checked with `npm view` on 2026-11-11): `npm install -g @sugatoray-ai/aiskills`, then `aiskills install`. It bundles **13 skills in 7 groups** (#161 merged to `master`). Source in `src/packages/aiskills/`. **Open:** [#184](https://github.com/sugatoray/aiskills/pull/184) (`claude/happy-ramanujan-yf66t0`, AIS-13) adds `install -i`/`--interactive` and `install --last-agents`, under CHANGELOG `[Unreleased]`, `package.json` still `0.7.0`. On that branch `npm test` runs 348 offline tests, all pass. Docs live at https://sugatoray.github.io/aiskills/, redeployed by `.github/workflows/aiskills-docs.yml` on pushes to `master`.
+`@sugatoray-ai/aiskills` **`0.7.0` is published on npm** (dist-tag `latest`; `0.4.0`–`0.6.0` before it; checked with `npm view` on 2026-11-11): `npm install -g @sugatoray-ai/aiskills`, then `aiskills install`. It bundles **13 skills in 7 groups** (#161 merged to `master`). Source in `src/packages/aiskills/`. **Open:** [#184](https://github.com/sugatoray/aiskills/pull/184) (`claude/happy-ramanujan-yf66t0`, AIS-13) adds `install -i`/`--interactive` and `install --last-agents`, and bumps the package to **`0.8.0`** (CHANGELOG `## [0.8.0] - 2026-11-11`, SECURITY supported `0.8.x`, banner v0.8.0, docs version examples). On that branch `npm test` runs 350 offline tests, all pass. Docs live at https://sugatoray.github.io/aiskills/, redeployed by `.github/workflows/aiskills-docs.yml` on pushes to `master`.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -33,7 +33,8 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **Docs refresh** (create-lib-docs `--update`, by hand): tutorial 02 (`-i`, `-l` with verified output), FAQ "which agents", `use-from-an-agent` (no `-i` in scripts), installation, landing page (`video` group was missing from the intro). `docs.test.mjs` examples take a new `last=a,b` param (writes `~/.agents/.skill-lock.json`). `npm run docs` + `banner:png` rerun; banner unchanged. 350 tests pass.
 
 ## Known issues / open threads
-- **Next:** merge #184; the user decides the bump (`0.8.0`, MINOR per the CHANGELOG rules), then publish: `npm run audit:skills`, `npm test` + `npm run test:e2e`, `npm run pack:dry`, `npm publish`, `npm stage approve`, update SPEC's release note.
+- **0.8.0 bump done in #184** (the user's request): `package.json`, CHANGELOG (also added link refs for 0.5.0–0.8.0), SECURITY, README install examples (`-i`, `-l`), `reference/cli.md`/`files.md`/`installation.md` version output; `npm run docs` + `banner:png` regenerated.
+- **Next:** merge #184, then publish `0.8.0`: `npm run audit:skills`, `npm test` + `npm run test:e2e`, `npm run pack:dry`, `npm publish`, `npm stage approve`, update SPEC's release note.
 - **Try `aiskills install -i` once by hand** on a real machine: the real pickers were never driven (see GAP_ANALYSIS). With `-p`, `npx skills` asks for the scope (no `--project` flag on `add`).
 - **Windows is untested:** run `aiskills skills --version` with `AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'` in PowerShell and `set "AISKILLS_SKILLS_LIB_VERSION=(..., 1.7.6]"` in Command Prompt.
 - **The user's `~/.npmrc`:** `skills` in their `min-release-age-exclude[]` line does nothing for `npx`; they can drop it.
