@@ -11,8 +11,8 @@
 //     what the page shows.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
 import { PKG_SRC, REPO_ROOT, sandbox, tempDir } from "./helpers.mjs";
@@ -235,6 +235,8 @@ describe("reference pages cover the code", () => {
  * `list=` sets what the stand-in `npx skills list --json` reports as installed
  * (a bare name comes from the install folder, owner/repo@name from GitHub);
  * `find=` sets the lines `npx skills find` prints.
+ * `last=` sets the agents `npx skills` recorded as last picked (`lastSelectedAgents`
+ * in ~/.agents/.skill-lock.json), for `install -l`; without it there is no lock file.
  */
 function examples() {
   const out = [];
@@ -332,6 +334,12 @@ describe("examples in the docs print what the docs show", () => {
           : { name: e, scope: "global", agents: ["Claude Code"], source: b.root, sourceType: "local" };
       });
       b.setList(rows);
+      const lock = join(b.home, ".agents", ".skill-lock.json");
+      rmSync(lock, { force: true });
+      if (ex.params.last) {
+        mkdirSync(dirname(lock), { recursive: true });
+        writeFileSync(lock, JSON.stringify({ version: 3, skills: {}, lastSelectedAgents: ex.params.last.split(",") }));
+      }
       b.setFind((ex.params.find ?? "").split(",").filter(Boolean).map((s) => `${s} 1.2K installs`).join("\n") + "\n");
       let out = "";
       for (const line of ex.commands) {

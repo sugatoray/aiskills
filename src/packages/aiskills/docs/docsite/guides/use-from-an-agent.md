@@ -32,6 +32,8 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    aiskills install -g -G scrolls -a claude-code
    ```
 
+   Don't pass `-i`: it waits for a person to pick from a list, and without a terminal it stops with exit `1`. `-l` (the agents last picked in `npx skills add`) runs without asking, but depends on what a person picked before; `-a` is more predictable.
+
 4. **Branch on the exit code**, not on the text:
 
    | Exit code | Meaning |

@@ -8,6 +8,10 @@ Answers to the questions people ask most, and fixes for the problems they hit.
 
 Every agent the `skills` CLI supports: Claude Code, Codex, Cursor, Qoder and many more. `aiskills` reads the list from `npx skills`, so a newer `skills` version brings new agents with no change here. Pass agent ids to `-a` (`claude-code`, `codex`, `cursor`, …).
 
+### Does `aiskills install` put the skills in every agent's folder?
+
+No, only in the agents `npx skills` detects: those whose folder already exists (such as `~/.claude` or `~/.codex`), plus the agents that share `~/.config/agents/skills`. Only when it detects none does it install for every agent it supports, creating a folder for each. To choose yourself, name agents with `-a`, pick them from a list with [`-i`](reference/cli.md#-i---interactive), or reuse your last pick with [`-l`](reference/cli.md#-l---last-agents). See [2. Pick skills and agents](tutorial/02-pick-skills-and-agents.md#pick-from-a-list--i).
+
 ### Where are the skills on my machine?
 
 The saved copy is in `~/.config/sugatoray/aiskills/skills/` (`aiskills path` prints the folder). `npx skills` installs them into each agent's own folder, such as `~/.claude/skills/`, or the project's folders with `-p`.

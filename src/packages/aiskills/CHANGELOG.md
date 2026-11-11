@@ -30,6 +30,12 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   picked in `npx skills add` (its `lastSelectedAgents`), instead of every
   agent it detects.
 
+### Changed
+
+- **Docs:** tutorial step 2 shows `-i` and `-l` (with verified output), the
+  FAQ answers which agents `aiskills install` installs for, the agent guide
+  warns against `-i` in scripts, and the landing page lists the `video` group.
+
 ## [0.7.0] - 2026-11-11
 
 ### Added
