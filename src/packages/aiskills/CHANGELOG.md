@@ -20,6 +20,31 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-11
+
+`aiskills upgrade`: one command to get the latest aiskills and update the
+skills your agents have.
+
+### Added
+
+- **`aiskills upgrade [<version>|<tag>]`**: installs the latest aiskills (or
+  the version or tag you name) with the package manager that installed it
+  globally (npm, pnpm, bun or yarn), then re-adds the skills installed from
+  the install folder, for the same agents, by running the new version, so
+  your agents get the new skills. Skills new in that version are listed (not
+  installed) with the commands to add them; skills it dropped are listed with
+  the command to remove them. Run through npx, as a project dependency or
+  from a source checkout, it says what to do instead. `--check` only says
+  whether an upgrade is available (exit `0`; `--json` for scripts),
+  `--no-refresh` upgrades the package only, `-n` shows the commands, and a
+  downgrade asks first (or needs `-y`).
+
+### Changed
+
+- The update hints of `aiskills releases` and `aiskills info --full` now say
+  `aiskills upgrade` instead of `npm install -g @sugatoray-ai/aiskills@latest`.
+- The FAQ's "How do I update the skills?" now answers `aiskills upgrade`.
+
 ## [0.8.0] - 2026-11-11
 
 Interactive installs (pick the skills and agents from a list, or reuse the
@@ -381,6 +406,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[0.9.0]: https://github.com/sugatoray/aiskills/pulls?q=head%3Aclaude%2Faiskills-upgrade-v0.9.0
 [0.8.0]: https://github.com/sugatoray/aiskills/pull/184
 [0.7.0]: https://github.com/sugatoray/aiskills/pull/161
 [0.6.0]: https://github.com/sugatoray/aiskills/pull/162

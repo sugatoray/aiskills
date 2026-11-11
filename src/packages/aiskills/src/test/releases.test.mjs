@@ -140,7 +140,7 @@ describe("releaseRows without publish times (a registry mirror that strips them)
       "  0.8.0    –",
       "",
       "publish dates: not reported by https://npm.corp.example/",
-      "update available: 0.9.0 → 0.10.0  (npm install -g @sugatoray-ai/aiskills@latest)",
+      "update available: 0.9.0 → 0.10.0  (aiskills upgrade)",
     ]);
   });
 
@@ -227,7 +227,7 @@ describe("renderReleases", () => {
       "  0.6.0    2026-11-11 (1 day ago)           ← installed",
       "  0.5.0    2026-11-09 (3 days ago)",
       "",
-      "update available: 0.6.0 → 0.7.0  (npm install -g @sugatoray-ai/aiskills@latest)",
+      "update available: 0.6.0 → 0.7.0  (aiskills upgrade)",
       "more: aiskills releases all",
     ]);
   });

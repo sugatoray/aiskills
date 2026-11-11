@@ -15,7 +15,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, write
 import { dirname, join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
-import { PKG_SRC, REPO_ROOT, SAMPLE_API, SAMPLE_VIEW, sandbox, tempDir } from "./helpers.mjs";
+import { DOCS_VIEW, PKG_SRC, REPO_ROOT, SAMPLE_API, sandbox, tempDir } from "./helpers.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const SKILL_SCRIPTS = join(REPO_ROOT, "skills", "docs", "create-lib-docs", "scripts");
@@ -236,7 +236,9 @@ describe("reference pages cover the code", () => {
  * (a bare name comes from the install folder, owner/repo@name from GitHub);
  * `find=` sets the lines `npx skills find` prints.
  * Every example sees the sample registry data and download counts in helpers.mjs
- * (SAMPLE_VIEW, SAMPLE_API), with AISKILLS_TODAY=2026-11-12.
+ * (DOCS_VIEW, SAMPLE_API), with AISKILLS_TODAY=2026-11-21.
+ * `version=` makes that example run with an older aiskills installed (for
+ * `aiskills upgrade`); the real version is put back afterwards.
  * `last=` sets the agents `npx skills` recorded as last picked (`lastSelectedAgents`
  * in ~/.agents/.skill-lock.json), for `install -l`; without it there is no lock file.
  */
@@ -293,7 +295,8 @@ function linesMatch(expected, actual) {
 describe("examples in the docs print what the docs show", () => {
   const box = { current: null };
   before(async () => {
-    box.current = sandbox({ realSkills: true, stats: true });
+    // Laid out like `npm install -g`, so `aiskills upgrade` examples work.
+    box.current = sandbox({ realSkills: true, stats: true, globalNpm: true });
     // `aiskills releases` / `info --full` examples: sample registry data and download counts.
     await box.current.startApi();
   });
@@ -328,6 +331,8 @@ describe("examples in the docs print what the docs show", () => {
   for (const ex of examples()) {
     test(`${ex.where}: ${ex.commands.filter((l) => !l.startsWith("#")).join(" ; ")}`, () => {
       const b = box.current;
+      const realVersion = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8")).version;
+      b.setVersion(ex.params.version ?? realVersion);
       // A fresh install folder for each example, as npm install leaves it.
       rmSync(b.root, { recursive: true, force: true });
       assert.equal(b.run(["sync"]).status, 0);
@@ -338,7 +343,7 @@ describe("examples in the docs print what the docs show", () => {
           : { name: e, scope: "global", agents: ["Claude Code"], source: b.root, sourceType: "local" };
       });
       b.setList(rows);
-      b.setView(SAMPLE_VIEW);
+      b.setView(DOCS_VIEW);
       b.setApi(SAMPLE_API);
       const lock = join(b.home, ".agents", ".skill-lock.json");
       rmSync(lock, { force: true });
@@ -352,7 +357,7 @@ describe("examples in the docs print what the docs show", () => {
         const text = line.replace(/\s+#.*$/, "").trim();
         if (!text || text.startsWith("#")) continue;
         const w = words(text);
-        const env = { AISKILLS_TODAY: "2026-11-12" };
+        const env = { AISKILLS_TODAY: "2026-11-21" };
         while (/^\w+=/.test(w[0])) {
           const [k, ...v] = w.shift().split("=");
           env[k] = v.join("=");
@@ -373,6 +378,7 @@ describe("examples in the docs print what the docs show", () => {
         .split("\n")
         .map((l) => l.trimEnd());
       while (actual.length && actual.at(-1) === "") actual.pop();
+      b.setVersion(realVersion);
       const expected = ex.expected.map((l) => l.trimEnd());
       assert.ok(
         linesMatch(expected, actual),

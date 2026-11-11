@@ -116,6 +116,7 @@ aiskills sync [--nested|--flat] [--stats|--no-stats]   # only refresh ~/.config/
 aiskills list                # list the skills available in the saved folder
 aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
 aiskills info [--full] [--json]   # this setup: versions, folders, settings and their sources (offline)
+aiskills upgrade [<version>|<tag>] [--check [--json]] [--no-refresh] [-n] [-y]   # install the latest aiskills, then update your agents' skills
 aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|--table] [--by day|week|month] [--ascii] [--json]   # latest releases on npm (alias: rel)
 ```
 

@@ -345,6 +345,60 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 **Cause:** [`AISKILLS_TODAY`](environment.md#aiskills_today) is set to something that isn't a real date. **Fix:** a date like `2026-11-12`, or unset it.
 
+## Upgrade
+
+### Can't upgrade
+
+```text
+[aiskills] can't upgrade: <how aiskills was run, and what to do>
+```
+
+**Cause:** this aiskills isn't a global install, so there's nothing for `upgrade` to replace. It was run through npx (`npx @sugatoray-ai/aiskills@latest install` gets the latest), is a project's dependency (`npm install -D @sugatoray-ai/aiskills@latest`; your lockfile pins it), or is a source checkout (`git pull`, or `npm install -g @sugatoray-ai/aiskills`). The message names which. **Fix:** the command it gives. `aiskills upgrade --check` still works.
+
+### No such version or tag
+
+```text
+[aiskills] no version or tag '<value>' of @sugatoray-ai/aiskills on the registry (see: aiskills releases all)
+```
+
+**Cause:** the `<version>` or `<tag>` given to `upgrade` isn't on the registry npm uses. If the registry reports no `latest` tag at all, the message is `the registry reports no latest version of @sugatoray-ai/aiskills`. **Fix:** pick one from `aiskills releases all`.
+
+### Downgrade not confirmed
+
+```text
+[aiskills] not downgrading <installed> → <target> without confirmation: re-run with -y
+```
+
+**Cause:** the target is older than the installed version (`--check` says `installed <version> is newer than <target>`), and there was no terminal to ask in (or the answer to `[y/N]` wasn't yes: `nothing changed: not confirmed`). **Fix:** add `-y` if you mean it.
+
+### Bad `upgrade` options
+
+```text
+[aiskills] --json only works with --check
+[aiskills] give one version or tag (got '<a>' and '<b>')
+```
+
+**Cause:** `--json` without `--check`, or two targets. **Fix:** `aiskills upgrade --check --json`; one target.
+
+### The package manager failed
+
+```text
+npm has no permission to write its global folder. Don't use sudo; give npm a folder you own:
+  npm config set prefix ~/.npm-global   (then add ~/.npm-global/bin to PATH and install aiskills again)
+```
+
+**Cause:** the global install failed; `upgrade` exits with its exit code and nothing else changes. A permission error (`EACCES`) gets the hint above; npm's release-age rule gets [its usual explanation](#npms-release-age-rule-blocked-the-skills-cli); if the package manager can't be started at all: `could not run <npm|pnpm|bun|yarn>: <reason>`. **Fix:** as shown; then run `aiskills upgrade` again.
+
+### Refresh warnings
+
+```text
+[aiskills] could not read 'npx skills list'; the skills won't be refreshed
+[aiskills] couldn't tell which agent '<name>' is; re-add its skills with: aiskills install -s <skills> -a <agent id>
+[aiskills] <npm> installed <version>, not <target>
+```
+
+**Cause:** after the upgrade, aiskills couldn't list what's installed (no network for `npx`), couldn't map an agent's display name to an id, or the package manager installed a different version than asked (a registry or mirror lagging behind). The upgrade itself succeeded. **Fix:** run the `aiskills install` command for the skills and agents shown (to see the agent ids, give `-a` a pattern that matches none: `aiskills install -a 'x*' -n` stops with `no agent matches` and lists every valid id).
+
 ## Running `npx skills`
 
 ### Bad `AISKILLS_SKILLS_LIB_VERSION`
