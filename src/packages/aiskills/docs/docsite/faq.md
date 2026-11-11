@@ -34,7 +34,7 @@ Don't: every sync replaces `~/.config/sugatoray/aiskills/skills/`. Copy a skill 
 
 ### `aiskills` fails with "No matching version found for skills@… with a date before …"
 
-Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and the `skills` CLI version `aiskills` runs is newer than it allows. `aiskills` prints the options after npm's error: wait, run once with `npm_config_min_release_age=0 aiskills <command>`, or set `AISKILLS_SKILLS_VERSION='(…, 1.7.6]'` so npm can fall back to an older version. See [When npm's release-age rule blocks the pinned version](guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
+Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and the `skills` CLI version `aiskills` runs is newer than it allows. `aiskills` prints the options after npm's error: wait, run once with `npm_config_min_release_age=0 aiskills <command>`, or set `AISKILLS_SKILLS_VERSION='(..., 1.7.6]'` so npm can fall back to an older version. See [When npm's release-age rule blocks the pinned version](guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 ### Why don't my installs show up on skills.sh?
 

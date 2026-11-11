@@ -31,7 +31,7 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
 3. Or set it for every command, in your shell profile:
 
    ```bash
-   export AISKILLS_SKILLS_VERSION='(…, 1.7.6]'
+   export AISKILLS_SKILLS_VERSION='(..., 1.7.6]'
    ```
 
 ## Variations
@@ -41,14 +41,14 @@ Every `npx` call that `aiskills` makes runs one tested version of the `skills` C
 | Exact version (the default) | `1.7.6`, `1.8.0-beta.1` | the same | Exactly this release |
 | Tag | `latest`, `next` | the same | Whatever the tag points at now |
 | npm range | `~1.7.4`, `^1.7.0`, `1.7.x`, `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `~1.7.4 \|\| 2.x` | the same | The newest version in the range |
-| `[x, …)` | `[1.7.4, …)` | `>=1.7.4` | x or newer |
-| `(x, …)` | `(1.7.4, …)` | `>1.7.4` | Newer than x |
+| `[x, ...)` | `[1.7.4, ...)`, `[1.7.4, ?)` | `>=1.7.4` | x or newer |
+| `(x, ...)` | `(1.7.4, ...)` | `>1.7.4` | Newer than x |
 | `[x, y)` | `[1.7.4, 1.8.0)` | `>=1.7.4 <1.8.0` | From x, up to but not including y |
 | `(x, y]`, `[x, y]` | `(1.7.0, 1.7.6]` | `>1.7.0 <=1.7.6` | `[`/`]` include the bound, `(`/`)` exclude it |
-| `(…, x]` | `(…, 1.7.6]` | `<=1.7.6` | x or older |
-| `(…, x)` | `(…, 1.7.6)` | `<1.7.6` | Older than x |
+| `(..., x]` | `(..., 1.7.6]`, `(?, 1.7.6]` | `<=1.7.6` | x or older |
+| `(..., x)` | `(..., 1.7.6)` | `<1.7.6` | Older than x |
 
-`…` and `...` both mean an open end, which takes `(` or `)`. Quote the value in your shell: brackets, `<`, `>` and `|` mean something to it.
+`...` (three plain dots) or `?` is an open end, which takes `(` or `)`. Both are plain ASCII, so they type the same in every shell and Windows console. Quote the value in your shell: brackets, `?`, `<`, `>` and `|` mean something to it.
 
 Anything else is refused before `npx` runs, so a typo can't turn into a different package or a shell command:
 
@@ -63,7 +63,17 @@ AISKILLS_SKILLS_VERSION='1.7 && calc' aiskills find pdf
 
 An interval that no version fits, such as `[1.8.0, 1.7.0)`, is refused too.
 
-On Windows, `npx` runs through `cmd.exe`. A range's package argument (`skills@>=1.7.4 <1.8.0`) is passed in double quotes, where `cmd.exe` reads `<`, `>`, `|` and `^` as plain text; every other argument still may not contain them.
+On Windows, set it the way your shell quotes:
+
+```powershell
+$env:AISKILLS_SKILLS_VERSION = '(..., 1.7.6]'   # PowerShell
+```
+
+```bat
+set "AISKILLS_SKILLS_VERSION=(..., 1.7.6]"      & rem Command Prompt: no single quotes, they'd become part of the value
+```
+
+Git Bash and WSL work like macOS and Linux. `npx` then runs through `cmd.exe`: a range's package argument (`skills@<=1.7.6`) is passed in double quotes, where `cmd.exe` reads `<`, `>`, `|` and `^` as plain text; every other argument still may not contain them.
 
 ## When npm's release-age rule blocks the pinned version
 
@@ -73,12 +83,12 @@ With `min-release-age=7` (or `before=<date>`) in your `.npmrc`, npm refuses a ve
 [aiskills] npm's release-age rule (min-release-age or before) blocked skills@1.7.6: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer.
 [aiskills]   - wait until it is old enough ('npm view skills time' shows when each version came out), or
 [aiskills]   - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or
-[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(…, 1.7.6]' (npm picks the newest it may)
+[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(..., 1.7.6]' (npm picks the newest it may)
 ```
 
 - **Wait.** The pinned version qualifies once it's old enough.
 - **Relax the rule for one run:** `npm_config_min_release_age=0 aiskills installed`. `aiskills` passes `npm_config_min_release_age`, `npm_config_min_release_age_exclude` and `npm_config_before` on to `npx`.
-- **Allow an older version:** `AISKILLS_SKILLS_VERSION='(…, 1.7.6]'` lets npm fall back to the newest version your rule allows.
+- **Allow an older version:** `AISKILLS_SKILLS_VERSION='(..., 1.7.6]'` lets npm fall back to the newest version your rule allows.
 
 `min-release-age-exclude[]=skills` in `.npmrc` doesn't help here: `npm install` honours it, but `npx` (npm 11.21 and 12.2 tested) ignores it.
 

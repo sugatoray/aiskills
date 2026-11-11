@@ -286,7 +286,7 @@ npm error notarget No matching version found for skills@1.7.6 with a date before
 [aiskills] npm's release-age rule (min-release-age or before) blocked skills@1.7.6: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer.
 [aiskills]   - wait until it is old enough ('npm view skills time' shows when each version came out), or
 [aiskills]   - relax the rule for one run: npm_config_min_release_age=0 aiskills <command>, or
-[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(…, 1.7.6]' (npm picks the newest it may)
+[aiskills]   - allow an older, untested skills CLI: AISKILLS_SKILLS_VERSION='(..., 1.7.6]' (npm picks the newest it may)
 ```
 
 **Cause:** your `.npmrc` (or environment) sets `min-release-age` or `before`, and the `skills` CLI version `aiskills` runs was published more recently. npm's `min-release-age-exclude` doesn't apply to `npx`. With a range in `AISKILLS_SKILLS_VERSION`, the last line instead suggests a wider range. **Fix:** one of the three lines; see [When npm's release-age rule blocks the pinned version](../guides/choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).

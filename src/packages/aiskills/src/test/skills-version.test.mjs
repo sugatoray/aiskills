@@ -1,8 +1,9 @@
 // Which `skills` CLI version npx runs, and living with npm's release-age rules.
 //
 // 1. AISKILLS_SKILLS_VERSION takes an exact version, "latest"/"next", an npm
-//    range (~1.7.4, 1.7.x, >=1.7.4 <1.8.0), or interval notation:
-//    [x, …) >=x   (x, …) >x   [x, y) >=x <y   (…, x] <=x   (and the other mixes).
+//    range (~1.7.4, 1.7.x, >=1.7.4 <1.8.0), or interval notation, where "..."
+//    or "?" is an open end (plain ASCII, so it types the same in every shell):
+//    [x, ...) >=x   (x, ?) >x   [x, y) >=x <y   (..., x] <=x   (and the other mixes).
 //    With a range, npm picks the newest version that its own rules allow, so a
 //    min-release-age setting no longer blocks aiskills while the pinned
 //    version is too new. The default stays the exact, tested pin.
@@ -35,15 +36,19 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
 
   test("interval notation becomes an npm range", () => {
     const cases = {
-      "[1.7.4, …)": ">=1.7.4",
       "[1.7.4, ...)": ">=1.7.4",
-      "(1.7.4, …)": ">1.7.4",
+      "[1.7.4, ?)": ">=1.7.4",
+      "(1.7.4, ...)": ">1.7.4",
+      "(1.7.4,?)": ">1.7.4",
       "[1.7.4, 1.8.0)": ">=1.7.4 <1.8.0",
       "[1.7.4,1.8.0)": ">=1.7.4 <1.8.0",
       "(1.7.0, 1.7.6]": ">1.7.0 <=1.7.6",
       "[1.7.4, 1.7.6]": ">=1.7.4 <=1.7.6",
-      "(…, 1.7.6]": "<=1.7.6",
-      "(…, 1.7.6)": "<1.7.6",
+      "(..., 1.7.6]": "<=1.7.6",
+      "(?, 1.7.6]": "<=1.7.6",
+      "(..., 1.7.6)": "<1.7.6",
+      "(?, 1.7.6)": "<1.7.6",
+      "(…, 1.7.6]": "<=1.7.6", // the Unicode ellipsis is still read as "..."
       "( 1.7 , 2 )": ">1.7 <2",
     };
     for (const [input, want] of Object.entries(cases)) assert.equal(skillsVersionSpec(input), want, input);
@@ -52,9 +57,10 @@ describe("skillsVersionSpec: AISKILLS_SKILLS_VERSION -> what npx is asked for", 
   test("anything else is refused, naming AISKILLS_SKILLS_VERSION", () => {
     for (const v of [
       "1.0 && calc", "1.7.6; rm -rf ~", "file:../skills", "github:vercel-labs/skills", "beta", "1.7.6 %PATH%",
-      "[1.7.4, …]", // an open end needs ")"
-      "[…, 1.7.6]", // an open start needs "("
-      "(…, …)", // no bounds at all: use "latest"
+      "[1.7.4, ...]", "[1.7.4, ?]", // an open end needs ")"
+      "[..., 1.7.6]", "[?, 1.7.6]", // an open start needs "("
+      "(..., ...)", "(?, ?)", "(?, ...)", // no bounds at all: use "latest"
+      "[1.7.4, ..)", "[1.7.4, ??)", // two dots or two question marks aren't an open end
       "[1.8.0, 1.7.0)", // empty
       "[1.7.6, 1.7.6)", // empty
       "[1.7.4)", "[1.7.4, 1.8.0", "[a, b)",
@@ -87,7 +93,7 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
   after(() => sb.cleanup());
 
   test("a range or interval reaches npx as the matching npm range", () => {
-    for (const [input, spec] of [["~1.7.4", "skills@~1.7.4"], ["[1.7.4, 1.8.0)", "skills@>=1.7.4 <1.8.0"], ["(…, 1.7.6]", "skills@<=1.7.6"]]) {
+    for (const [input, spec] of [["~1.7.4", "skills@~1.7.4"], ["[1.7.4, 1.8.0)", "skills@>=1.7.4 <1.8.0"], ["(..., 1.7.6]", "skills@<=1.7.6"], ["(?, 1.7.6]", "skills@<=1.7.6"]]) {
       const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: input } });
       assert.equal(r.status, 0, r.out);
       assert.ok(r.calls.length > 0);
@@ -112,7 +118,9 @@ describe("aiskills with AISKILLS_SKILLS_VERSION", () => {
   test("--help documents AISKILLS_SKILLS_VERSION with its forms", () => {
     const { out } = sb.run(["--help"]);
     assert.match(out, /AISKILLS_SKILLS_VERSION/);
-    assert.match(out, /\[1\.7\.4, …\)/);
+    assert.match(out, /\[1\.7\.4, \.\.\.\)/);
+    assert.match(out, /"\.\.\." or "\?"/);
+    assert.doesNotMatch(out, /…/, "help shows only plain ASCII forms");
   });
 });
 
@@ -149,7 +157,8 @@ describe("when npm's release-age rule blocks the skills CLI", () => {
     assert.match(r.out, new RegExp(`npm's release-age rule \\(min-release-age or before\\) blocked ${PINNED}: npm only installs versions published before 11/2/2026, 9:53:24 AM, and this one is newer`));
     assert.match(r.out, /wait until it is old enough/);
     assert.match(r.out, /npm_config_min_release_age=0 aiskills/);
-    assert.match(r.out, new RegExp(`AISKILLS_SKILLS_VERSION='\\(…, ${SKILLS_CLI_VERSION.replace(/\./g, "\\.")}\\]'`));
+    assert.match(r.out, new RegExp(`AISKILLS_SKILLS_VERSION='\\(\\.\\.\\., ${SKILLS_CLI_VERSION.replace(/\./g, "\\.")}\\]'`));
+    assert.doesNotMatch(r.out, /…/, "the suggestion can be copied as is, on any OS");
   });
 
   test("commands that read npx skills' output (installed) explain it too", () => {

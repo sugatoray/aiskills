@@ -27,10 +27,10 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 - **`AISKILLS_SKILLS_VERSION` takes a range.** Besides an exact version,
   `latest` and `next`, it accepts an npm range (`~1.7.4`, `1.7.x`,
   `>=1.7.4 <1.8.0`, `1.7.4 - 1.7.6`, `||`) and interval notation, turned into
-  an npm range: `[x, …)` is `>=x`, `(x, …)` is `>x`, `[x, y)` is `>=x <y`,
-  `(…, x]` is `<=x`, and the other mixes of `[ ( ) ]` (`…` or `...` for an
-  open end). With a range, npm picks the newest version its own rules allow,
-  so `AISKILLS_SKILLS_VERSION='(…, 1.7.6]'` gets past a `min-release-age`
+  an npm range: `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`,
+  `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]` (`...` or `?` for an
+  open end, so it types the same in every shell). With a range, npm picks the newest version its own rules allow,
+  so `AISKILLS_SKILLS_VERSION='(..., 1.7.6]'` gets past a `min-release-age`
   rule that refuses the pinned version. The default stays the exact, tested
   `skills@1.7.6`. Values are still limited to version characters, and an
   interval no version fits is refused. On Windows, the `skills@<range>`
