@@ -293,6 +293,11 @@ class RenderTemplateTest(unittest.TestCase):
 
 
 @unittest.skipUnless(HAS_FFMPEG and HAS_NUMPY and has_playwright(), "ffmpeg, numpy, node or playwright missing")
+def narration(variant):
+    with open(os.path.join(SKILL, "assets", "demo", variant, "narration.txt")) as f:
+        return [l.strip() for l in f if l.strip() and not l.startswith("#")]
+
+
 class DemoTest(unittest.TestCase):
     """Runs scripts/demo.py end to end at 2 fps so it stays quick."""
 
@@ -328,7 +333,7 @@ class DemoTest(unittest.TestCase):
             self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 49.7, delta=0.6)
 
     def test_demo_page_is_the_placeholder_video_then_the_skill(self):
-        with open(os.path.join(SKILL, "assets", "demo", "index.html")) as f:
+        with open(os.path.join(SKILL, "assets", "demo", "default", "index.html")) as f:
             html = f.read()
         for text in ("One line that says what it does.", "github.com/owner/repo",  # the placeholder video comes first
                      "placeholder", "Make a video like this for your project",
@@ -340,10 +345,43 @@ class DemoTest(unittest.TestCase):
                      "npm install -g @sugatoray-ai/aiskills",
                      "aiskills install -s dynamic-promo-video"):
             self.assertIn(text, html)
-        with open(os.path.join(SKILL, "assets", "demo", "narration.txt")) as f:
-            lines = [l for l in f if l.strip() and not l.startswith("#")]
+        lines = narration("default")
         self.assertEqual(len(lines), 9, "one narration line per demo scene")
-        self.assertEqual(lines[-1].strip(), "-", "the last scene has no narration")
+        self.assertEqual(lines[-1], "-", "the last scene has no narration")
+
+    def test_self_page_is_about_the_skill(self):
+        with open(os.path.join(SKILL, "assets", "demo", "self", "index.html")) as f:
+            html = f.read()
+        for text in ("dynamic-promo-video</h1>", "Narrated promo videos, built from code.", "sugatoray/aiskills",
+                     "npx skills add sugatoray/aiskills --skill dynamic-promo-video",
+                     "/plugin install video-related-skills@sugatoray",
+                     "aiskills install -s dynamic-promo-video"):
+            self.assertIn(text, html)
+        self.assertNotIn("One line that says what it does.", html, "no template placeholders")
+        self.assertEqual(len(narration("self")), 6)
+
+    def test_bundled_clips_match_the_narration(self):
+        for variant in ("default", "self"):
+            want = {f"vo{i}.mp3" for i, line in enumerate(narration(variant)) if line != "-"}
+            have = set(os.listdir(os.path.join(SKILL, "assets", "demo", variant, "clips")))
+            self.assertEqual(have, want, variant)
+        for variant in ("default", "self"):
+            for line in narration(variant):
+                self.assertNotIn("sugatoray", line, "use the approved spoken spelling")
+                self.assertNotIn("aiskills", line, "use the approved spoken spelling")
+
+    def test_default_voice_uses_bundled_clips(self):
+        with tempfile.TemporaryDirectory() as d:  # no API key needed: nothing is generated
+            out = self.demo(d, "--voice-id", "TABZn6CDfjMNGrsnGzzD")
+            self.assertIn("(default, narrated)", out)
+            self.assertNotIn("ElevenLabs voice", out)
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 48.39, delta=0.3)
+
+    def test_self_variant_narrated(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = self.demo(d, "--variant", "self", "--voice")
+            self.assertIn("(self, narrated)", out)
+            self.assertAlmostEqual(self.duration(os.path.join(d, "demo_final.mp4")), 32.39, delta=0.3)
 
     def test_needs_all_clips(self):
         with tempfile.TemporaryDirectory() as clips, tempfile.TemporaryDirectory() as d:

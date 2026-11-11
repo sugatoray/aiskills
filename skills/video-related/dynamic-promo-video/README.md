@@ -14,13 +14,15 @@ ElevenLabs voiceover, and background music that ducks under the voice.
 /dynamic-promo-video --demo
 /dynamic-promo-video --demo --voice
 /dynamic-promo-video --demo --voice-elevenlabs=<voice-id>
+/dynamic-promo-video --demo=self --voice
 ```
 
 ### Flags
 
 | Flag | What it does |
 | --- | --- |
-| `--demo` | Builds a 48s demo video: the template as a placeholder for your video, then how to install and use this skill from `sugatoray/aiskills`, with an energetic synthesized track. No research or editing. Music only unless a voice flag is given. |
+| `--demo`, `--demo=default` | Builds the 48s default demo: the template as a placeholder for your video, then how to install and use this skill from `sugatoray/aiskills`. No research or editing. Music only unless a voice flag is given. |
+| `--demo=self` | Builds the 32s self demo: the skill explaining itself (what it is, how it works, install, use). |
 | `--voice` | Narrates with the default ElevenLabs voice, `TABZn6CDfjMNGrsnGzzD`. |
 | `--voice-elevenlabs=<voice-id>` | Narrates with that ElevenLabs voice. A bare `--voice-elevenlabs` is the same as `--voice`. |
 
@@ -45,10 +47,17 @@ another instead of picking one itself.
 
 ### The demo
 
-`--demo` runs [`scripts/demo.py`](scripts/demo.py) on
-[`assets/demo/index.html`](assets/demo/index.html). The first part is the
-generic template, a placeholder for the viewer's own video; the second part shows
-how to make one.
+`--demo` runs [`scripts/demo.py`](scripts/demo.py). There are two variants,
+each in `assets/demo/<variant>/` with its page, narration and bundled voice clips.
+
+With `--voice` (the default voice), the narration comes from the bundled clips:
+the approved takes, including the corrected "Shoo-gaw-doe Ray" and "A.I.
+skills". No ElevenLabs calls, and the same command always gives the same video.
+Another voice generates new clips.
+
+**`--demo` / `--demo=default`** ([page](assets/demo/default/index.html), 48s): the
+generic template first, as a placeholder for the viewer's own video; then how to
+make one.
 
 1. Cover: ProjectName, "One line that says what it does.", and a tag "Demo of Skill
    `/dynamic-promo-video` · `sugatoray/aiskills`" (also the thumbnail).
@@ -66,9 +75,18 @@ how to make one.
 9. Get started: install, ask for a video, add `--voice`; the commands and
    `github.com/sugatoray/aiskills`. Music only.
 
-With a voice, it speaks the lines in
-[`assets/demo/narration.txt`](assets/demo/narration.txt), one per scene (`-` is a
-scene without narration), and stretches a scene when its line runs long. It writes to `promo-demo/`:
+**`--demo=self`** ([page](assets/demo/self/index.html), 32s): the skill
+explaining itself.
+
+1. Cover: `/dynamic-promo-video`, "Narrated promo videos, built from code.", `sugatoray/aiskills`.
+2. The problem: promo videos are slow to make.
+3. How it works: the scene engine's code under a moving camera.
+4. Install: the same three routes, typed out.
+5. How you use it: ask for a video, add a voice, get the MP4.
+6. Get started: the `npx skills` command, `/dynamic-promo-video --demo --voice`, and the repo link.
+
+Narration is one line per scene (`-` is a scene without narration); a scene
+stretches when its line runs long. Output goes to `promo-demo/`:
 `demo_final.mp4`, `thumbnail.png`, `demo_silent.mp4`, `music.wav`, the voice
 clips (if narrated) and frames to check in `check/`.
 
@@ -78,8 +96,8 @@ clips (if narrated) and frames to check in `check/`.
 | --- | --- |
 | [`SKILL.md`](SKILL.md) | The workflow the agent follows. |
 | [`assets/template/index.html`](assets/template/index.html) | Deterministic 6-scene starter (cover, problem, product camera, install, usage, end card). |
-| [`assets/demo/index.html`](assets/demo/index.html) | The demo page: the template's six scenes, then three scenes on installing and using this skill. |
-| [`assets/demo/narration.txt`](assets/demo/narration.txt) | The demo's narration, one line per scene (`-` = none). |
+| [`assets/demo/default/`](assets/demo/default/) | `--demo`: page (template scenes, then installing and using this skill), narration, bundled clips. |
+| [`assets/demo/self/`](assets/demo/self/) | `--demo=self`: page about the skill itself, narration, bundled clips. |
 | [`scripts/demo.py`](scripts/demo.py) | `--demo` in one command: demo page, music, optional narration, render, mix, verify. |
 | [`scripts/render.js`](scripts/render.js) | Preview frames, thumbnail, full frame render and silent MP4 encode. |
 | [`scripts/tts_elevenlabs.py`](scripts/tts_elevenlabs.py) | One narration clip per scene via the ElevenLabs API; `--dry-run`, skips existing clips, never retries. |
@@ -103,9 +121,11 @@ clips (if narrated) and frames to check in `check/`.
 The demo:
 
 ```sh
-python3 SKILL_DIR/scripts/demo.py                                  # music only
-python3 SKILL_DIR/scripts/demo.py --voice-id TABZn6CDfjMNGrsnGzzD  # narrated (API key)
-python3 SKILL_DIR/scripts/demo.py --clips-dir clips/               # narrated (clips from the MCP connector)
+python3 SKILL_DIR/scripts/demo.py                          # --demo, music only
+python3 SKILL_DIR/scripts/demo.py --voice                  # --demo --voice (bundled clips)
+python3 SKILL_DIR/scripts/demo.py --variant self --voice   # --demo=self --voice
+python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>    # another voice (API key)
+python3 SKILL_DIR/scripts/demo.py --clips-dir clips/       # another voice (clips from the MCP connector)
 ```
 
 A real video, step by step:

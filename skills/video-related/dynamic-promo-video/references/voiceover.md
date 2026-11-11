@@ -5,10 +5,12 @@
 - `--voice-elevenlabs=<voice-id>` sets the voice. `--voice` (or a bare
   `--voice-elevenlabs`) means the default `TABZn6CDfjMNGrsnGzzD`; so does no
   flag at all for a real project.
-- `--demo` without a voice flag is music only. With one, the demo speaks the
-  lines in `assets/demo/narration.txt`: via the MCP connector, generate one clip
-  per line and pass them with `demo.py --clips-dir`; via an API key, run
-  `demo.py --voice-id <voice-id>`, which calls tts_elevenlabs.py itself.
+- `--demo[=default|self]` without a voice flag is music only. With `--voice`
+  (the default voice), use `demo.py --voice`: the variant's bundled clips, no
+  ElevenLabs calls. With another voice, the demo speaks the lines in
+  `assets/demo/<variant>/narration.txt`: via the MCP connector, generate one
+  clip per non-`-` line and pass them with `demo.py --clips-dir`; via an API
+  key, run `demo.py --voice-id <voice-id>`, which calls tts_elevenlabs.py itself.
 - Say which voice id you used when you deliver.
 - If ElevenLabs rejects the id (unknown voice, no access), stop and ask the user
   for another id. Do not swap in a different voice on your own.

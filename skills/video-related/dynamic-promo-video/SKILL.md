@@ -6,7 +6,7 @@ metadata:
   name: dynamic-promo-video
   type: skill
   author: sugatoray
-  version: "1.5.1"
+  version: "1.6.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video"
 ---
 
@@ -28,7 +28,8 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
 ## Inputs
 | Flag | Meaning |
 | --- | --- |
-| `--demo` | Build the demo video instead of a real project: a placeholder video, then how to make one with this skill; see **Demo** below. |
+| `--demo`, `--demo=default` | Build the default demo instead of a real project: a placeholder video, then how to make one with this skill; see **Demo** below. |
+| `--demo=self` | Build the self demo: the skill explaining itself (what it is, how it works, install, use). |
 | `--voice` | Narrate with the default ElevenLabs voice `TABZn6CDfjMNGrsnGzzD`. |
 | `--voice-elevenlabs=<voice-id>` | Narrate with that ElevenLabs voice. A bare `--voice-elevenlabs` = `--voice`. |
 
@@ -36,19 +37,22 @@ Produces a 1280x720, ~25-45s MP4: animated scenes in one HTML page, rendered fra
   1. the **ElevenLabs MCP connector** (its `creative_generate_speech` tool can be loaded with ToolSearch), or
   2. an **API key**: `ELEVENLABS_API_KEY` is set, or the session's network secrets hold one for `api.elevenlabs.io` (then run `scripts/tts_elevenlabs.py`).
 - Real project, no voice flag: narrate with the default voice if a route exists, else music only.
-- `--demo` without a voice flag: music only (no narration).
+- `--demo` (any variant) without a voice flag: music only. With `--voice` (or the default voice id), use the variant's bundled clips: no ElevenLabs route is needed and no credits are spent.
 - A voice flag was given but no route exists: say so, offer to connect the connector, add a key or attach clips; do not silently drop the voice. Never invent a voice id and never fake narration.
 - A voice the user names in words is looked up with the connector's voice list; otherwise use the id as given.
 
-## Demo (`--demo`)
-No research, storyboard or editing: `assets/demo/index.html`. Scenes 1-6 are the generic template, a placeholder for the viewer's own video; scenes 7-9 show how to make one: a bridge ("that was a placeholder"), the three install routes from `sugatoray/aiskills`, and get started. An energetic synthesized track, and (with a voice) the lines in `assets/demo/narration.txt` (`-` = scene without narration; the last scene is music only). The demo is 48s; scenes stretch if a line runs long.
+## Demo (`--demo[=default|self]`)
+No research, storyboard or editing. Each variant lives in `assets/demo/<variant>/`: `index.html`, `narration.txt` (one line per scene, `-` = none) and `clips/` (the approved narration in the default voice).
+- **default** (48s): scenes 1-6 are the generic template, a placeholder for the viewer's own video; scenes 7-9 show how to make one: a bridge ("that was a placeholder"), the three install routes from `sugatoray/aiskills`, get started (music only). The cover is tagged "Demo of Skill /dynamic-promo-video · sugatoray/aiskills".
+- **self** (32s): the skill explaining itself: cover, the problem, the scene engine's code, the three install routes, usage, get started.
 ```bash
-python3 SKILL_DIR/scripts/demo.py                                   # --demo
-python3 SKILL_DIR/scripts/demo.py --voice-id TABZn6CDfjMNGrsnGzzD   # --demo --voice, API key route
-python3 SKILL_DIR/scripts/demo.py --voice-id <voice-id>             # --demo --voice-elevenlabs=<voice-id>
-python3 SKILL_DIR/scripts/demo.py --clips-dir clips/                # narrated, clips made with the MCP connector
+python3 SKILL_DIR/scripts/demo.py                               # --demo            (music only)
+python3 SKILL_DIR/scripts/demo.py --voice                       # --demo --voice    (bundled clips)
+python3 SKILL_DIR/scripts/demo.py --variant self --voice        # --demo=self --voice
+python3 SKILL_DIR/scripts/demo.py --variant self --voice-id <voice-id>   # --demo=self --voice-elevenlabs=<voice-id>, API key route
+python3 SKILL_DIR/scripts/demo.py --variant self --clips-dir clips/      # another voice via the MCP connector
 ```
-For the MCP route, generate one clip per line of `assets/demo/narration.txt` (see references/voiceover.md), get them as `clips/vo0.mp3` ... `vo7.mp3` (numbered by scene; none for a `-` line), then run the last command. It writes `promo-demo/demo_final.mp4` and `thumbnail.png` and runs the checks; deliver as in step 5. The skill icons are simplified drawings.
+With `--voice` the result is identical every run (same frames, same audio). Another voice needs new clips: for the MCP route, generate one clip per non-`-` line of the variant's `narration.txt` (see references/voiceover.md), save them as `clips/vo<scene>.mp3`, then use `--clips-dir`. Output: `promo-demo/demo_final.mp4` and `thumbnail.png`, checked; deliver as in step 5. The skill icons are simplified drawings.
 
 ## 0. Before building
 - Research the subject first: README, package page, marketplace listing, install commands. Use real names, commands and versions. Do not invent features.

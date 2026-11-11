@@ -3,6 +3,25 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.0] - 2026-11-11
+
+### Added
+
+- `--demo=self`: the skill-explaining-itself demo (the v1.4.2 video, cover
+  "/dynamic-promo-video") is back as a variant. `--demo` / `--demo=default` is
+  the placeholder-then-how-to demo.
+- `demo.py --variant default|self` and `--voice`: narrate with the variant's
+  bundled clips (`assets/demo/<variant>/clips/`, the approved narration in the
+  default voice). No ElevenLabs calls; the rebuilt videos are identical to the
+  approved ones (checked frame by frame and sample by sample). `--voice-id`
+  with the default voice also uses the bundled clips.
+- Tests: self page, bundled clips match the narration and use the approved
+  spellings, narrated builds of both variants from the bundled clips.
+
+### Changed
+
+- Demo files moved to `assets/demo/default/` and `assets/demo/self/`.
+
 ## [1.5.1] - 2026-11-11
 
 ### Changed

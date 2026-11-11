@@ -5,7 +5,7 @@ Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, mus
 | Property | Value |
 | --- | --- |
 | Group | `video-related-skills` (alias `video-related`) |
-| Version | 1.5.1 |
+| Version | 1.6.0 |
 | Starts | When you type `/dynamic-promo-video`, or your agent uses it when a task fits its description |
 | License | MIT |
 | Source | [skills/video-related/dynamic-promo-video](https://github.com/sugatoray/aiskills/tree/master/skills/video-related/dynamic-promo-video) |
@@ -47,8 +47,24 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/dyna
 - `SKILL.md`
 - `agents/claude-code.yaml`
 - `agents/openai.yaml`
-- `assets/demo/index.html`
-- `assets/demo/narration.txt`
+- `assets/demo/default/clips/vo0.mp3`
+- `assets/demo/default/clips/vo1.mp3`
+- `assets/demo/default/clips/vo2.mp3`
+- `assets/demo/default/clips/vo3.mp3`
+- `assets/demo/default/clips/vo4.mp3`
+- `assets/demo/default/clips/vo5.mp3`
+- `assets/demo/default/clips/vo6.mp3`
+- `assets/demo/default/clips/vo7.mp3`
+- `assets/demo/default/index.html`
+- `assets/demo/default/narration.txt`
+- `assets/demo/self/clips/vo0.mp3`
+- `assets/demo/self/clips/vo1.mp3`
+- `assets/demo/self/clips/vo2.mp3`
+- `assets/demo/self/clips/vo3.mp3`
+- `assets/demo/self/clips/vo4.mp3`
+- `assets/demo/self/clips/vo5.mp3`
+- `assets/demo/self/index.html`
+- `assets/demo/self/narration.txt`
 - `assets/template/index.html`
 - `meta/MAINTAINERS.md`
 - `references/music-and-mix.md`
