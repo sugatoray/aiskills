@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (13 skills in 7 groups), with what it does and how to install it.
+Every skill in this version of the package (15 skills in 8 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -65,6 +65,15 @@ Alias `video-related`. Install the group with `aiskills install -G video-related
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`dynamic-promo-video`](dynamic-promo-video.md) | 1.6.2 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
+
+## image-styles-skills
+
+Alias `image-styles`. Install the group with `aiskills install -G image-styles`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`artwallbg`](artwallbg.md) | 1.0.0 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
+| [`commentdrop`](commentdrop.md) | 1.0.0 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 

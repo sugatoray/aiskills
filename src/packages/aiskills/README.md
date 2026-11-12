@@ -3,7 +3,7 @@
 # @sugatoray-ai/aiskills
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
-(scrolls, stata, personas, diagrams, docs, development, video), packaged
+(scrolls, stata, personas, diagrams, docs, development, video, image styles), packaged
 for npm. Every file under the repo's `skills/` folder ships, except what a
 [`.skillsignore`](#leaving-files-out-skillsignore) leaves out. The skills are
 flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
@@ -49,6 +49,24 @@ which:
 3. adds the install to the skills' install count on [skills.sh](https://skills.sh),
    in the background (see [The skills.sh install count](#the-skillssh-install-count);
    off with `--no-stats`).
+
+### Upgrading
+
+```sh
+aiskills upgrade          # the latest aiskills, then your agents' skills, for the same agents
+aiskills upgrade --check  # only say whether a newer version is out
+```
+
+From 1.0.0 the package follows [Semantic Versioning](https://semver.org/)
+strictly: a change that can break existing use (a removed or renamed command,
+option or variable, a changed default, or a different install folder or
+layout) only comes in a new major version. New skills and groups are minor
+releases. See [`CHANGELOG.md`](CHANGELOG.md).
+
+Coming from 0.x: `aiskills upgrade` arrived in 0.9.0 (before that, run
+`npm install -g @sugatoray-ai/aiskills@latest`, then `aiskills install`), and
+1.0.0 no longer reads `AISKILLS_SKILLS_VERSION`: rename it to
+`AISKILLS_SKILLS_LIB_VERSION`.
 
 ### As a project dependency, with `npx skills experimental_sync`
 
@@ -211,6 +229,7 @@ installed version. At the time of writing:
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
+| `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
 | `all` (built in) | | every skill |
 
 `newsletter-ai` isn't in the package: `skills/newsletters/.skillsignore`
@@ -498,7 +517,7 @@ a count fails.
 | `AISKILLS_LAYOUT=flat\|nested` | Same as `--flat` / `--nested` (see [Layouts](#layouts---flat-and---nested)) |
 | `AISKILLS_ROUTE=1` | Same as `--route` |
 | `AISKILLS_SKILLS_LIB_VERSION` | Version of the `skills` CLI that `npx` runs (default: the tested, pinned version). Also `latest`, `next`, an npm range (`~1.7.4`) or an interval (one of `...`, `?` or `*` is an open end): `[x, ...)` is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`. With a range, npm picks the newest version its rules (e.g. `min-release-age`) allow |
-| `AISKILLS_SKILLS_VERSION` | Deprecated old name of `AISKILLS_SKILLS_LIB_VERSION`; still works, with a warning, and is removed in 1.0.0 |
+| `AISKILLS_SKILLS_VERSION` | Removed in 1.0.0 (the old name of `AISKILLS_SKILLS_LIB_VERSION`): no longer read, so the pinned version runs; rename it |
 | `npm_config_min_release_age`, `npm_config_before` | npm's release-age rule, passed on to `npx`: `npm_config_min_release_age=0 aiskills installed` relaxes it for one run |
 | `AISKILLS_STATS=0\|1` | Same as `--no-stats` / `--stats` for one command, not remembered (see [The skills.sh install count](#the-skillssh-install-count)) |
 | `AISKILLS_STATS_FOREGROUND=1` | Wait for the skills.sh count and show its output |

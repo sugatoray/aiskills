@@ -1,6 +1,6 @@
 # @sugatoray-ai/aiskills
 
-`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video, image styles) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
 
 The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskills/skills/`, and are registered with your agents by `npx skills add`. The `aiskills` command then installs, lists and removes them by name, by group or by pattern, and with `--route` it manages skills from other sources too.
 
@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 13 skills in 7 groups, at the version you installed.
+- **Skills in one package**: 15 skills in 8 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -52,6 +52,8 @@ aiskills install -G scrolls -a claude-code
 
 <!-- skills:start -->
 - [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
+- [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
+- [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
 - [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.

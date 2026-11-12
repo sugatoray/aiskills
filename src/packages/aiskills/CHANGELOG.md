@@ -20,6 +20,33 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-11
+
+The first stable release. From here on, a change that can break existing use
+(a removed or renamed command, option or variable, a changed default, or a
+different install folder or layout) only comes in a new major version.
+Upgrade from 0.9.0 with `aiskills upgrade`.
+
+### Added
+
+- **New bundled skills: `artwallbg` and `commentdrop`**, in a new group,
+  `image-styles-skills` (alias `image-styles`). `/artwallbg` generates a vivid
+  illustrated scene of a subject in front of a huge spray-painted wall;
+  `/commentdrop` adds floating, simulated social-media comment cards to a
+  still image. Both need an image-generation or image-editing tool in the
+  agent, and each ships an `assets/EXAMPLE.md` with example prompts and
+  outputs. The package now bundles 15 skills in 8 groups:
+  `aiskills install -G image-styles` or `aiskills install -s artwallbg`.
+  See each skill's own `CHANGELOG.md` for its history.
+
+### Removed
+
+- **`AISKILLS_SKILLS_VERSION`**, the old name (0.4.0 to 0.5.0) of
+  `AISKILLS_SKILLS_LIB_VERSION`, deprecated since 0.6.0. It's no longer read:
+  if it's still set (in a shell profile, `.envrc` or CI), `aiskills` runs the
+  pinned, tested `skills` CLI instead, without a warning. Rename it to
+  `AISKILLS_SKILLS_LIB_VERSION` to keep choosing the version.
+
 ## [0.9.0] - 2026-11-11
 
 `aiskills upgrade`: one command to get the latest aiskills and update the
@@ -406,6 +433,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[1.0.0]: https://github.com/sugatoray/aiskills/pull/141
 [0.9.0]: https://github.com/sugatoray/aiskills/pull/193
 [0.8.0]: https://github.com/sugatoray/aiskills/pull/184
 [0.7.0]: https://github.com/sugatoray/aiskills/pull/161

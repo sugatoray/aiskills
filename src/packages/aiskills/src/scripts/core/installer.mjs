@@ -161,14 +161,11 @@ export const quote = (a) => (/[\s*'"<>|&;()$`]/.test(a) ? `'${a.replace(/'/g, "'
 // The `skills` CLI version every npx call runs. Pinned so a new (or
 // compromised) release is never picked up silently; bump it after testing
 // (npm test && npm run test:e2e && npm run audit:skills <version>).
-// AISKILLS_SKILLS_LIB_VERSION (the old name AISKILLS_SKILLS_VERSION still works,
-// deprecated) overrides it with a version, "latest"/"next", an npm
-// range or an interval (see skillsVersionSpec).
+// AISKILLS_SKILLS_LIB_VERSION overrides it with a version, "latest"/"next",
+// an npm range or an interval (see skillsVersionSpec).
 export const SKILLS_CLI_VERSION = "1.7.6";
 /** The variable that overrides it ("LIB": the skills CLI library, not the bundled skills). */
 export const SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_LIB_VERSION";
-/** Its name in 0.4.0 - 0.5.0; still read, with a deprecation warning, until 1.0.0 removes it. */
-export const OLD_SKILLS_LIB_VERSION_VAR = "AISKILLS_SKILLS_VERSION";
 
 // npm range grammar, limited to version characters: comparators (<, <=, >, >=,
 // =, ~, ^), x-ranges (1.7.x, 1.x, *), hyphen ranges (a - b) and || between sets.
@@ -233,28 +230,19 @@ export function skillsVersionSpec(input, name = SKILLS_LIB_VERSION_VAR) {
 }
 
 let announced = false;
-let deprecationShown = false;
-
 /**
  * "skills@<version or range>" for npx; throws on a malformed
- * AISKILLS_SKILLS_LIB_VERSION. The old name, AISKILLS_SKILLS_VERSION (0.4.0 -
- * 0.5.0), still works with a deprecation warning; the new one wins when both
- * are set. When the value overrides the pinned version, says so once per
+ * AISKILLS_SKILLS_LIB_VERSION (its 0.4.0 - 0.5.0 name was removed in 1.0.0 and is
+ * no longer read). When the value overrides the pinned version, says so once per
  * command (next to the `running: npx ...` lines), so a downgrade set by a
  * profile, .envrc or CI variable can't happen silently.
  */
 export function skillsPackageSpec() {
   const current = process.env[SKILLS_LIB_VERSION_VAR]?.trim();
-  const old = process.env[OLD_SKILLS_LIB_VERSION_VAR]?.trim();
-  if (old && !deprecationShown) {
-    deprecationShown = true;
-    warn(`${OLD_SKILLS_LIB_VERSION_VAR} is deprecated and will be removed in 1.0.0: use ${SKILLS_LIB_VERSION_VAR} (the version of the skills CLI library, not of the bundled skills)`);
-  }
-  const name = current ? SKILLS_LIB_VERSION_VAR : OLD_SKILLS_LIB_VERSION_VAR;
-  const spec = skillsVersionSpec(current || old || SKILLS_CLI_VERSION, name);
+  const spec = skillsVersionSpec(current || SKILLS_CLI_VERSION, SKILLS_LIB_VERSION_VAR);
   if (spec !== SKILLS_CLI_VERSION && !announced) {
     announced = true;
-    log(`using skills@${spec} from ${name}, not the tested ${SKILLS_CLI_VERSION}`);
+    log(`using skills@${spec} from ${SKILLS_LIB_VERSION_VAR}, not the tested ${SKILLS_CLI_VERSION}`);
   }
   return `skills@${spec}`;
 }

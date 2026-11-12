@@ -1,6 +1,6 @@
 # @sugatoray-ai/aiskills
 
-> `@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+> `@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video, image styles) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
 
 ## Getting started
 
@@ -11,6 +11,8 @@
 ## Skills
 
 - [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
+- [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
+- [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
 - [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.

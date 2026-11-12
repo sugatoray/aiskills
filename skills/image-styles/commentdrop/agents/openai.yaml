@@ -1,0 +1,6 @@
+interface:
+  display_name: "Comment Drop"
+  short_description: "Add floating simulated social comments to an image"
+  default_prompt: "Use $commentdrop to add floating simulated social comments to the latest image."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,23 @@
+{
+  "name": "image-styles-skills",
+  "version": "1.0.0",
+  "description": "Skills for generating images in a variety of styles and applying visual styles or effects to existing images.",
+  "author": {
+    "name": "Sugato Ray",
+    "url": "https://github.com/sugatoray"
+  },
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": [
+    "image",
+    "image-styles",
+    "image-generation",
+    "image-editing",
+    "visual-effects"
+  ],
+  "skills": [
+    "./artwallbg",
+    "./commentdrop"
+  ]
+}

@@ -1,7 +1,7 @@
 <!-- source: README.md -->
 # @sugatoray-ai/aiskills
 
-`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
+`@sugatoray-ai/aiskills` installs Sugato Ray's agent skills (scrolls, stata, personas, diagrams, docs, development, video, image styles) into Claude Code, Codex, Cursor and every other agent the [`skills`](https://www.npmjs.com/package/skills) CLI supports.
 
 The skills ship inside the npm package, are saved to `~/.config/sugatoray/aiskills/skills/`, and are registered with your agents by `npx skills add`. The `aiskills` command then installs, lists and removes them by name, by group or by pattern, and with `--route` it manages skills from other sources too.
 
@@ -28,7 +28,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 13 skills in 7 groups, at the version you installed.
+- **Skills in one package**: 15 skills in 8 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -53,6 +53,8 @@ aiskills install -G scrolls -a claude-code
 
 <!-- skills:start -->
 - [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
+- [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
+- [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
 - [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.
@@ -193,7 +195,7 @@ aiskills path
 ```
 
 ```text
-0.9.0
+1.0.0
 ~/.config/sugatoray/aiskills
 ```
 
@@ -309,7 +311,7 @@ See also: [CLI reference](../reference/cli.md)
 <!-- source: skills/README.md -->
 # Bundled skills
 
-Every skill in this version of the package (13 skills in 7 groups), with what it does and how to install it.
+Every skill in this version of the package (15 skills in 8 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -375,9 +377,128 @@ Alias `video-related`. Install the group with `aiskills install -G video-related
 | --- | --- | --- |
 | [`dynamic-promo-video`](dynamic-promo-video.md) | 1.6.2 | Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product. |
 
+## image-styles-skills
+
+Alias `image-styles`. Install the group with `aiskills install -G image-styles`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`artwallbg`](artwallbg.md) | 1.0.0 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
+| [`commentdrop`](commentdrop.md) | 1.0.0 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
+
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 
 See also: [Skill groups](../concepts/skill-groups.md) · [1. Install a group](../tutorial/01-install-a-group.md)
+
+<!-- source: skills/artwallbg.md -->
+# artwallbg
+
+Create a vivid illustrated image of a subject in front of a huge spray-painted wall. Use when the user invokes /artwallbg or requests this art-wall background visual.
+
+| Property | Value |
+| --- | --- |
+| Group | `image-styles-skills` (alias `image-styles`) |
+| Version | 1.0.0 |
+| Starts | When you ask for it: you type `/artwallbg` (your agent doesn't start it on its own) |
+| Needs | An image-generation or image-editing tool capable of returning rendered images |
+| License | MIT |
+| Source | [skills/image-styles/artwallbg](https://github.com/sugatoray/aiskills/tree/master/skills/image-styles/artwallbg) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s artwallbg -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: artwallbg
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill artwallbg --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `image-styles-skills` group:
+
+```bash
+aiskills install -G image-styles -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s artwallbg
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/artwallbg/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLE.md`
+- `meta/MAINTAINERS.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/commentdrop.md -->
+# commentdrop
+
+Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. Use when the user invokes /commentdrop or asks for a comment-drop effect on an image.
+
+| Property | Value |
+| --- | --- |
+| Group | `image-styles-skills` (alias `image-styles`) |
+| Version | 1.0.0 |
+| Starts | When you ask for it: you type `/commentdrop` (your agent doesn't start it on its own) |
+| Needs | An image-generation or image-editing tool capable of returning rendered images |
+| License | MIT |
+| Source | [skills/image-styles/commentdrop](https://github.com/sugatoray/aiskills/tree/master/skills/image-styles/commentdrop) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s commentdrop -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: commentdrop
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill commentdrop --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `image-styles-skills` group:
+
+```bash
+aiskills install -G image-styles -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s commentdrop
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/commentdrop/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLE.md`
+- `meta/MAINTAINERS.md`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
 <!-- source: skills/create-issues-update-pr.md -->
 # create-issues-update-pr
@@ -1229,6 +1350,10 @@ video-related-skills  (alias: video-related)
   Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...
   skills: dynamic-promo-video
 
+image-styles-skills  (alias: image-styles)
+  Skills for generating images in a variety of styles and applying visual styles or effects to existing image...
+  skills: artwallbg, commentdrop
+
 Install a group:  aiskills install --group <name|alias> --global --agent <agent>
 ```
 
@@ -1327,7 +1452,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -1489,7 +1614,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 
@@ -2017,7 +2142,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    ```text
    [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
    [aiskills] no group matches: nope
-     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), all
+     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), image-styles-skills (image-styles), all
      see 'aiskills groups'
    ```
 
@@ -2082,7 +2207,7 @@ See also: [CLI reference](../reference/cli.md) · [Errors and exit codes](../ref
 
 Use this when you need a different release of the `skills` CLI than the one `aiskills` pins, or when npm's release-age rule (`min-release-age`, `before`) refuses the pinned one.
 
-Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, still works but is deprecated, and is removed in 1.0.0.
+Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, was removed in 1.0.0 and is no longer read.
 
 ## Steps
 
@@ -2334,7 +2459,8 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
-| `all` (built in) | | all 13 skills |
+| `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
+| `all` (built in) | | all 15 skills |
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 
@@ -2761,10 +2887,10 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 0.9.0
+  aiskills version : 1.0.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
-      saved skills : 13 skills in 7 groups, flat layout
+      saved skills : 15 skills in 8 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)
@@ -2794,12 +2920,12 @@ What each line means:
 With [`--full`](#--full) it also asks npm and `npx skills` (a few seconds; needs network), and adds:
 
 ```text
-     latest on npm : 0.8.0  (up to date)
-  installed skills : 13 from the install root, 2 from other sources  (global)
-         per agent : Claude Code 13, Codex 13
+     latest on npm : 1.0.0  (up to date)
+  installed skills : 15 from the install root, 2 from other sources  (global)
+         per agent : Claude Code 15, Codex 15
 ```
 
-`latest on npm` says `up to date`, `update available: npm install -g @sugatoray-ai/aiskills@latest`, or that this version is not published; if npm can't be reached it says `unavailable` and why, and the command still succeeds. `installed skills` counts what `npx skills list` reports for the current scope.
+`latest on npm` says `up to date`, `update available: run aiskills upgrade`, or that this version is not published; if npm can't be reached it says `unavailable` and why, and the command still succeeds. `installed skills` counts what `npx skills list` reports for the current scope.
 
 See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md)
 
@@ -2826,12 +2952,12 @@ aiskills rel 3
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 3 of 6 releases
+@sugatoray-ai/aiskills: latest 3 of 7 releases
 
-  VERSION  PUBLISHED                 TAG
-  0.9.0    2026-11-20 (1 day ago)    latest  ← installed
+  VERSION  PUBLISHED                TAG
+  1.0.0    2026-11-20 (1 day ago)   latest  ← installed
+  0.9.0    2026-11-15 (6 days ago)
   0.8.0    2026-11-12 (9 days ago)
-  0.7.0    2026-11-11 (10 days ago)
 
 more: aiskills rel all
 
@@ -2853,14 +2979,14 @@ aiskills rel --downloads
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 5 of 6 releases
+@sugatoray-ai/aiskills: latest 5 of 7 releases
 
   VERSION  PUBLISHED                 TAG     DOWNLOADS (7 DAYS)
-  0.9.0    2026-11-20 (1 day ago)    latest                   –  ← installed
+  1.0.0    2026-11-20 (1 day ago)    latest                   –  ← installed
+  0.9.0    2026-11-15 (6 days ago)                            –
   0.8.0    2026-11-12 (9 days ago)                            –
   0.7.0    2026-11-11 (10 days ago)                           –
   0.6.0    2026-11-11 (10 days ago)                           –
-  0.5.0    2026-11-09 (12 days ago)                         140
 
 more: aiskills rel all
 
@@ -2889,10 +3015,10 @@ aiskills rel 1 --downloads 7d --table
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 1 of 6 releases
+@sugatoray-ai/aiskills: latest 1 of 7 releases
 
   VERSION  PUBLISHED               TAG     DOWNLOADS (7 DAYS)
-  0.9.0    2026-11-20 (1 day ago)  latest                   –  ← installed
+  1.0.0    2026-11-20 (1 day ago)  latest                   –  ← installed
 
 more: aiskills rel all
 
@@ -2931,41 +3057,41 @@ aiskills upgrade [<version>|<tag>] [--check [--json]] [--no-refresh] [-n] [-y]
 | Default | Upgrade to the `latest` tag, then refresh the skills (global) |
 | Exit code | `0` if upgraded, already up to date, or with `--check` (whatever it finds); `1` if aiskills can't upgrade itself, the version is unknown, or a downgrade isn't confirmed; otherwise the package manager's exit code |
 
-Check first, without changing anything (the examples here run with 0.8.0 installed and 0.9.0 on the registry):
+Check first, without changing anything (the examples here run with 0.9.0 installed and 1.0.0 on the registry):
 
-<!-- verify: version=0.8.0 -->
+<!-- verify: version=0.9.0 -->
 ```bash
 aiskills upgrade --check
 ```
 
 ```text
-[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
 [aiskills] update available: run 'aiskills upgrade'
 ```
 
 Then upgrade:
 
-<!-- verify: version=0.8.0 list=scrolls-setup,scrolls-update -->
+<!-- verify: version=0.9.0 list=scrolls-setup,scrolls-update -->
 ```bash
 aiskills upgrade
 ```
 
 ```text
-[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] running: npm install -g @sugatoray-ai/aiskills@0.9.0
+[aiskills] running: npm install -g @sugatoray-ai/aiskills@1.0.0
 changed 1 package in 1s
-[aiskills] refreshing 2 skills for claude-code (global) with aiskills 0.9.0
+[aiskills] refreshing 2 skills for claude-code (global) with aiskills 1.0.0
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: scrolls-setup, scrolls-update
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --skill scrolls-update --agent claude-code --yes
 [aiskills] project installs aren't refreshed: run 'aiskills install -p' in each project that uses them
-[aiskills] upgraded 0.8.0 → 0.9.0
+[aiskills] upgraded 0.9.0 → 1.0.0
 ```
 
 What it does, in order:
 
-1. **Picks the target** from `npm view` (your npm config applies): `latest`, or the `<version>` or `<tag>` you give (`aiskills upgrade 0.9.1`, `aiskills upgrade next`). If you already have it: `already up to date (<version>)`, and nothing changes.
+1. **Picks the target** from `npm view` (your npm config applies): `latest`, or the `<version>` or `<tag>` you give (`aiskills upgrade 1.0.1`, `aiskills upgrade next`). If you already have it: `already up to date (<version>)`, and nothing changes.
 2. **Finds out how aiskills was installed**, from where its files are. Only a global install can upgrade itself:
 
    | Installed with | `upgrade` runs |
@@ -2983,24 +3109,24 @@ What it does, in order:
 5. **Tells you what changed in the bundle:** skills new in this version are listed, not installed, with the commands to add them; skills the new version no longer has are listed with the command to remove them:
 
    ```text
-   [aiskills] new in 0.9.0, not installed: gamma
-     to install them:      aiskills install -s gamma -a claude-code,codex
+   [aiskills] new in 1.0.0, not installed: artwallbg, commentdrop
+     to install them:      aiskills install -s artwallbg,commentdrop -a claude-code,codex
      or pick from a list:  aiskills install -i
-   [aiskills] no longer in 0.9.0 but still installed: old-skill
+   [aiskills] no longer in 1.0.0 but still installed: old-skill
      to remove:  aiskills uninstall -s old-skill
    ```
 
 Only global installs from the install folder are refreshed; skills installed into a project (`-p`) are not, as aiskills can't know every project: run `aiskills install -p` in each. A **downgrade** (`aiskills upgrade 0.7.0`) asks `[y/N]` first, or needs [`-y`](#-y---yes); without a terminal it stops. Preview everything with [`-n`](#-n---dry-run):
 
-<!-- verify: version=0.8.0 list=scrolls-setup,scrolls-update -->
+<!-- verify: version=0.9.0 list=scrolls-setup,scrolls-update -->
 ```bash
 aiskills upgrade -n
 ```
 
 ```text
-[aiskills] installed: 0.8.0 (npm, global) · latest: 0.9.0 (published 2026-11-20)
+[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@0.9.0
+[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@1.0.0
 [aiskills] [dry-run] then: aiskills install -g -s scrolls-setup,scrolls-update -a claude-code
 ```
 
@@ -3033,7 +3159,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 0.9.0 — Sugato Ray's agent skills
+aiskills 1.0.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -3167,7 +3293,6 @@ Environment:
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
-                                (AISKILLS_SKILLS_VERSION, its old name, still works until 1.0.0)
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 ```
@@ -3182,7 +3307,7 @@ ais -v
 ```
 
 ```text
-0.9.0
+1.0.0
 ```
 
 ## Options
@@ -3476,9 +3601,7 @@ The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is 
 
 The version of the `skills` CLI library that every `npx` call runs (not the version of the bundled skills). Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where exactly one of `...`, `?` or `*` is an open end (no combinations): `[x, ...)` (or `[x, ?)`, `[x, *)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. A typographic `…` (as autocorrect makes it) is read as `...`. Only plain spaces may separate a range's parts; tabs, line breaks and Unicode spaces are refused. Anything else, or an interval no version fits, is refused. When it overrides the pinned version, every command says so once: `using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6`. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).
 
-### `AISKILLS_SKILLS_VERSION`
-
-Deprecated: the old name (0.4.0 to 0.5.0) of [`AISKILLS_SKILLS_LIB_VERSION`](#aiskills_skills_lib_version), renamed so it isn't mistaken for the version of the bundled skills. It still works, with a warning, and is removed in 1.0.0; if both are set, `AISKILLS_SKILLS_LIB_VERSION` wins. Rename it in your profile or CI.
+Its old name, `AISKILLS_SKILLS_VERSION` (0.4.0 to 0.5.0; deprecated with a warning from 0.6.0 to 0.9.0), was removed in 1.0.0 and is no longer read: if it's still set, the pinned version runs, without a warning. Rename it in your profile, `.envrc` or CI.
 
 ## `info` and `releases`
 
@@ -3530,7 +3653,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```json
 {
   "package": "@sugatoray-ai/aiskills",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "layout": "flat",
   "installedAt": "2026-11-06T10:26:01.152Z",
   "skills": "/home/me/.config/sugatoray/aiskills/skills"
@@ -4090,14 +4213,6 @@ npm has no permission to write its global folder. Don't use sudo; give npm a fol
 
 **Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax, tabs, line breaks or Unicode spaces between a range's parts, and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
 
-### `AISKILLS_SKILLS_VERSION` is deprecated
-
-```text
-[aiskills] AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
-```
-
-**Cause:** a warning, not an error: the old name of the variable is set (it still works until 1.0.0; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). From 1.0.0 it's ignored, so the pinned version would run instead. **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
-
 ### `skills` CLI version overridden
 
 ```text
@@ -4449,10 +4564,12 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-13 skills, sorted by name.
+15 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
+| [`artwallbg`](skills/artwallbg.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/SKILL.md) |
+| [`commentdrop`](skills/commentdrop.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/SKILL.md) |
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |
 | [`create-lib-docs`](skills/create-lib-docs.md) | docs | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/SKILL.md) |
 | [`dynamic-promo-video`](skills/dynamic-promo-video.md) | video-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/video-related/dynamic-promo-video/SKILL.md) |

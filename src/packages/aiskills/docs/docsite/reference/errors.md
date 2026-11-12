@@ -409,14 +409,6 @@ npm has no permission to write its global folder. Don't use sudo; give npm a fol
 
 **Cause:** tags other than `latest`/`next`, URLs, paths, shell syntax, tabs, line breaks or Unicode spaces between a range's parts, and malformed intervals (an open end `…` needs `(` or `)`) are refused. **Fix:** use one of the forms in [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md#variations), or unset it for the pinned one.
 
-### `AISKILLS_SKILLS_VERSION` is deprecated
-
-```text
-[aiskills] AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1.0.0: use AISKILLS_SKILLS_LIB_VERSION (the version of the skills CLI library, not of the bundled skills)
-```
-
-**Cause:** a warning, not an error: the old name of the variable is set (it still works until 1.0.0; `AISKILLS_SKILLS_LIB_VERSION` wins if both are). From 1.0.0 it's ignored, so the pinned version would run instead. **Fix:** rename it to `AISKILLS_SKILLS_LIB_VERSION` wherever it's set (shell profile, `.envrc`, CI).
-
 ### `skills` CLI version overridden
 
 ```text

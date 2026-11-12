@@ -318,3 +318,16 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Video Related](skills/video-related/README.md) | `dynamic-promo-video` | Builds a short (~25-45s) narrated promo or intro video for a library, app or product: animated HTML scenes with zoom/tilt camera moves over real screenshots, rendered with Playwright and ffmpeg, an ElevenLabs voiceover, and ducked background music. `--demo` / `--demo=self` build ready-made demo videos. See [usage](skills/video-related/dynamic-promo-video/README.md). |
+
+---
+
+### 🎨 Image styles
+
+Skills for generating images in a variety of styles and applying visual styles or effects to existing images. The current skills create spray-painted art wall scenes and add simulated social comment overlays. See the [image styles guide](skills/image-styles/README.md).
+
+```sh
+npx skills add sugatoray/aiskills --skill artwallbg
+npx skills add sugatoray/aiskills --skill commentdrop
+```
+
+For Claude Code, use `/plugin marketplace add sugatoray/aiskills` and `/plugin install image-styles-skills@sugatoray`. Choose one installation route.
