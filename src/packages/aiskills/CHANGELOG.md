@@ -20,6 +20,18 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+### Added
+
+- **New bundled skills: `artwallbg` and `commentdrop`**, in a new group,
+  `image-styles-skills` (alias `image-styles`). `/artwallbg` generates a vivid
+  illustrated scene of a subject in front of a huge spray-painted wall;
+  `/commentdrop` adds floating, simulated social-media comment cards to a
+  still image. Both need an image-generation or image-editing tool in the
+  agent, and each ships an `assets/EXAMPLE.md` with example prompts and
+  outputs. The package now bundles 15 skills in 8 groups:
+  `aiskills install -G image-styles` or `aiskills install -s artwallbg`.
+  See each skill's own `CHANGELOG.md` for its history.
+
 ## [0.9.0] - 2026-11-11
 
 `aiskills upgrade`: one command to get the latest aiskills and update the
