@@ -47,13 +47,12 @@ file is a human-facing pointer, not read at invocation time.
 
 ## Installing as a Claude Code plugin
 
-This directory is a self-contained Claude Code plugin: `SKILL.md` sits
-at the plugin root with no `skills/` subfolder needed, and
-[`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) carries the
-plugin manifest. Load it locally with:
+This skill ships as part of the `stata-skills` plugin (every `stata-*`
+skill, currently just this one). It has no plugin manifest of its own.
+Load that plugin locally with:
 
 ```
-claude --plugin-dir skills/stata/stata-recipes
+claude --plugin-dir skills/stata
 ```
 
 `agents/claude-code.yaml` and `agents/openai.yaml` carry per-agent-
@@ -63,19 +62,17 @@ install path (same shape as the `scrolls-*` skills' own
 plugin's own `agents/` directory convention; see `meta/MAINTAINERS.md`
 for why.
 
-This skill is also installable via the repo's marketplace, as part of
-the `stata-skills` plugin (every `stata-*` skill, currently just this
-one):
+Install it from the repo's marketplace:
 
 ```
 /plugin marketplace add sugatoray/aiskills
 /plugin install stata-skills@sugatoray
 ```
 
-See [`../meta/MAINTAINERS.md`](../meta/MAINTAINERS.md) for how that
-family-level manifest (`skills/stata/.claude-plugin/plugin.json`) relates
-to this skill's own `.claude-plugin/plugin.json` above, and the
-[group README](../README.md) for the `npx skills add` install path.
+See [`../meta/MAINTAINERS.md`](../meta/MAINTAINERS.md) for that
+family-level manifest's design (`skills/stata/.claude-plugin/plugin.json`),
+and the [group README](../README.md) for the `npx skills add` install
+path.
 
 ## Adding a recipe
 

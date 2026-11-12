@@ -25,11 +25,6 @@ Stata code-writing request (that's `../SKILL.md`).
     sections) and the naming convention for which subfolder a new
     recipe goes in. Read this, not this file, before writing a new
     recipe.
-- `../.claude-plugin/plugin.json` — the Claude Code plugin manifest
-  (name, version, description, author, license, keywords). Not read
-  during a normal skill invocation; only Claude Code's plugin loader
-  reads it, when this directory is loaded as a plugin (see "Claude Code
-  plugin packaging" below).
 - `../agents/claude-code.yaml`, `../agents/openai.yaml` — per-agent-
   harness interface metadata (`display_name`, `short_description`,
   `allow_implicit_invocation`), same shape and purpose as the
@@ -50,29 +45,25 @@ it applies to a live request.
 
 ## Claude Code plugin packaging
 
-`../SKILL.md` already sits directly at this skill's root with no
-`skills/` subfolder — that's Claude Code's "single-skill plugin" layout
-already, so adding `../.claude-plugin/plugin.json` was enough to make
-this directory a self-contained, loadable Claude Code plugin with no
-restructuring. Test it locally with:
+This skill has no plugin manifest of its own. It ships only through the
+family-level `skills/stata/.claude-plugin/plugin.json`, which groups
+every `stata-*` skill (currently just this one) into a single
+`stata-skills` plugin listed in the repo-root
+`.claude-plugin/marketplace.json`. That is the same group-only
+arrangement `scrolls-*` uses. See `../meta/MAINTAINERS.md` for that
+manifest's design and its keep-in-sync rules. Test it locally by loading
+the family directory:
 
 ```
-claude --plugin-dir skills/stata/stata-recipes
+claude --plugin-dir skills/stata
 ```
 
-This individual manifest is separate from, and in addition to, the
-family-level `skills/stata/.claude-plugin/plugin.json` that groups every
-`stata-*` skill (currently just this one) into a single `stata-skills`
-plugin listed in the repo-root `.claude-plugin/marketplace.json` — see
-`../meta/MAINTAINERS.md` for that manifest's design and its own
-keep-in-sync rules. Unlike the `scrolls-*` family, which ships **only**
-the group-level manifest (no per-skill `plugin.json` under any individual
-`scrolls-*` skill directory), `stata-recipes` currently has both. That's
-a deliberate difference worth a second look before adding a second
-`stata-*` skill: decide then whether the individual manifest stays (two
-install paths: the skill alone, or the whole family) or gets dropped for
-closer parity with how `scrolls-*` does it — don't let it happen by
-default either way.
+Up to v1.3.2 this directory also carried its own
+`.claude-plugin/plugin.json`, so it could load as a standalone
+single-skill plugin. It was dropped in v1.3.3 for parity with
+`scrolls-*`: the standalone plugin installed exactly the same skill as
+`stata-skills`, under a second name, and needed its version kept in
+step separately.
 
 ## Versioning
 
@@ -88,11 +79,10 @@ bump in practice, even though they're not something a live request
 would see — treat that as the actual working norm here, not just the
 letter of the rule above.
 
-Keep `../.claude-plugin/plugin.json`'s `version` field, **and**
-`../../.claude-plugin/plugin.json`'s (the family-level manifest) `version`
-field, equal to `SKILL.md`'s `metadata.version` — bump all three in the
-same commit. Three manifests for the same release, and a mismatch in any
-one of them is exactly the kind of inconsistency worth catching before it
+Keep `../../.claude-plugin/plugin.json`'s (the family-level manifest)
+`version` field equal to `SKILL.md`'s `metadata.version` — bump both in
+the same commit. Two files for the same release, and a mismatch between
+them is exactly the kind of inconsistency worth catching before it
 ships. See `../meta/MAINTAINERS.md` for the family-level manifest's full
 keep-in-sync checklist (the `"skills"` array entry, in particular, if a
 second `stata-*` skill is ever added).

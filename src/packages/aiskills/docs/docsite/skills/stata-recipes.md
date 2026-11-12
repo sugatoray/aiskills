@@ -5,7 +5,7 @@ Turns a plain-language description of a data/statistics task into correct, runna
 | Property | Value |
 | --- | --- |
 | Group | `stata-skills` (alias `stata`) |
-| Version | 1.3.2 |
+| Version | 1.3.3 |
 | Starts | When you type `/stata-recipes`, or your agent uses it when a task fits its description |
 | Needs | Stata 16+ (Stata 17+ recommended — modern `ardl` command and built-in Python integration); optionally Python 3.9+ with the `pystata`/`stata_setup` package (bundled with Stata 17+) for Stata<->Python interop |
 | License | MIT |
@@ -43,7 +43,6 @@ aiskills uninstall -s stata-recipes
 
 The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/stata-recipes/`:
 
-- `.claude-plugin/plugin.json`
 - `CHANGELOG.md`
 - `README.md`
 - `SKILL.md`

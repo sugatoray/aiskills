@@ -39,7 +39,7 @@ Each skill's directory has:
 - `meta/MAINTAINERS.md` — development notes: layout and versioning.
   Not read at invocation time.
 - `CHANGELOG.md` — that skill's own version history.
-- `.claude-plugin/plugin.json` — Claude Code plugin manifest, present
-  when the skill also sits at its plugin root with no `skills/`
-  subfolder (true today for `stata-recipes/`), letting it load directly
-  via `claude --plugin-dir <path>`.
+
+Skills here have no plugin manifest of their own. They ship only through
+the family-level `.claude-plugin/plugin.json`, the same way the
+`scrolls-*` skills do.

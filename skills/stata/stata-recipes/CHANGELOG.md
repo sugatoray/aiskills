@@ -3,6 +3,16 @@
 All notable changes to the `stata-recipes` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.3] - 2026-11-12
+
+### Removed
+
+- `.claude-plugin/plugin.json`, the per-skill plugin manifest. This
+  skill now ships only through the family-level `stata-skills` plugin
+  (`skills/stata/.claude-plugin/plugin.json`), the same group-only
+  structure `scrolls-*` uses. Load it locally with `claude --plugin-dir
+  skills/stata`. No change to the skill's behavior.
+
 ## [1.3.2] - 2026-09-21
 
 ### Fixed

@@ -25,7 +25,7 @@ Alias `stata`. Install the group with `aiskills install -G stata`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`stata-recipes`](stata-recipes.md) | 1.3.2 | Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode. |
+| [`stata-recipes`](stata-recipes.md) | 1.3.3 | Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode. |
 
 ## repo-related-skills
 
