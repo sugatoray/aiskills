@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs><linearGradient id="g-video-related" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DC2626"/><stop offset="1" stop-color="#B91C1C"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g-video-related)"/>
+<rect fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" x="88" y="128" width="336" height="256" rx="40"/>
+<path d="M224 196v120l104-60z" fill="#fff" stroke="#fff" stroke-width="20" stroke-linejoin="round"/>
+</svg>
