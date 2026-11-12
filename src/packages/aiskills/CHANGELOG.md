@@ -20,6 +20,23 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+### Added
+
+- **New bundled skill: `code-review`**, in a new group, `reviews-skills`
+  (alias `reviews`). `/code-review` runs a thorough code review of a pull
+  request, branch, diff, set of files or whole repository at a senior or staff
+  engineer's bar, and returns a structured report: a verdict, findings ranked
+  by severity with file and line, and suggested code changes. It ships a
+  checklist, fix patterns and tool commands for Python, JavaScript,
+  TypeScript, Rust, shell scripts, PowerShell and SQL. The package now bundles
+  17 skills in 9 groups: `aiskills install -s code-review`, or
+  `aiskills install -G reviews`. See the skill's own `CHANGELOG.md`.
+
+### Changed
+
+- The README, the docs' skill and group lists, the examples that print them,
+  the banner and the generated docs pages list the new skill and group.
+
 ## [1.1.0] - 2026-11-12
 
 ### Added

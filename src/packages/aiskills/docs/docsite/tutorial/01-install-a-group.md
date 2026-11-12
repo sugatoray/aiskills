@@ -24,6 +24,10 @@ repo-related-skills  (alias: repo-related)
   Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and simila...
   skills: create-issues-update-pr
 
+reviews-skills  (alias: reviews)
+  Review skills: /code-review runs a thorough, evidence-based code review of a PR, diff, files or repo at a s...
+  skills: code-review
+
 docs-skills  (alias: docs)
   Docs skills: writes verified user documentation for a library, CLI or framework, structured like FastAPI, P...
   skills: create-lib-docs

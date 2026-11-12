@@ -218,7 +218,7 @@ aiskills info
   aiskills version : 1.1.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
-      saved skills : 16 skills in 8 groups, flat layout
+      saved skills : 17 skills in 9 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)

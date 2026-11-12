@@ -22,12 +22,13 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
+| `reviews-skills` | `reviews` | code-review |
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
 | `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
-| `all` (built in) | | all 16 skills |
+| `all` (built in) | | all 17 skills |
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 

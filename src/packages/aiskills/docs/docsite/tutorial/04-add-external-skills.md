@@ -16,7 +16,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, code-review, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 

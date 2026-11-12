@@ -54,6 +54,7 @@ aiskills install -G scrolls -a claude-code
 <!-- skills:start -->
 - [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
 - [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
+- [code-review](skills/code-review.md): Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds…
 - [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
@@ -313,7 +314,7 @@ See also: [CLI reference](../reference/cli.md)
 <!-- source: skills/README.md -->
 # Bundled skills
 
-Every skill in this version of the package (16 skills in 8 groups), with what it does and how to install it.
+Every skill in this version of the package (17 skills in 9 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -347,6 +348,14 @@ Alias `repo-related`. Install the group with `aiskills install -G repo-related`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`create-issues-update-pr`](create-issues-update-pr.md) | 1.3.0 | Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine… |
+
+## reviews-skills
+
+Alias `reviews`. Install the group with `aiskills install -G reviews`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`code-review`](code-review.md) | 1.0.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 
@@ -447,6 +456,87 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/artw
 - `meta/MAINTAINERS.md`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
+<!-- source: skills/code-review.md -->
+# code-review
+
+Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell and SQL, each with its own checklist, before/after fix patterns and tool commands under references/review_<language>/; files in other languages get the cross-language review only. Use this whenever the user asks to review code, review a PR or merge request, do a code review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked.
+
+| Property | Value |
+| --- | --- |
+| Group | `reviews-skills` (alias `reviews`) |
+| Version | 1.0.0 |
+| Starts | When you type `/code-review`, or your agent uses it when a task fits its description |
+| Needs | Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
+| License | MIT |
+| Source | [skills/development/reviews/code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/reviews/code-review) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s code-review -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: code-review
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill code-review --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `reviews-skills` group:
+
+```bash
+aiskills install -G reviews -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s code-review
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code-review/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/claude-code.yaml`
+- `agents/openai.yaml`
+- `meta/MAINTAINERS.md`
+- `references/CROSS_LANGUAGE.md`
+- `references/REPORT_TEMPLATE.md`
+- `references/SEVERITY.md`
+- `references/review_javascript/PATTERNS.md`
+- `references/review_javascript/REVIEW.md`
+- `references/review_javascript/TOOLING.md`
+- `references/review_powershell-script/PATTERNS.md`
+- `references/review_powershell-script/REVIEW.md`
+- `references/review_powershell-script/TOOLING.md`
+- `references/review_python/PATTERNS.md`
+- `references/review_python/REVIEW.md`
+- `references/review_python/TOOLING.md`
+- `references/review_rust/PATTERNS.md`
+- `references/review_rust/REVIEW.md`
+- `references/review_rust/TOOLING.md`
+- `references/review_shellscript/PATTERNS.md`
+- `references/review_shellscript/REVIEW.md`
+- `references/review_shellscript/TOOLING.md`
+- `references/review_sql/PATTERNS.md`
+- `references/review_sql/REVIEW.md`
+- `references/review_sql/TOOLING.md`
+- `references/review_typescript/PATTERNS.md`
+- `references/review_typescript/REVIEW.md`
+- `references/review_typescript/TOOLING.md`
+- `scripts/detect_languages.py`
+- `tests/test_detect_languages.py`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/reviews/code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/reviews/code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
 <!-- source: skills/commentdrop.md -->
 # commentdrop
@@ -1443,6 +1533,10 @@ repo-related-skills  (alias: repo-related)
   Repo-related skills: acting on a repository's own hosted state (issues, pull requests, releases, and simila...
   skills: create-issues-update-pr
 
+reviews-skills  (alias: reviews)
+  Review skills: /code-review runs a thorough, evidence-based code review of a PR, diff, files or repo at a s...
+  skills: code-review
+
 docs-skills  (alias: docs)
   Docs skills: writes verified user documentation for a library, CLI or framework, structured like FastAPI, P...
   skills: create-lib-docs
@@ -1561,7 +1655,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, code-review, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -1723,7 +1817,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, code-review, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 
@@ -2251,7 +2345,7 @@ Use this page when a program, not a person, runs `aiskills`: an AI coding agent,
    ```text
    [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
    [aiskills] no group matches: nope
-     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), image-styles-skills (image-styles), all
+     available: scrolls-skills (scrolls), stata-skills (stata), repo-related-skills (repo-related), reviews-skills (reviews), docs-skills (docs), diagrams-skills (diagrams), personas-skills (personas), video-related-skills (video-related), image-styles-skills (image-styles), all
      see 'aiskills groups'
    ```
 
@@ -2564,12 +2658,13 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
+| `reviews-skills` | `reviews` | code-review |
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
 | `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
-| `all` (built in) | | all 16 skills |
+| `all` (built in) | | all 17 skills |
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 
@@ -2999,7 +3094,7 @@ aiskills info
   aiskills version : 1.1.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
-      saved skills : 16 skills in 8 groups, flat layout
+      saved skills : 17 skills in 9 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)
@@ -4673,11 +4768,12 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-16 skills, sorted by name.
+17 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
 | [`artwallbg`](skills/artwallbg.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/SKILL.md) |
+| [`code-review`](skills/code-review.md) | reviews | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/reviews/code-review/SKILL.md) |
 | [`commentdrop`](skills/commentdrop.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/SKILL.md) |
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |
 | [`create-lib-docs`](skills/create-lib-docs.md) | docs | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/SKILL.md) |
