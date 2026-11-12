@@ -156,33 +156,39 @@ describe("aiskills with AISKILLS_SKILLS_LIB_VERSION", () => {
     assert.ok(dry.out.includes("[aiskills] using skills@latest from AISKILLS_SKILLS_LIB_VERSION, not the tested " + SKILLS_CLI_VERSION), dry.out);
   });
 
-  test("the old name AISKILLS_SKILLS_VERSION still works, with a deprecation warning naming the new one", () => {
+  test("1.0.0 removed the old name AISKILLS_SKILLS_VERSION: it's ignored, so the pinned version runs", () => {
     const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "(..., 1.7.6]" } });
     assert.equal(r.status, 0, r.out);
-    for (const c of r.calls) assert.equal(skillsPackage(c), "skills@<=1.7.6");
-    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated and will be removed in 1\.0\.0: use AISKILLS_SKILLS_LIB_VERSION \(the version of the skills CLI library, not of the bundled skills\)/);
-    assert.equal(r.out.split("is deprecated").length - 1, 1, "warned once");
-    assert.match(r.out, /using skills@<=1\.7\.6 from AISKILLS_SKILLS_VERSION, not the tested/);
+    assert.ok(r.calls.length > 0);
+    for (const c of r.calls) assert.equal(skillsPackage(c), "skills@" + SKILLS_CLI_VERSION);
+    assert.doesNotMatch(r.out, /deprecated|AISKILLS_SKILLS_VERSION/);
   });
 
-  test("AISKILLS_SKILLS_LIB_VERSION wins when both are set, and the old one is still flagged", () => {
+  test("with both set, only AISKILLS_SKILLS_LIB_VERSION is read", () => {
     const r = sb.run(["install"], { env: { AISKILLS_SKILLS_LIB_VERSION: "~1.7.4", AISKILLS_SKILLS_VERSION: "latest" } });
     assert.equal(r.status, 0, r.out);
     for (const c of r.calls) assert.equal(skillsPackage(c), "skills@~1.7.4");
-    assert.match(r.out, /AISKILLS_SKILLS_VERSION is deprecated/);
-    assert.match(r.out, /using skills@~1\.7\.4 from AISKILLS_SKILLS_LIB_VERSION/);
+    assert.doesNotMatch(r.out, /AISKILLS_SKILLS_VERSION/);
   });
 
-  test("a bad value under the old name is refused, naming the variable that was used", () => {
+  test("a bad value under the old name no longer stops an install", () => {
     const r = sb.run(["install"], { env: { AISKILLS_SKILLS_VERSION: "1.0 && calc" } });
-    assert.equal(r.status, 1);
-    assert.match(r.out, /AISKILLS_SKILLS_VERSION must be a version/);
-    assert.deepEqual(r.calls, []);
+    assert.equal(r.status, 0, r.out);
+    for (const c of r.calls) assert.equal(skillsPackage(c), "skills@" + SKILLS_CLI_VERSION);
   });
 
-  test("the docs say the old name is removed in 1.0.0", () => {
-    for (const page of ["docs/docsite/reference/environment.md", "CHANGELOG.md", "README.md"]) {
-      assert.match(readFileSync(join(PKG_SRC, page), "utf8"), /AISKILLS_SKILLS_VERSION[\s\S]{0,400}?removed in 1\.0\.0/, page);
+  test("aiskills info ignores the old name too", () => {
+    const r = sb.run(["info"], { env: { AISKILLS_SKILLS_VERSION: "latest" } });
+    assert.equal(r.status, 0, r.out);
+    assert.match(r.out, new RegExp("skills CLI : skills@" + SKILLS_CLI_VERSION.replace(/\./g, "\\.") + "  \\(pinned, tested\\)"));
+  });
+
+  test("the CHANGELOG lists the removal under 1.0.0, and the code and help no longer mention the old name", () => {
+    const log = readFileSync(join(PKG_SRC, "CHANGELOG.md"), "utf8");
+    const v1 = log.slice(log.indexOf("## [1.0.0]"), log.indexOf("## [0.9.0]"));
+    assert.match(v1, /### Removed[\s\S]*AISKILLS_SKILLS_VERSION/);
+    for (const file of ["src/scripts/core/installer.mjs", "src/scripts/core/cli.mjs"]) {
+      assert.doesNotMatch(readFileSync(join(PKG_SRC, file), "utf8"), /AISKILLS_SKILLS_VERSION|OLD_SKILLS_LIB_VERSION_VAR/, file);
     }
   });
 

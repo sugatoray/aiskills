@@ -34,7 +34,6 @@ import {
   skillsRemove,
   syncSkills,
   warn,
-  OLD_SKILLS_LIB_VERSION_VAR,
   SKILLS_LIB_VERSION_VAR,
   readJson,
   resolveLayout,
@@ -195,7 +194,6 @@ Environment:
                                 [1.7.4, 1.8.0) >=1.7.4 <1.8.0   (..., 1.7.6] <=1.7.6. With a range, npm picks
                                 the newest version its rules (e.g. min-release-age) allow.
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
-                                (AISKILLS_SKILLS_VERSION, its old name, still works until 1.0.0)
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
 `;
@@ -379,7 +377,7 @@ function info(opts) {
       savedAt: meta.installedAt ?? null,
     };
   }
-  const libVar = e[SKILLS_LIB_VERSION_VAR]?.trim() ? SKILLS_LIB_VERSION_VAR : e[OLD_SKILLS_LIB_VERSION_VAR]?.trim() ? OLD_SKILLS_LIB_VERSION_VAR : null;
+  const libVar = e[SKILLS_LIB_VERSION_VAR]?.trim() ? SKILLS_LIB_VERSION_VAR : null;
   const statsOff = ["DO_NOT_TRACK", "DISABLE_TELEMETRY", "CI", "GITHUB_ACTIONS"].find((k) => e[k]);
   const env = envOptions();
   const data = {
