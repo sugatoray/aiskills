@@ -13,7 +13,7 @@ Layout (decided by the user; see `WISDOM.md` → Constraints):
 package.json            "bin": { aiskills, ais -> bin/aiskills.mjs; aix -> bin/aix.mjs }; scripts incl. docs, docs:skills, docs:html
 CHANGELOG.md            Keep a Changelog + SemVer; ships with the package
 SECURITY.md             reporting + what the package touches + protections; ships
-docs/docsite/           user docs (not published): 45 Markdown pages incl. license.md (GENERATED), images/*.svg, llms.txt, llms-full.txt, index.html
+docs/docsite/           user docs (not published): 47 Markdown pages incl. license.md (GENERATED), images/*.svg, llms.txt, llms-full.txt, index.html
 docs/docsite/skills/    GENERATED: one page per bundled skill + overview (npm run docs:skills)
 docs/banner/            banner: config.yaml, GENERATED aiskills-banner.html (editor page), banner_2x.png, README (not published)
 docs/meta/              ARCHITECTURE, FEATURES, MAINTAINERS (not published)
