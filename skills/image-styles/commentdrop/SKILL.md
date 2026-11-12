@@ -21,3 +21,5 @@ Use supplied comments faithfully, including usernames and other details when giv
 By default, add a small set of staggered, floating social-style cards: rounded light rectangles, soft shadows, circular avatars, bold usernames, subtle timestamps, readable comment text, and small heart icons. Make them look like overlay graphics captured from a video edit, not paint on the image. Balance the layout and keep the main subject and important visual features visible; preserve the source image, aspect ratio, and overall composition. Adapt colors and density to the scene or user's preferences.
 
 Use the available image-editing tool to produce and display the edited image. Include the source image and any style reference as inputs. If exact text is important, preserve it as accurately as the tool allows; do not claim verbatim accuracy without verification. Do not present a description alone as the completed result.
+
+See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/commentdrop` prompts and their outputs.
