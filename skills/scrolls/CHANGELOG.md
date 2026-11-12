@@ -32,13 +32,14 @@ Versioning entry) — one shared number across the family, currently:
 
 ## 2026-11-12 (2.5.0)
 
-- **New skill: `/scrolls-explainer`.** It writes `scrolls-explainer.html`, an interactive, offline page that explains the family.
+- **New skill: `/scrolls-explainer`.** It shows `scrolls-explainer.html`, an interactive, offline page that explains the family.
   - One tab per command (setup, update, hide, unhide, remove, restore, help), plus **Overview** and **New session** (how a fresh agent session follows `AGENTS.md`/`CLAUDE.md` → `SCROLLS.md` → `STARTER.md`).
   - Each command tab animates its steps on the diagram, with a callout next to the file being touched.
   - Full keyboard navigation: arrows step, `[` `]` or `0`–`8` switch tabs, `Space` pauses, `R` replays, `?` lists every key.
-  - The page ships prebuilt in `assets/`; `scripts/explain.py` (with thin `.sh`/`.ps1` launchers) copies it: `-o`, `-f`, `--open`, `--version`.
-  - The page's source is `meta/generator/graph.json`, rendered with the `network-flow` skill; `build.py --check` and the test suite fail when the bundled page is stale.
-  - Built Red/Green: `tests/test_explain.sh` (script behavior, page content and version stamp, build freshness, Playwright browser checks) and `tests/test_explain.ps1`.
+  - The page ships prebuilt in `assets/`; `scripts/explain.py` (with thin `.sh`/`.ps1` launchers) opens it in place by default (= `--show`), or copies it with `-o` (`-f`, `--open`).
+  - `--build` regenerates the page from the `scrolls-*` skills as they are now: one tab per skill (a skill switched off with `SKILL.md.deprecated` loses its tab), the lockstep version stamped on it, and a stop (exit 4) naming any skill whose `SKILL.md` changed since its tab was last reviewed (`--build --reviewed` confirms). It renders with the `network-flow` skill.
+  - Built Red/Green: `tests/test_explain.sh` (109 assertions: copying, `--show`, every `--build` outcome on throwaway copies of the skills, page content, freshness, Playwright browser checks) and `tests/test_explain.ps1`.
+  - **Maintainers:** after changing any scrolls skill's `SKILL.md`, run `scrolls-explainer/scripts/explain.sh --build`; its test suite fails until the page is reviewed and rebuilt.
 - **All eight skills bumped to `2.5.0`** together, in lockstep, along with `.claude-plugin/plugin.json` (which now lists `./scrolls-explainer`). MINOR, for the new skill; no other skill changes behavior.
 - `/scrolls-help`: `references/HELP.md` and its `description` now cover `/scrolls-explainer`.
 - Every install command that lists all the skills, `marketplace.json`, the repository `README.md` and `src/scrolls/CLAUDE.md` now include `scrolls-explainer`.

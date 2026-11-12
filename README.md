@@ -101,7 +101,7 @@ use skill: /scrolls-update
 | [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) | Unhide the folder: `docs/.scrolls` --> `docs/scrolls`. |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-remove` | [![badge-scrolls][#skills-sh-badge-scrolls-remove]](https://www.skills.sh/sugatoray/aiskills/scrolls-remove) | Remove the scrolls system and commit the removal (`maint(memory): scrolls-removed`), recording the previous commit for restore. |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-restore` | [![badge-scrolls][#skills-sh-badge-scrolls-restore]](https://www.skills.sh/sugatoray/aiskills/scrolls-restore) | Restore the scrolls memory from the latest `/scrolls-remove` checkpoint (or any commit) into the current code, or `--onto` another branch. |
-| [Scrolls](skills/scrolls/README.md) | `scrolls-explainer` | [![badge-scrolls][#skills-sh-badge-scrolls-explainer]](https://www.skills.sh/sugatoray/aiskills/scrolls-explainer) | Write an interactive, offline page that animates what each scrolls command does, step by step, with keyboard navigation. |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-explainer` | [![badge-scrolls][#skills-sh-badge-scrolls-explainer]](https://www.skills.sh/sugatoray/aiskills/scrolls-explainer) | Show an interactive, offline page that animates what each scrolls command does, step by step, with keyboard navigation (`-o` copies it, `--build` regenerates it). |
 
 ---
 

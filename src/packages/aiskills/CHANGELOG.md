@@ -25,7 +25,7 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 ### Added
 
 - **New bundled skill: `scrolls-explainer`**, in the `scrolls-skills` group
-  (alias `scrolls`). `/scrolls-explainer` writes `scrolls-explainer.html`, an
+  (alias `scrolls`). `/scrolls-explainer` opens `scrolls-explainer.html`, an
   interactive, offline page with one tab per scrolls command that animates
   what the command does, step by step, with a callout for each step and full
   keyboard navigation. The package now bundles 16 skills in 8 groups:

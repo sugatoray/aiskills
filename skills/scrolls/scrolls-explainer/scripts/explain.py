@@ -2,30 +2,47 @@
 """Write the scrolls explainer page: an interactive, offline HTML page that
 shows how the scrolls-* skills work, one animated tab per command.
 
-The page itself is prebuilt and ships with this skill as
-assets/scrolls-explainer.html; this script only copies it to where the
-user wants it (and can open it). explain.sh and explain.ps1 are thin
+The page ships prebuilt with this skill as assets/scrolls-explainer.html.
+By default (or with --show) this script opens that page in place and copies
+nothing; -o copies it to where the user wants it; --build first regenerates
+it from the scrolls-* skills as they are now (see build_page.py). explain.sh and explain.ps1 are thin
 launchers that locate a Python interpreter and pass every argument
 through unchanged, so the two platforms can never drift apart.
 
 Stdlib only, Python 3.9+.
 
 Usage:
-  explain.py [-o PATH] [-f] [--open]
+  explain.py [--show]
+  explain.py -o PATH [-f] [--open]
+  explain.py --build [--reviewed] [--skills-dir DIR] [--show | -o PATH [-f] [--open]]
   explain.py --version | -h
 
-  -o, --output PATH   Where to write the page. A file path is used as is; an
-                      existing folder, or a path ending in a slash, gets
-                      scrolls-explainer.html inside it. Missing folders are
-                      created. Default: ./scrolls-explainer.html
+  -o, --output PATH   Copy the page here. A file path is used as is; an
+                      existing folder (such as .), or a path ending in a
+                      slash, gets scrolls-explainer.html inside it. Missing
+                      folders are created. Without -o nothing is copied:
+                      the bundled page is shown in place (--show).
   -f, --force         Overwrite a different file that is already there.
-      --open          Also open the page in the default web browser.
+      --open          With -o: also open the copy in the default browser.
+      --show          The default. Copy nothing: print where the bundled page
+                      is (assets/scrolls-explainer.html) and open it in place.
+      --build         Regenerate assets/scrolls-explainer.html from the
+                      scrolls-* skills next to this one: their tabs, their
+                      lockstep version, and a check that no SKILL.md changed
+                      since the page's text was last reviewed. Alone, it
+                      only rebuilds; add --show to open it, or -o to copy it.
+      --reviewed      With --build: the changed skills' tabs were checked;
+                      record their new SKILL.md fingerprints and build.
+      --skills-dir DIR  With --build: where the scrolls-* skills are
+                      (default: the folder this skill is in).
       --version       Print the version of the page and exit.
   -h, --help          Print this help and exit.
 
-Exit codes: 0 written (or already up to date), 1 the bundled page is
-missing or the file could not be written, 2 usage error, 3 refused: a
-different file is already there and -f was not given.
+Exit codes: 0 done (or already up to date), 1 the bundled page is missing
+or a file could not be written, 2 usage error, 3 refused: a different file
+is already there and -f was not given, 4 --build stopped: the skills need
+attention first (a review, lockstep versions, a missing skill, a skill with
+no tab), 5 --build could not find the network-flow skill's renderer.
 """
 from __future__ import annotations
 
@@ -65,10 +82,15 @@ def resolve_target(output: str | None) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = Parser(prog="explain", add_help=False, usage="explain [-o PATH] [-f] [--open] | --version | -h")
+    ap = Parser(prog="explain", add_help=False,
+                usage="explain [-o PATH] [-f] [--open] | --show | --build [--reviewed] [...] | --version | -h")
     ap.add_argument("-o", "--output")
     ap.add_argument("-f", "--force", action="store_true")
     ap.add_argument("--open", action="store_true")
+    ap.add_argument("--show", action="store_true")
+    ap.add_argument("--build", action="store_true")
+    ap.add_argument("--reviewed", action="store_true")
+    ap.add_argument("--skills-dir")
     ap.add_argument("--version", action="store_true")
     ap.add_argument("-h", "--help", action="store_true")
     args = ap.parse_args(argv)
@@ -76,6 +98,21 @@ def main(argv: list[str] | None = None) -> int:
     if args.help:
         print(__doc__.split("Usage:", 1)[1].split("Exit codes:", 1)[0].strip("\n").replace("explain.py", "explain"))
         return 0
+
+    if args.force and not args.output:
+        ap.error("-f only goes with -o: without -o nothing is copied, so there is nothing to overwrite")
+    if args.show and args.output:
+        ap.error("--show opens the bundled page in place; it can't be combined with -o")
+    if (args.reviewed or args.skills_dir) and not args.build:
+        ap.error("--reviewed and --skills-dir only go with --build")
+    if args.build:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import build_page
+        code = build_page.build(Path(args.skills_dir).resolve() if args.skills_dir else None, reviewed=args.reviewed)
+        if code != 0:
+            return code
+        if not (args.show or args.output or args.open):
+            return 0
 
     try:
         data = PAGE.read_bytes()
@@ -87,6 +124,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.version:
         print(f"scrolls-explainer {version}")
         return 0
+
+    if not args.output:  # no -o: show the bundled page in place (--show is the default)
+        url = PAGE.as_uri()
+        print(f"scrolls-explainer {version}: {PAGE}")
+        print(f"open: {url}")
+        return _maybe_open(True, url)
 
     target = resolve_target(args.output)
     shown = os.path.abspath(target)

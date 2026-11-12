@@ -976,5 +976,14 @@
     "text": "Scripted explanation of the scrolls skill family, not measured activity.",
     "reference": "Source: skills/scrolls/*/SKILL.md in sugatoray/aiskills",
     "note": "Shared flags: -p path · -t repo root · -l current dir · -r recurse"
+  },
+  "sources": {
+    "scrolls-help": "fddb7450237dfee908ab51a47f5470d556f9895537450aab122d0866def59b06",
+    "scrolls-hide": "6d9734dc78036b5c0bfd0f387f9bb77dd16bb69761ffdcee141c9a0a2ffa558b",
+    "scrolls-remove": "1623ee1f0a5886c634857a36e9b1d12d0ebb497fabc7793216ffa683c3fe4d03",
+    "scrolls-restore": "c6398ac09815bcf1391efff868e838c51ba75b45ce74662974518c10ce138dff",
+    "scrolls-setup": "5456b21097f5decc049432903e0f3019b4e4a6c085aad622cd84a6c44df4b2b3",
+    "scrolls-unhide": "6082ca023fc2b098bb53b04a801ae52d2617e5ebab9101809a78ac3c360bf78e",
+    "scrolls-update": "a77dc6a9a9bc0b778900acdfa4e49aedc60a8ea1cd3c3df54574dc3d88d27d0a"
   }
 }

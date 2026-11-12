@@ -81,8 +81,9 @@ function placeCallout(){const sc=scenes[scene];
  else{ar.style.top=side==='below'?'-7px':'';ar.style.left=Math.max(12,Math.min(nl+nw/2-x-6,cw-24))+'px';}
  co.classList.add('on');}
 const tabBtns=()=>[...root.querySelectorAll('.rf-tab')];
+const lastTab=Math.min(9,tabBtns().length-1);
 const keys=document.createElement('div');keys.className='rf-keys';
-keys.innerHTML='<span><kbd>&larr;</kbd> <kbd>&rarr;</kbd> step</span><span><kbd>[</kbd> <kbd>]</kbd> or <kbd>Shift</kbd>+<kbd>&larr;</kbd><kbd>&rarr;</kbd> tab</span><span><kbd>0</kbd>&ndash;<kbd>8</kbd> jump to tab</span><span><kbd>Space</kbd> pause</span><span><kbd>R</kbd> replay</span><span><button type="button" data-keys-help>all shortcuts (<kbd>?</kbd>)</button></span>';
+keys.innerHTML='<span><kbd>&larr;</kbd> <kbd>&rarr;</kbd> step</span><span><kbd>[</kbd> <kbd>]</kbd> or <kbd>Shift</kbd>+<kbd>&larr;</kbd><kbd>&rarr;</kbd> tab</span><span><kbd>0</kbd>&ndash;<kbd>'+lastTab+'</kbd> jump to tab</span><span><kbd>Space</kbd> pause</span><span><kbd>R</kbd> replay</span><span><button type="button" data-keys-help>all shortcuts (<kbd>?</kbd>)</button></span>';
 $('.rf-nav').after(keys);
 const help=document.createElement('div');help.className='rf-help';help.setAttribute('role','dialog');help.setAttribute('aria-modal','true');help.setAttribute('aria-label','Keyboard shortcuts');
 help.innerHTML='<div class="rf-help-box" tabindex="-1"><h3>Keyboard shortcuts</h3><table>'+[
@@ -90,7 +91,7 @@ help.innerHTML='<div class="rf-help-box" tabindex="-1"><h3>Keyboard shortcuts</h
  ['<kbd>Home</kbd> / <kbd>End</kbd>','First / last step of this tab'],
  ['<kbd>]</kbd> / <kbd>[</kbd>','Next / previous tab'],
  ['<kbd>Shift</kbd>+<kbd>&rarr;</kbd> / <kbd>&larr;</kbd>','Next / previous tab'],
- ['<kbd>0</kbd> &ndash; <kbd>8</kbd>','Jump to a tab (0 = Overview)'],
+ ['<kbd>0</kbd> &ndash; <kbd>'+lastTab+'</kbd>','Jump to a tab (0 = Overview)'],
  ['<kbd>Space</kbd> or <kbd>P</kbd>','Pause / resume autoplay'],
  ['<kbd>R</kbd>','Replay this tab from step 1'],
  ['<kbd>Tab</kbd>, <kbd>Enter</kbd>','Move between and press buttons or blocks'],

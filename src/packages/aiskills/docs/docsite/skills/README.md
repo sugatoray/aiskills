@@ -10,7 +10,7 @@ Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`scrolls-explainer`](scrolls-explainer.md) | 2.5.0 | Writes scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup, /scrolls-update,… |
+| [`scrolls-explainer`](scrolls-explainer.md) | 2.5.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
 | [`scrolls-help`](scrolls-help.md) | 2.5.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
 | [`scrolls-hide`](scrolls-hide.md) | 2.5.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
 | [`scrolls-remove`](scrolls-remove.md) | 2.5.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |

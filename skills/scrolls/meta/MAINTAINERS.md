@@ -16,7 +16,9 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   (plus [`SECURITY.md`](../scrolls-help/meta/SECURITY.md) for its local
   `-e`/`--online` server)
 - [`scrolls-explainer/meta/MAINTAINERS.md`](../scrolls-explainer/meta/MAINTAINERS.md)
-  (plus how its page is built from `meta/generator/` and kept current)
+  (plus how `--build` keeps its page true to the other skills: when you
+  change any scrolls skill's `SKILL.md`, run `scrolls-explainer`'s
+  `scripts/explain.sh --build`; it names the tabs to review)
 
 ## What's shared across all eight
 

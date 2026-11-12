@@ -1,11 +1,14 @@
 # scrolls-explainer
 
-Writes `scrolls-explainer.html`: an interactive, offline page that shows
+Shows `scrolls-explainer.html`: an interactive, offline page that shows
 how the scrolls skill family works. Each command gets a tab that animates
 what it does, step by step, with a callout explaining each step. You can
 drive it all from the keyboard.
 
-Run it with `/scrolls-explainer`.
+Run it with `/scrolls-explainer` (the same as `--show`: open the bundled
+page in place), `/scrolls-explainer -o .` (copy it here) or
+`/scrolls-explainer --build` (regenerate the bundled page from the
+`scrolls-*` skills as they are now).
 
 ## Layout
 
@@ -15,17 +18,16 @@ scrolls-explainer/
 │   └── openai.yaml
 ├── assets/
 │   ├── EXAMPLES.md
+│   ├── explainer-graph.json
 │   └── scrolls-explainer.html
 ├── meta/
-│   ├── generator/
-│   │   ├── build.py
-│   │   ├── enhance.py
-│   │   └── graph.json
 │   └── MAINTAINERS.md
 ├── scripts/
+│   ├── build_page.py
 │   ├── explain.ps1
 │   ├── explain.py
-│   └── explain.sh
+│   ├── explain.sh
+│   └── page_enhance.py
 ├── tests/
 │   ├── browser/
 │   │   └── check_page.cjs
@@ -39,6 +41,7 @@ scrolls-explainer/
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
 - **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
 - **The page**: [`assets/scrolls-explainer.html`](assets/scrolls-explainer.html) (prebuilt; open it in any browser)
+- **The page's words**: [`assets/explainer-graph.json`](assets/explainer-graph.json) (every tab, step and block; `--build` renders it)
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)
 - **Skill family**: [`../README.md`](../README.md)

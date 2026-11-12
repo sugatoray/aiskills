@@ -53,13 +53,14 @@ Built and tested (88 assertions, end to end through the real `remove.sh`). Merge
 
 ## `/scrolls-explainer` (2.5.0, on branch `claude/brave-mccarthy-m6aut0`)
 
-Writes `scrolls-explainer.html`, an interactive, offline page that shows how the family works: an Overview, a New session tab (how an agent follows `AGENTS.md`/`CLAUDE.md` → `SCROLLS.md` → `STARTER.md`), and one tab per command that animates its steps with a callout next to the file being touched.
+Shows `scrolls-explainer.html`, an interactive, offline page that shows how the family works: an Overview, a New session tab (how an agent follows `AGENTS.md`/`CLAUDE.md` → `SCROLLS.md` → `STARTER.md`), and one tab per command that animates its steps with a callout next to the file being touched.
 
 - Everything works from the keyboard: arrows step, `[` `]` or `0`–`8` switch tabs, `Space` pauses, `R` replays, `?` lists every key.
-- `-o` picks a file or folder (default `./scrolls-explainer.html`), `-f` overwrites a different file, `--open` opens a browser, `--version`.
-- It never touches the user's scrolls; the page ships prebuilt and the script only copies it.
+- With no flags (= `--show`, the user's call) it opens the bundled page in place and copies nothing; `-o` copies it to a file or folder (`-o .` for `./scrolls-explainer.html`), `-f` overwrites a different file, `--open` opens the copy, `--version`.
+- `--build` regenerates it from the `scrolls-*` skills as they are now (tabs, lockstep version, a review stop when a `SKILL.md` changed, `--reviewed` to confirm).
+- It never touches the user's scrolls memory.
 
-Tested: 55 assertions in `test_explain.sh`, including Playwright browser checks and a build-freshness check.
+Tested: 109 assertions in `test_explain.sh`, including Playwright browser checks and a build-freshness check.
 
 ## `src/scrolls/` install pointer
 

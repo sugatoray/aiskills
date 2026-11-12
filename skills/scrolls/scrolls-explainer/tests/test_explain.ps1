@@ -32,9 +32,16 @@ function Invoke-Explain($dir, [string[]]$argv) {
     finally { Pop-Location }
 }
 
-Write-Host "`n=== 1: no arguments writes ./$Name ==="
+$env:BROWSER = 'false'   # showing the page opens a browser; never a real one from a test
+
+Write-Host "`n=== 0: no arguments shows the bundled page and copies nothing ==="
 $d = New-TempDir
 $r = Invoke-Explain $d @()
+Check ($r.Code -eq 0 -and $r.Out -match 'assets[/\\]scrolls-explainer\.html') 'prints the bundled page'
+Check (-not (Test-Path (Join-Path $d $Name))) 'copies nothing'
+
+Write-Host "`n=== 1: -o . writes ./$Name ==="
+$r = Invoke-Explain $d @('-o', '.')
 Check ($r.Code -eq 0) 'exit 0'
 Check (Same (Join-Path $d $Name) $Page) 'file is the bundled page'
 Check ($r.Out -match "scrolls-explainer $([regex]::Escape($Version))") 'names the version'
@@ -42,10 +49,10 @@ Check ($r.Out -match 'file://') 'prints a file:// URL'
 
 Write-Host "`n=== 2: an existing, different file needs -f ==="
 Set-Content -NoNewline -Path (Join-Path $d $Name) -Value "keep me`n"
-$r = Invoke-Explain $d @()
+$r = Invoke-Explain $d @('-o', '.')
 Check ($r.Code -eq 3) 'refused with exit 3'
 Check ((Get-Content -Raw (Join-Path $d $Name)) -eq "keep me`n") 'file left untouched'
-$r = Invoke-Explain $d @('--force')
+$r = Invoke-Explain $d @('-o', '.', '--force')
 Check ($r.Code -eq 0) '--force exit 0'
 Check (Same (Join-Path $d $Name) $Page) '--force replaced the file'
 
@@ -65,6 +72,20 @@ $r = Invoke-Explain $d @('-h')
 Check ($r.Code -eq 0 -and $r.Out -match '--output') '-h prints usage'
 $r = Invoke-Explain $d @('--bogus')
 Check ($r.Code -eq 2) 'unknown flag exits 2'
+
+Write-Host "`n=== 5: --show and --build pass through the launcher ==="
+$d = New-TempDir
+$r = Invoke-Explain $d @('--show')
+Check ($r.Code -eq 0 -and $r.Out -match 'assets[/\\]scrolls-explainer\.html') '--show prints the bundled page'
+Check (-not (Test-Path (Join-Path $d $Name))) '--show copies nothing'
+$r = Invoke-Explain $d @('--show', '-o', 'x.html')
+Check ($r.Code -eq 2) '--show with -o exits 2'
+$r = Invoke-Explain $d @('--reviewed')
+Check ($r.Code -eq 2) '--reviewed without --build exits 2'
+if (Test-Path (Join-Path $SkillDir '../../diagrams/network-flow/scripts/render.py')) {
+    $r = Invoke-Explain $d @('--build')
+    Check ($r.Code -eq 0 -and $r.Out -match 'unchanged') '--build on unchanged skills reports the page unchanged'
+}
 
 Write-Host ""
 Write-Host "$($script:Total - $script:Failures)/$($script:Total) passed"

@@ -14,13 +14,14 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 2. **`/scrolls-explainer` built Red/Green** (the user's request, modelled on the other scrolls skills):
    - `tests/test_explain.sh` was written first: 54 assertions, 49 failing for the right reason (no script, page or build).
    - Then `scripts/explain.py` (+ thin `.sh`/`.ps1` launchers): `-o` file or folder, `-f`, `--open`, `--version`. A different file at the target is refused (exit 3); an identical one is "already up to date".
-   - The page ships prebuilt in `assets/`. Its source is `meta/generator/graph.json`, rendered by `skills/diagrams/network-flow`'s renderer, plus `enhance.py` (callouts, keys, version stamp); `build.py --check` and test scenario 11 catch a stale page.
+   - The page ships prebuilt in `assets/`. Its words are in `assets/explainer-graph.json`, rendered by `skills/diagrams/network-flow`'s renderer, plus `scripts/page_enhance.py` (callouts, keys, version stamp); test scenario 11 catches a stale page.
    - `tests/browser/check_page.cjs` (Playwright) runs from the suite when available.
-3. **The user's choices:** default output is `./scrolls-explainer.html` (the agent passes `-o` to a host outputs folder when it has one); bundle the skill in the npm package and bump it to `1.1.0`.
-4. **Caught on the way:** the generator first lived in `meta/build/`, which the repo `.gitignore` ignores (`build/`), so it would never have been committed. Renamed to `meta/generator/`; scenario 13 now fails if git ignores any file in the skill.
+3. **The user's choices:** a bare `/scrolls-explainer` is `--show` (open the bundled page in place, copy nothing; this replaced an earlier copy-to-`./scrolls-explainer.html` default); copying needs `-o` (`-o .` for the current folder, or the host's outputs folder); bundle the skill in the npm package and bump it to `1.1.0`.
+4. **Caught on the way:** the generator first lived in `meta/build/`, which the repo `.gitignore` ignores (`build/`), so it would never have been committed. Scenario 13 now fails if git ignores any file in the skill.
+5. **`--show` and `--build`** (the user's follow-up): `--show` opens the bundled page in place. `--build` regenerates it from the `scrolls-*` skills as they are then: tabs per skill (deactivated via `SKILL.md.deprecated` → tab dropped; folder missing → stop), the lockstep version (mismatch → stop), and a fingerprint of each `SKILL.md` minus its version line (changed → stop until the tab is reviewed and `--build --reviewed`). The generator moved from `meta/` to `scripts/` (`build_page.py`, `page_enhance.py`) and the graph to `assets/explainer-graph.json`, since `--build` is now user-facing. Red/Green: 48 new assertions (scenarios 14–25) failed first, then passed; four deliberate code mutations were each caught. Folded into the unreleased 2.5.0 rather than a new 2.6.0, as nothing had merged.
 
 ## Known issues / open threads
 
 - Open a PR for `claude/brave-mccarthy-m6aut0` when the user asks.
 - `test_explain.ps1` (and every other `.ps1` suite) has never run: no `pwsh` here, and downloading it was blocked again.
-- If any other scrolls command's behavior changes, `/scrolls-explainer`'s `meta/generator/graph.json` must be edited and the page rebuilt (see its `meta/MAINTAINERS.md`).
+- After any change to a scrolls skill's `SKILL.md`, run `skills/scrolls/scrolls-explainer/scripts/explain.sh --build`: it names the tabs to review in `assets/explainer-graph.json`, then `--build --reviewed`. Its test suite fails until that's done.

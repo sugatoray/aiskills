@@ -10,7 +10,11 @@ const assert = require('node:assert/strict');
 
 const file = process.argv[2];
 const shots = process.argv[3];
-const TABS = ['setup', 'session', 'update', 'hide', 'unhide', 'remove', 'restore', 'help'];
+const ALL_TABS = ['setup', 'session', 'update', 'hide', 'unhide', 'remove', 'restore', 'help'];
+// SCROLLS_TABS: the tabs a rebuilt page should have (e.g. after a skill was
+// deactivated). The keyboard walk-through below assumes the full set.
+const TABS = process.env.SCROLLS_TABS ? process.env.SCROLLS_TABS.split(',') : ALL_TABS;
+const FULL = TABS.join() === ALL_TABS.join();
 const STEP_MS = 5200;
 
 (async () => {
@@ -70,6 +74,17 @@ const STEP_MS = 5200;
       }
     }
     ok(`callouts placed at ${width}px`);
+  }
+
+  const hint = await page.locator('.rf-keys').textContent();
+  assert.ok(hint.includes(`0–${TABS.length}`), `key hint names tabs 0–${TABS.length}: ${hint}`);
+  ok('key hint matches the number of tabs');
+  if (!FULL) {
+    assert.deepEqual(errors, []);
+    assert.deepEqual(requests, []);
+    ok('no runtime errors, no network requests');
+    await browser.close();
+    return;
   }
 
   await page.setViewportSize({width: 1280, height: 900});
