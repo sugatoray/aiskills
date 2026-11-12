@@ -20,7 +20,7 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-11-12
+## [1.0.0] - 2026-11-11
 
 The first stable release. From here on, a change that can break existing use
 (a removed or renamed command, option or variable, a changed default, or a
