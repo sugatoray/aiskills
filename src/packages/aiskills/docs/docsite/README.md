@@ -69,6 +69,7 @@ aiskills install -G scrolls -a claude-code
 - [scrolls-update](skills/scrolls-update.md): Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any…
 - [stata-recipes](skills/stata-recipes.md): Turns a plain-language description of a data/statistics task into correct, runnable Stata code — a .do file or command sequence, not pseudocode.
 <!-- skills:end -->
+- [See how the scrolls skills work](explainers/scrolls.md): an interactive, animated page with one tab per `/scrolls-*` command, step by step.
 
 ### Tutorial
 

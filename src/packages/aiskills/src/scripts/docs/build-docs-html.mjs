@@ -9,6 +9,11 @@
 // under each. Every page's Markdown and every SVG in images/ are embedded as
 // JSON; the page renders them in the browser with marked and highlight.js,
 // loaded from cdnjs. Links to files outside the docs point at GitHub on --ref.
+// HTML pages kept in the docs folder (explainers/*.html, but not index.html)
+// are not embedded: the bundle lists them in DATA.static, links and iframes
+// that point at them stay relative to index.html, and the command line copies
+// them next to the file it writes when that is not in the docs folder (as for
+// the GitHub Pages build, site/index.html).
 // The landing page opens with the banner: its markup and CSS, without the
 // editing features, copied from docs/banner/aiskills-banner.html (npm run
 // banner). --banner picks another file, --no-banner leaves it out.
@@ -16,7 +21,7 @@
 // Ported from sugatoray/callai's docs/site/build_docs_html.py. Used only to
 // build the docs, so it is not published.
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -65,6 +70,19 @@ function mdFiles(dir, rel = "") {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? mdFiles(join(dir, e.name), rel + e.name + "/") : e.name.endsWith(".md") ? [rel + e.name] : [],
   );
+}
+
+/**
+ * The HTML pages under <dir> (e.g. explainers/scrolls-explainer.html) that are
+ * served next to the bundle as they are, as sorted posix paths. index.html at
+ * the top is the bundle itself, so it isn't one.
+ */
+export function staticPages(dir, rel = "") {
+  return readdirSync(dir, { withFileTypes: true })
+    .flatMap((e) =>
+      e.isDirectory() ? staticPages(join(dir, e.name), rel + e.name + "/") : e.name.endsWith(".html") && rel + e.name !== "index.html" ? [rel + e.name] : [],
+    )
+    .sort();
 }
 
 /**
@@ -125,6 +143,7 @@ export function build(docs, { ref = "master", banner = BANNER } = {}) {
     tabs,
     pages,
     images,
+    static: staticPages(docs),
     repoBase: `${REPO}/blob/${ref}/${DOCS_IN_REPO}`,
     treeBase: `${REPO}/tree/${ref}/${DOCS_IN_REPO}`,
     banner: null,
@@ -149,7 +168,7 @@ export function build(docs, { ref = "master", banner = BANNER } = {}) {
     .replace("/*__SKIN_CSS__*/", () => pageSkinCss())
     .replace("/*__BANNER_CSS__*/", () => bannerCss)
     .replace("/*__DOCS_DATA__*/null", () => blob);
-  return { html, count: pages.length };
+  return { html, count: pages.length, statics: data.static };
 }
 
 /** Command line: <docs> --out <file> [--ref <branch>]. */
@@ -166,10 +185,19 @@ export function main(argv = process.argv.slice(2)) {
     else docs = argv[i];
   }
   if (!docs || !out) throw new Error("usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]");
-  const { html, count } = build(docs, { ref, banner });
-  mkdirSync(dirname(resolve(out)), { recursive: true });
+  const { html, count, statics } = build(docs, { ref, banner });
+  const outDir = dirname(resolve(out));
+  mkdirSync(outDir, { recursive: true });
   writeFileSync(out, html);
-  console.error(`wrote ${out} (${count} pages, ${Math.round(html.length / 1024)} KB)`);
+  // Pages the bundle links to but doesn't embed must sit next to it.
+  if (outDir !== resolve(docs)) {
+    for (const rel of statics) {
+      mkdirSync(dirname(join(outDir, rel)), { recursive: true });
+      copyFileSync(join(docs, rel), join(outDir, rel));
+    }
+  }
+  console.error(`wrote ${out} (${count} pages, ${Math.round(html.length / 1024)} KB` +
+    (statics.length ? `; ${statics.length} page${statics.length === 1 ? "" : "s"} next to it: ${statics.join(", ")}` : "") + ")");
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

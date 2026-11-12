@@ -84,6 +84,10 @@ skill whose `SKILL.md` changed since the last review. Then:
 3. `bash tests/test_explain.sh` (it re-runs the browser checks).
 4. Look at the page at desktop and phone width. For screenshots:
    `node tests/browser/check_page.cjs assets/scrolls-explainer.html <dir>`.
+5. The npm package's docs carry a copy of the page
+   (`src/packages/aiskills/docs/docsite/explainers/scrolls-explainer.html`,
+   embedded by `explainers/scrolls.md`). Refresh it with `npm run docs` in
+   `src/packages/aiskills/`; the package's `npm test` fails until you do.
 
 A family-wide version bump changes the stamp but needs no review: just
 `--build` after bumping `metadata.version` everywhere; scenario 11 fails

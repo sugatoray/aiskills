@@ -105,5 +105,12 @@ describe("docs publishing workflow", () => {
     const html = readFileSync(out, "utf8");
     assert.match(html, /<title>[^<]*aiskills/i);
     assert.match(html, /github\.com\/sugatoray\/aiskills\/blob\/some-branch\//);
+    const explainer = join(out, "..", "explainers", "scrolls-explainer.html");
+    assert.ok(existsSync(explainer), "the explainer page is published next to index.html");
+    assert.equal(
+      readFileSync(explainer, "utf8"),
+      readFileSync(join(PKG_SRC, docs, "explainers", "scrolls-explainer.html"), "utf8"),
+      "an exact copy of the one in docs/docsite/",
+    );
   });
 });

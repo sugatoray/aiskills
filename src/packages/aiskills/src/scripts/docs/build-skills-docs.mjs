@@ -3,6 +3,7 @@
 //   docs/docsite/skills/README.md     an overview, by group
 //   docs/docsite/skills/<name>.md     one page per skill
 //   docs/docsite/README.md            the list between <!-- skills:start --> and <!-- skills:end -->
+//   docs/docsite/explainers/*.html    copies of the skills' explainer pages (EXPLAINERS below)
 //   docs/docsite/license.md           the package's license, and a table of every bundled skill's
 //
 // Usage: node src/scripts/docs/build-skills-docs.mjs   (npm run docs:skills)
@@ -25,6 +26,14 @@ const PKG_DIR = resolve(HERE, "..", "..", "..");
 const DOCS = join(PKG_DIR, "docs", "docsite");
 const TREE = "https://github.com/sugatoray/aiskills/tree/master/skills/";
 const BLOB = "https://github.com/sugatoray/aiskills/blob/master/skills/";
+/**
+ * Explainer pages the docs serve next to index.html, copied as they are from
+ * the skill that ships them: docs path -> repo path. A docs page introduces
+ * and embeds each one (explainers/*.md, written by hand).
+ */
+export const EXPLAINERS = {
+  "explainers/scrolls-explainer.html": "skills/scrolls/scrolls-explainer/assets/scrolls-explainer.html",
+};
 const START = "<!-- skills:start -->";
 const END = "<!-- skills:end -->";
 
@@ -258,6 +267,11 @@ export function main() {
   // license.md sits at the top of the docs, next to README.md.
   for (const [rel, text] of Object.entries(out)) writeFileSync(join(DOCS, rel), text);
   writeFileSync(join(DOCS, "README.md"), landing);
+  const repoRoot = findRepoRoot(PKG_DIR);
+  for (const [rel, src] of Object.entries(EXPLAINERS)) {
+    mkdirSync(dirname(join(DOCS, rel)), { recursive: true });
+    writeFileSync(join(DOCS, rel), readFileSync(join(repoRoot, src)));
+  }
   console.error(`wrote ${Object.keys(out).length} pages to ${dir}`);
 }
 

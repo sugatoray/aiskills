@@ -560,7 +560,16 @@ const DATA = /*__DOCS_DATA__*/null;
       host.replaceWith(wrap); wrap.appendChild(img);
     });
 
-    // Links: other pages become in-app routes; files outside the docs go to GitHub
+    // Embedded pages (explainers): a relative iframe src points next to index.html
+    doc.querySelectorAll("iframe[src]").forEach(f => {
+      const src = f.getAttribute("src");
+      if (/^[a-z]+:/i.test(src)) return;
+      const r = resolve(page.path, src);
+      if (r && (DATA.static || []).includes(r.path)) f.setAttribute("src", r.path);
+    });
+
+    // Links: other pages become in-app routes; HTML pages served next to
+    // index.html stay relative; other files outside the docs go to GitHub
     doc.querySelectorAll("a[href]").forEach(a => {
       if (a.classList.contains("anchor")) return;
       const href = a.getAttribute("href");
@@ -569,6 +578,7 @@ const DATA = /*__DOCS_DATA__*/null;
       const r = resolve(page.path, href);
       const target = r && byPath.get(r.path);
       if (target) { a.href = "#" + target.id; if (r.hash) a.dataset.anchor = r.hash; return; }
+      if (r && (DATA.static || []).includes(r.path)) { a.setAttribute("href", r.path); a.target = "_blank"; a.rel = "noopener"; return; }
       const base = r.path.endsWith("/") ? DATA.treeBase : DATA.repoBase;
       a.href = new URL(href, base + page.path).href;
       a.target = "_blank"; a.rel = "noopener";

@@ -40,6 +40,12 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   banner and the generated docs pages list the new skill. Upgrading from
   1.0.0 with `aiskills upgrade` lists `scrolls-explainer` as new, with the
   command to install it.
+- The docs gain **See how the scrolls skills work**
+  (`docs/docsite/explainers/scrolls.md`, in the Skills tab), which embeds the
+  skill's interactive page. `npm run docs:skills` copies that page from the
+  skill into `docs/docsite/explainers/`; the docs bundle links it relative to
+  `index.html`, and `npm run docs:site` publishes it next to `site/index.html`.
+  The docs are not part of the npm package.
 
 ## [1.0.0] - 2026-11-11
 
