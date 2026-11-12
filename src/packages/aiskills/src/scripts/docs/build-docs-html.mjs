@@ -10,10 +10,12 @@
 // JSON; the page renders them in the browser with marked and highlight.js,
 // loaded from cdnjs. Links to files outside the docs point at GitHub on --ref.
 // HTML pages kept in the docs folder (explainers/*.html, but not index.html)
-// are not embedded: the bundle lists them in DATA.static, links and iframes
-// that point at them stay relative to index.html, and the command line copies
-// them next to the file it writes when that is not in the docs folder (as for
-// the GitHub Pages build, site/index.html).
+// are listed in DATA.static and embedded (base64) in DATA.staticHtml: an iframe that
+// shows one renders the embedded copy (srcdoc), so index.html works on its own
+// (a preview, a single downloaded file). A link to one opens the file next to
+// index.html when the site is served and the file is there, else the embedded
+// copy. The command line also copies them next to the file it writes when that
+// is not in the docs folder (the GitHub Pages build, site/index.html).
 // The landing page opens with the banner: its markup and CSS, without the
 // editing features, copied from docs/banner/aiskills-banner.html (npm run
 // banner). --banner picks another file, --no-banner leaves it out.
@@ -144,6 +146,8 @@ export function build(docs, { ref = "master", banner = BANNER } = {}) {
     pages,
     images,
     static: staticPages(docs),
+    // base64, like the images: raw HTML (with its own <script> tags) must not sit inside this page's <script>.
+    staticHtml: Object.fromEntries(staticPages(docs).map((rel) => [rel, readFileSync(join(docs, rel)).toString("base64")])),
     repoBase: `${REPO}/blob/${ref}/${DOCS_IN_REPO}`,
     treeBase: `${REPO}/tree/${ref}/${DOCS_IN_REPO}`,
     banner: null,

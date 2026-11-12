@@ -486,6 +486,33 @@ const DATA = /*__DOCS_DATA__*/null;
     return;
   }
 
+  /* ---------- pages served next to index.html (explainers) ---------- */
+  // A link opens the file next to index.html when the site is served and the
+  // file is there; otherwise (index.html opened on its own, file://) it opens
+  // the copy embedded in DATA.staticHtml.
+  function staticHtml(path) {
+    const b64 = (DATA.staticHtml || {})[path];
+    if (b64 === undefined) return undefined;
+    return new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+  }
+  const staticUrls = new Map();
+  function embeddedUrl(path) {
+    if (!staticUrls.has(path)) staticUrls.set(path, URL.createObjectURL(new Blob([staticHtml(path)], { type: "text/html" })));
+    return staticUrls.get(path);
+  }
+  const servedNextToMe = new Map();
+  function staticLink(a, path) {
+    a.target = "_blank"; a.rel = "noopener";
+    a.dataset.page = path;
+    a.setAttribute("href", path);
+    if (!(DATA.staticHtml || {})[path]) return;
+    if (!/^https?:$/.test(location.protocol)) { a.href = embeddedUrl(path); return; }
+    if (!servedNextToMe.has(path)) {
+      servedNextToMe.set(path, fetch(path, { method: "HEAD" }).then(r => r.ok).catch(() => false));
+    }
+    servedNextToMe.get(path).then(ok => { if (!ok) a.href = embeddedUrl(path); });
+  }
+
   /* ---------- markdown helpers ---------- */
   function slug(text) {
     return text.trim().toLowerCase().split("").filter(ch => /[\p{L}\p{N}]/u.test(ch) || " -_".includes(ch)).join("").replace(/ /g, "-");
@@ -560,12 +587,17 @@ const DATA = /*__DOCS_DATA__*/null;
       host.replaceWith(wrap); wrap.appendChild(img);
     });
 
-    // Embedded pages (explainers): a relative iframe src points next to index.html
+    // Embedded pages (explainers): the iframe shows the copy inside this file,
+    // so it works even when index.html is opened on its own
     doc.querySelectorAll("iframe[src]").forEach(f => {
       const src = f.getAttribute("src");
       if (/^[a-z]+:/i.test(src)) return;
       const r = resolve(page.path, src);
-      if (r && (DATA.static || []).includes(r.path)) f.setAttribute("src", r.path);
+      const html = r && staticHtml(r.path);
+      if (html === undefined) return;
+      f.removeAttribute("src");
+      f.dataset.page = r.path;
+      f.srcdoc = html;
     });
 
     // Links: other pages become in-app routes; HTML pages served next to
@@ -578,7 +610,7 @@ const DATA = /*__DOCS_DATA__*/null;
       const r = resolve(page.path, href);
       const target = r && byPath.get(r.path);
       if (target) { a.href = "#" + target.id; if (r.hash) a.dataset.anchor = r.hash; return; }
-      if (r && (DATA.static || []).includes(r.path)) { a.setAttribute("href", r.path); a.target = "_blank"; a.rel = "noopener"; return; }
+      if (r && (DATA.static || []).includes(r.path)) { staticLink(a, r.path); return; }
       const base = r.path.endsWith("/") ? DATA.treeBase : DATA.repoBase;
       a.href = new URL(href, base + page.path).href;
       a.target = "_blank"; a.rel = "noopener";

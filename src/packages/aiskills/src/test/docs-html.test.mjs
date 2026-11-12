@@ -84,6 +84,12 @@ describe("build-docs-html", () => {
     const intro = d.pages.find((p) => p.path === "explainers/scrolls.md");
     assert.ok(intro, "explainers/scrolls.md is a page in the bundle");
     assert.match(intro.md, /<iframe[^>]+src="scrolls-explainer\.html"/, "it embeds the explainer");
+    assert.deepEqual(Object.keys(d.staticHtml ?? {}), d.static, "each one is also embedded, so index.html works on its own");
+    assert.equal(
+      Buffer.from(d.staticHtml["explainers/scrolls-explainer.html"], "base64").toString("utf8"),
+      readFileSync(join(DOCS, "explainers", "scrolls-explainer.html"), "utf8"),
+      "embedded as base64 (raw HTML would hold <script> tags inside this page's own <script>)",
+    );
     assert.match(intro.md, /\]\(scrolls-explainer\.html\)/, "and links to it full-size");
     const skillsTab = d.tabs.find((t) => t.label === "Skills");
     assert.ok(skillsTab.pages.includes("explainers/scrolls.md"), "listed in the Skills tab");
@@ -218,6 +224,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
           imgs: [...document.querySelectorAll("#doc img")].map((i) => i.src.slice(0, 30)),
           links: [...document.querySelectorAll("#doc a[href]:not(.anchor)")].map((a) => ({
             href: a.getAttribute("href"),
+            page: a.dataset.page ?? null,
             anchor: a.dataset.anchor ?? null,
             text: a.textContent,
           })),
@@ -234,8 +241,8 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
           const target = l.href.slice(1);
           if (!anchorsOf.has(target)) problems.push(`${l.from}: link to unknown page ${l.href} (${l.text})`);
           else if (l.anchor && !anchorsOf.get(target).has(l.anchor)) problems.push(`${l.from}: no heading #${l.anchor} on ${target} (${l.text})`);
-        } else if (statics.includes(l.href)) {
-          // an explainer page next to index.html (checked to load below)
+        } else if (statics.includes(l.href) || (l.page && statics.includes(l.page))) {
+          // an explainer page: next to index.html, or its embedded copy (both checked to load below)
         } else if (l.href.startsWith(repoBase) && /\.md(#|$)/.test(l.href)) {
           problems.push(`${l.from}: link to a docs page that isn't in the bundle: ${l.href} (${l.text})`);
         } else if (!/^https:\/\//.test(l.href)) {
@@ -262,15 +269,39 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       page.on("pageerror", (e) => errors.push(e.message));
       await page.goto(pathToFileURL(OUT).href + "#explainers-scrolls");
       await page.waitForSelector("#doc iframe");
-      assert.equal(await page.getAttribute("#doc iframe", "src"), "explainers/scrolls-explainer.html", "src resolved against index.html");
-      const hrefs = await page.$$eval("#doc a[href]", (as) => as.map((a) => a.getAttribute("href")));
-      assert.ok(hrefs.includes("explainers/scrolls-explainer.html"), "the full-size link points next to index.html, not at GitHub");
       const frame = page.frameLocator("#doc iframe");
       await frame.locator("#network-flow[data-ready=true]").waitFor();
       assert.equal(await frame.locator(".rf-tab").count(), 9, "Overview plus 8 tabs");
       const box = await page.locator("#doc iframe").boundingBox();
       const doc = await page.locator("#doc").boundingBox();
       assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
+      assert.deepEqual(errors, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("index.html on its own (no explainers/ folder next to it) still shows and opens the explainer", async () => {
+    // A viewer or preview that only gets index.html: the explainer must come from the bundle itself.
+    const dir = tempDir();
+    const lone = join(dir, "index.html");
+    writeFileSync(lone, readFileSync(OUT));
+    const browser = await playwright.chromium.launch();
+    try {
+      const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
+      const page = await context.newPage();
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(lone).href + "#explainers-scrolls");
+      await page.waitForSelector("#doc iframe");
+      const frame = page.frameLocator("#doc iframe");
+      await frame.locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
+      assert.equal(await frame.locator(".rf-tab").count(), 9, "the embedded explainer loads with all its tabs");
+      // The full-size link opens a working page too.
+      const link = page.locator('#doc a:has-text("Open the explainer full-size")');
+      const [popup] = await Promise.all([context.waitForEvent("page"), link.click()]);
+      await popup.waitForSelector("#network-flow[data-ready=true]", { timeout: 10000 });
+      assert.equal(await popup.locator(".rf-tab").count(), 9, "the full-size link opens the explainer");
       assert.deepEqual(errors, []);
     } finally {
       await browser.close();
