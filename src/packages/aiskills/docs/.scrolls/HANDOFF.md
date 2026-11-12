@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 `@sugatoray-ai/aiskills` **`1.0.0` is published on npm** (dist-tag `latest`; published 2026-11-12T01:06Z, i.e. the evening of 2026-11-11 US Eastern, so the CHANGELOG date `2026-11-11` stands; checked with `npm view` 2026-11-12). It is the first stable release (strict SemVer from here). It came from [#141](https://github.com/sugatoray/aiskills/pull/141) (the `image-styles-skills` group with `artwallbg` and `commentdrop`, AIS-16; `AISKILLS_SKILLS_VERSION` removed, AIS-11), squash-merged to `master` as `28aee02`, and bundles **15 skills in 8 groups**. Published versions: `0.4.0`–`0.9.0`, `1.0.0` (plus npm's hidden `0.0.0-stage` placeholder). Source in `src/packages/aiskills/`. `npm test`: 421 offline tests, all pass. Docs live at https://sugatoray.github.io/aiskills/, redeployed by `.github/workflows/aiskills-docs.yml` on pushes to `master`.
 
-**On `claude/brave-mccarthy-m6aut0`: `1.1.0`** (the user's call: bundle the new skill, MINOR). It adds **`scrolls-explainer`** to the `scrolls-skills` group (**16 skills in 8 groups**; the scrolls family moves to 2.5.0 in lockstep). Package changes: `package.json`, CHANGELOG `[1.1.0] - 2026-11-12`, SECURITY `1.1.x` current, README and docs group lists, `DOCS_VIEW` (1.0.0 on 2026-11-18, 1.1.0 latest on 2026-11-20), version and upgrade examples (now 1.0.0 → 1.1.0, "new in 1.1.0: scrolls-explainer"), banner + PNG, `npm run docs`. `npm test`: 422 pass. `npm run pack:dry`: 1.1.0, 236 files, 969 kB. Not merged or published; no PR yet.
+**On `claude/brave-mccarthy-m6aut0`: `1.1.0`** (the user's call: bundle the new skill, MINOR). It adds **`scrolls-explainer`** to the `scrolls-skills` group (**16 skills in 8 groups**; the scrolls family moves to 2.5.0 in lockstep). Package changes: `package.json`, CHANGELOG `[1.1.0] - 2026-11-12`, SECURITY `1.1.x` current, README and docs group lists, `DOCS_VIEW` (1.0.0 on 2026-11-18, 1.1.0 latest on 2026-11-20), version and upgrade examples (now 1.0.0 → 1.1.0, "new in 1.1.0: scrolls-explainer"), banner + PNG, `npm run docs`. `npm test`: 422 pass. `npm run pack:dry`: 1.1.0, 236 files, 969 kB. In [#206](https://github.com/sugatoray/aiskills/pull/206) (opened 2026-11-12); not merged or published.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -31,6 +31,8 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ## What just happened (this session)
 - **Recorded `1.0.0` as published** (`npm view`: latest, 2026-11-12T01:06Z).
 - **Built `/scrolls-explainer`** in `skills/scrolls/` (see `src/scrolls/docs/.scrolls/` for the skill's own story) and **bumped the package to `1.1.0`** to bundle it. The package tests led the doc changes: banner counts first (`16 skills`, `bundled: scrolls-explainer, … (8)`), then every `<!-- verify -->` example that changed.
+- **Follow-up in the same branch** (`242345c`): a bare `/scrolls-explainer` now opens the bundled page in place (= `--show`), `-o` copies it, and `--build` regenerates it from the scrolls skills. Only the skill's docs page in the package changed (`npm run docs`); `npm test` still 422 pass.
+- **PR opened:** [#206](https://github.com/sugatoray/aiskills/pull/206), the whole branch (1.0.0 record, the skill, 1.1.0).
 - Two traps hit (see WISDOM): the sandbox copies only git-tracked skills, and the repo `.gitignore` ignores `build/` folders.
 
 ## Known issues / open threads

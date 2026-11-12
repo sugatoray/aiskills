@@ -51,7 +51,7 @@ The counterpart to `/scrolls-remove`. It brings back only the agentic memory, in
 
 Built and tested (88 assertions, end to end through the real `remove.sh`). Merged in #114.
 
-## `/scrolls-explainer` (2.5.0, on branch `claude/brave-mccarthy-m6aut0`)
+## `/scrolls-explainer` (2.5.0, in [#206](https://github.com/sugatoray/aiskills/pull/206), not merged yet)
 
 Shows `scrolls-explainer.html`, an interactive, offline page that shows how the family works: an Overview, a New session tab (how an agent follows `AGENTS.md`/`CLAUDE.md` → `SCROLLS.md` → `STARTER.md`), and one tab per command that animates its steps with a callout next to the file being touched.
 

@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 
 - **`master`:** seven `scrolls-*` skills at `2.4.0` (setup, update, hide, unhide, remove, restore, help). `/scrolls-restore` and `assets/EXAMPLES.md` merged as #114 (`718388a`).
-- **Branch `claude/brave-mccarthy-m6aut0`:** adds **`/scrolls-explainer`** (an animated, offline `scrolls-explainer.html`, one tab per command) and bumps the whole family to **`2.5.0`** in lockstep, with `plugin.json` listing the new skill. The same branch bumps the `@sugatoray-ai/aiskills` npm package to `1.1.0` to bundle it (16 skills in 8 groups). Pushed; no PR yet.
+- **Branch `claude/brave-mccarthy-m6aut0`:** adds **`/scrolls-explainer`** (an animated, offline `scrolls-explainer.html`, one tab per command) and bumps the whole family to **`2.5.0`** in lockstep, with `plugin.json` listing the new skill. The same branch bumps the `@sugatoray-ai/aiskills` npm package to `1.1.0` to bundle it (16 skills in 8 groups). Open as [#206](https://github.com/sugatoray/aiskills/pull/206) (opened 2026-11-12, into `master`); not merged.
 - **Stale branch:** `claude/confident-maxwell-d6ws37` still points at the pre-squash `/scrolls-remove` commit. Leave it or delete it; don't build on it.
 
 ## What just happened
@@ -22,6 +22,6 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## Known issues / open threads
 
-- Open a PR for `claude/brave-mccarthy-m6aut0` when the user asks.
+- [#206](https://github.com/sugatoray/aiskills/pull/206) is open and not merged. No GitHub issues were filed for it (earlier releases had them; offered, not asked for). The user hasn't yet asked for it to be watched for review comments or CI.
 - `test_explain.ps1` (and every other `.ps1` suite) has never run: no `pwsh` here, and downloading it was blocked again.
 - After any change to a scrolls skill's `SKILL.md`, run `skills/scrolls/scrolls-explainer/scripts/explain.sh --build`: it names the tabs to review in `assets/explainer-graph.json`, then `--build --reviewed`. Its test suite fails until that's done.
