@@ -3,6 +3,19 @@
 All notable changes to the `scrolls-help` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.0] - 2026-11-12
+
+### Changed
+
+- Synced to `2.5.0` to stay in lockstep with the other `scrolls-*`
+  skills. The minor bump is for the new `/scrolls-explainer` skill; see
+  `../CHANGELOG.md`.
+- `references/HELP.md` now lists `/scrolls-explainer` (what it does, its
+  flags and an example), and the `description` names it with the rest of
+  the family, so a question about the explainer is answered here too.
+- `README.md`: the install commands that list every `scrolls-*` skill
+  now include `scrolls-explainer`.
+
 ## [2.4.0] - 2026-11-06
 
 ### Added

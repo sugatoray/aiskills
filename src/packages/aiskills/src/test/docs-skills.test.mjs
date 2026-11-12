@@ -56,13 +56,15 @@ describe("docs/docsite/skills/", () => {
     assert.equal(readFileSync(join(DOCS, "README.md"), "utf8"), landing, "README.md's Skills section is stale");
   });
 
-  test("the landing page has a Skills section right after Getting started, listing every skill page", () => {
+  test("the landing page has a Skills section right after Getting started, listing every skill page, then the explainers", () => {
     const readme = readFileSync(join(DOCS, "README.md"), "utf8");
     const sections = [...readme.matchAll(/^### (.+)$/gm)].map((m) => m[1]);
     assert.equal(sections[sections.indexOf("Getting started") + 1], "Skills", sections.join(", "));
     const body = readme.split("### Skills\n")[1].split("\n### ")[0];
     const links = [...body.matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map((m) => m[1]);
-    assert.deepEqual(links, ["skills/README.md", ...box.names.map((n) => `skills/${n}.md`)]);
+    // The generated list (between the skills:start/end markers), then the hand-written explainer pages.
+    const explainers = readdirSync(join(DOCS, "explainers")).filter((f) => f.endsWith(".md")).sort().map((f) => `explainers/${f}`);
+    assert.deepEqual(links, ["skills/README.md", ...box.names.map((n) => `skills/${n}.md`), ...explainers]);
   });
 
   test("the overview lists every skill under its group, with its version", () => {
@@ -203,5 +205,18 @@ describe("the generator", () => {
     const before = readdirSync(tmpdir()).filter((f) => f.startsWith("aiskills-docs-")).length;
     render({ repoRoot: REPO_ROOT });
     assert.equal(readdirSync(tmpdir()).filter((f) => f.startsWith("aiskills-docs-")).length, before);
+  });
+});
+
+describe("explainer pages in the docs (docs/docsite/explainers/)", () => {
+  test("each one is an exact copy of its skill's bundled page (run: npm run docs:skills)", async () => {
+    const { EXPLAINERS } = await load();
+    assert.ok(EXPLAINERS && Object.keys(EXPLAINERS).length > 0, "build-skills-docs.mjs exports EXPLAINERS");
+    assert.equal(EXPLAINERS["explainers/scrolls-explainer.html"], "skills/scrolls/scrolls-explainer/assets/scrolls-explainer.html");
+    for (const [rel, src] of Object.entries(EXPLAINERS)) {
+      const copy = join(DOCS, rel);
+      assert.ok(existsSync(copy), `${rel} is missing: run npm run docs:skills`);
+      assert.equal(readFileSync(copy, "utf8"), readFileSync(join(REPO_ROOT, src), "utf8"), `${rel} is stale: run npm run docs:skills`);
+    }
   });
 });

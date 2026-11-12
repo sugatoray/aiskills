@@ -8,12 +8,14 @@ entry point; a `SCROLLS.md` file tells new sessions to read it first, with
 a short `CLAUDE.md` pointer to `SCROLLS.md` and a matching `AGENTS.md`
 pointer to `CLAUDE.md` for other agent harnesses.
 
-All seven commands work the same way on macOS, Linux, and Windows. Every
+All eight commands work the same way on macOS, Linux, and Windows. Every
 bundled script — all but `/scrolls-setup`, which needs none — ships as
 both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version.
 
 Run `/scrolls-help` for the full example-driven reference (add `-e`/`--online`
-to view it as a styled local web page instead of chat text).
+to view it as a styled local web page instead of chat text), or
+`/scrolls-explainer` for an animated, offline page that walks through what
+each command does, step by step.
 
 ## Commands
 
@@ -26,6 +28,7 @@ to view it as a styled local web page instead of chat text).
 | [`/scrolls-remove`](scrolls-remove/) | The opposite of `/scrolls-setup`. It removes `docs/.scrolls/` and `SCROLLS.md` and strips the scrolls pointers from `CLAUDE.md`/`AGENTS.md`, all as one `maint(memory): scrolls-removed` commit that records the previous commit's SHA for restoring. `-x`/`--purge` deletes pointer files outright. |
 | [`/scrolls-restore`](scrolls-restore/) | The counterpart to `/scrolls-remove`. Restores the memory from the newest removal checkpoint, or from any commit, into the repo as it is now: the folders come back and the stubs are re-inserted, and nothing else is rolled back. `--onto` mounts it on another branch through a temporary worktree. |
 | [`/scrolls-help`](scrolls-help/) | Crisp, example-driven reference for the whole family — what each command does, their shared flags, and common usage examples. Supports `-e`/`--online` to serve it as a styled local page (light/dark and colorize/plain toggles) instead of chat text. |
+| [`/scrolls-explainer`](scrolls-explainer/) | Opens `scrolls-explainer.html`: an interactive, offline page with one tab per command that animates what it does, step by step, with a callout for each step and full keyboard navigation. With no flags (= `--show`) it opens the bundled page in place; `-o` copies it to a file or folder (`-f` overwrites, `--open` opens the copy); `--build` regenerates it from the `scrolls-*` skills as they are now. |
 
 ## Shared flags
 
@@ -80,6 +83,12 @@ Command-specific additions:
   presented-to-users content; `scripts/`/`tests/` for its `-e`/`--online`
   local server; and `meta/SECURITY.md` alongside `MAINTAINERS.md`,
   covering that server's scope, network exposure, and bounded lifecycle.
+- `/scrolls-explainer` — `assets/scrolls-explainer.html`, the prebuilt
+  page, and `assets/explainer-graph.json`, its words; `scripts/explain.py`
+  (copy, `--show`, `--build`) with thin `.sh`/`.ps1` launchers, plus
+  `build_page.py`/`page_enhance.py` behind `--build` (which renders with
+  the `network-flow` skill); and `tests/` (bash + PowerShell, Red/Green
+  TDD, plus a Playwright browser check).
 
 `tests/` and `meta/` are development-only — for maintaining bundled
 scripts and documenting design decisions, not part of using the skills.
@@ -89,6 +98,6 @@ carrying out a request — neither is ever read as instructions while a
 
 This directory (`skills/scrolls/`) has its own `meta/MAINTAINERS.md` and
 `CHANGELOG.md` too — family-wide maintainer notes (shared conventions
-across all seven, versioning, where the installable artifacts live) and a
+across all eight, versioning, where the installable artifacts live) and a
 family-wide change log for anything that isn't tied to a single skill's
 own version, neither of which belong in any single skill's own docs.

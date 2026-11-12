@@ -22,7 +22,7 @@ Every one of the five `scrolls-*` skills now has its own `meta/MAINTAINERS.md` (
 
 ## Family version lockstep
 
-All `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.2.0` on `master` (six skills), `2.4.0` on the unmerged `claude/scrolls-restore` branch (seven skills).
+All `scrolls-*` skills share a single version number instead of bumping independently (`skills/scrolls/meta/MAINTAINERS.md`'s Versioning entry). A change anywhere in the family that's visible to an actual `/scrolls-*` invocation bumps every skill to the same new number in the same commit; skills with nothing of their own that release get a short "synced to vX.Y.Z" `CHANGELOG.md` entry. Currently `2.4.0` on `master` (seven skills), `2.5.0` on `claude/brave-mccarthy-m6aut0` (eight skills, with `/scrolls-explainer`).
 
 ## Idempotent `SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill on `/scrolls-update`
 
@@ -39,7 +39,7 @@ Removes the scrolls system from a git repository: the exact opposite of `/scroll
 
 Merged via PR #110; tracked by issues #111 (with sub-issues #112, #113).
 
-## `/scrolls-restore` (2.3.0, on branch, not yet merged)
+## `/scrolls-restore` (2.3.0; shipped on `master` in 2.4.0, #114)
 
 The counterpart to `/scrolls-remove`. It brings back only the agentic memory, into the repository as it is now: folders are checked out from the source commit, and pointer stubs are re-inserted into today's `CLAUDE.md`/`AGENTS.md` instead of overwriting them. Nothing else is rolled back, which is the point compared with `git revert`.
 
@@ -49,7 +49,18 @@ The counterpart to `/scrolls-remove`. It brings back only the agentic memory, in
 - `--full` brings back the whole content of purged files, `-f` replaces an existing folder, and `--list [--all]` finds checkpoints.
 - Records the restore as one `maint(memory): scrolls-restored` commit with `Scrolls-*` trailers.
 
-Built and tested (88 assertions, end to end through the real `remove.sh`) on branch `claude/scrolls-restore`, commit `2a46fb5`. No PR yet.
+Built and tested (88 assertions, end to end through the real `remove.sh`). Merged in #114.
+
+## `/scrolls-explainer` (2.5.0, in [#206](https://github.com/sugatoray/aiskills/pull/206), not merged yet)
+
+Shows `scrolls-explainer.html`, an interactive, offline page that shows how the family works: an Overview, a New session tab (how an agent follows `AGENTS.md`/`CLAUDE.md` → `SCROLLS.md` → `STARTER.md`), and one tab per command that animates its steps with a callout next to the file being touched.
+
+- Everything works from the keyboard: arrows step, `[` `]` or `0`–`8` switch tabs, `Space` pauses, `R` replays, `?` lists every key.
+- With no flags (= `--show`, the user's call) it opens the bundled page in place and copies nothing; `-o` copies it to a file or folder (`-o .` for `./scrolls-explainer.html`), `-f` overwrites a different file, `--open` opens the copy, `--version`.
+- `--build` regenerates it from the `scrolls-*` skills as they are now (tabs, lockstep version, a review stop when a `SKILL.md` changed, `--reviewed` to confirm).
+- It never touches the user's scrolls memory.
+
+Tested: 109 assertions in `test_explain.sh`, including Playwright browser checks and a build-freshness check.
 
 ## `src/scrolls/` install pointer
 

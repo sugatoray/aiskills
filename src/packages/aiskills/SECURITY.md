@@ -21,9 +21,9 @@ version, and the steps to reproduce.
 
 | Version | Supported |
 | --- | --- |
-| `1.0.x` | Yes (current) |
-| `0.9.x` | No: upgrade to `1.0.x` (`aiskills upgrade`) |
-| `0.8.x`, `0.7.x`, `0.6.x`, `0.5.x`, `0.4.x` | No: upgrade to `1.0.x` (`npm install -g @sugatoray-ai/aiskills@latest`; `aiskills upgrade` arrived in 0.9.0) |
+| `1.1.x` | Yes (current) |
+| `1.0.x`, `0.9.x` | No: upgrade to `1.1.x` (`aiskills upgrade`) |
+| `0.8.x`, `0.7.x`, `0.6.x`, `0.5.x`, `0.4.x` | No: upgrade to `1.1.x` (`npm install -g @sugatoray-ai/aiskills@latest`; `aiskills upgrade` arrived in 0.9.0) |
 | `0.3.x`, `0.2.x`, `0.1.x` | Never published |
 
 Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).

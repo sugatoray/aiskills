@@ -6,8 +6,13 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] File issues for PR #110: #111, with sub-issues #112 and #113. Retitle the PR and add an Issues section.
 - [x] Design `/scrolls-restore`'s interface with the user, then build it (2.3.0) with tests driven end to end through `remove.sh`.
 - [x] Push the restore work: `claude/scrolls-restore`, commit `2a46fb5`.
-- [ ] Open a PR from `claude/scrolls-restore` to `master`, then file its issues and update the PR with an Issues section, the same way as for #110.
-- [ ] Run `tests/test_remove.ps1` and `tests/test_restore.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
+- [x] Open a PR for the restore work and file its issues: PR #114 (issues #115–#118), merged as `718388a` (2.4.0).
+- [x] Build `/scrolls-explainer` Red/Green (2.5.0, the family bumped in lockstep), bundled in the npm package `1.1.0`. On `claude/brave-mccarthy-m6aut0`.
+- [x] Open a PR for `claude/brave-mccarthy-m6aut0`: [#206](https://github.com/sugatoray/aiskills/pull/206) (2026-11-12).
+- [x] File #206's issues: epic #207 with sub-issues #208–#213 (2026-11-12); PR body lists them with `Closes`.
+- [x] Show the explainer on the npm package's docs site (embedded, works from `index.html` alone and on phones); checked by the user in an artifact preview.
+- [ ] Get #206 merged. Optionally file the docs-site work as a child of #207.
+- [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
 - [ ] Optionally delete the stale remote branch `claude/confident-maxwell-d6ws37`. Its content is already on `master`; this is the user's call.
 
 Longer-horizon:

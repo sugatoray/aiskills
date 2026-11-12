@@ -215,10 +215,10 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.0.0
+  aiskills version : 1.1.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
-      saved skills : 15 skills in 8 groups, flat layout
+      saved skills : 16 skills in 8 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)
@@ -280,12 +280,12 @@ aiskills rel 3
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 3 of 7 releases
+@sugatoray-ai/aiskills: latest 3 of 8 releases
 
   VERSION  PUBLISHED                TAG
-  1.0.0    2026-11-20 (1 day ago)   latest  ← installed
+  1.1.0    2026-11-20 (1 day ago)   latest  ← installed
+  1.0.0    2026-11-18 (3 days ago)
   0.9.0    2026-11-15 (6 days ago)
-  0.8.0    2026-11-12 (9 days ago)
 
 more: aiskills rel all
 
@@ -307,14 +307,14 @@ aiskills rel --downloads
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 5 of 7 releases
+@sugatoray-ai/aiskills: latest 5 of 8 releases
 
   VERSION  PUBLISHED                 TAG     DOWNLOADS (7 DAYS)
-  1.0.0    2026-11-20 (1 day ago)    latest                   –  ← installed
+  1.1.0    2026-11-20 (1 day ago)    latest                   –  ← installed
+  1.0.0    2026-11-18 (3 days ago)                            –
   0.9.0    2026-11-15 (6 days ago)                            –
   0.8.0    2026-11-12 (9 days ago)                            –
   0.7.0    2026-11-11 (10 days ago)                           –
-  0.6.0    2026-11-11 (10 days ago)                           –
 
 more: aiskills rel all
 
@@ -343,10 +343,10 @@ aiskills rel 1 --downloads 7d --table
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 1 of 7 releases
+@sugatoray-ai/aiskills: latest 1 of 8 releases
 
   VERSION  PUBLISHED               TAG     DOWNLOADS (7 DAYS)
-  1.0.0    2026-11-20 (1 day ago)  latest                   –  ← installed
+  1.1.0    2026-11-20 (1 day ago)  latest                   –  ← installed
 
 more: aiskills rel all
 
@@ -385,36 +385,36 @@ aiskills upgrade [<version>|<tag>] [--check [--json]] [--no-refresh] [-n] [-y]
 | Default | Upgrade to the `latest` tag, then refresh the skills (global) |
 | Exit code | `0` if upgraded, already up to date, or with `--check` (whatever it finds); `1` if aiskills can't upgrade itself, the version is unknown, or a downgrade isn't confirmed; otherwise the package manager's exit code |
 
-Check first, without changing anything (the examples here run with 0.9.0 installed and 1.0.0 on the registry):
+Check first, without changing anything (the examples here run with 1.0.0 installed and 1.1.0 on the registry):
 
-<!-- verify: version=0.9.0 -->
+<!-- verify: version=1.0.0 -->
 ```bash
 aiskills upgrade --check
 ```
 
 ```text
-[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
 [aiskills] update available: run 'aiskills upgrade'
 ```
 
 Then upgrade:
 
-<!-- verify: version=0.9.0 list=scrolls-setup,scrolls-update -->
+<!-- verify: version=1.0.0 list=scrolls-setup,scrolls-update -->
 ```bash
 aiskills upgrade
 ```
 
 ```text
-[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] running: npm install -g @sugatoray-ai/aiskills@1.0.0
+[aiskills] running: npm install -g @sugatoray-ai/aiskills@1.1.0
 changed 1 package in 1s
-[aiskills] refreshing 2 skills for claude-code (global) with aiskills 1.0.0
+[aiskills] refreshing 2 skills for claude-code (global) with aiskills 1.1.0
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: scrolls-setup, scrolls-update
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --skill scrolls-update --agent claude-code --yes
 [aiskills] project installs aren't refreshed: run 'aiskills install -p' in each project that uses them
-[aiskills] upgraded 0.9.0 → 1.0.0
+[aiskills] upgraded 1.0.0 → 1.1.0
 ```
 
 What it does, in order:
@@ -437,24 +437,24 @@ What it does, in order:
 5. **Tells you what changed in the bundle:** skills new in this version are listed, not installed, with the commands to add them; skills the new version no longer has are listed with the command to remove them:
 
    ```text
-   [aiskills] new in 1.0.0, not installed: artwallbg, commentdrop
-     to install them:      aiskills install -s artwallbg,commentdrop -a claude-code,codex
+   [aiskills] new in 1.1.0, not installed: scrolls-explainer
+     to install them:      aiskills install -s scrolls-explainer -a claude-code,codex
      or pick from a list:  aiskills install -i
-   [aiskills] no longer in 1.0.0 but still installed: old-skill
+   [aiskills] no longer in 1.1.0 but still installed: old-skill
      to remove:  aiskills uninstall -s old-skill
    ```
 
 Only global installs from the install folder are refreshed; skills installed into a project (`-p`) are not, as aiskills can't know every project: run `aiskills install -p` in each. A **downgrade** (`aiskills upgrade 0.7.0`) asks `[y/N]` first, or needs [`-y`](#-y---yes); without a terminal it stops. Preview everything with [`-n`](#-n---dry-run):
 
-<!-- verify: version=0.9.0 list=scrolls-setup,scrolls-update -->
+<!-- verify: version=1.0.0 list=scrolls-setup,scrolls-update -->
 ```bash
 aiskills upgrade -n
 ```
 
 ```text
-[aiskills] installed: 0.9.0 (npm, global) · latest: 1.0.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@1.0.0
+[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@1.1.0
 [aiskills] [dry-run] then: aiskills install -g -s scrolls-setup,scrolls-update -a claude-code
 ```
 
@@ -487,7 +487,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.0.0 — Sugato Ray's agent skills
+aiskills 1.1.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -635,7 +635,7 @@ ais -v
 ```
 
 ```text
-1.0.0
+1.1.0
 ```
 
 ## Options

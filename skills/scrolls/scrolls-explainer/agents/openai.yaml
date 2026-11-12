@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Explainer"
+  short_description: "Writes an interactive, offline page that animates how each Scrolls command works, step by step."
+policy:
+  allow_implicit_invocation: false

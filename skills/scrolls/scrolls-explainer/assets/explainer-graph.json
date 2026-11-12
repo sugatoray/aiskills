@@ -1,0 +1,989 @@
+{
+  "eyebrow": "sugatoray/aiskills · scrolls {version}",
+  "title": "How the scrolls-* skills work",
+  "subtitle": "The scrolls-* slash commands create, maintain, move, remove and restore a project's cross-session memory. Pick a command tab to watch what it does, step by step.",
+  "colors": {
+    "cmd": "#4F9DFF",
+    "pointer": "#B57CFF",
+    "memory": "#3FCF8E",
+    "git": "#FF9F43",
+    "help": "#9AA5B1"
+  },
+  "legend": {
+    "cmd": "Command acting",
+    "pointer": "Pointer chain (read first)",
+    "memory": "Memory files",
+    "git": "Git history / checkpoints",
+    "help": "Reference only"
+  },
+  "nodes": [
+    {
+      "id": "setup",
+      "name": "/scrolls-setup",
+      "kind": "Create · once",
+      "sub": "-p -t -l -r -u",
+      "color": "cmd",
+      "detail": "Run once per project. Creates docs/.scrolls/ (or docs/scrolls/ with -u) with the seven memory files, then the SCROLLS.md, CLAUDE.md and AGENTS.md pointers. Never overwrites existing scroll files; warns if run from a subdirectory instead of the repo root. No script: it writes files from its templates."
+    },
+    {
+      "id": "templates",
+      "name": "Setup templates",
+      "kind": "assets/templates",
+      "sub": "Scrolls + pointer stubs",
+      "color": "cmd",
+      "detail": "The single source for every scroll file's starting content and for the SCROLLS_MD / CLAUDE_MD / AGENTS_MD pointer blocks. /scrolls-update reads the pointer blocks from here too, so they are never duplicated."
+    },
+    {
+      "id": "update",
+      "name": "/scrolls-update",
+      "kind": "Maintain · every session",
+      "sub": "Per-file update rules",
+      "color": "cmd",
+      "detail": "Run at the end of every session. Reads STARTER.md as the map, cross-checks the conversation against git, then updates each file by its own rule. Also backfills missing SCROLLS.md / CLAUDE.md / AGENTS.md pointers (idempotent). If no scrolls exist, it points at /scrolls-setup instead of inventing files."
+    },
+    {
+      "id": "diff",
+      "name": "session_diff script",
+      "kind": ".sh + .ps1",
+      "sub": "Changes since last update",
+      "color": "cmd",
+      "detail": "Lists uncommitted changes and the commits since docs/.scrolls/ was last touched, with a stat summary. It catches work the conversation forgot (for example after a resume or compaction) without dumping full diffs."
+    },
+    {
+      "id": "hide",
+      "name": "/scrolls-hide",
+      "kind": "Rename",
+      "sub": "scrolls → .scrolls",
+      "color": "cmd",
+      "detail": "Renames a visible docs/scrolls/ to hidden docs/.scrolls/ and rewrites the path references inside the scrolls and in SCROLLS.md. -r sweeps a whole tree, such as every package in a monorepo. The opposite of /scrolls-unhide."
+    },
+    {
+      "id": "unhide",
+      "name": "/scrolls-unhide",
+      "kind": "Rename",
+      "sub": ".scrolls → scrolls",
+      "color": "cmd",
+      "detail": "Renames hidden docs/.scrolls/ to visible docs/scrolls/ and rewrites the path references so nothing breaks. For a new project, /scrolls-setup -u does this in one step."
+    },
+    {
+      "id": "remove",
+      "name": "/scrolls-remove",
+      "kind": "Tear down",
+      "sub": "One checkpoint commit",
+      "color": "cmd",
+      "detail": "The opposite of /scrolls-setup. Deletes the scrolls folder and SCROLLS.md, strips the pointer stubs from CLAUDE.md / AGENTS.md (deleting a file only if nothing else is left; -x purges outright), and records it all as ONE commit, maint(memory): scrolls-removed, naming the commit before it. Refuses if anything it would remove has uncommitted changes."
+    },
+    {
+      "id": "restore",
+      "name": "/scrolls-restore",
+      "kind": "Bring back",
+      "sub": "Memory only · --onto",
+      "color": "cmd",
+      "detail": "The counterpart to /scrolls-remove. Finds the newest removal checkpoint (or takes any commit), brings back the scrolls folders and re-inserts the pointer stubs into the files as they are today. Nothing else in the repo is rolled back. --onto mounts the memory on another branch through a temporary worktree."
+    },
+    {
+      "id": "git",
+      "name": "Git history",
+      "kind": "Checkpoints",
+      "sub": "scrolls-removed commits",
+      "color": "git",
+      "detail": "Where /scrolls-remove leaves its checkpoint and /scrolls-restore finds it. /scrolls-update's session_diff also reads it to see what changed since the scrolls were last updated."
+    },
+    {
+      "id": "help",
+      "name": "/scrolls-help",
+      "kind": "Reference",
+      "sub": "-e / --online",
+      "color": "help",
+      "detail": "Example-driven reference for the whole family: what each command does, the shared -p/-t/-l/-r flags and common recipes. Changes nothing in the repo."
+    },
+    {
+      "id": "helpref",
+      "name": "HELP.md / page",
+      "kind": "Output",
+      "sub": "Chat or localhost",
+      "color": "help",
+      "detail": "Prints references/HELP.md as chat text, or with -e serves it as a styled page on an OS-assigned localhost port with light/dark and colorize/plain toggles."
+    },
+    {
+      "id": "next",
+      "name": "New agent session",
+      "kind": "Reader",
+      "sub": "Claude Code · Codex …",
+      "color": "pointer",
+      "detail": "A fresh session knows nothing. Claude Code reads CLAUDE.md automatically; other harnesses read AGENTS.md. Both lead to SCROLLS.md and then STARTER.md, so the project's memory is loaded before work starts."
+    },
+    {
+      "id": "agents",
+      "name": "AGENTS.md",
+      "kind": "Pointer",
+      "sub": "→ CLAUDE.md",
+      "color": "pointer",
+      "detail": "A short stub for non-Claude agent harnesses that points at CLAUDE.md. Other content in the file is left alone."
+    },
+    {
+      "id": "claude",
+      "name": "CLAUDE.md",
+      "kind": "Pointer",
+      "sub": "→ SCROLLS.md",
+      "color": "pointer",
+      "detail": "A fixed two-line stub near the top: read SCROLLS.md first. Inserted, never overwriting the project's own instructions."
+    },
+    {
+      "id": "scrollsmd",
+      "name": "SCROLLS.md",
+      "kind": "Pointer",
+      "sub": "→ STARTER.md",
+      "color": "pointer",
+      "detail": "The one file that knows where the scrolls folder lives (hidden or visible, at any path). /scrolls-hide and /scrolls-unhide rewrite its path."
+    },
+    {
+      "id": "starter",
+      "name": "STARTER.md",
+      "kind": "Entry point · map",
+      "sub": "Every scroll + its rule",
+      "color": "memory",
+      "detail": "The map of the memory: each scroll, when to read it and how to update it. Projects can add their own scrolls here (architecture, security reviews); /scrolls-update follows each one's documented rule."
+    },
+    {
+      "id": "handoff",
+      "name": "HANDOFF.md",
+      "kind": "Overwrite",
+      "sub": "Current state snapshot",
+      "color": "memory",
+      "detail": "Where things stand right now, what just happened, open threads. Overwritten each session, never appended."
+    },
+    {
+      "id": "spec",
+      "name": "SPEC.md",
+      "kind": "Append when shipped",
+      "sub": "What it does for users",
+      "color": "memory",
+      "detail": "Gets a new section only for features that actually shipped, described from the user's side, not the implementation's."
+    },
+    {
+      "id": "plan",
+      "name": "PLAN.md",
+      "kind": "Tick and reorder",
+      "sub": "Tickets [ ] → [x]",
+      "color": "memory",
+      "detail": "The ticket list: flip completed tickets, reprioritize, add newly found work."
+    },
+    {
+      "id": "gaps",
+      "name": "GAP_* files",
+      "kind": "Lockstep pair",
+      "sub": "Missing · and why",
+      "color": "memory",
+      "detail": "GAP_ANALYSIS.md lists what isn't done; GAP_CONTEXT.md says why (deliberate cut, oversight, blocker). Closing a gap deletes it from both."
+    },
+    {
+      "id": "wisdom",
+      "name": "WISDOM.md",
+      "kind": "Only when new",
+      "sub": "Constraints · traps · lessons",
+      "color": "memory",
+      "detail": "Constraints, traps, ditches and lessons. An entry is added only when the session actually taught something new."
+    }
+  ],
+  "edges": [
+    {
+      "id": "tpl-setup",
+      "from": "templates",
+      "to": "setup",
+      "kind": "cmd"
+    },
+    {
+      "id": "setup-starter",
+      "from": "setup",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "setup-scrollsmd",
+      "from": "setup",
+      "to": "scrollsmd",
+      "kind": "cmd"
+    },
+    {
+      "id": "setup-claude",
+      "from": "setup",
+      "to": "claude",
+      "kind": "cmd"
+    },
+    {
+      "id": "setup-agents",
+      "from": "setup",
+      "to": "agents",
+      "kind": "cmd"
+    },
+    {
+      "id": "next-agents",
+      "from": "next",
+      "to": "agents",
+      "kind": "pointer"
+    },
+    {
+      "id": "next-claude",
+      "from": "next",
+      "to": "claude",
+      "kind": "pointer"
+    },
+    {
+      "id": "agents-claude",
+      "from": "agents",
+      "to": "claude",
+      "kind": "pointer"
+    },
+    {
+      "id": "claude-scrollsmd",
+      "from": "claude",
+      "to": "scrollsmd",
+      "kind": "pointer"
+    },
+    {
+      "id": "scrollsmd-starter",
+      "from": "scrollsmd",
+      "to": "starter",
+      "kind": "pointer"
+    },
+    {
+      "id": "starter-handoff",
+      "from": "starter",
+      "to": "handoff",
+      "kind": "memory"
+    },
+    {
+      "id": "starter-spec",
+      "from": "starter",
+      "to": "spec",
+      "kind": "memory"
+    },
+    {
+      "id": "starter-plan",
+      "from": "starter",
+      "to": "plan",
+      "kind": "memory"
+    },
+    {
+      "id": "starter-gaps",
+      "from": "starter",
+      "to": "gaps",
+      "kind": "memory"
+    },
+    {
+      "id": "starter-wisdom",
+      "from": "starter",
+      "to": "wisdom",
+      "kind": "memory"
+    },
+    {
+      "id": "git-diff",
+      "from": "git",
+      "to": "diff",
+      "kind": "git"
+    },
+    {
+      "id": "diff-update",
+      "from": "diff",
+      "to": "update",
+      "kind": "cmd"
+    },
+    {
+      "id": "update-starter",
+      "from": "update",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "update-scrollsmd",
+      "from": "update",
+      "to": "scrollsmd",
+      "kind": "cmd"
+    },
+    {
+      "id": "hide-starter",
+      "from": "hide",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "hide-scrollsmd",
+      "from": "hide",
+      "to": "scrollsmd",
+      "kind": "cmd"
+    },
+    {
+      "id": "unhide-starter",
+      "from": "unhide",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "unhide-scrollsmd",
+      "from": "unhide",
+      "to": "scrollsmd",
+      "kind": "cmd"
+    },
+    {
+      "id": "remove-git",
+      "from": "remove",
+      "to": "git",
+      "kind": "git"
+    },
+    {
+      "id": "remove-starter",
+      "from": "remove",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "remove-claude",
+      "from": "remove",
+      "to": "claude",
+      "kind": "cmd"
+    },
+    {
+      "id": "git-restore",
+      "from": "git",
+      "to": "restore",
+      "kind": "git"
+    },
+    {
+      "id": "restore-starter",
+      "from": "restore",
+      "to": "starter",
+      "kind": "cmd"
+    },
+    {
+      "id": "restore-claude",
+      "from": "restore",
+      "to": "claude",
+      "kind": "cmd"
+    },
+    {
+      "id": "help-out",
+      "from": "help",
+      "to": "helpref",
+      "kind": "help"
+    }
+  ],
+  "scenarios": {
+    "setup": {
+      "label": "/scrolls-setup",
+      "summary": "Run once per project: creates the memory folder and the pointers that lead every new session to it.",
+      "scope": [
+        "tpl-setup",
+        "setup-starter",
+        "starter-handoff",
+        "starter-spec",
+        "starter-plan",
+        "starter-gaps",
+        "starter-wisdom",
+        "setup-scrollsmd",
+        "setup-claude",
+        "setup-agents"
+      ],
+      "steps": [
+        {
+          "edge": "tpl-setup",
+          "title": "Check, then read templates",
+          "text": "It first checks for an existing scrolls folder. If one has files, it stops and asks: it never overwrites real memory. Then it reads its own templates."
+        },
+        {
+          "edge": "setup-starter",
+          "title": "Create STARTER.md",
+          "text": "It creates docs/.scrolls/ (or docs/scrolls/ with -u) and writes STARTER.md: the map listing every scroll and how to update it."
+        },
+        {
+          "edge": "starter-handoff",
+          "title": "Create HANDOFF.md",
+          "text": "The current-state snapshot: where things stand and what's open.",
+          "at": "handoff"
+        },
+        {
+          "edge": "starter-spec",
+          "title": "Create SPEC.md",
+          "text": "What the project does for its users, filled from a quick look at the code.",
+          "at": "spec"
+        },
+        {
+          "edge": "starter-plan",
+          "title": "Create PLAN.md",
+          "text": "The ticket list for what comes next.",
+          "at": "plan"
+        },
+        {
+          "edge": "starter-gaps",
+          "title": "Create the gap files",
+          "text": "GAP_ANALYSIS.md (what's missing) and GAP_CONTEXT.md (why), kept as a pair.",
+          "at": "gaps"
+        },
+        {
+          "edge": "starter-wisdom",
+          "title": "Create WISDOM.md",
+          "text": "Constraints, traps and lessons. That makes seven memory files.",
+          "at": "wisdom"
+        },
+        {
+          "edge": "setup-scrollsmd",
+          "title": "Write SCROLLS.md",
+          "text": "A file at the project root that says where the scrolls folder is: docs/.scrolls/STARTER.md."
+        },
+        {
+          "edge": "setup-claude",
+          "title": "Add a stub to CLAUDE.md",
+          "text": "A two-line 'read SCROLLS.md first' stub goes at the top. CLAUDE.md is created if missing; existing instructions are kept."
+        },
+        {
+          "edge": "setup-agents",
+          "title": "Add a stub to AGENTS.md",
+          "text": "The same idea for Codex and other agent tools: AGENTS.md points at CLAUDE.md. Setup is done."
+        }
+      ]
+    },
+    "session": {
+      "label": "New session",
+      "summary": "What a fresh agent session does with the memory: follow the pointers, then read.",
+      "scope": [
+        "next-claude",
+        "next-agents",
+        "agents-claude",
+        "claude-scrollsmd",
+        "scrollsmd-starter",
+        "starter-handoff",
+        "starter-plan",
+        "starter-wisdom"
+      ],
+      "steps": [
+        {
+          "edge": "next-claude",
+          "title": "Claude Code opens CLAUDE.md",
+          "text": "A new session knows nothing about the project. Claude Code loads CLAUDE.md automatically.",
+          "at": "claude"
+        },
+        {
+          "edge": "next-agents",
+          "title": "Other agents open AGENTS.md",
+          "text": "Codex and other harnesses read AGENTS.md instead.",
+          "at": "agents"
+        },
+        {
+          "edge": "agents-claude",
+          "title": "AGENTS.md → CLAUDE.md",
+          "text": "…which sends them to CLAUDE.md too, so every agent takes the same path."
+        },
+        {
+          "edge": "claude-scrollsmd",
+          "title": "CLAUDE.md → SCROLLS.md",
+          "text": "The stub says: read SCROLLS.md first."
+        },
+        {
+          "edge": "scrollsmd-starter",
+          "title": "SCROLLS.md → STARTER.md",
+          "text": "SCROLLS.md knows the folder's real path: hidden or visible, at the repo root or inside a package."
+        },
+        {
+          "edge": "starter-handoff",
+          "title": "Read HANDOFF.md first",
+          "text": "STARTER.md says what to read when. HANDOFF.md comes first: current state and open threads.",
+          "at": "handoff"
+        },
+        {
+          "edge": "starter-plan",
+          "title": "Then PLAN.md",
+          "text": "What's next to work on.",
+          "at": "plan"
+        },
+        {
+          "edge": "starter-wisdom",
+          "title": "And WISDOM.md",
+          "text": "The traps not to fall into again. SPEC and the gap files are read when the task touches them.",
+          "at": "wisdom"
+        }
+      ]
+    },
+    "update": {
+      "label": "/scrolls-update",
+      "summary": "Run at the end of every session: records what happened, each file by its own rule.",
+      "scope": [
+        "git-diff",
+        "diff-update",
+        "update-starter",
+        "starter-handoff",
+        "starter-spec",
+        "starter-plan",
+        "starter-gaps",
+        "starter-wisdom",
+        "update-scrollsmd"
+      ],
+      "steps": [
+        {
+          "edge": "git-diff",
+          "title": "Look at git",
+          "text": "The session_diff script lists uncommitted changes and the commits since the scrolls were last touched.",
+          "at": "diff"
+        },
+        {
+          "edge": "diff-update",
+          "title": "Cross-check the session",
+          "text": "That catches work the conversation forgot, for example after a resume or compaction.",
+          "at": "update"
+        },
+        {
+          "edge": "update-starter",
+          "title": "Read the map",
+          "text": "STARTER.md says which scrolls exist and each one's update rule, including any the project added itself."
+        },
+        {
+          "edge": "starter-handoff",
+          "title": "HANDOFF.md: overwrite",
+          "text": "Replaced with a fresh snapshot. Never appended.",
+          "at": "handoff"
+        },
+        {
+          "edge": "starter-spec",
+          "title": "SPEC.md: only what shipped",
+          "text": "A section is added only for features that really work, described for users.",
+          "at": "spec"
+        },
+        {
+          "edge": "starter-plan",
+          "title": "PLAN.md: tick and add",
+          "text": "Done tickets flip [ ] → [x]; newly found work becomes new tickets.",
+          "at": "plan"
+        },
+        {
+          "edge": "starter-gaps",
+          "title": "Gap files: in lockstep",
+          "text": "A closed gap is deleted from both files. A new gap gets a line in one and its reason in the other.",
+          "at": "gaps"
+        },
+        {
+          "edge": "starter-wisdom",
+          "title": "WISDOM.md: only if new",
+          "text": "An entry is added only when the session taught something new.",
+          "at": "wisdom"
+        },
+        {
+          "edge": "update-scrollsmd",
+          "title": "Backfill pointers",
+          "text": "Missing SCROLLS.md, CLAUDE.md or AGENTS.md stubs are added. Safe to run every time; nothing is overwritten."
+        }
+      ]
+    },
+    "hide": {
+      "label": "/scrolls-hide",
+      "summary": "Turns a visible docs/scrolls/ into hidden docs/.scrolls/ without breaking anything.",
+      "scope": [
+        "hide-starter",
+        "hide-scrollsmd",
+        "scrollsmd-starter"
+      ],
+      "steps": [
+        {
+          "edge": "hide-starter",
+          "title": "Rename the folder",
+          "text": "docs/scrolls/ becomes docs/.scrolls/. Path references inside the scrolls are rewritten to match."
+        },
+        {
+          "edge": "hide-scrollsmd",
+          "title": "Rewrite SCROLLS.md",
+          "text": "SCROLLS.md now points at docs/.scrolls/STARTER.md."
+        },
+        {
+          "edge": "scrollsmd-starter",
+          "title": "Chain still works",
+          "text": "New sessions still find the memory. With -r, every package in a monorepo is done in one run."
+        }
+      ]
+    },
+    "unhide": {
+      "label": "/scrolls-unhide",
+      "summary": "Turns hidden docs/.scrolls/ into visible docs/scrolls/ without breaking anything.",
+      "scope": [
+        "unhide-starter",
+        "unhide-scrollsmd",
+        "scrollsmd-starter"
+      ],
+      "steps": [
+        {
+          "edge": "unhide-starter",
+          "title": "Rename the folder",
+          "text": "docs/.scrolls/ becomes docs/scrolls/. Path references inside the scrolls are rewritten."
+        },
+        {
+          "edge": "unhide-scrollsmd",
+          "title": "Rewrite SCROLLS.md",
+          "text": "SCROLLS.md now points at docs/scrolls/STARTER.md."
+        },
+        {
+          "edge": "scrollsmd-starter",
+          "title": "Chain still works",
+          "text": "Nothing else changes. For a new project, /scrolls-setup -u gives a visible folder from the start."
+        }
+      ]
+    },
+    "remove": {
+      "label": "/scrolls-remove",
+      "summary": "The opposite of setup: takes the memory out in one commit that can always be undone.",
+      "scope": [
+        "remove-git",
+        "remove-starter",
+        "remove-claude"
+      ],
+      "steps": [
+        {
+          "edge": "remove-git",
+          "title": "Check for uncommitted work",
+          "text": "It refuses if anything it would remove has uncommitted changes, because those could not be restored.",
+          "at": "remove"
+        },
+        {
+          "edge": "remove-starter",
+          "title": "Delete the scrolls",
+          "text": "The scrolls folder and SCROLLS.md are deleted.",
+          "at": "starter"
+        },
+        {
+          "edge": "remove-claude",
+          "title": "Strip the stubs",
+          "text": "The pointer stubs come out of CLAUDE.md and AGENTS.md. A file is deleted only if nothing else is left (or with -x)."
+        },
+        {
+          "edge": "remove-git",
+          "title": "One checkpoint commit",
+          "text": "Everything lands as ONE commit, maint(memory): scrolls-removed, naming the commit before it.",
+          "at": "git"
+        }
+      ]
+    },
+    "restore": {
+      "label": "/scrolls-restore",
+      "summary": "The counterpart to remove: brings the memory back from git, and nothing else.",
+      "scope": [
+        "git-restore",
+        "restore-starter",
+        "restore-claude"
+      ],
+      "steps": [
+        {
+          "edge": "git-restore",
+          "title": "Find the checkpoint",
+          "text": "It finds the newest scrolls-removed commit, or uses any commit you name. --list shows the options.",
+          "at": "git"
+        },
+        {
+          "edge": "restore-starter",
+          "title": "Bring back the scrolls",
+          "text": "The scrolls folders come back exactly as they were before removal."
+        },
+        {
+          "edge": "restore-claude",
+          "title": "Re-insert the stubs",
+          "text": "The pointer stubs go back into CLAUDE.md and AGENTS.md as they are today. No other file is rolled back."
+        },
+        {
+          "edge": "git-restore",
+          "title": "Record it",
+          "text": "It is recorded as one commit. --onto puts the memory on another branch through a temporary worktree.",
+          "at": "restore"
+        }
+      ]
+    },
+    "help": {
+      "label": "/scrolls-help",
+      "summary": "A reference for the whole family. It changes nothing in the repo.",
+      "scope": [
+        "help-out"
+      ],
+      "steps": [
+        {
+          "edge": "help-out",
+          "title": "Show the reference",
+          "text": "What each command does, the shared -p / -t / -l / -r flags and common recipes, as chat text."
+        },
+        {
+          "edge": "help-out",
+          "title": "Or as a web page",
+          "text": "With -e / --online it serves the same reference as a styled local page, with light/dark and colour toggles."
+        }
+      ]
+    }
+  },
+  "layouts": {
+    "wide": {
+      "setup": [
+        0,
+        0
+      ],
+      "templates": [
+        1,
+        0
+      ],
+      "agents": [
+        2,
+        0
+      ],
+      "next": [
+        3,
+        0
+      ],
+      "update": [
+        0,
+        1
+      ],
+      "diff": [
+        1,
+        1
+      ],
+      "claude": [
+        2,
+        1
+      ],
+      "handoff": [
+        3,
+        1
+      ],
+      "hide": [
+        0,
+        2
+      ],
+      "scrollsmd": [
+        2,
+        2
+      ],
+      "spec": [
+        3,
+        2
+      ],
+      "unhide": [
+        0,
+        3
+      ],
+      "git": [
+        1,
+        3
+      ],
+      "starter": [
+        2,
+        3
+      ],
+      "plan": [
+        3,
+        3
+      ],
+      "remove": [
+        0,
+        4
+      ],
+      "gaps": [
+        3,
+        4
+      ],
+      "restore": [
+        0,
+        5
+      ],
+      "wisdom": [
+        3,
+        5
+      ],
+      "help": [
+        0,
+        6
+      ],
+      "helpref": [
+        1,
+        6
+      ]
+    },
+    "medium": {
+      "setup": [
+        0,
+        0
+      ],
+      "templates": [
+        1,
+        0
+      ],
+      "next": [
+        2,
+        0
+      ],
+      "update": [
+        0,
+        1
+      ],
+      "diff": [
+        1,
+        1
+      ],
+      "agents": [
+        2,
+        1
+      ],
+      "hide": [
+        0,
+        2
+      ],
+      "claude": [
+        2,
+        2
+      ],
+      "unhide": [
+        0,
+        3
+      ],
+      "git": [
+        1,
+        3
+      ],
+      "scrollsmd": [
+        2,
+        3
+      ],
+      "remove": [
+        0,
+        4
+      ],
+      "starter": [
+        1,
+        4
+      ],
+      "handoff": [
+        2,
+        4
+      ],
+      "restore": [
+        0,
+        5
+      ],
+      "spec": [
+        2,
+        5
+      ],
+      "help": [
+        0,
+        6
+      ],
+      "plan": [
+        2,
+        6
+      ],
+      "helpref": [
+        0,
+        7
+      ],
+      "gaps": [
+        2,
+        7
+      ],
+      "wisdom": [
+        2,
+        8
+      ]
+    },
+    "narrow": {
+      "setup": [
+        0,
+        0
+      ],
+      "next": [
+        1,
+        0
+      ],
+      "templates": [
+        0,
+        1
+      ],
+      "agents": [
+        1,
+        1
+      ],
+      "update": [
+        0,
+        2
+      ],
+      "claude": [
+        1,
+        2
+      ],
+      "diff": [
+        0,
+        3
+      ],
+      "scrollsmd": [
+        1,
+        3
+      ],
+      "hide": [
+        0,
+        4
+      ],
+      "starter": [
+        1,
+        4
+      ],
+      "unhide": [
+        0,
+        5
+      ],
+      "handoff": [
+        1,
+        5
+      ],
+      "git": [
+        0,
+        6
+      ],
+      "spec": [
+        1,
+        6
+      ],
+      "remove": [
+        0,
+        7
+      ],
+      "plan": [
+        1,
+        7
+      ],
+      "restore": [
+        0,
+        8
+      ],
+      "gaps": [
+        1,
+        8
+      ],
+      "help": [
+        0,
+        9
+      ],
+      "wisdom": [
+        1,
+        9
+      ],
+      "helpref": [
+        0,
+        10
+      ]
+    }
+  },
+  "footer": {
+    "label": "Simulated",
+    "text": "Scripted explanation of the scrolls skill family, not measured activity.",
+    "reference": "Source: skills/scrolls/*/SKILL.md in sugatoray/aiskills",
+    "note": "Shared flags: -p path · -t repo root · -l current dir · -r recurse"
+  },
+  "sources": {
+    "scrolls-help": "fddb7450237dfee908ab51a47f5470d556f9895537450aab122d0866def59b06",
+    "scrolls-hide": "6d9734dc78036b5c0bfd0f387f9bb77dd16bb69761ffdcee141c9a0a2ffa558b",
+    "scrolls-remove": "1623ee1f0a5886c634857a36e9b1d12d0ebb497fabc7793216ffa683c3fe4d03",
+    "scrolls-restore": "c6398ac09815bcf1391efff868e838c51ba75b45ce74662974518c10ce138dff",
+    "scrolls-setup": "5456b21097f5decc049432903e0f3019b4e4a6c085aad622cd84a6c44df4b2b3",
+    "scrolls-unhide": "6082ca023fc2b098bb53b04a801ae52d2617e5ebab9101809a78ac3c360bf78e",
+    "scrolls-update": "a77dc6a9a9bc0b778900acdfa4e49aedc60a8ea1cd3c3df54574dc3d88d27d0a"
+  }
+}
