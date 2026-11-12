@@ -2,9 +2,9 @@
 
 The scrolls skills give a project a memory that lasts between agent sessions: a few Markdown files in `docs/.scrolls/`, and short pointer files (`AGENTS.md`, `CLAUDE.md`, `SCROLLS.md`) that lead every new session to them. The page below shows what each `/scrolls-*` command does to those files, step by step.
 
-<iframe src="scrolls-explainer.html" title="How the scrolls-* skills work: an interactive explainer" loading="lazy" style="width:100%;height:880px;border:1px solid #2a3440;border-radius:10px;background:#060809"></iframe>
+<iframe data-page="scrolls-explainer.html" title="How the scrolls-* skills work: an interactive explainer" loading="lazy" style="width:100%;height:880px;border:1px solid #2a3440;border-radius:10px;background:#060809"></iframe>
 
-[Open the explainer full-size](scrolls-explainer.html)
+[Open the explainer full-size](scrolls-explainer.html) (full screen; close it with ✕ or `Esc`)
 
 ## How to use it
 

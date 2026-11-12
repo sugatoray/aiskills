@@ -83,7 +83,8 @@ describe("build-docs-html", () => {
     assert.deepEqual(d.static, ["explainers/scrolls-explainer.html"], "the HTML pages under docs/docsite/, other than index.html");
     const intro = d.pages.find((p) => p.path === "explainers/scrolls.md");
     assert.ok(intro, "explainers/scrolls.md is a page in the bundle");
-    assert.match(intro.md, /<iframe[^>]+src="scrolls-explainer\.html"/, "it embeds the explainer");
+    assert.match(intro.md, /<iframe[^>]+data-page="scrolls-explainer\.html"/, "it embeds the explainer");
+    assert.doesNotMatch(intro.md, /<iframe[^>]+\ssrc=/, "with no src: a viewer must never request a file that may not be there");
     assert.deepEqual(Object.keys(d.staticHtml ?? {}), d.static, "each one is also embedded, so index.html works on its own");
     assert.equal(
       Buffer.from(d.staticHtml["explainers/scrolls-explainer.html"], "base64").toString("utf8"),
@@ -281,32 +282,51 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
     }
   });
 
-  test("index.html on its own (no explainers/ folder next to it) still shows and opens the explainer", async () => {
-    // A viewer or preview that only gets index.html: the explainer must come from the bundle itself.
-    const dir = tempDir();
-    const lone = join(dir, "index.html");
-    writeFileSync(lone, readFileSync(OUT));
-    const browser = await playwright.chromium.launch();
-    try {
-      const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
-      const page = await context.newPage();
-      const errors = [];
-      page.on("pageerror", (e) => errors.push(e.message));
-      await page.goto(pathToFileURL(lone).href + "#explainers-scrolls");
-      await page.waitForSelector("#doc iframe");
-      const frame = page.frameLocator("#doc iframe");
-      await frame.locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
-      assert.equal(await frame.locator(".rf-tab").count(), 9, "the embedded explainer loads with all its tabs");
-      // The full-size link opens a working page too.
-      const link = page.locator('#doc a:has-text("Open the explainer full-size")');
-      const [popup] = await Promise.all([context.waitForEvent("page"), link.click()]);
-      await popup.waitForSelector("#network-flow[data-ready=true]", { timeout: 10000 });
-      assert.equal(await popup.locator(".rf-tab").count(), 9, "the full-size link opens the explainer");
-      assert.deepEqual(errors, []);
-    } finally {
-      await browser.close();
-    }
-  });
+  for (const [label, viewport] of [["desktop", { width: 1400, height: 900 }], ["phone", { width: 390, height: 844 }]]) {
+    test(`index.html on its own (no explainers/ folder next to it) shows the explainer and opens it full-size, on a ${label}`, async () => {
+      // A viewer or preview that only gets index.html: the explainer must come from the bundle itself,
+      // and nothing may navigate to (or request) a file next to index.html.
+      const dir = tempDir();
+      const lone = join(dir, "index.html");
+      writeFileSync(lone, readFileSync(OUT));
+      const browser = await playwright.chromium.launch();
+      try {
+        const context = await browser.newContext({ viewport });
+        const page = await context.newPage();
+        const errors = [];
+        const missing = [];
+        page.on("pageerror", (e) => errors.push(e.message));
+        page.on("requestfailed", (r) => { if (r.url().startsWith("file:")) missing.push(r.url()); });
+        await page.goto(pathToFileURL(lone).href + "#explainers-scrolls");
+        await page.waitForSelector("#doc iframe");
+        assert.equal(await page.getAttribute("#doc iframe", "src"), null, "no src on the frame");
+        await page.frameLocator("#doc iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
+        assert.equal(await page.frameLocator("#doc iframe").locator(".rf-tab").count(), 9, "the embedded explainer loads with all its tabs");
+        // "Open the explainer full-size": an overlay in this page, not a navigation.
+        const before = page.url();
+        await page.click('#doc a:has-text("Open the explainer full-size")');
+        await page.waitForSelector(".explainer-overlay iframe");
+        assert.equal(page.url(), before, "no navigation");
+        assert.equal(context.pages().length, 1, "no new tab");
+        const ov = await page.locator(".explainer-overlay").boundingBox();
+        assert.ok(Math.abs(ov.width - viewport.width) <= 1 && Math.abs(ov.height - viewport.height) <= 1, `overlay ${ov.width}x${ov.height} fills the screen`);
+        await page.frameLocator(".explainer-overlay iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
+        assert.equal(await page.frameLocator(".explainer-overlay iframe").locator(".rf-tab").count(), 9);
+        const overflow = await page.frameLocator(".explainer-overlay iframe").locator("body").evaluate(() => document.documentElement.scrollWidth > innerWidth);
+        assert.equal(overflow, false, "the explainer fits the screen width");
+        await page.click(".explainer-overlay .explainer-close");
+        assert.equal(await page.locator(".explainer-overlay").count(), 0, "✕ closes it");
+        await page.click('#doc a:has-text("Open the explainer full-size")');
+        await page.waitForSelector(".explainer-overlay");
+        await page.keyboard.press("Escape");
+        assert.equal(await page.locator(".explainer-overlay").count(), 0, "Esc closes it");
+        assert.deepEqual(missing, [], "nothing requested a missing file");
+        assert.deepEqual(errors, []);
+      } finally {
+        await browser.close();
+      }
+    });
+  }
 
   test("the banner shows on the landing page only, scaled to the column", async () => {
     const browser = await playwright.chromium.launch();

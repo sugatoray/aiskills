@@ -43,10 +43,11 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 - The docs gain **See how the scrolls skills work**
   (`docs/docsite/explainers/scrolls.md`, in the Skills tab), which embeds the
   skill's interactive page. `npm run docs:skills` copies that page from the
-  skill into `docs/docsite/explainers/`. The docs bundle embeds it, so the page
-  shows even when `index.html` is opened on its own; `npm run docs:site` also
-  publishes it next to `site/index.html`, and the full-size link uses that
-  file when it is there.
+  skill into `docs/docsite/explainers/`. The docs bundle embeds it, so it
+  shows even when `index.html` is opened on its own (a phone app's preview, a
+  single downloaded file): the frame and a full-screen overlay both render the
+  embedded copy, and nothing requests the file itself. `npm run docs:site`
+  still publishes the file next to `site/index.html`.
   The docs are not part of the npm package.
 
 ## [1.0.0] - 2026-11-11

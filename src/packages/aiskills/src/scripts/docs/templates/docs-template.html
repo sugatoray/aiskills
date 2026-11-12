@@ -363,6 +363,13 @@ main { min-width: 0; padding-block: 28px 80px; }
 .hero[hidden] { display: none; }
 .hero-scaler { position: absolute; left: 0; top: 0; width: 1280px; height: 640px; transform-origin: 0 0; }
 /*__BANNER_CSS__*/
+
+/* explainer pages: the full-size overlay */
+.explainer-overlay{position:fixed;inset:0;z-index:1000;background:#060809;display:flex;flex-direction:column}
+.explainer-overlay iframe{flex:1;width:100%;border:0;display:block;background:#060809}
+.explainer-close{position:absolute;bottom:16px;right:16px;z-index:1;width:48px;height:48px;border-radius:50%;border:1px solid #394451;background:rgba(20,26,32,.92);box-shadow:0 4px 18px rgba(0,0,0,.5);color:#f0f2f4;font-size:20px;line-height:1;cursor:pointer}
+.explainer-close:hover{background:#1f2730}
+body.explainer-open{overflow:hidden}
 </style>
 </head>
 <body>
@@ -495,22 +502,51 @@ const DATA = /*__DOCS_DATA__*/null;
     if (b64 === undefined) return undefined;
     return new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
   }
-  const staticUrls = new Map();
-  function embeddedUrl(path) {
-    if (!staticUrls.has(path)) staticUrls.set(path, URL.createObjectURL(new Blob([staticHtml(path)], { type: "text/html" })));
-    return staticUrls.get(path);
+  // Nothing ever navigates to (or requests) the file itself: wherever this
+  // page is opened (a phone app's preview, file://, the published site), it
+  // may not be there. A link opens the embedded copy in a full-screen overlay.
+  let overlay = null, overlayReturn = null;
+  function closeOverlay() {
+    if (!overlay) return;
+    overlay.remove(); overlay = null;
+    document.body.classList.remove("explainer-open");
+    if (overlayReturn && overlayReturn.focus) overlayReturn.focus();
   }
-  const servedNextToMe = new Map();
-  function staticLink(a, path) {
-    a.target = "_blank"; a.rel = "noopener";
+  function openOverlay(path, title) {
+    closeOverlay();
+    overlayReturn = document.activeElement;
+    overlay = document.createElement("div");
+    overlay.className = "explainer-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", title);
+    const close = document.createElement("button");
+    close.type = "button"; close.className = "explainer-close"; close.textContent = "✕";
+    close.setAttribute("aria-label", "Close"); close.title = "Close (Esc)";
+    close.addEventListener("click", closeOverlay);
+    const frame = document.createElement("iframe");
+    frame.title = title;
+    frame.srcdoc = staticHtml(path);
+    // Esc inside the explainer closes the overlay too, unless the explainer's own shortcut panel is open.
+    frame.addEventListener("load", () => {
+      try {
+        frame.contentDocument.addEventListener("keydown", e => {
+          if (e.key === "Escape" && !frame.contentDocument.querySelector(".rf-help.on")) closeOverlay();
+        });
+      } catch (_) { /* a viewer that isolates the frame: the ✕ button still works */ }
+    });
+    overlay.append(close, frame);
+    document.body.append(overlay);
+    document.body.classList.add("explainer-open");
+    frame.focus();
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && overlay) { e.preventDefault(); closeOverlay(); } });
+  function staticLink(a, path, pageId) {
     a.dataset.page = path;
-    a.setAttribute("href", path);
-    if (!(DATA.staticHtml || {})[path]) return;
-    if (!/^https?:$/.test(location.protocol)) { a.href = embeddedUrl(path); return; }
-    if (!servedNextToMe.has(path)) {
-      servedNextToMe.set(path, fetch(path, { method: "HEAD" }).then(r => r.ok).catch(() => false));
-    }
-    servedNextToMe.get(path).then(ok => { if (!ok) a.href = embeddedUrl(path); });
+    if (staticHtml(path) === undefined) { a.setAttribute("href", path); a.target = "_blank"; a.rel = "noopener"; return; }
+    a.setAttribute("href", "#" + pageId);
+    a.setAttribute("role", "button");
+    a.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); openOverlay(path, a.textContent); });
   }
 
   /* ---------- markdown helpers ---------- */
@@ -587,15 +623,13 @@ const DATA = /*__DOCS_DATA__*/null;
       host.replaceWith(wrap); wrap.appendChild(img);
     });
 
-    // Embedded pages (explainers): the iframe shows the copy inside this file,
-    // so it works even when index.html is opened on its own
-    doc.querySelectorAll("iframe[src]").forEach(f => {
-      const src = f.getAttribute("src");
-      if (/^[a-z]+:/i.test(src)) return;
-      const r = resolve(page.path, src);
+    // Embedded pages (explainers): <iframe data-page="…"> shows the copy inside
+    // this file (srcdoc), so it works even when index.html is opened on its own.
+    // There is no src, so a viewer never requests a file that may not be there.
+    doc.querySelectorAll("iframe[data-page]").forEach(f => {
+      const r = resolve(page.path, f.dataset.page);
       const html = r && staticHtml(r.path);
       if (html === undefined) return;
-      f.removeAttribute("src");
       f.dataset.page = r.path;
       f.srcdoc = html;
     });
@@ -610,7 +644,7 @@ const DATA = /*__DOCS_DATA__*/null;
       const r = resolve(page.path, href);
       const target = r && byPath.get(r.path);
       if (target) { a.href = "#" + target.id; if (r.hash) a.dataset.anchor = r.hash; return; }
-      if (r && (DATA.static || []).includes(r.path)) { staticLink(a, r.path); return; }
+      if (r && (DATA.static || []).includes(r.path)) { staticLink(a, r.path, page.id); return; }
       const base = r.path.endsWith("/") ? DATA.treeBase : DATA.repoBase;
       a.href = new URL(href, base + page.path).href;
       a.target = "_blank"; a.rel = "noopener";
