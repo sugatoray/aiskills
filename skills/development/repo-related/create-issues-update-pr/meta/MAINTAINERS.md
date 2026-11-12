@@ -11,11 +11,6 @@ For people developing this skill — not read as part of answering a
   not read at invocation time.
 - `../CHANGELOG.md` — this skill's version history; update it alongside
   `metadata.version` in `SKILL.md`.
-- `../.claude-plugin/plugin.json` — the Claude Code plugin manifest
-  (name, version, description, author, license, keywords). Not read
-  during a normal skill invocation; only Claude Code's plugin loader
-  reads it, when this directory is loaded as a plugin (see "Claude Code
-  plugin packaging" below).
 - `../agents/claude-code.yaml`, `../agents/openai.yaml` — per-agent-
   harness interface metadata (`display_name`, `short_description`,
   `allow_implicit_invocation`), same shape and purpose as the
@@ -52,26 +47,25 @@ up.
 
 ## Claude Code plugin packaging
 
-`../SKILL.md` already sits directly at this skill's root with no
-`skills/` subfolder — that's Claude Code's "single-skill plugin" layout
-already, so adding `../.claude-plugin/plugin.json` was enough to make
-this directory a self-contained, loadable Claude Code plugin with no
-restructuring. Test it locally with:
-
-```
-claude --plugin-dir skills/development/repo-related/create-issues-update-pr
-```
-
-This individual manifest is separate from, and in addition to, the
-family-level `skills/development/repo-related/.claude-plugin/plugin.json`
-that groups every `repo-related` skill (currently just this one) into a
+This skill has no plugin manifest of its own. It ships only through the
+family-level `skills/development/repo-related/.claude-plugin/plugin.json`,
+which groups every `repo-related` skill (currently just this one) into a
 single `repo-related-skills` plugin listed in the repo-root
-`.claude-plugin/marketplace.json` — see `../meta/MAINTAINERS.md` for
-that manifest's design and its own keep-in-sync rules. Same
-individual-plus-family arrangement as `stata-recipes` (see its own
-`meta/MAINTAINERS.md` for the tradeoff worth revisiting once a family
-gains a second skill), and unlike `scrolls-*`, which ships only the
-group-level manifest.
+`.claude-plugin/marketplace.json`. That is the same group-only
+arrangement `scrolls-*` uses. See `../meta/MAINTAINERS.md` for that
+manifest's design and its keep-in-sync rules. Test it locally by loading
+the family directory:
+
+```
+claude --plugin-dir skills/development/repo-related
+```
+
+Up to v1.3.0 this directory also carried its own
+`.claude-plugin/plugin.json`, so it could load as a standalone
+single-skill plugin. It was removed to match the `scrolls-*` structure:
+the standalone plugin installed exactly the same skill as
+`repo-related-skills`, under a second name, and needed its version kept
+in step separately.
 
 ## Versioning
 
@@ -82,12 +76,11 @@ changed format-reference example, a new edge case documented in "What
 this doesn't do". Pure typo fixes or formatting-only edits don't need a
 bump.
 
-Keep `../.claude-plugin/plugin.json`'s `version` field, **and**
-`../../.claude-plugin/plugin.json`'s (the family-level manifest)
-`version` field, equal to `SKILL.md`'s `metadata.version` — bump all
-three in the same commit. Three manifests for the same release, and a
-mismatch in any one of them is exactly the kind of inconsistency worth
-catching before it ships.
+Keep `../../.claude-plugin/plugin.json`'s (the family-level manifest)
+`version` field equal to `SKILL.md`'s `metadata.version` — bump both in
+the same commit. Two files for the same release, and a mismatch between
+them is exactly the kind of inconsistency worth catching before it
+ships.
 
 This is currently the only skill under `skills/development/`, so its
 version moves independently — no family-wide lockstep the way the five

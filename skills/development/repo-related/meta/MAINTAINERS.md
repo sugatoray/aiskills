@@ -45,12 +45,9 @@ future subgroup under `skills/development/` gets its own
 - **Version**: `plugin.json`'s top-level `"version"` must match
   `create-issues-update-pr/SKILL.md`'s `metadata.version` exactly (the
   family's only member today, so its version *is* the family version).
-  Bump both in the same commit. Also keep
-  `create-issues-update-pr/.claude-plugin/plugin.json`'s own
-  `"version"` — the individual single-skill plugin manifest, separate
-  from this family-level one, see that skill's own
-  `meta/MAINTAINERS.md` — equal to the same number. Three files, one
-  version, every release.
+  Bump both in the same commit. Two files, one version, every release.
+  Skills here carry no `.claude-plugin/plugin.json` of their own (the
+  same group-only structure as `scrolls-*`); don't add one.
 - **New skill published**: add its `./<skill-name>` path to the
   `"skills"` array here in the same commit that adds the skill
   directory.

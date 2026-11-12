@@ -43,7 +43,6 @@ aiskills uninstall -s create-issues-update-pr
 
 The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/create-issues-update-pr/`:
 
-- `.claude-plugin/plugin.json`
 - `CHANGELOG.md`
 - `README.md`
 - `SKILL.md`

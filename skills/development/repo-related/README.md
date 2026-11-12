@@ -36,10 +36,10 @@ Every skill's directory has:
   `agents/openai.yaml` files.
 - `meta/MAINTAINERS.md` — development notes: layout and versioning.
 - `CHANGELOG.md` — that skill's own version history.
-- `.claude-plugin/plugin.json` — Claude Code plugin manifest, present
-  because `SKILL.md` sits directly at the skill's root with no `skills/`
-  subfolder (Claude Code's single-skill plugin layout), letting it load
-  directly via `claude --plugin-dir <path>`.
+
+Skills here have no plugin manifest of their own. They ship only through
+the family-level manifest described below, the same way the `scrolls-*`
+skills do.
 
 `meta/` is development-only — for documenting design decisions, not part
 of using the skills. `SKILL.md` may point to it by name, but only to say
