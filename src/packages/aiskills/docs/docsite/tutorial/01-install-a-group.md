@@ -40,6 +40,10 @@ video-related-skills  (alias: video-related)
   Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...
   skills: dynamic-promo-video
 
+image-styles-skills  (alias: image-styles)
+  Skills for generating images in a variety of styles and applying visual styles or effects to existing image...
+  skills: artwallbg, commentdrop
+
 Install a group:  aiskills install --group <name|alias> --global --agent <agent>
 ```
 

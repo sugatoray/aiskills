@@ -211,6 +211,7 @@ installed version. At the time of writing:
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
+| `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
 | `all` (built in) | | every skill |
 
 `newsletter-ai` isn't in the package: `skills/newsletters/.skillsignore`
