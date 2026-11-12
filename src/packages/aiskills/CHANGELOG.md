@@ -20,6 +20,27 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-12
+
+### Added
+
+- **New bundled skill: `scrolls-explainer`**, in the `scrolls-skills` group
+  (alias `scrolls`). `/scrolls-explainer` writes `scrolls-explainer.html`, an
+  interactive, offline page with one tab per scrolls command that animates
+  what the command does, step by step, with a callout for each step and full
+  keyboard navigation. The package now bundles 16 skills in 8 groups:
+  `aiskills install -s scrolls-explainer`, or `aiskills install -G scrolls`
+  for the whole group. See the skill's own `CHANGELOG.md` for its history.
+
+### Changed
+
+- The other scrolls skills ship at their new lockstep version, 2.5.0 (no
+  change in behavior; `scrolls-help`'s reference now covers the explainer).
+- The README, the docs' skill and group lists, the version examples, the
+  banner and the generated docs pages list the new skill. Upgrading from
+  1.0.0 with `aiskills upgrade` lists `scrolls-explainer` as new, with the
+  command to install it.
+
 ## [1.0.0] - 2026-11-11
 
 The first stable release. From here on, a change that can break existing use
@@ -433,6 +454,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[1.1.0]: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-explainer
 [1.0.0]: https://github.com/sugatoray/aiskills/pull/141
 [0.9.0]: https://github.com/sugatoray/aiskills/pull/193
 [0.8.0]: https://github.com/sugatoray/aiskills/pull/184

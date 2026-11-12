@@ -23,7 +23,7 @@ being written down here.
 **Local (project-level), Claude Code only:**
 
 ```
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --agent claude-code --yes
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --agent claude-code --yes
 ```
 
 Installs into `./.claude/skills/` and writes `./skills-lock.json`,
@@ -33,7 +33,7 @@ relative to whatever directory you run it from.
 `-g`/`--global`:
 
 ```
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --agent claude-code --global --yes
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --agent claude-code --global --yes
 ```
 
 Installs into `~/.claude/skills/` instead, independent of the current

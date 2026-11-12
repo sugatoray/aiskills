@@ -18,8 +18,8 @@ aiskills install -G scrolls -a claude-code
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+[aiskills] bundled: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 15 skills in 8 groups, at the version you installed.
+- **Skills in one package**: 16 skills in 8 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -59,6 +59,7 @@ aiskills install -G scrolls -a claude-code
 - [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.
 - [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
 - [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
+- [scrolls-explainer](skills/scrolls-explainer.md): Writes scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup, /scrolls-update,…
 - [scrolls-help](skills/scrolls-help.md): Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,…
 - [scrolls-hide](skills/scrolls-hide.md): Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the…
 - [scrolls-remove](skills/scrolls-remove.md): Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup.

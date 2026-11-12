@@ -1,11 +1,11 @@
 # scrolls-help
 
-Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the six commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell).
+Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore, and the /scrolls-explainer page) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the six commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell).
 
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.4.0 |
+| Version | 2.5.0 |
 | Starts | When you ask for it: you type `/scrolls-help` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |

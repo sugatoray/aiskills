@@ -53,7 +53,7 @@ visible to a `/scrolls-update` invocation changes (new flag, changed
 default, changed update rule) — not for pure documentation or test-only
 changes.
 
-This skill's version is locked in step with the other six `scrolls-*`
+This skill's version is locked in step with the other seven `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all seven to the same new number in the same commit,
+here means bumping all eight to the same new number in the same commit,
 even the ones with nothing of their own to report that release.

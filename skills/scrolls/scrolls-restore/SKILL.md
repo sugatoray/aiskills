@@ -8,7 +8,7 @@ metadata:
   name: scrolls-restore
   type: skill
   author: sugatoray
-  version: "2.4.0"
+  version: "2.5.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-restore"
 ---
 

@@ -5,7 +5,7 @@ Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git rep
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.4.0 |
+| Version | 2.5.0 |
 | Starts | When you ask for it: you type `/scrolls-remove` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |

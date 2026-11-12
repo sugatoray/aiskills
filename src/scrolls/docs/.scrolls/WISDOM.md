@@ -24,6 +24,9 @@ Hard-won lessons for this project. Read this LAST, right before editing code, so
 
 - `git log --grep` / `%(trailers)` only see trailers in the **last paragraph** of a commit message. If any prose follows the trailer block, the trailers silently become invisible. Keep `Scrolls-*` trailers last, with nothing after them.
 
+- The repository `.gitignore` ignores every `build/` folder (and other Python build names). A skill folder named `build/` is silently left out of `git add`, so it never ships, while the skill still works locally. `/scrolls-explainer` first kept its generator in `meta/build/`; it's `meta/generator/` now, and its scenario 13 fails if git ignores any file in the skill. Check `git check-ignore` before naming a folder.
+- The npm package's tests copy only **git-tracked** skills into their sandbox. An untracked new skill makes them report stale counts (15, not 16) until it is staged.
+
 ## Ditches — bad patterns or decisions to avoid
 
 - Don't leave GitHub issues open-ended prose when the ask is "group some into bigger issues with subtasks" — use the real `sub_issue_write` API (native GitHub sub-issue hierarchy) over markdown checklists when it's available; it's genuinely a different, better-supported feature (progress bars, linked issue views), not just a formatting choice.

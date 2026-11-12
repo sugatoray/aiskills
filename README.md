@@ -82,7 +82,7 @@ use skill: /scrolls-update
 
 > 💡 For more information, refer to the [**Scrolls README.md**](skills/scrolls/README.md).
 
-[#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,remove,restore,help%7D-green
+[#scrolls-skills-sh-badge]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--%7Bsetup,update,hide,unhide,remove,restore,help,explainer%7D-green
 [#skills-sh-badge-scrolls-setup]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--setup-green
 [#skills-sh-badge-scrolls-update]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--update-green
 [#skills-sh-badge-scrolls-help]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--help-green
@@ -90,6 +90,7 @@ use skill: /scrolls-update
 [#skills-sh-badge-scrolls-unhide]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--unhide-green
 [#skills-sh-badge-scrolls-remove]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--remove-green
 [#skills-sh-badge-scrolls-restore]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--restore-green
+[#skills-sh-badge-scrolls-explainer]: https://img.shields.io/badge/skills.sh-sugatoray/aiskills@scrolls--explainer-green
 
 | Skill Group | Skill Name | Skills.sh Skill Badge | Short Description | 
 |:---:|:---|:---|:---|
@@ -100,6 +101,7 @@ use skill: /scrolls-update
 | [Scrolls](skills/scrolls/README.md) | `scrolls-unhide` | [![badge-scrolls][#skills-sh-badge-scrolls-unhide]](https://www.skills.sh/sugatoray/aiskills/scrolls-unhide) | Unhide the folder: `docs/.scrolls` --> `docs/scrolls`. |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-remove` | [![badge-scrolls][#skills-sh-badge-scrolls-remove]](https://www.skills.sh/sugatoray/aiskills/scrolls-remove) | Remove the scrolls system and commit the removal (`maint(memory): scrolls-removed`), recording the previous commit for restore. |
 | [Scrolls](skills/scrolls/README.md) | `scrolls-restore` | [![badge-scrolls][#skills-sh-badge-scrolls-restore]](https://www.skills.sh/sugatoray/aiskills/scrolls-restore) | Restore the scrolls memory from the latest `/scrolls-remove` checkpoint (or any commit) into the current code, or `--onto` another branch. |
+| [Scrolls](skills/scrolls/README.md) | `scrolls-explainer` | [![badge-scrolls][#skills-sh-badge-scrolls-explainer]](https://www.skills.sh/sugatoray/aiskills/scrolls-explainer) | Write an interactive, offline page that animates what each scrolls command does, step by step, with keyboard navigation. |
 
 ---
 

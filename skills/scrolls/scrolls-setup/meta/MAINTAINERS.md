@@ -26,7 +26,7 @@ For people developing this skill — not read as part of answering a
   here propagates there automatically.
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
 
-Unlike the other six scrolls skills, this one has no bundled `.sh`/`.ps1`
+Unlike the other seven scrolls skills, this one has no bundled `.sh`/`.ps1`
 script and no `tests/` — file creation goes through Read/Write/Edit tools
 directly at invocation time, not a script, so there's nothing to
 regression-test the way the others do.
@@ -50,7 +50,7 @@ Bump `metadata.version` in `../SKILL.md`'s frontmatter when something
 visible to a `/scrolls-setup` invocation changes (new flag, changed
 default, changed template content) — not for pure documentation changes.
 
-This skill's version is locked in step with the other six `scrolls-*`
+This skill's version is locked in step with the other seven `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all seven to the same new number in the same commit,
+here means bumping all eight to the same new number in the same commit,
 even the ones with nothing of their own to report that release.

@@ -46,7 +46,7 @@ follows the same pattern as the other `scrolls-*` skills' READMEs.
 
 **Pick skills interactively, global or local** — omit `--skill`/`--yes`
 and the CLI prompts you to choose the agent and which skills to install;
-select all seven `scrolls-*` skills (or just `scrolls-restore`) at the prompt:
+select all eight `scrolls-*` skills (or just `scrolls-restore`) at the prompt:
 
 ```
 npx skills add sugatoray/aiskills              # project-level
@@ -63,8 +63,8 @@ npx skills add sugatoray/aiskills --skill scrolls-restore            # local
 **Fully unattended, every scrolls-* skill, global or project:**
 
 ```
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --yes            # project
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore --global --yes   # global
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --yes            # project
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --global --yes   # global
 ```
 
 **Fully unattended, just this skill, global or project:**

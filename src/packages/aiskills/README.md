@@ -222,7 +222,7 @@ installed version. At the time of writing:
 
 | Group name (from `marketplace.json`) | Alias (made by the CLI) | Skills |
 | --- | --- | --- |
-| `scrolls-skills` | `scrolls` | scrolls-setup, scrolls-update, scrolls-hide, scrolls-unhide, scrolls-remove, scrolls-restore, scrolls-help |
+| `scrolls-skills` | `scrolls` | scrolls-setup, scrolls-update, scrolls-hide, scrolls-unhide, scrolls-remove, scrolls-restore, scrolls-help, scrolls-explainer |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
 | `docs-skills` | `docs` | create-lib-docs |

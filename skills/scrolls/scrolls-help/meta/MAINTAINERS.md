@@ -22,9 +22,9 @@ behind how this skill is built, see `SECURITY.md`.
 ## Updating `references/HELP.md`
 
 It needs to stay accurate as `scrolls-setup`/`scrolls-update`/
-`scrolls-hide`/`scrolls-unhide`/`scrolls-remove`/`scrolls-restore` evolve, since it's the thing users are told
+`scrolls-hide`/`scrolls-unhide`/`scrolls-remove`/`scrolls-restore`/`scrolls-explainer` evolve, since it's the thing users are told
 to trust, in chat and on the rendered page alike. If you notice it's
-drifted from what those six skills actually do (a flag behaves
+drifted from what those seven skills actually do (a flag behaves
 differently than documented, a new flag exists that isn't listed), edit it
 directly — it's a normal file in this repo like any other.
 
@@ -59,7 +59,7 @@ Bump `metadata.version` in `../SKILL.md`'s frontmatter when something visible
 to a `/scrolls-help` invocation changes (new flag, changed default,
 changed behavior) — not for pure documentation or test-only changes.
 
-This skill's version is locked in step with the other six `scrolls-*`
+This skill's version is locked in step with the other seven `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all seven to the same new number in the same commit,
+here means bumping all eight to the same new number in the same commit,
 even the ones with nothing of their own to report that release.

@@ -1,6 +1,6 @@
 # Maintaining the scrolls family
 
-Family-wide maintainer notes for all seven `scrolls-*` skills under
+Family-wide maintainer notes for all eight `scrolls-*` skills under
 `skills/scrolls/` — not read as part of answering any `/scrolls-*`
 request; each skill's own `SKILL.md` is what's actually read at
 invocation time. For a specific skill's own layout, running its tests,
@@ -15,8 +15,10 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
 - [`scrolls-help/meta/MAINTAINERS.md`](../scrolls-help/meta/MAINTAINERS.md)
   (plus [`SECURITY.md`](../scrolls-help/meta/SECURITY.md) for its local
   `-e`/`--online` server)
+- [`scrolls-explainer/meta/MAINTAINERS.md`](../scrolls-explainer/meta/MAINTAINERS.md)
+  (plus how its page is built from `meta/generator/` and kept current)
 
-## What's shared across all seven
+## What's shared across all eight
 
 - **License / authorship**: MIT, `metadata.author: sugatoray` — keep
   both consistent across every skill's `SKILL.md`.
@@ -26,25 +28,27 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   its own `meta/MAINTAINERS.md`. `scrolls-remove` and `scrolls-restore`
   keep all their logic in one stdlib `remove.py`/`restore.py`, so their
   `.sh`/`.ps1` are thin launchers that
-  pass flags through unchanged.
+  pass flags through unchanged; `scrolls-explainer` (`explain.py`)
+  follows the same pattern.
 - **Shared location flags** (`-p`/`-t`/`-l`/`-r`, plus `-u` on
   `scrolls-setup` only): keep semantics and defaults identical across
   every command that takes them. `../README.md`'s "Shared flags" table
   is the source of truth users are pointed at — update it whenever a
   flag's behavior changes on any one skill, not just that skill's own
-  `SKILL.md`.
+  `SKILL.md`. `scrolls-explainer` doesn't take them: it never looks for a
+  scrolls folder, and its `-o`/`-f`/`--open` only say where the page goes.
 - **Red/Green TDD**: every bundled script (`scripts/*.sh`/`*.ps1`) is
   developed and changed test-first — write or update the failing test
   in that skill's `tests/` before touching the script, confirm it fails
   for the right reason, then make it pass.
-- **Versioning — locked in lockstep**: all seven `scrolls-*` skills
+- **Versioning — locked in lockstep**: all eight `scrolls-*` skills
   share a single version number, kept identical across every skill's
-  `metadata.version` in `SKILL.md` — as of this writing, `2.4.0`
+  `metadata.version` in `SKILL.md` — as of this writing, `2.5.0`
   everywhere. A version bump is still only warranted by a change
   visible to an actual `/scrolls-*` invocation (new/changed flag,
   changed default, changed behavior) somewhere in the family — pure
   documentation or test-only changes don't trigger one. But once
-  *anything* in the family earns a bump, bump **all seven** to that
+  *anything* in the family earns a bump, bump **all eight** to that
   same new number in the same commit, including skills with no
   functional change of their own. Never let one skill's version number
   outpace or lag the others — a mismatched set of versions across the
@@ -59,7 +63,7 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   look for what actually shipped in each shared version, across the
   whole family.
 - **`../README.md`** (this directory's README) is the user-facing
-  overview across all seven commands — update it whenever a skill's
+  overview across all eight commands — update it whenever a skill's
   directory layout or shared-flag behavior changes, not just that
   skill's own docs.
 

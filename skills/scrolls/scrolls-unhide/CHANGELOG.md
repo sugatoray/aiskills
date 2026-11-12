@@ -3,6 +3,16 @@
 All notable changes to the `scrolls-unhide` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.0] - 2026-11-12
+
+### Changed
+
+- Synced to `2.5.0` to stay in lockstep with the other `scrolls-*`
+  skills. No functional change of its own. The minor bump is for the
+  new `/scrolls-explainer` skill; see `../CHANGELOG.md`.
+- `README.md`: the install commands that list every `scrolls-*` skill
+  now include `scrolls-explainer`.
+
 ## [2.4.0] - 2026-11-06
 
 ### Added

@@ -28,6 +28,8 @@ That covers the typical single-repo workflow completely. Everything below is for
 
 `/scrolls-hide` and `/scrolls-unhide` are retrofit tools — for a brand-new project, `/scrolls-setup -u` already creates it visible in one step, no separate toggle needed.
 
+**See it animated:** `/scrolls-explainer` writes `scrolls-explainer.html`, an offline page with one tab per command that animates what each one does, step by step, with a callout for every step. Drive it from the keyboard: `→`/`←` step, `[` `]` switch tabs, `Space` pauses, `?` lists every key. It only writes that one file and takes its own flags, not the location flags below: `-o PATH` (a file or a folder; default `./scrolls-explainer.html`), `-f` to replace a different file already there, `--open` to open it in a browser.
+
 ## Flags
 
 All six commands share the same location flags. `-u` only makes sense on `setup`, `-x` only on `remove`, and `--onto`/`-b` only on `restore`; `-r` means something specific to each command.
@@ -121,6 +123,12 @@ Mount the memory onto another branch, or a new branch at a release tag, without 
 ```
 /scrolls-restore --onto feature/x
 /scrolls-restore --onto v1.4.0 -b memory/v1.4.0
+```
+
+**Show someone how it works** — an animated, offline page, one tab per command:
+```
+/scrolls-explainer
+/scrolls-explainer -o docs/ --open
 ```
 
 ## How the pieces fit together
