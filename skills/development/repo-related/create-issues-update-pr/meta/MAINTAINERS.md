@@ -62,7 +62,8 @@ claude --plugin-dir skills/development/repo-related
 
 Up to v1.3.0 this directory also carried its own
 `.claude-plugin/plugin.json`, so it could load as a standalone
-single-skill plugin. It was removed to match the `scrolls-*` structure:
+single-skill plugin. It was removed in v1.3.1 to match the `scrolls-*`
+structure:
 the standalone plugin installed exactly the same skill as
 `repo-related-skills`, under a second name, and needed its version kept
 in step separately.

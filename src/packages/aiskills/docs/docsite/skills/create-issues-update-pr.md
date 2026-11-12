@@ -5,7 +5,7 @@ Files GitHub issue(s) for work already done (or about to be done) on a branch/PR
 | Property | Value |
 | --- | --- |
 | Group | `repo-related-skills` (alias `repo-related`) |
-| Version | 1.3.0 |
+| Version | 1.3.1 |
 | Starts | When you type `/create-issues-update-pr`, or your agent uses it when a task fits its description |
 | Needs | GitHub MCP server tools with write access to the target repository: issue_write, sub_issue_write, list_issue_types, search_issues/list_issues, pull_request_read, update_pull_request. Works against any GitHub repository the current session has push/write access to, not just this one. |
 | License | MIT |
