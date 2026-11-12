@@ -7,6 +7,10 @@
   "repository": "https://github.com/sugatoray/aiskills",
   "license": "MIT",
   "icon": "./icon.png",
+  "documentationUrl": "https://github.com/sugatoray/aiskills/tree/master/skills/diagrams",
+  "supportUrl": "https://github.com/sugatoray/aiskills/issues",
+  "privacyPolicyUrl": "https://github.com/sugatoray/aiskills/blob/master/PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/sugatoray/aiskills/blob/master/LICENSE",
   "keywords": ["diagrams", "architecture", "network-flow", "visualization"],
   "skills": ["./network-flow"]
 }
