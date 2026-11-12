@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-<defs><linearGradient id="g-video-related" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DC2626"/><stop offset="1" stop-color="#B91C1C"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="url(#g-video-related)"/>
-<rect fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" x="88" y="128" width="336" height="256" rx="40"/>
-<path d="M224 196v120l104-60z" fill="#fff" stroke="#fff" stroke-width="20" stroke-linejoin="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128" role="img" aria-label="video-related-skills icon"><rect x="0.75" y="0.75" width="126.5" height="126.5" rx="28" fill="#17171C" stroke="#2A2A32" stroke-width="1.5"/><g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><rect stroke="#F4F4F5" x="26" y="30" width="76" height="54" rx="12"/><path stroke="#F4F4F5" d="M26 100h76"/><path stroke="#FB7185" d="M26 100h30"/><path stroke="#FB7185" fill="#FB7185" stroke-width="4" d="M58 46v22l18-11z"/></g></svg>

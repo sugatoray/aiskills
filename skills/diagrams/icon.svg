@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-<defs><linearGradient id="g-diagrams" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#6D28D9"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="url(#g-diagrams)"/>
-<rect fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" x="96" y="112" width="112" height="80" rx="18"/>
-<rect fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" x="304" y="112" width="112" height="80" rx="18"/>
-<rect fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" x="200" y="320" width="112" height="80" rx="18"/>
-<path fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" d="M208 152h96M152 192v72h104v56M360 192v72H256"/>
-<circle cx="256" cy="152" r="14" fill="#fff"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128" role="img" aria-label="diagrams-skills icon"><rect x="0.75" y="0.75" width="126.5" height="126.5" rx="28" fill="#17171C" stroke="#2A2A32" stroke-width="1.5"/><g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><rect stroke="#F4F4F5" x="24" y="30" width="32" height="24" rx="6"/><rect stroke="#F4F4F5" x="72" y="30" width="32" height="24" rx="6"/><rect stroke="#F4F4F5" x="48" y="78" width="32" height="24" rx="6"/><path stroke="#A78BFA" d="M56 42h16M40 54v12h48V54M64 66v12"/></g></svg>
