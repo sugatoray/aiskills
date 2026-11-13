@@ -22,11 +22,11 @@ Reads only each selected language's `SECURITY.md` and `WISDOM.md` plus the share
 
 ## Scope options: which files are reviewed (1.1.0)
 
-`-p` / `--path` (repeatable, files or folders), `-t` / `--reporoot` (every tracked file), `--local` (the current folder), `-r` / `--recurse` (descend into folders), and `--base REF` (files changed against a ref, plus untracked files). `-p`, `-t` and `--local` exclude each other. The flags follow `scrolls-setup`'s, except that `--local` has no short form because `-l` is `--lang`. Paths are always named from the folder the command runs in, so they can be opened from there.
+`-p` / `--path` (repeatable, files or folders), `-t` / `--reporoot` (every tracked file), `--local` (the current folder), `-r` / `--recurse` (descend into folders), and `--base REF` (files changed against a ref, plus untracked files). `-p`, `-t` and `--local` exclude each other. The flags follow `scrolls-setup`'s, except that `--local` has no short form because `-l` is `--lang`. Paths are always named from the folder the command runs in, so they can be opened from there. A folder walked by `-p` or `--local` leaves out what git ignores, and a vendored folder such as `node_modules/` is listed once as skipped, so a review never wades through build output or dependencies; a path that doesn't exist is an error.
 
 ## Tool-first formats: XML, JSON, YAML, TOML (1.1.0)
 
-A parser, formatter or validator checks these before anything is read, and the report names each tool, its version, the command and the outcome. The model then reads for what no tool judges (secrets, dangerous settings, wrong values, breaking schema changes). XML keeps its full review on top of the tool run. `scripts/check_formats.py` does the syntax check with Python's own parsers, reports each file as `ok`, `error` or `unchecked`, and lists which linters are on `PATH`. It installs nothing and runs no external program.
+A parser, formatter or validator checks these before anything is read, and the report names each tool, its version, the command and the outcome. The model then reads for what no tool judges (secrets, dangerous settings, wrong values, breaking schema changes). XML keeps its full review on top of the tool run. `scripts/check_formats.py` does the syntax check with Python's own parsers, reports each file as `ok`, `error` or `unchecked` (a duplicate key is an error in JSON, TOML and YAML alike), and lists which linters are on `PATH`. It installs nothing and runs no external program.
 
 ## Language detection: `scripts/detect_languages.py` (1.0.0, extended in 1.1.0)
 

@@ -21,6 +21,9 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - Python's `json.loads` accepts duplicate keys (last one wins) and `NaN`/`Infinity`, so a plain `json.loads` passes files other parsers reject or read differently. `check_formats.py` uses `object_pairs_hook` and `parse_constant` to catch both; keep them.
 - `git diff --name-only` and `git ls-files --others` name files from the repository's top level or the current folder depending on the command, so a `--base` run from a subfolder printed paths that could not be opened there and missed untracked files elsewhere. `_repo_top()` and `_from_here()` in `detect_languages.py` fix this; test any new git-backed scope from a subfolder.
 - `json`'s error positions change between Python versions: 3.13 reports a trailing comma at the comma's own line ("Illegal trailing comma"), 3.12 and earlier at the closing brace. A test asserting a line number must use an error every version places the same way (a missing comma does), and the suite should be run on the newest Python, not only the ones it was written on.
+- In YAML, a plain scalar can't contain `: `. `- run: echo "Title: $X"` is invalid even though the colon is inside quotes, because the scalar starts with `echo`; use `run: |`. `tests/test_reference_code.py` now catches this in every reference block.
+- `git add -A` after running `mypy` or `ruff` inside the skill folder stages `.mypy_cache/` and `.ruff_cache/`, and the package's docs generator lists staged files, so the package tests fail on "files that ship with the skill". Delete the caches and `git rm --cached` them before `npm run docs`.
+- The package tutorials paste real CLI output: renaming a skill changes the alphabetical "available:" lists, and changing a plugin's description moves where `aiskills groups` cuts it off. Re-run the commands (`npm run vendor`, then the CLI, then `npm run clean`) and paste.
 - The detector tests compare whole result dictionaries. Adding a field to the JSON output (as `tool_first` was) breaks them all at once; update the expected values in the same change.
 - New skill files must be staged (`git add`, by path) before `npm run docs` in `src/packages/aiskills`: the generator lists tracked files, and the package tests fail on the stale count otherwise.
 - Don't use `EOF` as the delimiter of a shell heredoc that writes one of the reference files: several patterns contain a line that is exactly `EOF`.
@@ -28,6 +31,8 @@ Specific bugs that have bitten this project before — avoid repeating them.
 
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
+
+- Naming a skill after a host's built-in command (`/code-review` in Claude Code). An installed project skill and the built-in shadow each other; the skill was renamed `/run-code-review` before release.
 
 - Having the model read XML, JSON, YAML or TOML line by line for syntax, formatting or schema validity. A parser decides those exactly and for almost nothing; the user chose tool-first for that reason.
 - Letting a missing parser or tool count as a pass. Report `unchecked` and name what would check it.
