@@ -2,7 +2,7 @@
 
 The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ ]` → `[x]`) as work completes, and re-prioritize when new requests change the calculus — this file reflects what's next, not a permanent record (that's what git history is for).
 
-- [ ] Owner decides what [#223](https://github.com/sugatoray/aiskills/pull/223) is for (it duplicates #215 plus 1.2.0).
+- [ ] After #215 merges: make sure [#223](https://github.com/sugatoray/aiskills/pull/223) (1.2.0) targets `master`; the owner reviews and merges it, closing #226–#228.
 - [ ] Owner reviews [#215](https://github.com/sugatoray/aiskills/pull/215) and decides on the merge; merging closes #216–#222, #224 and #225. Not to be merged without being asked.
 - [ ] After #215 merges: rewrite `HANDOFF.md` and the opening note of `SPEC.md` to say the work is on `master`.
 - [ ] Owner decides the `@sugatoray-ai/aiskills` version bump that releases the skill (it sits under `[Unreleased]` at 1.1.0).
@@ -16,5 +16,6 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Put the four follow-up commits on #215's branch; file #216–#222 and list them in #215's description.
 - [x] Independent review of #215; fix its findings Red/Green (`8168cc1`, #224).
 - [x] Rename `/code-review` → `/run-code-review` to avoid Claude Code's built-in (`7f2bff3`, #225).
+- [x] #215 and the #216 parent retitled to `/run-code-review`; #223 made the 1.2.0 PR on #215's branch, issues #226–#228.
 
 Not planned: a captured agent run to replace the sample report in `assets/EXAMPLE.md`. The user declined it; see `GAP_CONTEXT.md`.
