@@ -159,8 +159,9 @@ python3 scripts/render_report.py report.json -o r.html --host-type gitlab   # a 
 The HTML page needs no network and runs nothing from the report: the report is embedded as
 escaped JSON and every element is built as text, so code quoted from the reviewed project is
 shown, never run. Its title bar, verdict and severity counts stay pinned while you scroll, and the
-verdict card collapses to one line. It has severity and file filters, a text filter, copy buttons, the checks that
-ran, and light and dark themes. Each finding links to its line at the reviewed commit, on the
+verdict card collapses to one line. A search box (press `/`) searches the whole report and jumps to
+each hit. It has severity and file filters, a text filter, copy buttons, the checks that ran, and a
+light/dark switch like the docs site's. Each finding links to its line at the reviewed commit, on the
 remote the branch tracks (else `origin`): GitHub or GitLab by the host name, or `--host-type` for
 a server whose name doesn't say. A link is left out when it would be wrong (the commit is not
 pushed, the file changed since it or is untracked), and the report says why. Credentials in a

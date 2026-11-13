@@ -39,7 +39,9 @@ that's `../SKILL.md`.
   `textContent`. Keep both properties: reports quote untrusted code. `tests/test_report_page.py`
   drives the rendered page in Chromium through Node's Playwright (skipped without them): the
   pinned header, the collapsible verdict, the sidebar and section links below the pinned block,
-  and the phone layout. When the template changes, also look at it at 1280 and 390 px in light
+  the search (matches, highlighting, keys, reaching a finding a filter hid, quoted markup staying
+  inert), the light/dark switch, and the phone layout. The search draws results with text nodes
+  and `<mark>` elements only; keep it that way. When the template changes, also look at it at 1280 and 390 px in light
   and dark, and check that a title with `</script><img onerror>` in it shows as text.
 - `../assets/report-example.json` is Example-01's report as JSON. The tests use it; keep it valid.
 - `../tests/` tests the three scripts, that every language the detector knows has its folder and

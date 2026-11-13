@@ -23,11 +23,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (Example-01's report). `assets/report-template.html`: the HTML page, with severity, file and
   text filters, copy buttons, light and dark themes, and print styles. The title bar, the verdict
   and the severity counts stay pinned at the top while the page scrolls; the verdict card
-  collapses to its badge and one-line reason (remembered; collapsed by default on a phone). The
-  report is embedded as escaped JSON and shown as text only, so code quoted from the reviewed
+  collapses to its badge and one-line reason (remembered; collapsed by default on a phone). A
+  search box in the header (`/` to focus) searches the whole report, with highlighted results,
+  arrow keys and Enter; a hit opens and scrolls to its finding or section, resetting any filter
+  that hid it. The light/dark switch is the docs site's: a moon or sun button that follows the
+  system until used, then remembers the choice. The report is embedded as escaped JSON and shown as text only, so code quoted from the reviewed
   project cannot run.
 - `tests/test_render_report.py`, and `tests/test_report_page.py`, which checks the pinned header
-  and the collapsible verdict in Chromium (skipped without Node and Playwright).
+  and the collapsible verdict, the search and the light/dark switch in Chromium (skipped
+  without Node and Playwright).
 
 ## [1.1.0] - 2026-11-12
 

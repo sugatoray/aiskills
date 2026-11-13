@@ -685,8 +685,9 @@ line links: github (github.com/acme/shop @ fb0a0eaf75cd)
 ```
 
 In the chat it gives the verdict, the counts and the two paths, not the whole report again.
-`review.html` opens offline: the verdict and counts first, then the findings as cards with
-severity, file and text filters, each with an **Open `app/users.py:13`** link, its diff and copy
+`review.html` opens offline: the verdict and counts first, pinned while you scroll, with a search
+box (`/`) that finds any finding or section; then the findings as cards with severity, file and
+text filters, each with an **Open `app/users.py:13`** link, its diff and copy
 buttons, then scope and checks, tests and the order of work. `review.json` carries the same
 report with what the renderer added:
 
