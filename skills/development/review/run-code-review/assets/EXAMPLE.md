@@ -37,6 +37,7 @@ shop/                          branch feature/search, one commit ahead of main
 | [08](#example-08) | Plain words | No flags at all |
 | [09](#example-09) | Mistakes | What a wrong flag returns |
 | [10](#example-10) | Follow-ups | Apply fixes; post to a pull request |
+| [11](#example-11) | `/run-code-review -o review.html` | The report as a page, Markdown or JSON, with line links |
 
 <!--- example:start --->
 ## Example-01
@@ -646,5 +647,87 @@ post the review to PR 128        one summary comment, and one inline comment per
 write the report to REVIEW.md    a file instead of the chat
 explain finding 3 in more detail
 ```
+<!--- prompt-output:end --->
+<!--- example:end --->
+
+<!--- example:start --->
+## Example-11
+
+The report as a file as well as in the chat: a self-contained HTML page, Markdown or JSON, each
+finding linked to its line on GitHub or GitLab. For this example the demo repository's branch was
+pushed to a remote at `git@github.com:acme/shop.git`.
+
+<!--- prompt-block:start --->
+```prompt
+## ---
+## metadata:
+##   date: "2026-11-13"
+##   agent: "claude-code"
+## ---
+
+/run-code-review -o review.html -o review.json
+```
+<!--- prompt-block:end --->
+
+<!--- prompt-output:start --->
+**Output**:
+
+The review runs as in Example-01. The skill then writes the report as JSON (the content of
+[`report-example.json`](report-example.json)) to a temporary file and renders it from the
+repository's folder:
+
+```text
+$ python3 scripts/render_report.py /tmp/run-code-review-report.json -o review.html -o review.json
+wrote review.html
+wrote review.json
+Request changes — 3 blocker, 3 major, 0 minor, 0 nit
+line links: github (github.com/acme/shop @ fb0a0eaf75cd)
+```
+
+In the chat it gives the verdict, the counts and the two paths, not the whole report again.
+`review.html` opens offline: the verdict and counts first, then the findings as cards with
+severity, file and text filters, each with an **Open `app/users.py:13`** link, its diff and copy
+buttons, then scope and checks, tests and the order of work. `review.json` carries the same
+report with what the renderer added:
+
+```text
+"repo": {"host_type": "github", "host": "github.com", "project": "acme/shop", "remote": "origin",
+         "commit": "fb0a0eaf75cdff71007947f5073cf760b0aeaa4b", "links": true, "reason": ""}
+finding 1 url: https://github.com/acme/shop/blob/fb0a0eaf75cdff71007947f5073cf760b0aeaa4b/app/users.py#L13
+```
+
+Variations:
+
+```prompt
+/run-code-review -o                         review.html in the current folder, named by date:
+                                        run-code-review-branch-feature-search-against-main-20261113-0252.html
+/run-code-review -o reports/ --open         the same name in reports/, opened in the browser
+/run-code-review -o REVIEW.md               the Markdown report as a file
+```
+
+On a self-hosted server whose name doesn't say GitHub or GitLab (remote
+`git@git.acme.com:team/shop.git`), links are off until you say which:
+
+```text
+line links: off (git.acme.com is not recognisably GitHub or GitLab; pass --host-type github or gitlab)
+```
+
+```prompt
+/run-code-review -o review.html --host-type gitlab
+```
+
+```text
+line links: gitlab (git.acme.com/team/shop @ fb0a0eaf75cd)
+finding 2 url: https://git.acme.com/team/shop/-/blob/fb0a0eaf75cdff71007947f5073cf760b0aeaa4b/app/users.py#L12-15
+```
+
+A link is also left out, with the reason, when the commit is not pushed or a file changed after
+it. An existing file that differs is kept:
+
+```text
+render_report.py: other.md exists and differs; nothing written. Use -f/--force to overwrite.
+```
+
+The skill says so and offers `-f`.
 <!--- prompt-output:end --->
 <!--- example:end --->

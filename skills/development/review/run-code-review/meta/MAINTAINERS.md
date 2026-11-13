@@ -31,7 +31,16 @@ that's `../SKILL.md`.
 - `../scripts/check_formats.py` syntax-checks the languages in `TOOL_FIRST`, reusing the
   detector's parser so both take the same flags. Standard library only; PyYAML is used when it
   happens to be importable and never required.
-- `../tests/` tests both scripts, that every language the detector knows has its folder and
+- `../scripts/render_report.py` renders the report, kept as JSON (`../references/report.schema.json`),
+  to Markdown, HTML or JSON and adds line links from git. Its `REQUIRED`, `FINDING_REQUIRED`,
+  `SEVERITIES` and `VERDICTS` must match the schema; a test compares them. The HTML is
+  `../assets/report-template.html` with the report put in place of `__REPORT_JSON__`, escaped so it
+  can't leave its `<script type="application/json">` block; the page builds every element with
+  `textContent`. Keep both properties: reports quote untrusted code. When the template changes,
+  open a rendered page at 1280 and 390 px wide in light and dark, and check that a title with
+  `</script><img onerror>` in it shows as text.
+- `../assets/report-example.json` is Example-01's report as JSON. The tests use it; keep it valid.
+- `../tests/` tests the three scripts, that every language the detector knows has its folder and
   five files, and (`test_reference_code.py`) that every Python, JSON, TOML, YAML and shell block
   in the references parses.
 - `../agents/*.yaml`: display metadata for the `npx skills add --agent <name>` packaging.

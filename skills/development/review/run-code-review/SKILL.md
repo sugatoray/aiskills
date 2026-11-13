@@ -1,13 +1,13 @@
 ---
 name: run-code-review
-description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
+description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed; -o writes it as HTML, Markdown or JSON with line links. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
 license: MIT
-compatibility: "Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
+compatibility: "Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
 metadata:
   name: run-code-review
   type: skill
   author: sugatoray
-  version: "1.1.0"
+  version: "1.2.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review"
 ---
 
@@ -50,8 +50,8 @@ they do differently:
 
 ## Options
 
-`/run-code-review [scope] [-l <languages>] [-s]`. With no option it reviews every supported
-language in the current branch's changes, in full.
+`/run-code-review [scope] [-l <languages>] [-s] [-o <path>]`. With no option it reviews every
+supported language in the current branch's changes, in full, and gives the report in the chat.
 
 | Option | Meaning |
 | --- | --- |
@@ -62,10 +62,15 @@ language in the current branch's changes, in full.
 | `--local` | Review the files in the current folder. It has no short form: `-l` is `--lang`. |
 | `-r`, `--recurse` | With `-p` or `--local`: include subfolders. |
 | `--base <ref>` | Review what changed against this git ref, plus untracked files. |
+| `-o`, `--output [<path>]` | Also write the report to a file. The extension sets the format: `.html` (a self-contained page), `.md` or `.json`. A folder, or `-o` alone for the current folder, gets `run-code-review-<title>-<date>.html`. Repeatable. |
+| `-f`, `--force` | With `-o`: overwrite a different file. Without it, an existing file is kept and nothing is written. |
+| `--open` | With `-o`: open the HTML report afterwards. |
+| `--host-type github\|gitlab` | With `-o`: the code host to link findings to, when the remote's host name doesn't say (a self-hosted `git.acme.com`, say). |
 
 Use at most one of `-p`, `-t` and `--local`. `-l`, `-s` and `-r` combine with any of them, so
 `/run-code-review -p src -r -l py,sql -s` is a security review of the Python and SQL under `src/`.
-Both scripts take the same flags, so pass the user's options through unchanged. When the user
+The detector and `check_formats.py` take the same scope flags, so pass the user's options through
+unchanged; `-o`, `-f`, `--open` and `--host-type` go to `render_report.py` in step 8. When the user
 describes the scope in words instead, map it to these options.
 
 ## Workflow
@@ -247,8 +252,22 @@ that. If they did, apply or post only the findings they chose, and re-run the ch
 Write the report with `references/REPORT_TEMPLATE.md`: verdict first, then findings from most to
 least severe, each with location, problem, impact, suggested change and confidence. Keep the
 template's section order so reports are comparable from one review to the next. Give the report
-in the chat by default; write it to a file only when the user asks for one or the review is too
-long to read comfortably in a message.
+in the chat by default.
+
+With `-o`, or when the user asks for the report as a file or page, write the same report as JSON
+following `references/report.schema.json` (fields named as in the template; `assets/report-example.json`
+is a complete one) to a temporary file outside the project, and render it from the project's folder:
+
+```bash
+python3 scripts/render_report.py /tmp/run-code-review-report.json -o <path> [-f] [--open] [--host-type github|gitlab]
+```
+
+It checks the report (the verdict must agree with the findings), writes each `-o` file, and links
+every finding to its line at the reviewed commit on GitHub or GitLab, chosen from the remote the
+branch tracks. It leaves a link out where it would be wrong (commit not pushed, file changed since,
+host unknown) and says why. Exit 3 means a different file is already there: tell the user and
+offer `-f`. Then give in the chat the verdict, the counts, the path of each file written and the
+line-links line it printed, not the whole report again.
 
 ## Security-only review
 

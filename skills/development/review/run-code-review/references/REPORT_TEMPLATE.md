@@ -110,6 +110,17 @@ be shortened to: the verdict line, the summary, "Scope and method" as one or two
 findings as a list of `path:line — severity — problem — fix`. Keep the full form whenever there
 is a `blocker` or `major`.
 
+## As a file (`-o`)
+
+The same report, written as JSON, is the source of every file `-o` asks for. The fields follow
+this template one for one; `report.schema.json` defines them and `../assets/report-example.json`
+is Example-01's report in that form. Text fields are plain text in which `` `backticks` `` mark
+code; a suggested change is a `diff` string (lines starting `-`, `+` or a space), or `text` when
+the fix is a design decision. Don't write counts, links or the date: `scripts/render_report.py`
+adds them, checks that the verdict agrees with the findings, and writes the `.html`, `.md` or
+`.json` file. If the reviewed commit is not the checkout's `HEAD` (a pull request's head, say),
+put it in `commit` so the line links point at it.
+
 ## Posting to a pull request
 
 Only when the user asks. Then: one top-level review comment with the verdict, summary and counts,

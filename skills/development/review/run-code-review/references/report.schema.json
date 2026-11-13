@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review/references/report.schema.json",
+  "title": "run-code-review report",
+  "description": "The /run-code-review report as data: what the reviewer writes, and what scripts/render_report.py turns into Markdown, HTML or JSON. Fields mirror references/REPORT_TEMPLATE.md. Text fields are plain text in which `backticks` mark code. counts, repo, generated, generator and each finding's url are added by the renderer.",
+  "type": "object",
+  "required": ["schema_version", "title", "mode", "verdict", "reason", "summary", "scope", "findings"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "title": {"type": "string", "description": "What was reviewed, as in '# Code review: <title>': PR title and number, branch, or path."},
+    "mode": {"enum": ["Full review", "Security-only review"]},
+    "verdict": {"enum": ["Request changes", "Approve with comments", "Approve", "No verdict"], "description": "Must agree with the findings (references/SEVERITY.md): a blocker means Request changes or No verdict; a major rules out Approve."},
+    "reason": {"type": "string", "description": "One sentence after the verdict."},
+    "summary": {"type": "string", "description": "Two to four sentences."},
+    "commit": {"type": "string", "description": "The commit reviewed, when it is not the checkout's HEAD (a PR's head, say). Line links point at it."},
+    "scope": {
+      "type": "object",
+      "properties": {
+        "reviewed": {"type": "string"},
+        "languages": {"type": "string"},
+        "not_run": {"type": "string", "description": "What could not be run or read, and why; empty for nothing."}
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "result"],
+        "properties": {
+          "command": {"type": "string"},
+          "version": {"type": "string"},
+          "result": {"type": "string"},
+          "status": {"enum": ["ok", "warning", "error", "skipped"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["where", "question"],
+        "properties": {
+          "where": {"type": "string"},
+          "question": {"type": "string"},
+          "otherwise": {"type": "string", "description": "What it becomes if the answer is no, with its severity."}
+        },
+        "additionalProperties": false
+      }
+    },
+    "tests": {
+      "type": "object",
+      "properties": {"summary": {"type": "string"}, "cases": {"type": "array", "items": {"type": "string"}}},
+      "additionalProperties": false
+    },
+    "preexisting": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["where", "severity", "text"],
+        "properties": {"where": {"type": "string"}, "severity": {"enum": ["blocker", "major", "minor", "nit"]}, "text": {"type": "string"}},
+        "additionalProperties": false
+      }
+    },
+    "works_well": {"type": "array", "items": {"type": "string"}, "maxItems": 3},
+    "order_of_work": {"type": "array", "items": {"type": "string"}},
+    "counts": {"type": "object", "description": "Added by the renderer."},
+    "repo": {"type": "object", "description": "Added by the renderer: host_type, host, project, remote, commit, links, reason."},
+    "generated": {"type": "string"},
+    "generator": {"type": "string"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["id", "severity", "title", "file", "lines", "confidence", "problem", "impact"],
+      "properties": {
+        "id": {"type": "integer", "minimum": 1},
+        "severity": {"enum": ["blocker", "major", "minor", "nit"]},
+        "title": {"type": "string", "description": "A short title stating the problem."},
+        "file": {"type": "string", "description": "As named from the folder the renderer runs in."},
+        "lines": {"type": "string", "description": "'42', '42-47', or a list such as '3, 5' (links go to the first)."},
+        "symbol": {"type": "string"},
+        "language": {"type": "string"},
+        "confidence": {"enum": ["confirmed", "likely", "to verify"]},
+        "confidence_note": {"type": "string", "description": "How you know, or what would settle it."},
+        "problem": {"type": "string"},
+        "impact": {"type": "string"},
+        "suggestion": {
+          "type": "object",
+          "properties": {
+            "diff": {"type": "string", "description": "Unified-diff lines: '-' removed, '+' added, ' ' kept."},
+            "text": {"type": "string", "description": "In place of a diff, when the fix is a design decision: the options and the recommendation."},
+            "note": {"type": "string", "description": "Why this fix, any trade-off, and the test that should accompany it."}
+          },
+          "additionalProperties": false
+        },
+        "url": {"type": ["string", "null"], "description": "Added by the renderer: the line on GitHub or GitLab, or null."}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -32,7 +32,9 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   HTML, CSS, Markdown, XML, JSON, YAML and TOML. Options choose the languages
   (`-l`), the files (`-p`, `-t`, `--local`, `-r`, `--base`) and a
   security-only review (`-s`); XML, JSON, YAML and TOML are checked with
-  tools first. The package now bundles
+  tools first. `-o` (skill 1.2.0) also writes the report as a self-contained
+  HTML page, Markdown or JSON, each finding linked to its line on GitHub or
+  GitLab. The package now bundles
   17 skills in 9 groups: `aiskills install -s run-code-review`, or
   `aiskills install -G review`. See the skill's own `CHANGELOG.md`.
 
