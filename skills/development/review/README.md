@@ -18,7 +18,7 @@ security-focused review), following the same layout as `code-review/`.
 ## This folder
 
 - `.claude-plugin/plugin.json`: the subgroup-level Claude Code plugin manifest, grouping every
-  skill in this folder into one `reviews-skills` plugin listed in the repo-root
+  skill in this folder into one `review-skills` plugin listed in the repo-root
   `.claude-plugin/marketplace.json`. See [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md) for its
   keep-in-sync rules; the layout is the same as `../repo-related/`.
 - `meta/MAINTAINERS.md`: subgroup-wide maintainer notes. Not read at invocation time.
@@ -49,7 +49,7 @@ As a Claude Code plugin:
 
 ```
 /plugin marketplace add sugatoray/aiskills
-/plugin install reviews-skills@sugatoray
+/plugin install review-skills@sugatoray
 ```
 
-With the npm package: `aiskills install --group reviews`.
+With the npm package: `aiskills install --group review`.

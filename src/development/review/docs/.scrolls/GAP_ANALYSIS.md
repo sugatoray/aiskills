@@ -8,6 +8,6 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - The two scripts and their tests have only been run on Linux (Python 3.10 to 3.13); never on Windows or macOS.
 - Only the fourteen listed languages are reviewed with a checklist; files in any other language (Go, Java, C#, …) are listed as `unsupported`.
 - No workflow runs the skill's tests: the repository's only workflow runs on pushes to `master` that touch the npm package's docs.
-- The subgroup has no `CHANGELOG.md`, so `src/development/reviews/` has no `CHANGELOG.md` symlink where `src/scrolls/` has one.
+- The subgroup has no `CHANGELOG.md`, so `src/development/review/` has no `CHANGELOG.md` symlink where `src/scrolls/` has one.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.

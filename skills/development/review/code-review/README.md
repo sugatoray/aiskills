@@ -100,7 +100,7 @@ each option, the options combined, and a complete report.
 At most one of `-p`, `-t` and `--local`; `-l`, `-s` and `-r` combine with any of them.
 
 Install it with `npx skills add sugatoray/aiskills` (choose `code-review`), or as part of the
-`reviews-skills` Claude Code plugin; see [`../README.md`](../README.md).
+`review-skills` Claude Code plugin; see [`../README.md`](../README.md).
 
 ## The scripts
 

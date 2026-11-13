@@ -8,7 +8,7 @@ metadata:
   type: skill
   author: sugatoray
   version: "1.1.0"
-  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/reviews/code-review"
+  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/code-review"
 ---
 
 # Code review

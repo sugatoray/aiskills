@@ -9,10 +9,11 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - Every `references/review_<language>/` folder has exactly five files: `REVIEW.md`, `PATTERNS.md`, `TOOLING.md`, `SECURITY.md`, `WISDOM.md`. A test fails if a language the detector knows lacks its folder or a file.
 - Each language's `WISDOM.md` has exactly four `##` sections: Constraints, Traps, Ditches, Wisdom. `SECURITY.md` and `WISDOM.md` are the only language files read under `-s`.
 - `-l` is `--lang`. `--local` has no short form, unlike in `scrolls-setup`. `-p`, `-t` and `--local` exclude each other.
+- The plugin is named after its folder (`review/` → `review-skills`, alias `review`), like every plugin in `marketplace.json`; the npm alias is derived from the plugin name. Rename folder and plugin together.
 - Folder names follow the names the user gave: `review_powershell-script` and `review_shellscript`, not `review_powershell` or `review_shell`.
-- One version in two files: `code-review/SKILL.md`'s `metadata.version` and `skills/development/reviews/.claude-plugin/plugin.json`. The plugin's `description` must be identical in `plugin.json` and the root `marketplace.json`.
+- One version in two files: `code-review/SKILL.md`'s `metadata.version` and `skills/development/review/.claude-plugin/plugin.json`. The plugin's `description` must be identical in `plugin.json` and the root `marketplace.json`.
 - XML is tool-first **and** keeps its full review. That was the user's explicit choice; don't cut `review_xml/` down to the short form the other three tool-first formats use.
-- `src/development/reviews/` holds memory and symlinks only. Never copy skill content into `src/`; edit it at `skills/development/reviews/`.
+- `src/development/review/` holds memory and symlinks only. Never copy skill content into `src/`; edit it at `skills/development/review/`.
 
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.

@@ -4,12 +4,12 @@ Runs a thorough, evidence-based code review of a pull request, branch, diff, set
 
 | Property | Value |
 | --- | --- |
-| Group | `reviews-skills` (alias `reviews`) |
+| Group | `review-skills` (alias `review`) |
 | Version | 1.1.0 |
 | Starts | When you type `/code-review`, or your agent uses it when a task fits its description |
 | Needs | Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
-| Source | [skills/development/reviews/code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/reviews/code-review) |
+| Source | [skills/development/review/code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/code-review) |
 
 ## Install
 
@@ -27,10 +27,10 @@ aiskills install -s code-review -a claude-code
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
-Or the whole `reviews-skills` group:
+Or the whole `review-skills` group:
 
 ```bash
-aiskills install -G reviews -a claude-code
+aiskills install -G review -a claude-code
 ```
 
 Into the current project instead: add `-p`. To remove it:
@@ -128,4 +128,4 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code
 - `tests/test_check_formats.py`
 - `tests/test_detect_languages.py`
 
-See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/reviews/code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/reviews/code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

@@ -131,7 +131,7 @@ with every skill twice — pick one.
 ```
 /plugin marketplace add sugatoray/aiskills
 /plugin install repo-related-skills@sugatoray   # create-issues-update-pr
-/plugin install reviews-skills@sugatoray        # code-review
+/plugin install review-skills@sugatoray        # code-review
 ```
 
 </details>

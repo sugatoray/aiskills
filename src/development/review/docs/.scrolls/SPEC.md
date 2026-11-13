@@ -1,12 +1,12 @@
 # SPEC.md — Feature Spec
 
-What reviews (aiskills) does, feature by feature. Add a section per feature when it ships — describe *what* it does and *why* it matters to a user, not the implementation detail (that belongs in code comments or `WISDOM.md`).
+What review (aiskills) does, feature by feature. Add a section per feature when it ships — describe *what* it does and *why* it matters to a user, not the implementation detail (that belongs in code comments or `WISDOM.md`).
 
-Everything below is built, tested and pushed on branch `devin/1794523707-code-review-skill` ([#215](https://github.com/sugatoray/aiskills/pull/215), open, not merged), so none of it is on `master` yet. The version-by-version record is `skills/development/reviews/code-review/CHANGELOG.md`; this file says what a user gets.
+Everything below is built, tested and pushed on branch `devin/1794523707-code-review-skill` ([#215](https://github.com/sugatoray/aiskills/pull/215), open, not merged), so none of it is on `master` yet. The version-by-version record is `skills/development/review/code-review/CHANGELOG.md`; this file says what a user gets.
 
 ## `/code-review`: a structured review at a staff engineer's bar (1.0.0)
 
-Reviews a pull request, branch, diff, set of files or whole repository and returns a report: a verdict first, then findings ranked `blocker` / `major` / `minor` / `nit`, each with file and line, the problem, its impact, a confidence level (`confirmed`, `likely`, `to verify`) and a suggested code change. It follows eight steps (fix the scope, detect languages, build context, run the project's own checks, review in passes, verify every finding, write the suggested changes, report). It reads and suggests; it edits files or posts review comments only when asked. Lives in `skills/development/reviews/code-review/SKILL.md`, with `references/SEVERITY.md`, `REPORT_TEMPLATE.md` and `CROSS_LANGUAGE.md` applying to every review.
+Reviews a pull request, branch, diff, set of files or whole repository and returns a report: a verdict first, then findings ranked `blocker` / `major` / `minor` / `nit`, each with file and line, the problem, its impact, a confidence level (`confirmed`, `likely`, `to verify`) and a suggested code change. It follows eight steps (fix the scope, detect languages, build context, run the project's own checks, review in passes, verify every finding, write the suggested changes, report). It reads and suggests; it edits files or posts review comments only when asked. Lives in `skills/development/review/code-review/SKILL.md`, with `references/SEVERITY.md`, `REPORT_TEMPLATE.md` and `CROSS_LANGUAGE.md` applying to every review.
 
 ## Per-language references, loaded only for the languages in the change (1.0.0, 1.1.0)
 
@@ -36,6 +36,6 @@ Maps the files in scope to languages and to the reference files to read, and lis
 
 Ten examples on one small demo repository: a full review with the complete report, each option, the options combined, plain-language requests, what a wrong flag returns, and follow-ups (apply the fixes, post to a PR). Linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
 
-## Packaging: the `reviews-skills` plugin (1.0.0)
+## Packaging: the `review-skills` plugin (1.0.0)
 
-`skills/development/reviews/` is its own subgroup with a `.claude-plugin/plugin.json` (`reviews-skills`), listed in the root `.claude-plugin/marketplace.json` as `./development/reviews`. The skill installs with `npx skills add sugatoray/aiskills` (choose `code-review`), with `/plugin install reviews-skills@sugatoray`, or through the `@sugatoray-ai/aiskills` npm package (group alias `reviews`), which lists it under `[Unreleased]`.
+`skills/development/review/` is its own subgroup with a `.claude-plugin/plugin.json` (`review-skills`), listed in the root `.claude-plugin/marketplace.json` as `./development/review`. The skill installs with `npx skills add sugatoray/aiskills` (choose `code-review`), with `/plugin install review-skills@sugatoray`, or through the `@sugatoray-ai/aiskills` npm package (group alias `review`), which lists it under `[Unreleased]`.

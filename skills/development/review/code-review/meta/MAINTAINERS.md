@@ -39,12 +39,12 @@ that's `../SKILL.md`.
   [`../../meta/MAINTAINERS.md`](../../meta/MAINTAINERS.md)).
 
 There is no per-skill `.claude-plugin/plugin.json`: the skill installs through the subgroup's
-`reviews-skills` plugin, as `skills/docs/` and `skills/scrolls/` skills do.
+`review-skills` plugin, as `skills/docs/` and `skills/scrolls/` skills do.
 
 ## Tests
 
 ```bash
-python3 -m pytest skills/development/reviews/code-review/tests
+python3 -m pytest skills/development/review/code-review/tests
 ```
 
 ## Adding a language

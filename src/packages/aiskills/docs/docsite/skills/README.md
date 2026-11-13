@@ -35,9 +35,9 @@ Alias `repo-related`. Install the group with `aiskills install -G repo-related`.
 | --- | --- | --- |
 | [`create-issues-update-pr`](create-issues-update-pr.md) | 1.3.0 | Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine… |
 
-## reviews-skills
+## review-skills
 
-Alias `reviews`. Install the group with `aiskills install -G reviews`.
+Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
