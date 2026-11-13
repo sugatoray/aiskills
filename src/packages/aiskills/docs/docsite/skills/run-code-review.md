@@ -133,6 +133,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `tests/test_detect_languages.py`
 - `tests/test_reference_code.py`
 - `tests/test_render_report.py`
+- `tests/test_report_page.py`
 - `tests/test_skill_name.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

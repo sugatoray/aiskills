@@ -40,14 +40,23 @@ header.top{background:var(--panel);border-bottom:1px solid var(--line)}
 .top h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px}
 .btn{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
 .btn:hover{background:var(--soft)}
-.verdict{margin:20px 0 0;border-radius:14px;padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;align-items:center;border:1px solid var(--line);background:var(--panel)}
+.pinned{position:sticky;top:0;z-index:20;background:var(--bg);padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.vtoggle{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+.vtoggle:hover{background:var(--soft);color:var(--ink)}.vtoggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vtoggle svg{transition:transform .15s}.verdict.collapsed .vtoggle svg{transform:rotate(180deg)}
+.verdict.collapsed{padding-top:12px;padding-bottom:12px}
+.verdict.collapsed .summary{display:none}
+.verdict.collapsed .badge{grid-row:auto;padding:6px 10px;font-size:14px}
+.verdict.collapsed .reason{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.verdict{position:relative;padding-right:56px!important;margin:16px 0 0;border-radius:14px;padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;align-items:center;border:1px solid var(--line);background:var(--panel)}
 .verdict .badge{grid-row:span 2;font-weight:700;font-size:15px;padding:10px 14px;border-radius:10px;white-space:nowrap;background:var(--soft)}
 .v-request .badge{background:var(--blocker-bg);color:var(--blocker)}
 .v-comments .badge{background:var(--major-bg);color:var(--major)}
 .v-approve .badge{background:var(--approve-bg);color:var(--approve)}
 .verdict .reason{font-weight:600;font-size:16px}
 .verdict .summary{color:var(--muted)}
-.counts{display:flex;gap:10px;margin:16px 0 0;flex-wrap:wrap}
+.counts{display:flex;gap:10px;margin:12px 0 0;flex-wrap:wrap}
 .chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)}
 .chip b{font-size:15px}
 .chip .dot{width:10px;height:10px;border-radius:50%}
@@ -56,7 +65,7 @@ header.top{background:var(--panel);border-bottom:1px solid var(--line)}
 .chip.links{cursor:default;max-width:100%;overflow-wrap:anywhere}
 .dot.blocker{background:var(--blocker)}.dot.major{background:var(--major)}.dot.minor{background:var(--minor)}.dot.nit{background:var(--nit)}
 .grid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;margin:22px auto 60px}
-nav.side{position:sticky;top:12px;align-self:start;font-size:13px}
+nav.side{position:sticky;top:calc(var(--pinned-h, 0px) + 12px);align-self:start;font-size:13px}
 nav.side h4{margin:16px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 nav.side a{display:flex;justify-content:space-between;gap:8px;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
 nav.side a:hover,nav.side a.on{background:var(--soft)}
@@ -65,6 +74,7 @@ nav.side .n{font:12px var(--mono);color:var(--muted)}
 .filebtn:hover{background:var(--soft)}.filebtn[aria-pressed=true]{background:var(--soft);outline:1px solid var(--accent)}
 .filebtn:focus-visible,.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sevbar{display:flex;gap:2px;flex:none}.sevbar i{width:6px;height:12px;border-radius:2px;display:block}
+section.card,details.f{scroll-margin-top:calc(var(--pinned-h, 0px) + 12px)}
 section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px}
 section.card>h2{margin:0 0 12px;font-size:16px}
 .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
@@ -107,14 +117,19 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:0 16px 40px}
 [hidden]{display:none!important}
 @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}nav.side{position:static}.two{grid-template-columns:minmax(0,1fr)}
   .verdict{grid-template-columns:minmax(0,1fr)}.verdict .badge{grid-row:auto;justify-self:start}
+  .verdict.collapsed{grid-template-columns:auto minmax(0,1fr)}
+  .top .wrap{padding-top:10px;padding-bottom:10px}.brand,.top h1 small{display:none}.top h1{font-size:16px}
+  .pinned{padding-bottom:8px}.verdict{margin-top:10px}.counts{gap:6px;margin-top:8px}.chip{padding:4px 9px 4px 7px;font-size:12px;gap:6px}.chip b{font-size:13px}.chip.links{font-size:11px}
   details.f summary{grid-template-columns:auto auto minmax(0,1fr)}.loc{grid-column:1/-1;white-space:normal;overflow-wrap:anywhere}
   .kv{grid-template-columns:minmax(0,1fr)}.kv dd{margin-bottom:6px}}
-@media (prefers-reduced-motion:reduce){.toast{transition:none}}
-@media print{nav.side,.toolbar,.btn,.chip[aria-pressed]{display:none!important}.grid{grid-template-columns:1fr}
+@media (prefers-reduced-motion:reduce){.toast,.vtoggle svg{transition:none}}
+@media print{.pinned{position:static}.vtoggle{display:none}.verdict.collapsed .summary{display:block}
+  nav.side,.toolbar,.btn,.chip[aria-pressed]{display:none!important}.grid{grid-template-columns:1fr}
   details.f{break-inside:avoid}body{background:#fff}}
 </style>
 </head>
 <body>
+<div class="pinned" id="pinned">
 <header class="top"><div class="wrap">
   <span class="brand" id="brand"></span>
   <h1 id="title"></h1>
@@ -122,15 +137,21 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:0 16px 40px}
   <button class="btn" id="copymd" type="button" title="Copy the Markdown report">Copy as Markdown</button>
   <button class="btn" id="theme" type="button" title="Switch between light and dark">Theme</button>
 </div></header>
-
-<main class="wrap">
+<div class="wrap">
   <div class="verdict" id="verdict">
     <div class="badge" id="vbadge"></div>
     <div class="reason" id="vreason"></div>
     <div class="summary" id="vsummary"></div>
+    <button class="vtoggle" id="vtoggle" type="button" aria-expanded="true" aria-controls="vsummary" title="Hide the summary">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 10l4.5-4.5 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="sr-only">Summary</span>
+    </button>
   </div>
   <div class="counts" id="counts"></div>
+</div>
+</div>
 
+<main class="wrap">
   <div class="grid">
     <nav class="side" aria-label="Report sections">
       <h4>Sections</h4>
@@ -302,6 +323,21 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:0 16px 40px}
     lab.append(cb, rich("span", null, `${i + 1}. ${o}`)); $("orderl").append(lab); });
 
   $("foot").textContent = `Generated by ${R.generator || "/run-code-review"}${R.generated ? " · " + R.generated : ""} · one self-contained file, no network requests`;
+  const verdict = $("verdict"), vtoggle = $("vtoggle");
+  const setCollapsed = (on, remember) => {
+    verdict.classList.toggle("collapsed", on);
+    vtoggle.setAttribute("aria-expanded", String(!on));
+    vtoggle.title = on ? "Show the summary" : "Hide the summary";
+    if (remember) store.set("run-code-review:verdict-collapsed", on ? "1" : "0");
+  };
+  const remembered = store.get("run-code-review:verdict-collapsed");
+  setCollapsed(remembered === null ? matchMedia("(max-width: 860px)").matches : remembered === "1", false);
+  vtoggle.onclick = () => setCollapsed(!verdict.classList.contains("collapsed"), true);
+  const pinned = $("pinned");
+  const setPinnedHeight = () => document.documentElement.style.setProperty("--pinned-h", pinned.offsetHeight + "px");
+  setPinnedHeight();
+  if ("ResizeObserver" in window) new ResizeObserver(setPinnedHeight).observe(pinned);
+  else addEventListener("resize", setPinnedHeight);
   const saved = store.get("run-code-review:theme"); if (saved) document.documentElement.dataset.theme = saved;
   $("theme").onclick = () => { const r = document.documentElement;
     const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;

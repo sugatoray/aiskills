@@ -21,9 +21,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (`references/SEVERITY.md`), and writes nothing if it is invalid. Standard library only.
 - `references/report.schema.json` (`schema_version` 1) and `assets/report-example.json`
   (Example-01's report). `assets/report-template.html`: the HTML page, with severity, file and
-  text filters, copy buttons, light and dark themes, and print styles. The report is embedded as
-  escaped JSON and shown as text only, so code quoted from the reviewed project cannot run.
-- `tests/test_render_report.py`.
+  text filters, copy buttons, light and dark themes, and print styles. The title bar, the verdict
+  and the severity counts stay pinned at the top while the page scrolls; the verdict card
+  collapses to its badge and one-line reason (remembered; collapsed by default on a phone). The
+  report is embedded as escaped JSON and shown as text only, so code quoted from the reviewed
+  project cannot run.
+- `tests/test_render_report.py`, and `tests/test_report_page.py`, which checks the pinned header
+  and the collapsible verdict in Chromium (skipped without Node and Playwright).
 
 ## [1.1.0] - 2026-11-12
 

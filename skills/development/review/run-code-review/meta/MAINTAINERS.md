@@ -36,13 +36,15 @@ that's `../SKILL.md`.
   `SEVERITIES` and `VERDICTS` must match the schema; a test compares them. The HTML is
   `../assets/report-template.html` with the report put in place of `__REPORT_JSON__`, escaped so it
   can't leave its `<script type="application/json">` block; the page builds every element with
-  `textContent`. Keep both properties: reports quote untrusted code. When the template changes,
-  open a rendered page at 1280 and 390 px wide in light and dark, and check that a title with
-  `</script><img onerror>` in it shows as text.
+  `textContent`. Keep both properties: reports quote untrusted code. `tests/test_report_page.py`
+  drives the rendered page in Chromium through Node's Playwright (skipped without them): the
+  pinned header, the collapsible verdict, the sidebar and section links below the pinned block,
+  and the phone layout. When the template changes, also look at it at 1280 and 390 px in light
+  and dark, and check that a title with `</script><img onerror>` in it shows as text.
 - `../assets/report-example.json` is Example-01's report as JSON. The tests use it; keep it valid.
 - `../tests/` tests the three scripts, that every language the detector knows has its folder and
   five files, and (`test_reference_code.py`) that every Python, JSON, TOML, YAML and shell block
-  in the references parses.
+  in the references parses; `test_report_page.py` covers the HTML page in a browser.
 - `../agents/*.yaml`: display metadata for the `npx skills add --agent <name>` packaging.
 - `../CHANGELOG.md`: update it together with `metadata.version` in `SKILL.md`, and keep the
   subgroup manifest (`../../.claude-plugin/plugin.json`) equal to it. Two files, one version (see
