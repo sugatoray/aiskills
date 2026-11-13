@@ -22,7 +22,7 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
-| `review-skills` | `review` | code-review |
+| `review-skills` | `review` | run-code-review |
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |

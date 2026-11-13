@@ -1,15 +1,15 @@
-# code-review
+# run-code-review
 
-Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked.
+Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked.
 
 | Property | Value |
 | --- | --- |
 | Group | `review-skills` (alias `review`) |
 | Version | 1.1.0 |
-| Starts | When you type `/code-review`, or your agent uses it when a task fits its description |
+| Starts | When you type `/run-code-review`, or your agent uses it when a task fits its description |
 | Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
-| Source | [skills/development/review/code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/code-review) |
+| Source | [skills/development/review/run-code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review) |
 
 ## Install
 
@@ -17,13 +17,13 @@ For one agent (leave out `-a` for every agent `npx skills` finds):
 
 <!-- verify -->
 ```bash
-aiskills install -s code-review -a claude-code
+aiskills install -s run-code-review -a claude-code
 ```
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: code-review
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill code-review --agent claude-code --yes
+[aiskills] bundled: run-code-review
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill run-code-review --agent claude-code --yes
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
@@ -36,12 +36,12 @@ aiskills install -G review -a claude-code
 Into the current project instead: add `-p`. To remove it:
 
 ```bash
-aiskills uninstall -s code-review
+aiskills uninstall -s run-code-review
 ```
 
 ## What's inside
 
-The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code-review/`:
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-code-review/`:
 
 - `CHANGELOG.md`
 - `README.md`
@@ -128,5 +128,6 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code
 - `tests/test_check_formats.py`
 - `tests/test_detect_languages.py`
 - `tests/test_reference_code.py`
+- `tests/test_skill_name.py`
 
-See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

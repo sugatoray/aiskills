@@ -22,8 +22,8 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ### Added
 
-- **New bundled skill: `code-review`**, in a new group, `review-skills`
-  (alias `review`). `/code-review` runs a thorough code review of a pull
+- **New bundled skill: `run-code-review`**, in a new group, `review-skills`
+  (alias `review`). `/run-code-review` runs a thorough code review of a pull
   request, branch, diff, set of files or whole repository at a senior or staff
   engineer's bar, and returns a structured report: a verdict, findings ranked
   by severity with file and line, and suggested code changes. It ships a
@@ -33,7 +33,7 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   (`-l`), the files (`-p`, `-t`, `--local`, `-r`, `--base`) and a
   security-only review (`-s`); XML, JSON, YAML and TOML are checked with
   tools first. The package now bundles
-  17 skills in 9 groups: `aiskills install -s code-review`, or
+  17 skills in 9 groups: `aiskills install -s run-code-review`, or
   `aiskills install -G review`. See the skill's own `CHANGELOG.md`.
 
 ### Changed

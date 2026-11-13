@@ -1,6 +1,6 @@
-# Maintaining code-review
+# Maintaining run-code-review
 
-For people developing this skill. None of this is read when answering a `/code-review` request;
+For people developing this skill. None of this is read when answering a `/run-code-review` request;
 that's `../SKILL.md`.
 
 ## Layout
@@ -45,7 +45,7 @@ There is no per-skill `.claude-plugin/plugin.json`: the skill installs through t
 ## Tests
 
 ```bash
-python3 -m pytest skills/development/review/code-review/tests
+python3 -m pytest skills/development/review/run-code-review/tests
 ```
 
 ## Adding a language

@@ -4,7 +4,7 @@ Subgroup-wide maintainer notes for the skills under `skills/development/review/`
 answering any request; each skill's own `SKILL.md` is what's read at invocation time. For a
 skill's own layout and versioning, see its `meta/MAINTAINERS.md`:
 
-- [`code-review/meta/MAINTAINERS.md`](../code-review/meta/MAINTAINERS.md)
+- [`run-code-review/meta/MAINTAINERS.md`](../run-code-review/meta/MAINTAINERS.md)
 
 This file covers one skill today. It exists because the plugin manifest below is a subgroup-level
 artifact, the same arrangement as `../../repo-related/meta/MAINTAINERS.md`. Don't invent shared
@@ -21,7 +21,7 @@ The `aiskills` npm package derives the group alias from the plugin name minus `-
 
 **Keep it in sync, every time:**
 
-- **Version:** `plugin.json`'s `"version"` must equal `code-review/SKILL.md`'s
+- **Version:** `plugin.json`'s `"version"` must equal `run-code-review/SKILL.md`'s
   `metadata.version`. Two files, one version, bumped in the same commit.
 - **New skill:** add its `./<skill-name>` path to the `"skills"` array in the commit that adds it,
   and a row to `../README.md`.
@@ -43,7 +43,7 @@ The `aiskills` npm package derives the group alias from the plugin name minus `-
 ## Tests
 
 ```bash
-python3 -m pytest skills/development/review/code-review/tests
+python3 -m pytest skills/development/review/run-code-review/tests
 ```
 
 ## Why `skills/development/review/`

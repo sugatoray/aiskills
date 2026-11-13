@@ -41,7 +41,7 @@ Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`code-review`](code-review.md) | 1.1.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
+| [`run-code-review`](run-code-review.md) | 1.1.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 

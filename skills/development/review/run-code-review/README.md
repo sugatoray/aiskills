@@ -1,4 +1,4 @@
-# code-review
+# run-code-review
 
 Runs a thorough code review of a pull request, branch, diff, set of files or whole repository, at
 the bar a senior or staff engineer holds at a large engineering organisation, and returns a
@@ -25,7 +25,7 @@ structured report.
 ## Layout
 
 ```text
-code-review/
+run-code-review/
 ├── agents/
 │   ├── claude-code.yaml          display name and invocation policy
 │   └── openai.yaml
@@ -69,22 +69,22 @@ In each language folder:
 
 ## Usage
 
-Invoke as `/code-review`, or ask for a review in plain words ("review this PR", "check my changes
+Invoke as `/run-code-review`, or ask for a review in plain words ("review this PR", "check my changes
 before I merge"). Say what to review; with nothing named, it reviews the current branch against
 the default branch plus uncommitted work.
 
 ```text
-/code-review                              the current branch and uncommitted changes
-/code-review PR 128                       a pull request
-/code-review src/billing/                 a folder, in full
-/code-review the repo, security first     a whole repository, with a priority
-/code-review -l py,sql                    only the Python and SQL in the current changes
-/code-review -s                           a security review alone
-/code-review -p src -r -l ts -s           security review of the TypeScript under src/
-/code-review -t -l json,yaml,toml,xml     every tracked configuration file, tools first
+/run-code-review                              the current branch and uncommitted changes
+/run-code-review PR 128                       a pull request
+/run-code-review src/billing/                 a folder, in full
+/run-code-review the repo, security first     a whole repository, with a priority
+/run-code-review -l py,sql                    only the Python and SQL in the current changes
+/run-code-review -s                           a security review alone
+/run-code-review -p src -r -l ts -s           security review of the TypeScript under src/
+/run-code-review -t -l json,yaml,toml,xml     every tracked configuration file, tools first
 ```
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/code-review` prompts and their outputs:
+See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/run-code-review` prompts and their outputs:
 each option, the options combined, and a complete report.
 
 | Option | Meaning |
@@ -99,7 +99,7 @@ each option, the options combined, and a complete report.
 
 At most one of `-p`, `-t` and `--local`; `-l`, `-s` and `-r` combine with any of them.
 
-Install it with `npx skills add sugatoray/aiskills` (choose `code-review`), or as part of the
+Install it with `npx skills add sugatoray/aiskills` (choose `run-code-review`), or as part of the
 `review-skills` Claude Code plugin; see [`../README.md`](../README.md).
 
 ## The scripts

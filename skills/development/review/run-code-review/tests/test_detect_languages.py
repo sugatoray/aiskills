@@ -1,6 +1,6 @@
 """Regression tests for scripts/detect_languages.py.
 
-Run: python3 -m pytest skills/development/review/code-review/tests
+Run: python3 -m pytest skills/development/review/run-code-review/tests
 """
 
 import importlib.util

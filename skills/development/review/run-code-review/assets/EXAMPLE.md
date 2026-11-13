@@ -1,6 +1,6 @@
-# Examples: `/code-review`
+# Examples: `/run-code-review`
 
-List of example prompts and their outputs for the usage of `/code-review` skill.
+List of example prompts and their outputs for the usage of `/run-code-review` skill.
 
 **How to read these examples**
 
@@ -27,13 +27,13 @@ shop/                          branch feature/search, one commit ahead of main
 
 | Example | Prompt | Shows |
 | --- | --- | --- |
-| [01](#example-01) | `/code-review` | A full review of the current branch, with the whole report |
-| [02](#example-02) | `/code-review -l py,sh` | Limit the review to chosen languages |
-| [03](#example-03) | `/code-review -s` | A security review alone |
-| [04](#example-04) | `/code-review -s -l js,yaml` | Security review of chosen languages |
-| [05](#example-05) | `/code-review -p app -p scripts` | Chosen folders, with and without `-r` |
-| [06](#example-06) | `/code-review -t -l json,yaml,toml,xml` | Whole repository; tool-first formats |
-| [07](#example-07) | `/code-review --local` | The current folder; bare `-l` |
+| [01](#example-01) | `/run-code-review` | A full review of the current branch, with the whole report |
+| [02](#example-02) | `/run-code-review -l py,sh` | Limit the review to chosen languages |
+| [03](#example-03) | `/run-code-review -s` | A security review alone |
+| [04](#example-04) | `/run-code-review -s -l js,yaml` | Security review of chosen languages |
+| [05](#example-05) | `/run-code-review -p app -p scripts` | Chosen folders, with and without `-r` |
+| [06](#example-06) | `/run-code-review -t -l json,yaml,toml,xml` | Whole repository; tool-first formats |
+| [07](#example-07) | `/run-code-review --local` | The current folder; bare `-l` |
 | [08](#example-08) | Plain words | No flags at all |
 | [09](#example-09) | Mistakes | What a wrong flag returns |
 | [10](#example-10) | Follow-ups | Apply fixes; post to a pull request |
@@ -52,7 +52,7 @@ and untracked files.
 ##   agent: "devin"
 ## ---
 
-/code-review
+/run-code-review
 ```
 <!--- prompt-block:end --->
 
@@ -296,7 +296,7 @@ commas: `py,sh` is the same as `python,shellscript`.
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -l py,sh
+/run-code-review -l py,sh
 ```
 <!--- prompt-block:end --->
 
@@ -334,7 +334,7 @@ A security review alone, with `-s`.
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -s
+/run-code-review -s
 ```
 <!--- prompt-block:end --->
 
@@ -391,7 +391,7 @@ A clean `-s` report means no finding in what was read. It is not an audit.
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -s -l js,yaml
+/run-code-review -s -l js,yaml
 ```
 <!--- prompt-block:end --->
 
@@ -422,7 +422,7 @@ than one. A folder means the files directly in it; add `-r` to go into subfolder
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -p app -p scripts
+/run-code-review -p app -p scripts
 ```
 <!--- prompt-block:end --->
 
@@ -443,10 +443,10 @@ The whole of each file is reviewed, not only the lines a branch changed.
 Variations:
 
 ```prompt
-/code-review -p app/users.py              one file
-/code-review -p . -r                      this folder and everything below it
-/code-review -p src -r -l ts,sql          the TypeScript and SQL below src/
-/code-review -p services/billing -r -s    a security review of one service
+/run-code-review -p app/users.py              one file
+/run-code-review -p . -r                      this folder and everything below it
+/run-code-review -p src -r -l ts,sql          the TypeScript and SQL below src/
+/run-code-review -p services/billing -r -s    a security review of one service
 ```
 <!--- prompt-output:end --->
 <!--- example:end --->
@@ -460,7 +460,7 @@ syntax, format and schema, and the skill then reads the files for what no tool j
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -t -l json,yaml,toml,xml
+/run-code-review -t -l json,yaml,toml,xml
 ```
 <!--- prompt-block:end --->
 
@@ -491,9 +491,9 @@ points, authentication, data access, money, public API) and says what it did not
 Variations:
 
 ```prompt
-/code-review -t                the whole repository, every language
-/code-review -t -s             a security review of the whole repository
-/code-review -t -l md          every Markdown file
+/run-code-review -t                the whole repository, every language
+/run-code-review -t -s             a security review of the whole repository
+/run-code-review -t -l md          every Markdown file
 ```
 
 From a subfolder, `-t` still covers the whole repository. Files are named from where you are
@@ -517,7 +517,7 @@ filtered (4): ../.github/workflows/ci.yml, ../README.md, ../scripts/deploy.sh, .
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review --local
+/run-code-review --local
 ```
 <!--- prompt-block:end --->
 
@@ -541,9 +541,9 @@ xml (1 file) [tool-first: run the checks in TOOLING.md before reading]
 review:
 
 ```prompt
-/code-review --local -r
-/code-review --local -r -l
-/code-review --local -r --lang
+/run-code-review --local -r
+/run-code-review --local -r -l
+/run-code-review --local -r --lang
 ```
 <!--- prompt-output:end --->
 <!--- example:end --->
@@ -556,10 +556,10 @@ when it cannot tell.
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review PR 128
-/code-review my changes against origin/develop
-/code-review the last commit
-/code-review src/billing/, and look hardest at the refund path
+/run-code-review PR 128
+/run-code-review my changes against origin/develop
+/run-code-review the last commit
+/run-code-review src/billing/, and look hardest at the refund path
 review this diff before I open the pull request
 is scripts/deploy.sh safe to run in production?
 do a security review of the Python in services/auth
@@ -586,8 +586,8 @@ What a wrong flag returns.
 
 <!--- prompt-block:start --->
 ```prompt
-/code-review -l py,go
-/code-review -t --local
+/run-code-review -l py,go
+/run-code-review -t --local
 ```
 <!--- prompt-block:end --->
 

@@ -13,4 +13,4 @@ The review skills live at `skills/development/review/`, not here. Two symlinks r
 - `README.md` → `../../../skills/development/review/README.md` (the subgroup's README)
 - `../meta/review` (that is, `src/development/meta/review`) → `../../../skills/development/review/meta` (the subgroup's `MAINTAINERS.md`)
 
-These are symlinks, not copies: editing through them edits the real files at `skills/development/review/`. There is no subgroup `CHANGELOG.md` to link; each skill keeps its own (`skills/development/review/code-review/CHANGELOG.md`).
+These are symlinks, not copies: editing through them edits the real files at `skills/development/review/`. There is no subgroup `CHANGELOG.md` to link; each skill keeps its own (`skills/development/review/run-code-review/CHANGELOG.md`).

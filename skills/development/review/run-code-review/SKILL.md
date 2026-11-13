@@ -1,14 +1,14 @@
 ---
-name: code-review
-description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
+name: run-code-review
+description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
 license: MIT
 compatibility: "Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
 metadata:
-  name: code-review
+  name: run-code-review
   type: skill
   author: sugatoray
   version: "1.1.0"
-  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/code-review"
+  source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review"
 ---
 
 # Code review
@@ -20,7 +20,7 @@ structured report, not a stream of remarks.
 
 Paths below (`references/…`, `scripts/…`) are relative to this skill's folder.
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/code-review` prompts and their outputs.
+See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/run-code-review` prompts and their outputs.
 
 ## The bar you hold
 
@@ -50,7 +50,7 @@ they do differently:
 
 ## Options
 
-`/code-review [scope] [-l <languages>] [-s]`. With no option it reviews every supported
+`/run-code-review [scope] [-l <languages>] [-s]`. With no option it reviews every supported
 language in the current branch's changes, in full.
 
 | Option | Meaning |
@@ -64,7 +64,7 @@ language in the current branch's changes, in full.
 | `--base <ref>` | Review what changed against this git ref, plus untracked files. |
 
 Use at most one of `-p`, `-t` and `--local`. `-l`, `-s` and `-r` combine with any of them, so
-`/code-review -p src -r -l py,sql -s` is a security review of the Python and SQL under `src/`.
+`/run-code-review -p src -r -l py,sql -s` is a security review of the Python and SQL under `src/`.
 Both scripts take the same flags, so pass the user's options through unchanged. When the user
 describes the scope in words instead, map it to these options.
 

@@ -11,7 +11,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - `-l` is `--lang`. `--local` has no short form, unlike in `scrolls-setup`. `-p`, `-t` and `--local` exclude each other.
 - The plugin is named after its folder (`review/` → `review-skills`, alias `review`), like every plugin in `marketplace.json`; the npm alias is derived from the plugin name. Rename folder and plugin together.
 - Folder names follow the names the user gave: `review_powershell-script` and `review_shellscript`, not `review_powershell` or `review_shell`.
-- One version in two files: `code-review/SKILL.md`'s `metadata.version` and `skills/development/review/.claude-plugin/plugin.json`. The plugin's `description` must be identical in `plugin.json` and the root `marketplace.json`.
+- One version in two files: `run-code-review/SKILL.md`'s `metadata.version` and `skills/development/review/.claude-plugin/plugin.json`. The plugin's `description` must be identical in `plugin.json` and the root `marketplace.json`.
 - XML is tool-first **and** keeps its full review. That was the user's explicit choice; don't cut `review_xml/` down to the short form the other three tool-first formats use.
 - `src/development/review/` holds memory and symlinks only. Never copy skill content into `src/`; edit it at `skills/development/review/`.
 
@@ -39,8 +39,8 @@ Bad patterns or decisions to never take, and why they were rejected.
 Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code.
-- Check every claim about a language's behaviour by running it, and record what came from documentation instead. The list of what was run, and on which versions, is in `code-review/meta/MAINTAINERS.md`.
+- Check every claim about a language's behaviour by running it, and record what came from documentation instead. The list of what was run, and on which versions, is in `run-code-review/meta/MAINTAINERS.md`.
 - Every code block in a `PATTERNS.md` must at least parse: "after" blocks are handed to users as fixes.
 - When the user's wording implies scope the skill lacks (their `--lang` list named four unsupported languages), say so and add it, instead of accepting a flag value that does nothing.
 - Before a cost-saving redesign of work already drafted (the tool-first question arrived with a full XML review written), lay out the options and wait for the answer.
-- Read `code-review/meta/MAINTAINERS.md` ("Adding a language", "Design notes") before changing the skill; it holds the procedure and the reasons, and this file does not repeat them.
+- Read `run-code-review/meta/MAINTAINERS.md` ("Adding a language", "Design notes") before changing the skill; it holds the procedure and the reasons, and this file does not repeat them.

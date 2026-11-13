@@ -3,7 +3,7 @@
 A block may be invalid only if its first line says so (a "Before" example that shows an error).
 Checked here: python, json, toml (Python 3.11+), yaml (with PyYAML), bash/sh (with bash).
 
-Run: python3 -m pytest skills/development/review/code-review/tests
+Run: python3 -m pytest skills/development/review/run-code-review/tests
 """
 
 import ast

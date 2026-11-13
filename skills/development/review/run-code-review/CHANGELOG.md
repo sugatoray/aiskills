@@ -1,9 +1,14 @@
 # Changelog
 
-All notable changes to the `code-review` skill are documented here.
+All notable changes to the `run-code-review` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [1.1.0] - 2026-11-12
+
+### Changed
+
+- Renamed from `/code-review` to `/run-code-review`, folder and all, so the skill doesn't collide
+  with the built-in `/code-review` that Claude Code ships. The plugin is still `review-skills`.
 
 ### Added
 

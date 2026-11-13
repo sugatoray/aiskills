@@ -225,7 +225,7 @@ installed version. At the time of writing:
 | `scrolls-skills` | `scrolls` | scrolls-setup, scrolls-update, scrolls-hide, scrolls-unhide, scrolls-remove, scrolls-restore, scrolls-help, scrolls-explainer |
 | `stata-skills` | `stata` | stata-recipes |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
-| `review-skills` | `review` | code-review |
+| `review-skills` | `review` | run-code-review |
 | `docs-skills` | `docs` | create-lib-docs |
 | `diagrams-skills` | `diagrams` | network-flow |
 | `personas-skills` | `personas` | prodigy |

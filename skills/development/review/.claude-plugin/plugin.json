@@ -1,7 +1,7 @@
 {
   "name": "review-skills",
   "version": "1.1.0",
-  "description": "Review skills: /code-review runs a thorough, evidence-based code review of a PR, diff, files or repo at a staff engineer's bar and returns a structured report (verdict, findings by severity with file and line, suggested code changes), with per-language checklists, security scope and review wisdom for Python, JavaScript, TypeScript, Rust, shell, PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML. Options choose the languages (-l), the files (-p, -t, --local, -r, --base) and a security-only review (-s).",
+  "description": "Review skills: /run-code-review runs a thorough, evidence-based code review of a PR, diff, files or repo at a staff engineer's bar and returns a structured report (verdict, findings by severity with file and line, suggested code changes), with per-language checklists, security scope and review wisdom for Python, JavaScript, TypeScript, Rust, shell, PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML. Options choose the languages (-l), the files (-p, -t, --local, -r, --base) and a security-only review (-s).",
   "author": {
     "name": "Sugato Ray",
     "url": "https://github.com/sugatoray"
@@ -18,6 +18,6 @@
     "review"
   ],
   "skills": [
-    "./code-review"
+    "./run-code-review"
   ]
 }
