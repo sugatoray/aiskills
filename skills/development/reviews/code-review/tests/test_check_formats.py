@@ -33,7 +33,9 @@ def _write(tmp_path, name, text):
 
 def test_valid_json_is_ok_and_a_syntax_error_names_the_line(tmp_path):
     assert cf.check_file(_write(tmp_path, "a.json", '{"a": [1, 2]}'))["status"] == "ok"
-    result = cf.check_file(_write(tmp_path, "b.json", '{\n  "a": 1,\n}\n'))
+    # A missing comma, not a trailing one: Python 3.13 reports a trailing comma
+    # at the comma's own line, earlier versions at the closing brace.
+    result = cf.check_file(_write(tmp_path, "b.json", '{\n  "a": 1\n  "b": 2\n}\n'))
     assert result["status"] == "error" and result["checker"] == "python json"
     assert "line 3" in result["message"]
 
