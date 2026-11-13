@@ -18,7 +18,7 @@ they are listed under **Changed** or **Removed** with a note.
 This file covers the package and its `aiskills` CLI. Each bundled skill keeps
 its own `CHANGELOG.md` inside its folder under `skills/`.
 
-## [Unreleased]
+## [1.2.0] - 2026-11-13
 
 ### Added
 
@@ -486,6 +486,7 @@ published to npm, so it can't be installed on its own.
   built-in `node:test` runner.
 
 [Unreleased]: https://github.com/sugatoray/aiskills/tree/master/src/packages/aiskills
+[1.2.0]: https://github.com/sugatoray/aiskills/pull/223
 [1.1.0]: https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-explainer
 [1.0.0]: https://github.com/sugatoray/aiskills/pull/141
 [0.9.0]: https://github.com/sugatoray/aiskills/pull/193
