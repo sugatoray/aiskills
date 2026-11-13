@@ -29,6 +29,8 @@ code-review/
 ├── agents/
 │   ├── claude-code.yaml          display name and invocation policy
 │   └── openai.yaml
+├── assets/
+│   └── EXAMPLE.md                example prompts and their outputs, one per option
 ├── meta/
 │   └── MAINTAINERS.md
 ├── references/
@@ -81,6 +83,9 @@ the default branch plus uncommitted work.
 /code-review -p src -r -l ts -s           security review of the TypeScript under src/
 /code-review -t -l json,yaml,toml,xml     every tracked configuration file, tools first
 ```
+
+See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/code-review` prompts and their outputs:
+each option, the options combined, and a complete report.
 
 | Option | Meaning |
 | --- | --- |

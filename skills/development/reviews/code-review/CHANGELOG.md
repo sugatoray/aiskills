@@ -25,6 +25,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `scripts/check_formats.py`: syntax-checks the tool-first formats with Python's standard
   library, reports each file as `ok`, `error` or `unchecked`, and lists the linters on `PATH`.
   It takes the same flags as the detector, installs nothing and runs no external program.
+- `assets/EXAMPLE.md` with example prompts and outputs for each option and a complete report,
+  linked from `SKILL.md` and `README.md`.
 
 ### Changed
 

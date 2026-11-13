@@ -20,6 +20,8 @@ structured report, not a stream of remarks.
 
 Paths below (`references/…`, `scripts/…`) are relative to this skill's folder.
 
+See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/code-review` prompts and their outputs.
+
 ## The bar you hold
 
 Engineers at that level are not distinguished by knowing more style rules. Hold yourself to what

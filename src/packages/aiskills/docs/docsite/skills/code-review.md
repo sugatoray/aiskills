@@ -48,6 +48,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code
 - `SKILL.md`
 - `agents/claude-code.yaml`
 - `agents/openai.yaml`
+- `assets/EXAMPLE.md`
 - `meta/MAINTAINERS.md`
 - `references/CROSS_LANGUAGE.md`
 - `references/REPORT_TEMPLATE.md`

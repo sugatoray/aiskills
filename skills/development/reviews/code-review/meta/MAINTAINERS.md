@@ -9,6 +9,11 @@ that's `../SKILL.md`.
   eight-step workflow, and which reference to read at which step. Keep it under about 250 lines;
   detail belongs in `../references/`.
 - `../references/SEVERITY.md`, `REPORT_TEMPLATE.md` and `CROSS_LANGUAGE.md` apply to every review.
+- `../assets/EXAMPLE.md` shows each option on one small demo repository. Its command output was
+  pasted from real runs, with `read:` lines shortened to file names. When a script's output or
+  an option changes, rebuild the demo repository described at the top of that file, re-run the
+  commands and paste the new output. Its sample report was written by the skill's author on
+  seeded defects: it shows the report's form, not a measured detection rate.
 - `../references/review_<language>/` holds one language each, always with the same five files:
   - `REVIEW.md`: what to look for and why. Prose and bullets, no long code.
   - `PATTERNS.md`: before/after pairs, one `##` section per fix.
