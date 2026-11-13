@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (16 skills in 8 groups), with what it does and how to install it.
+Every skill in this version of the package (17 skills in 9 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -34,6 +34,14 @@ Alias `repo-related`. Install the group with `aiskills install -G repo-related`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`create-issues-update-pr`](create-issues-update-pr.md) | 1.3.0 | Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine… |
+
+## review-skills
+
+Alias `review`. Install the group with `aiskills install -G review`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`run-code-review`](run-code-review.md) | 1.1.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 

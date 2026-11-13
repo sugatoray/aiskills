@@ -108,12 +108,13 @@ use skill: /scrolls-update
 ### 🛠️ Development
 
 Skills for software-development workflows that aren't specific to any
-one language or project — currently: filing GitHub issues for a PR's
-work and keeping the PR's title/description in sync with them.
+one project — currently: filing GitHub issues for a PR's work and
+keeping the PR's title/description in sync with them, and thorough,
+structured code review.
 
 **Installation**:
 
-Run one of the following, choose the skill by name: `create-issues-update-pr` and install interactively.
+Run one of the following, choose the skill by name: `create-issues-update-pr` or `run-code-review`, and install interactively.
 
 ```sh
 npx skills add sugatoray/aiskills               # project-level
@@ -129,7 +130,8 @@ with every skill twice — pick one.
 
 ```
 /plugin marketplace add sugatoray/aiskills
-/plugin install repo-related-skills@sugatoray
+/plugin install repo-related-skills@sugatoray   # create-issues-update-pr
+/plugin install review-skills@sugatoray        # run-code-review
 ```
 
 </details>
@@ -139,6 +141,7 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Development](skills/development/README.md) | `create-issues-update-pr` | Files GitHub issue(s) for a PR's work — one flat issue, or a parent epic plus children via GitHub's native parent/child relationship — then rewrites the PR's title (kept short) and description with an itemized, correctly nested issue list. |
+| [Development](skills/development/README.md) | `run-code-review` | Runs a thorough code review of a PR, branch, diff, files or repo at a senior/staff engineer's bar, and returns a structured report: a verdict, findings ranked by severity with file and line, and suggested code changes. Per-language checklists, fix patterns, tool commands, security scope and review wisdom for Python, JavaScript, TypeScript, Rust, shell, PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML. Options choose the languages (`-l`), the files (`-p`, `-t`, `--local`, `-r`, `--base`) and a security-only review (`-s`). |
 
 ---
 

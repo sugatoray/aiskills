@@ -73,9 +73,9 @@ describe("values", () => {
     const local = market.plugins.filter((p) => typeof p.source === "string");
     assert.deepEqual(v.groups, local.map((p) => p.name.replace(/-skills$/, "")));
     assert.equal(v.groups_count, String(local.length));
-    assert.equal(v.skills_count, "16"); // 17 in the repo; skills/newsletters/.skillsignore leaves newsletter-ai out
+    assert.equal(v.skills_count, "17"); // 18 in the repo; skills/newsletters/.skillsignore leaves newsletter-ai out
     assert.equal(v.version_label, `v${pkg.version}`);
-    assert.equal(v.counts_label, `16 skills · ${local.length} groups`);
+    assert.equal(v.counts_label, `17 skills · ${local.length} groups`);
   });
 
   test("the banner's theme is Lights Out by default, and must be a known theme", async () => {
@@ -114,7 +114,7 @@ describe("render", () => {
     const v = resolveValues(readConfig());
     const banner = bannerMarkup(render(v));
     assert.ok(banner.includes(`<b>v${pkg.version}</b>`));
-    assert.ok(banner.includes("16 skills · 8 groups"));
+    assert.ok(banner.includes("17 skills · 9 groups"));
     assert.ok(banner.includes(`npm install -g ${pkg.name}`));
     for (const g of v.groups) assert.ok(banner.includes(`<span class="pill">${g}</span>`), g);
     assert.ok(banner.includes(`skills@${SKILLS_CLI_VERSION} add`), "pinned skills version in the demo");
@@ -278,12 +278,12 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
       await p.keyboard.press("Enter");
       await p.keyboard.type("extra");
       await p.click("#editToggle");
-      assert.equal(await p.locator("#pills .pill").count(), 9);
+      assert.equal(await p.locator("#pills .pill").count(), 10);
       await p.reload({ waitUntil: "networkidle" });
       assert.equal(await p.textContent("#banner .tagline"), "Edited.");
       await p.click("#resetBtn");
       assert.notEqual(await p.textContent("#banner .tagline"), "Edited.");
-      assert.equal(await p.locator("#pills .pill").count(), 8);
+      assert.equal(await p.locator("#pills .pill").count(), 9);
     }));
 
   test("ink that can't be read on a background can't be chosen", () =>
