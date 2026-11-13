@@ -84,6 +84,10 @@ _SKIPPED_NAMES = re.compile(
 )
 
 
+# Text output names at most this many skipped, filtered or unsupported files per line; --json names all.
+TEXT_LIST_LIMIT = 20
+
+
 class UsageError(Exception):
     """The command line named nothing to review."""
 
@@ -120,8 +124,11 @@ def parse_langs(text: str | None) -> list[str]:
 
 
 def is_skipped(path: str) -> bool:
-    """True for vendored, generated or cached files."""
-    posix = PurePosixPath(_normalise(path))
+    """True for vendored, generated or cached files, and for a skipped folder named as `dir/`."""
+    normal = _normalise(path)
+    posix = PurePosixPath(normal)
+    if normal.endswith("/"):
+        return any(part in _SKIPPED_DIRS for part in posix.parts)
     return any(part in _SKIPPED_DIRS for part in posix.parts[:-1]) or bool(_SKIPPED_NAMES.search(posix.name))
 
 
@@ -232,14 +239,63 @@ def repo_files() -> list[str]:
     return _from_here(top, _git_lines("-C", top, "ls-files"))
 
 
+def _git_folder_listing(root: Path) -> list[str] | None:
+    """Files under <root> that git tracks or would track (ignored files left out), relative to <root>.
+
+    None when <root> is not in a git checkout.
+    """
+    try:
+        listed = _git_lines("-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard", "--", ".")
+    except (RuntimeError, OSError):
+        return None
+    return [name for name in listed if (root / name).is_file()]
+
+
+def _walk_listing(root: Path, recurse: bool) -> list[str]:
+    """Files under <root>, relative to it. Skipped folders are not entered; each is listed once as `dir/`."""
+    names = []
+    for here, dirs, files in os.walk(root):
+        rel = Path(here).relative_to(root)
+        kept = []
+        for name in sorted(dirs):
+            if name in _SKIPPED_DIRS:
+                names.append((rel / name).as_posix() + "/")
+            elif name != ".git":
+                kept.append(name)
+        dirs[:] = kept if recurse else []
+        names += [(rel / name).as_posix() for name in files]
+    return names
+
+
+def _collapse_skipped_folders(names: list[str]) -> list[str]:
+    """Name each skipped folder once (`node_modules/`) instead of every file in it."""
+    out = set()
+    for name in names:
+        parts = PurePosixPath(name).parts
+        cut = next((i for i, part in enumerate(parts[:-1]) if part in _SKIPPED_DIRS), None)
+        out.add(name if cut is None else "/".join(parts[:cut + 1]) + "/")
+    return sorted(out)
+
+
 def folder_files(folder: str, recurse: bool) -> list[str]:
-    """The files in <folder>, and below it when <recurse>; a file path is returned as is."""
+    """The files in <folder>, and below it when <recurse>; a file path is returned as is.
+
+    In a git checkout, files git ignores are left out. Skipped folders (node_modules/, vendor/, ...)
+    are named once, as `dir/`, not file by file. UsageError if <folder> does not exist.
+    """
     root = Path(folder)
+    if not root.exists():
+        raise UsageError(f"{folder}: no such file or folder")
     if not root.is_dir():
         return [folder]
-    found = root.rglob("*") if recurse else root.iterdir()
-    names = sorted(p.as_posix() for p in found if p.is_file() and ".git" not in p.parts)
-    return [n[2:] if n.startswith("./") else n for n in names]
+    listed = _git_folder_listing(root)
+    if listed is None:
+        names = _walk_listing(root, recurse)
+    else:
+        names = [n for n in listed if recurse or "/" not in n]
+    prefix = PurePosixPath(_normalise(folder))
+    joined = [(prefix / name).as_posix() + ("/" if name.endswith("/") else "") for name in _collapse_skipped_folders(names)]
+    return [n[2:] if n.startswith("./") else n for n in joined]
 
 
 def render_text(report: dict) -> str:
@@ -254,7 +310,10 @@ def render_text(report: dict) -> str:
         lines.extend(f"  - {path}" for path in entry["files"])
     for key in ("skipped", "filtered", "unsupported"):
         if report[key]:
-            lines.append(f"{key} ({len(report[key])}): " + ", ".join(report[key]))
+            shown = ", ".join(report[key][:TEXT_LIST_LIMIT])
+            more = len(report[key]) - TEXT_LIST_LIMIT
+            tail = f", … and {more} more (--json lists all)" if more > 0 else ""
+            lines.append(f"{key} ({len(report[key])}): {shown}{tail}")
     if not report["languages"]:
         lines.insert(0, "no files in a supported language")
     return "\n".join(lines) + "\n"

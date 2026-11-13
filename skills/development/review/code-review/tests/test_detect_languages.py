@@ -312,7 +312,7 @@ def test_cli_local_is_the_current_folder(tmp_path):
     assert list(run("--local", cwd=tmp_path)["languages"]) == ["python"]
     everything = run("--local", "-r", cwd=tmp_path)
     assert list(everything["languages"]) == ["python", "rust", "sql"]
-    assert everything["skipped"] == ["node_modules/dep.js"]
+    assert everything["skipped"] == ["node_modules/"]  # a skipped folder is listed once, not walked
     assert list(run("--local", "-r", cwd=tmp_path / "sub")["languages"]) == ["rust", "sql"]
 
 
@@ -392,3 +392,63 @@ def test_parser_and_path_collection_are_reusable(tmp_path):
         assert "--base REF" in str(error)
     else:
         raise AssertionError("expected UsageError")
+
+
+def _cli(*args, cwd):
+    out = subprocess.run([sys.executable, str(SCRIPT), "--json", *args], capture_output=True, text=True, cwd=cwd)
+    assert out.returncode == 0, out.stderr
+    return json.loads(out.stdout)
+
+
+def _write(root, name, text="x\n"):
+    path = root / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+
+
+def test_recurse_in_a_git_checkout_leaves_out_ignored_files(tmp_path):
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    _write(tmp_path, ".gitignore", ".next/\ncoverage/\n.pytest_cache/\n")
+    for name in ("src/a.py", "src/deep/b.py", "new.py", ".next/static/chunk.js",
+                 "coverage/lcov-report/index.html", ".pytest_cache/README.md"):
+        _write(tmp_path, name)
+    subprocess.run(["git", "add", ".gitignore", "src"], cwd=tmp_path, check=True)
+    everything = _cli("--local", "-r", cwd=tmp_path)
+    assert list(everything["languages"]) == ["python"]
+    assert everything["languages"]["python"]["files"] == ["new.py", "src/a.py", "src/deep/b.py"]
+    assert everything["unsupported"] == [".gitignore"] and everything["skipped"] == []
+    assert _cli("-p", "src", cwd=tmp_path)["languages"]["python"]["files"] == ["src/a.py"]
+    assert _cli("--local", cwd=tmp_path / "src")["languages"]["python"]["files"] == ["a.py"]
+    (tmp_path / "src" / "a.py").unlink()  # tracked, deleted in the working tree: nothing to read
+    assert _cli("-p", "src", "-r", cwd=tmp_path)["languages"]["python"]["files"] == ["src/deep/b.py"]
+
+
+def test_recurse_lists_an_untracked_skipped_folder_once(tmp_path):
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    _write(tmp_path, "src/a.py")
+    for i in range(50):
+        _write(tmp_path, f"node_modules/p{i}/index.js")
+    result = _cli("--local", "-r", cwd=tmp_path)
+    assert result["skipped"] == ["node_modules/"]
+    outside = tmp_path / "plain"
+    _write(outside, "src/a.py")
+    _write(outside, "node_modules/p/index.js")
+    _write(outside, "pkg/vendor/lib.py")
+    plain = _cli("--local", "-r", cwd=outside)
+    assert plain["skipped"] == ["node_modules/", "pkg/vendor/"]
+    assert plain["languages"]["python"]["files"] == ["src/a.py"]
+
+
+def test_text_output_shortens_long_file_lists():
+    report = dl.classify([f"bin/tool{i}" for i in range(30)])
+    line = [row for row in dl.render_text(report).splitlines() if row.startswith("unsupported")][0]
+    assert line.startswith("unsupported (30): bin/tool0, bin/tool1,")
+    assert line.endswith("… and 10 more (--json lists all)") and line.count("bin/tool") == 20
+    assert len(dl.classify([f"x{i}" for i in range(30)])["unsupported"]) == 30  # JSON keeps every file
+
+
+def test_a_missing_path_is_a_usage_error(tmp_path):
+    _write(tmp_path, "src/a.py")
+    out = subprocess.run([sys.executable, str(SCRIPT), "-p", "src", "-p", "scr"], capture_output=True, text=True, cwd=tmp_path)
+    assert out.returncode == 2 and "scr: no such file or folder" in out.stderr
+

@@ -31,8 +31,9 @@ that's `../SKILL.md`.
 - `../scripts/check_formats.py` syntax-checks the languages in `TOOL_FIRST`, reusing the
   detector's parser so both take the same flags. Standard library only; PyYAML is used when it
   happens to be importable and never required.
-- `../tests/` tests both scripts, and that every language the detector knows has its folder and
-  five files.
+- `../tests/` tests both scripts, that every language the detector knows has its folder and
+  five files, and (`test_reference_code.py`) that every Python, JSON, TOML, YAML and shell block
+  in the references parses.
 - `../agents/*.yaml`: display metadata for the `npx skills add --agent <name>` packaging.
 - `../CHANGELOG.md`: update it together with `metadata.version` in `SKILL.md`, and keep the
   subgroup manifest (`../../.claude-plugin/plugin.json`) equal to it. Two files, one version (see
@@ -71,7 +72,10 @@ python3 -m pytest skills/development/review/code-review/tests
   Pester 5, and PostgreSQL 16. Statements about other versions and engines (Windows PowerShell
   5.1, MySQL, SQL Server, older PostgreSQL) come from their documentation and were not run.
 - **Code blocks must at least parse.** "After" blocks are what the skill hands to users as
-  suggested fixes; a broken one is worse than none. Extract the fenced blocks and run them through
+  suggested fixes; a broken one is worse than none. `tests/test_reference_code.py` enforces it for
+  Python, JSON, TOML, YAML and shell; a block that shows an error on purpose must say "error" on
+  its first line. In YAML, a plain scalar can't contain `: `, so a `run:` command with a colon
+  in it needs a block (`run: |`). Extract the fenced blocks and run them through
   `python3 -m ast`, `node --check`, `tsc`, `rustfmt --check`, `bash -n` and `shellcheck`, the
   PowerShell parser, and `sqlfluff parse`, as fits.
 - **Version gates are stated where a fix needs a recent version** ("Python 3.11+", "Node 17.3+",

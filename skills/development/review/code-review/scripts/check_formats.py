@@ -13,7 +13,8 @@ It parses; it does not format, lint or validate against a schema. Those need the
     toml   tomllib, where Python has it (3.11 and later).
     xml    expat, for well-formedness. A document that declares entities is reported and not
            expanded; external entities are never fetched.
-    yaml   PyYAML's event parser, if PyYAML is importable. The standard library has none.
+    yaml   PyYAML's composer, if PyYAML is importable (the standard library has none); a key
+           repeated in one mapping is an error. Nothing is constructed and aliases are not expanded.
 
 Standard library only. Exit codes: 0 no errors, 1 a file failed (or git failed), 2 usage error.
 """
@@ -122,12 +123,38 @@ def _check_yaml(path: str, data: bytes) -> str:
         raise _Unchecked("no YAML parser in the standard library and PyYAML is not installed; "
                          "use yamllint or the tool that reads the file")
     try:
-        # Events only: nothing is constructed, so tags are never acted on and aliases never expanded.
-        for _ in _yaml.parse(_text(data)):
-            pass
+        # Nodes only: nothing is constructed, so tags are never acted on, and each node is visited
+        # once, so aliases are never expanded.
+        duplicates = [found for document in _yaml.compose_all(_text(data), Loader=_yaml.SafeLoader)
+                      for found in _duplicate_keys(document)]
     except _yaml.YAMLError as error:
         raise ValueError(" ".join(str(error).split())) from None
+    if duplicates:
+        raise ValueError("duplicate key: " + ", ".join(f"{key!r} (line {line})" for key, line in duplicates))
     return ""
+
+
+def _duplicate_keys(root) -> list[tuple[str, int]]:
+    """(key, line) for each key repeated within one mapping. YAML forbids it; PyYAML keeps the last."""
+    found: list[tuple[str, int]] = []
+    seen: set[int] = set()
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node is None or id(node) in seen:
+            continue
+        seen.add(id(node))
+        if isinstance(node, _yaml.MappingNode):
+            keys: set[str] = set()
+            for key, value in node.value:
+                if isinstance(key, _yaml.ScalarNode) and key.value != "<<":  # `<<` is a merge, not a key
+                    if key.value in keys:
+                        found.append((key.value, key.start_mark.line + 1))
+                    keys.add(key.value)
+                stack += [key, value]
+        elif isinstance(node, _yaml.SequenceNode):
+            stack += node.value
+    return sorted(found, key=lambda item: item[1])
 
 
 _CHECKERS = {

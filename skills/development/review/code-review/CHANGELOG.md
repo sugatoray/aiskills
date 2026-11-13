@@ -24,7 +24,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   before they are read, and the report names each tool that ran. XML keeps its full review.
 - `scripts/check_formats.py`: syntax-checks the tool-first formats with Python's standard
   library, reports each file as `ok`, `error` or `unchecked`, and lists the linters on `PATH`.
-  It takes the same flags as the detector, installs nothing and runs no external program.
+  It takes the same flags as the detector, installs nothing and runs no external program. A
+  duplicate key is an error in JSON, TOML and YAML alike.
+- `-p` and `--local` leave out files git ignores, list a vendored folder such as
+  `node_modules/` once instead of file by file, and reject a path that doesn't exist. The text
+  output shows at most 20 names per skipped, filtered or unsupported list; `--json` shows all.
+- `tests/test_reference_code.py`: every Python, JSON, TOML, YAML and shell block in the
+  references parses, unless its first line says it shows an error.
 - `assets/EXAMPLE.md` with example prompts and outputs for each option and a complete report,
   linked from `SKILL.md` and `README.md`.
 

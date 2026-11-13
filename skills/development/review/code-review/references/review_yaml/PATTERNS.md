@@ -37,12 +37,14 @@ config = yaml.safe_load(text)
 
 ```yaml
 # Before: the title is pasted into the script before the shell runs it
-- run: echo "Title: ${{ github.event.pull_request.title }}"
+- run: |
+    echo "Title: ${{ github.event.pull_request.title }}"
 ```
 
 ```yaml
 # After: the shell receives it as data
-- run: echo "Title: $TITLE"
+- run: |
+    echo "Title: $TITLE"
   env:
     TITLE: ${{ github.event.pull_request.title }}
 ```

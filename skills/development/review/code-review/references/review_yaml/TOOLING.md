@@ -12,7 +12,7 @@ the report which tool and version ran, and what could not be checked.
 3. **A standard tool that is already installed** (`yamllint`, `actionlint`,
    `check-jsonschema`).
 4. **The fallback:** `scripts/check_formats.py` in this skill. Python's standard library has
-   no YAML parser, so it checks syntax only when PyYAML happens to be importable, and
+   no YAML parser, so it checks syntax and duplicate keys only when PyYAML happens to be importable, and
    otherwise reports each file as `unchecked`. Say so in the report.
 
 ## Find what the project uses
@@ -28,7 +28,7 @@ git grep -nE 'yaml\.(load|unsafe_load|full_load)\(|Loader=|YAML\.load|load_file|
 
 | Purpose | Command | Notes |
 | --- | --- | --- |
-| Syntax, with nothing installed | `python3 scripts/check_formats.py -l yaml -p <path> -r` | Uses PyYAML's event parser if importable (nothing is constructed), else `unchecked`. Also lists which tools are on `PATH`. |
+| Syntax and duplicate keys, with nothing installed | `python3 scripts/check_formats.py -l yaml -p <path> -r` | Uses PyYAML's composer if importable (nothing is constructed, aliases are not expanded), else `unchecked`. A key repeated in one mapping is an `error`. Also lists which tools are on `PATH`. |
 | Syntax, duplicate keys, truthy values, style | `yamllint -f parsable <path>` | Uses the project's `.yamllint` if present. With none, `-d relaxed` drops most style rules and keeps syntax and duplicate keys. Exit status 1 on an error; `-s` makes warnings fail too. |
 | Formatting | `npx prettier --check "**/*.{yaml,yml}"` | Only if the project uses Prettier. Exit status 1 is a style difference, 2 a file it could not parse. |
 | GitHub workflows | `actionlint` (in the repository), or `actionlint .github/workflows/ci.yml` | Checks expressions, contexts, `needs`, runner labels, and flags untrusted input in `run:` scripts. Runs `shellcheck` on those scripts when it is installed. |

@@ -91,7 +91,7 @@ each option, the options combined, and a complete report.
 | --- | --- |
 | `-l`, `--lang <list>` | Only these languages, comma-separated: `py,js,ts,sh,ps1,html,sql,xml,css,rs,md,json,yaml,toml` or the full names. `-l` alone, or no `-l`, means all. |
 | `-s`, `--security` | Security review alone. |
-| `-p`, `--path <path>` | This file or folder (repeatable). |
+| `-p`, `--path <path>` | This file or folder (repeatable). In a git checkout, ignored files are left out. |
 | `-t`, `--reporoot` | Every tracked file in the repository. |
 | `--local` | The current folder. No short form: `-l` is `--lang`. |
 | `-r`, `--recurse` | With `-p` or `--local`: include subfolders. |
@@ -120,12 +120,14 @@ It names each file from the folder it runs in, so every path opens as printed, i
 files without one. Vendored and generated
 files (`node_modules/`, `dist/`, `target/`, `*.min.js`, `*_pb2.py`, …) are listed as `skipped`,
 lock files likewise, files in other languages as `unsupported`, and files that `--lang` left out
-as `filtered`, so nothing drops out of the review unnoticed.
+as `filtered`, so nothing drops out of the review unnoticed. When `-p` or `--local` walks a folder,
+files git ignores are left out, and a vendored folder is listed once (`node_modules/`) instead of
+file by file; the text output shows the first 20 names of each list and `--json` shows all.
 
 `scripts/check_formats.py` takes the same flags and syntax-checks the tool-first formats with
 Python's standard library: JSON (duplicate keys, `NaN` and `Infinity` are errors), TOML (Python
 3.11 or later), XML (well-formedness; entities are never expanded) and YAML (only when PyYAML
-is importable). Each file is `ok`, `error` or `unchecked`, and the output ends with which
+is importable; a duplicate key is an error). Each file is `ok`, `error` or `unchecked`, and the output ends with which
 linters and validators are on `PATH`. It installs nothing and runs no external program.
 
 ```bash

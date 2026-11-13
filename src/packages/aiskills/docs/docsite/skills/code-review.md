@@ -7,7 +7,7 @@ Runs a thorough, evidence-based code review of a pull request, branch, diff, set
 | Group | `review-skills` (alias `review`) |
 | Version | 1.1.0 |
 | Starts | When you type `/code-review`, or your agent uses it when a task fits its description |
-| Needs | Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
+| Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
 | Source | [skills/development/review/code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/code-review) |
 
@@ -127,5 +127,6 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/code
 - `scripts/detect_languages.py`
 - `tests/test_check_formats.py`
 - `tests/test_detect_languages.py`
+- `tests/test_reference_code.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

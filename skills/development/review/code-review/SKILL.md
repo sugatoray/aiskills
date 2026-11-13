@@ -2,7 +2,7 @@
 name: code-review
 description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
 license: MIT
-compatibility: "Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
+compatibility: "Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
 metadata:
   name: code-review
   type: skill
@@ -57,7 +57,7 @@ language in the current branch's changes, in full.
 | --- | --- |
 | `-l`, `--lang <list>` | Review only these languages: a comma-separated list of names or short forms, such as `py,js,ts,sh,ps1,html,sql,xml,css,rs,md,json,yaml,toml`. `-l` with no list, or no `-l` at all, means every language. |
 | `-s`, `--security` | Security review alone (see "Security-only review" below). |
-| `-p`, `--path <path>` | Review this file or folder. Repeatable. A folder means the files directly in it, unless `-r` is given. |
+| `-p`, `--path <path>` | Review this file or folder. Repeatable. A folder means the files directly in it, unless `-r` is given. In a git checkout, files git ignores are left out. |
 | `-t`, `--reporoot` | Review every tracked file in the repository. |
 | `--local` | Review the files in the current folder. It has no short form: `-l` is `--lang`. |
 | `-r`, `--recurse` | With `-p` or `--local`: include subfolders. |
@@ -97,8 +97,11 @@ python3 scripts/detect_languages.py -t -s                        # the whole rep
 python3 scripts/detect_languages.py src/app.py db/001.sql        # explicit paths
 ```
 
-Run it from the project under review, giving the script's full path. It names every file from
-the folder it runs in, so with `-t` or `--base` in a subfolder a file higher up reads `../x.py`.
+These paths are relative to this skill's folder. Run the script from the project under review,
+by its full path: `python3 <skill-dir>/scripts/detect_languages.py --base origin/main`. It names
+every file from the folder it runs in, so with `-t` or `--base` in a subfolder a file higher up
+reads `../x.py`. A folder that `-p` or `--local` walks leaves out what git ignores, and a vendored
+folder such as `node_modules/` is listed once as `skipped`, not file by file.
 
 For each language it reports, read:
 
