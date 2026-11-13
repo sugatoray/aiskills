@@ -2,7 +2,7 @@
 
 The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ ]` → `[x]`) as work completes, and re-prioritize when new requests change the calculus — this file reflects what's next, not a permanent record (that's what git history is for).
 
-- [ ] Get `a59957b` (Python 3.13 test fix, on `claude/keen-babbage-2khhu9`) onto #215's branch; the owner picks how.
+- [ ] Get `a59957b`, `8179458` and `ec71a5c` (Python 3.13 test fix, scrolls, rename; on `claude/keen-babbage-2khhu9`) onto #215's branch; the owner picks how.
 - [ ] Owner reviews [#215](https://github.com/sugatoray/aiskills/pull/215) and decides on the merge. Not to be merged without being asked.
 - [ ] After #215 merges: rewrite `HANDOFF.md` and the opening note of `SPEC.md` to say the work is on `master`.
 - [ ] Owner decides the `@sugatoray-ai/aiskills` version bump that releases the skill (it sits under `[Unreleased]` at 1.1.0).
@@ -11,7 +11,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] 1.1.0: tool-first XML, JSON, YAML and TOML with `scripts/check_formats.py`; XML keeps its full review.
 - [x] `assets/EXAMPLE.md` with ten examples, linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
 - [x] Set up `src/development/review/` (this scroll set) and the `src/development/meta/review` symlink.
-
 - [x] Make the JSON line-number test pass on Python 3.13 (`a59957b`).
+- [x] Rename the subgroup `reviews` → `review` and the plugin `reviews-skills` → `review-skills` (`ec71a5c`).
 
 Not planned: a captured agent run to replace the sample report in `assets/EXAMPLE.md`. The user declined it; see `GAP_CONTEXT.md`.

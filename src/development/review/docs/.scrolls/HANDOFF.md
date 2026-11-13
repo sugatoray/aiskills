@@ -6,10 +6,10 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 - **Branch `devin/1794523707-code-review-skill`, [#215](https://github.com/sugatoray/aiskills/pull/215):** open into `master`, not merged. It adds the `skills/development/review/` subgroup and its one skill, `/code-review`, at **1.1.0** (the `review-skills` plugin manifest is at the same version). Nothing from this work is on `master`.
 - **Size:** 87 tracked files under `skills/development/review/`, 84 of them in `code-review/`. Fourteen language folders, five files each.
-- **Branch `claude/keen-babbage-2khhu9`:** the PR head (`f17f9bf`) plus one commit, `a59957b`, which fixes a test that failed on Python 3.13 (see "What just happened", item 6). Pushed to `origin`; **not yet on the PR branch**.
+- **Branch `claude/keen-babbage-2khhu9`:** the PR head (`f17f9bf`) plus three commits: `a59957b` (test fix for Python 3.13, item 6), `8179458` (scrolls), `ec71a5c` (rename `reviews` → `review`, item 7). Pushed to `origin`; **not yet on the PR branch**, whose files are still under `reviews/` with the plugin `reviews-skills`.
 - **Checks, all local:** `python3 -m pytest skills/development/review/code-review/tests` passes 43 tests on Python 3.10, 3.11, 3.12 and 3.13 (Linux) with `a59957b`; without it, 42 pass on 3.13. The npm package's `npm test` passed 428. Both `claude plugin validate … --strict` runs passed, and `npx skills add` from the branch installed all 84 files. The repository runs no workflow on pull requests, so these are the only checks behind the PR.
 - **npm package:** still 1.1.0, with the skill under `[Unreleased]` in its `CHANGELOG.md`; its docs, banner and counts say 17 skills in 9 groups. The version bump is the owner's decision.
-- **This folder:** `src/development/review/` and `src/development/meta/review` were created on 2026-11-12 on the same branch. See "What just happened", item 5.
+- **This folder:** `src/development/review/` and `src/development/meta/review` were created on 2026-11-12 as `…/reviews` and renamed on 2026-11-13. See "What just happened", items 5 and 7.
 
 ## What just happened
 
@@ -23,7 +23,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## Known issues / open threads
 
-- **The Python 3.13 fix and the rename are not on #215 yet.** The owner chooses: push it to `devin/1794523707-code-review-skill`, or ask Devin on the PR to apply it.
+- **The Python 3.13 fix and the rename are not on #215 yet.** The owner chooses: push the three commits to `devin/1794523707-code-review-skill` (they apply on its head `f17f9bf` without conflict), or ask Devin on the PR to apply them.
 - **[#215](https://github.com/sugatoray/aiskills/pull/215) awaits the owner's review.** Do not merge it without being asked.
 - **No independent run.** No agent has been invoked with `/code-review` on code it had not seen. What the skill finds on real code is unmeasured (`GAP_ANALYSIS.md`).
 - **One behaviour change in 1.1.0 worth a second look in review:** with `--base`, files are now named from the folder the command runs in, and untracked files are listed from the whole repository. From a subfolder, 1.0.0 printed paths that could not be opened there.
