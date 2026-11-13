@@ -20,9 +20,10 @@ the author most needs to know.>
 
 ## Scope and method
 
+- **Mode:** <Full review | Security-only review (`-s`)>
 - **Reviewed:** <base..head, commit, or file list; number of files and roughly how many lines>
-- **Languages:** <language (n files), …; and files with no language checklist, if any>
-- **Checks run:** <each command and its result, e.g. `pytest -q` — 212 passed; `ruff check` — 3 findings, 1 used below>
+- **Languages:** <language (n files), …; files with no language checklist, if any; and any `--lang` filter with the number of files it left out>
+- **Checks run:** <each command, the tool's version, and its result, e.g. `pytest -q` — 212 passed; `ruff check` — 3 findings, 1 used below; `check_formats.py` — 14 ok, 1 error, 2 unchecked (no YAML parser)>
 - **Not run / not reviewed:** <what you couldn't run or didn't read, and why — or "nothing">
 
 ## Findings

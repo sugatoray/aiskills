@@ -3,6 +3,42 @@
 All notable changes to the `code-review` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-11-12
+
+### Added
+
+- `-l`/`--lang <list>`: review only the named languages, by name or short form
+  (`py,js,ts,sh,ps1,html,sql,xml,css,rs,md,json,yaml,toml`). `-l` alone, or no `-l`, reviews all.
+  Files in a supported language that the list leaves out are reported as `filtered`.
+- `-s`/`--security`: a security review alone. It reads each language's `SECURITY.md` and
+  `WISDOM.md`, runs the security pass only, and says so in the report.
+- Scope options, after `scrolls-setup`: `-p`/`--path` (repeatable), `-t`/`--reporoot`, `--local`
+  and `-r`/`--recurse`, beside the existing `--base`. `--local` has no short form because `-l`
+  is `--lang`.
+- `SECURITY.md` in every language folder: scope, where untrusted data enters, checks, tools, and
+  what the review does not establish.
+- `WISDOM.md` in every language folder, with four sections: Constraints, Traps, Ditches, Wisdom.
+- Seven more languages, each with the five reference files: `review_html/`, `review_css/`,
+  `review_markdown/`, `review_xml/`, `review_json/`, `review_yaml/`, `review_toml/`.
+- Tool-first formats: XML, JSON, YAML and TOML are checked by a parser, formatter or validator
+  before they are read, and the report names each tool that ran. XML keeps its full review.
+- `scripts/check_formats.py`: syntax-checks the tool-first formats with Python's standard
+  library, reports each file as `ok`, `error` or `unchecked`, and lists the linters on `PATH`.
+  It takes the same flags as the detector, installs nothing and runs no external program.
+
+### Changed
+
+- The Security section of each existing `REVIEW.md` now points to that language's `SECURITY.md`
+  instead of repeating it.
+- TypeScript reviews also read `review_javascript/SECURITY.md`.
+- The detector lists lock files (`package-lock.json`, `pnpm-lock.yaml`, `*.lock`, …) and
+  `*.min.css` as `skipped`, and marks each language `tool_first` or not in its JSON output.
+- With `--base`, the detector names files from the folder it runs in, as it does for every other
+  scope, and lists untracked files from the whole repository. In a subfolder it used to name
+  changed files from the repository's top level and miss untracked files outside the folder.
+- `references/REPORT_TEMPLATE.md`: a **Mode** line (full or security-only), the `--lang` filter
+  under **Languages**, and tool versions under **Checks run**.
+
 ## [1.0.0] - 2026-11-12
 
 ### Added

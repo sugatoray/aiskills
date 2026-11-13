@@ -1,10 +1,11 @@
 # SQL review
 
-What to look for in SQL, beyond `../CROSS_LANGUAGE.md`: queries, views, functions and
-procedures, schema definitions and migrations, in `.sql` files and embedded in application
-code or ORM calls. SQL fails differently from other code: a wrong query still returns rows, a
-slow one works in development, and a migration that passes on a test database can lock
-production. `PATTERNS.md` has the fix for the common items, `TOOLING.md` the commands.
+What to look for in SQL, beyond `../CROSS_LANGUAGE.md`: queries, views, functions and procedures,
+schema definitions and migrations, in `.sql` files and embedded in application code or ORM calls.
+SQL fails differently from other code: a wrong query still returns rows, a slow one works in
+development, and a migration that passes on a test database can lock production. `PATTERNS.md` has
+the fix for the common items, `TOOLING.md` the commands, `SECURITY.md` the security scope, and
+`WISDOM.md` the constraints and traps to keep in mind for every review.
 
 ## Before you start
 
@@ -86,32 +87,11 @@ production. `PATTERNS.md` has the fix for the common items, `TOOLING.md` the com
 
 ## Security
 
-- **Injection.** Any statement assembled by concatenating or interpolating values:
-  in application code (f-strings, template literals, `+`, `String.format`), in ORM escape
-  hatches (`raw`, `extra`, `text`, `$queryRawUnsafe`, `whereRaw`), and inside stored
-  procedures that build dynamic SQL (`EXEC(@sql)`, `EXECUTE IMMEDIATE`, `EXECUTE '…' || x`).
-  Use bound parameters everywhere; in dynamic SQL use `sp_executesql` with parameters,
-  `EXECUTE … USING`, and `format()` with `%I`/`%L` or `quote_ident`/`QUOTENAME` for
-  identifiers.
-- **Identifiers can't be bound.** A table, column or sort direction that comes from input
-  must be checked against an allow-list in code.
-- **Privileges.** `GRANT ALL`, grants to `PUBLIC`, the application connecting as the schema
-  owner or a superuser, migrations and the application sharing one role. The application role
-  needs data access, not DDL.
-- **`SECURITY DEFINER` functions (PostgreSQL)** without a fixed `search_path`: a caller can
-  shadow the objects the function refers to. Same idea for `EXECUTE AS OWNER` (SQL Server) and
-  definer-rights views and procedures in MySQL and Oracle: check what the elevated code lets a
-  caller reach.
-- **Row-level access.** Multi-tenant or per-user data protected only by a `WHERE` the
-  application remembers to add; views that expose more columns or rows than their users should
-  see; row-level security enabled but bypassed by the table owner.
-- **Sensitive data:** passwords stored unhashed or with a fast hash; secrets, tokens,
-  personal data in plain columns, in logs or audit tables, or in `INSERT` statements checked
-  into the repository (seed and fixture files); production data in test fixtures.
-- **Credentials** in connection strings, migration files or scripts.
-- **Unbounded queries reachable by users:** no `LIMIT`, user-controlled `LIMIT`/`OFFSET`
-  with no cap, `LIKE '%…%'` on large tables, expensive queries without a statement timeout.
-- **Error text returned to clients** that includes the SQL or schema details.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: statements assembled from strings (in application code, ORM
+escape hatches and dynamic SQL), identifiers taken from input, over-broad grants,
+`SECURITY DEFINER` without a fixed `search_path`, a missing tenant or owner predicate, and
+sensitive data or credentials in seed and migration files.
 
 ## Performance
 

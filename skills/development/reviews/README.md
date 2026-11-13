@@ -10,7 +10,7 @@ failure each one causes, and a suggested code change wherever a fix is clear.
 
 | Skill | Purpose |
 | --- | --- |
-| [`/code-review`](code-review/) | Reviews code in Python, JavaScript, TypeScript, Rust, shell scripts, PowerShell and SQL (other languages get the cross-language review), with a checklist, fix patterns and tool commands per language. Verifies each finding before reporting it. Suggests changes; applies them only when asked. |
+| [`/code-review`](code-review/) | Reviews code in Python, JavaScript, TypeScript, Rust, shell scripts, PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML (other languages get the cross-language review), with a checklist, fix patterns, tool commands, security scope and review wisdom per language. `-l` limits it to chosen languages, `-s` runs a security review alone, and `-p`, `-t`, `--local`, `-r` and `--base` choose the files. XML, JSON, YAML and TOML are checked with tools first. Verifies each finding before reporting it. Suggests changes; applies them only when asked. |
 
 More skills will be added under this folder over time (for example design-document review or
 security-focused review), following the same layout as `code-review/`.

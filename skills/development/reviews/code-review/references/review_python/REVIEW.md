@@ -1,7 +1,8 @@
 # Python review
 
 What to look for in Python code, beyond `../CROSS_LANGUAGE.md`. Each item says why it matters;
-`PATTERNS.md` has the fix for the common ones, `TOOLING.md` the commands.
+`PATTERNS.md` has the fix for the common ones, `TOOLING.md` the commands, `SECURITY.md` the
+security scope, and `WISDOM.md` the constraints and traps to keep in mind for every review.
 
 ## Before you start
 
@@ -96,36 +97,10 @@ What to look for in Python code, beyond `../CROSS_LANGUAGE.md`. Each item says w
 
 ## Security
 
-- **`eval`, `exec`, `compile`, `__import__` or `importlib.import_module` on input.** For
-  literals use `ast.literal_eval`; otherwise parse the input.
-- **`pickle`, `marshal`, `shelve`, `joblib.load`, `torch.load` (without `weights_only=True`),
-  `numpy.load(allow_pickle=True)` on data from outside the trust boundary:** arbitrary code
-  execution. Use JSON or a schema-validated format.
-- **`yaml.load` without `Loader=yaml.SafeLoader`** (use `yaml.safe_load`).
-- **Shell injection.** `subprocess.*(…, shell=True)`, `os.system`, `os.popen` with any
-  interpolated value. Pass an argument list without `shell=True`; if a shell is unavoidable,
-  `shlex.quote` every interpolated piece.
-- **SQL built with f-strings, `%` or `.format`.** Use the driver's placeholders; identifiers
-  that can't be bound come from an allow-list.
-- **Path traversal.** `os.path.join(base, user_value)` discards `base` when `user_value` is
-  absolute, and `..` walks out. Resolve, then check containment
-  (`resolved.is_relative_to(base)`, 3.9+).
-- **Archive extraction.** `tarfile.extractall()` on an untrusted archive can write outside the
-  target; pass `filter="data"` (3.12, and backported to earlier security releases). Check member
-  names for `zipfile` too on old versions, and cap total extracted size.
-- **`random` for tokens, passwords, reset links or session IDs.** Use `secrets`.
-- **Hashing.** MD5/SHA-1 for security; a fast hash for passwords. Use `hashlib.scrypt`,
-  `argon2-cffi` or `bcrypt`; compare secrets with `hmac.compare_digest`.
-- **TLS switched off:** `verify=False`, `ssl._create_unverified_context`,
-  `check_hostname = False`.
-- **XML from untrusted sources** parsed with the standard library; use `defusedxml`.
-- **`tempfile.mktemp`** (race between naming and opening). Use `mkstemp` or
-  `NamedTemporaryFile`.
-- **Template rendering with autoescape off,** or `Markup`/`mark_safe`/`|safe` on user input.
-- **Requests to a user-supplied URL** with no allow-list (SSRF), and redirects followed blindly.
-- **Secrets** in source, defaults, test fixtures, logs, exception messages or `repr` output.
-- **Web frameworks:** `DEBUG = True` or a hard-coded `SECRET_KEY`; raw queries; a missing
-  permission check on a view; CSRF exemption; mass assignment from request data into a model.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: `eval`, `pickle` and `yaml.load` on input, `shell=True` and
+SQL built from strings, path traversal and archive extraction, `random` used for tokens,
+`verify=False`, and secrets in source or logs.
 
 ## Types
 

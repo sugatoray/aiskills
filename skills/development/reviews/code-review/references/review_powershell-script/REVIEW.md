@@ -2,9 +2,10 @@
 
 What to look for in PowerShell scripts and modules (`.ps1`, `.psm1`, `.psd1`), beyond
 `../CROSS_LANGUAGE.md`, including PowerShell embedded in pipeline YAML. PowerShell looks like a
-shell and behaves like a .NET language with its own rules for errors, output and collections:
-most serious findings come from one of those three. `PATTERNS.md` has the fix for the common
-items, `TOOLING.md` the commands.
+shell and behaves like a .NET language with its own rules for errors, output and collections: most
+serious findings come from one of those three. `PATTERNS.md` has the fix for the common items,
+`TOOLING.md` the commands, `SECURITY.md` the security scope, and `WISDOM.md` the constraints and
+traps to keep in mind for every review.
 
 ## Before you start
 
@@ -164,36 +165,11 @@ items, `TOOLING.md` the commands.
 
 ## Security
 
-- **`Invoke-Expression` (`iex`)** on anything containing a variable: command injection. Also
-  `[scriptblock]::Create($string)`, `Add-Type` with interpolated source,
-  `powershell -Command "… $var …"`, `Start-Process` with a constructed argument string, and
-  `& $userSuppliedPath`. Call commands directly with arguments as an array or splat.
-- **Download and run:** `iex (iwr …)`, `Invoke-RestMethod … | Invoke-Expression`, or
-  installing from an unpinned URL. Download to a file, verify the hash (`Get-FileHash`) or
-  signature (`Get-AuthenticodeSignature`), then run.
-- **Credentials in the script:** passwords or tokens as literals, as plain `[string]`
-  parameters, in `ConvertTo-SecureString -AsPlainText -Force` with a literal, or in command-line
-  arguments (visible in process listings and logs). Take `[pscredential]`, read from a vault
-  (SecretManagement, the CI system's secret store) or environment at run time.
-- **Secrets leaking** into transcripts, `Write-Verbose`/`Write-Host`, error messages,
-  `$PSBoundParameters` dumps, or `Export-Clixml` on non-Windows (where `SecureString` is not
-  encrypted at rest).
-- **TLS weakened:** `-SkipCertificateCheck`,
-  `[Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }`, forcing old
-  protocol versions. (5.1 may need TLS 1.2 enabled explicitly; that is fine.)
-- **Execution policy and signing bypassed:** `Set-ExecutionPolicy Bypass`/`Unrestricted` in
-  a script, `-ExecutionPolicy Bypass` baked into scheduled tasks, `Unblock-File` on downloads.
-- **Injection into query strings:** `-Filter` for Active Directory/LDAP, WQL in
-  `Get-CimInstance -Query`, SQL in `Invoke-Sqlcmd -Query` built by string interpolation. Escape
-  or parameterise (`-Variable`/`SqlParameter`).
-- **Paths from input** used with `Remove-Item -Recurse -Force`, `Copy-Item`, `Expand-Archive`:
-  validate, resolve and check containment; guard against an empty variable making the path a
-  drive root.
-- **Privilege.** `#Requires -RunAsAdministrator` where needed and nowhere else; no
-  self-elevation with a constructed command line; scheduled tasks and services not run as
-  SYSTEM by default.
-- **Remoting:** `-Authentication Basic` over HTTP, `CredSSP`, `TrustedHosts = '*'`,
-  unconstrained endpoints.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: `Invoke-Expression` and other ways of running a constructed
+string, download-and-run, credentials as literals or plain `[string]` parameters, secrets in
+transcripts and verbose output, `-SkipCertificateCheck`, execution-policy bypass, and
+`Remove-Item -Recurse -Force` on a path from input.
 
 ## Performance
 

@@ -1,9 +1,10 @@
 # Rust review
 
-What to look for in Rust code, beyond `../CROSS_LANGUAGE.md`. The compiler already rules out
-data races in safe code, use-after-free and null dereferences, so the review goes to what it
-can't see: panics, logic, `unsafe`, async behaviour, API shape and cost. `PATTERNS.md` has the
-fix for the common items, `TOOLING.md` the commands.
+What to look for in Rust code, beyond `../CROSS_LANGUAGE.md`. The compiler already rules out data
+races in safe code, use-after-free and null dereferences, so the review goes to what it can't see:
+panics, logic, `unsafe`, async behaviour, API shape and cost. `PATTERNS.md` has the fix for the
+common items, `TOOLING.md` the commands, `SECURITY.md` the security scope, and `WISDOM.md` the
+constraints and traps to keep in mind for every review.
 
 ## Before you start
 
@@ -154,25 +155,10 @@ Review every line of `unsafe` as if a memory-safety bug is present until shown o
 
 ## Security
 
-- **`unsafe`** (above) is the main source of memory-safety vulnerabilities.
-- **Untrusted sizes:** a length read from input used to allocate (`Vec::with_capacity(n)`,
-  `vec![0; n]`) or to index, with no upper bound; arithmetic on it that can overflow.
-- **Deserialisation of untrusted data:** no limit on size, depth or collection length;
-  `#[serde(deny_unknown_fields)]` where strictness matters; untagged enums accepting more than
-  intended.
-- **Path traversal:** `base.join(user_path)` replaces `base` entirely when `user_path` is
-  absolute, and `..` escapes. Canonicalise and check `starts_with(base)`.
-- **Command execution:** `Command::new("sh").arg("-c").arg(format!(…))` reintroduces shell
-  injection; even without a shell, user input starting with `-` is an option to the program.
-- **SQL built with `format!`.** Use bound parameters (`sqlx::query!`, `.bind`, diesel's DSL).
-- **Secrets:** printed through `Debug`/`Display`, kept in `String` after use (consider
-  `zeroize`/`secrecy`), compared with `==` (use `subtle::ConstantTimeEq` or the crypto
-  library's verify).
-- **TLS verification disabled** (`danger_accept_invalid_certs(true)` and similar).
-- **Randomness:** a non-cryptographic generator or a fixed seed for tokens and keys.
-- **Dependencies:** new crates checked (`cargo audit`, `cargo deny`), `build.rs` and proc-macro
-  crates run code at build time, `git` dependencies pinned to a revision, `Cargo.lock`
-  committed for binaries.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: `unsafe` and FFI (above), panics and unbounded allocation
+reachable from input, `base.join(user_path)`, commands and SQL built with `format!`, secrets
+printed through `Debug`, TLS verification disabled, and new crates or build scripts.
 
 ## Performance
 

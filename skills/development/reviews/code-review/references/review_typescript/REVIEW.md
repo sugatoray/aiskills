@@ -2,7 +2,9 @@
 
 What the type system adds to a review. TypeScript is JavaScript at run time, so read
 `../review_javascript/REVIEW.md` as well: everything there (async, security, Node, browser)
-applies unchanged. `PATTERNS.md` has the fix for the common items, `TOOLING.md` the commands.
+applies unchanged. `PATTERNS.md` has the fix for the common items, `TOOLING.md` the commands,
+`SECURITY.md` the security scope, and `WISDOM.md` the constraints and traps to keep in mind for
+every review.
 
 The question behind most items here: **does the type say what is true at run time?** Types are
 erased when the code is compiled. A type that is wrong is worse than no type, because the

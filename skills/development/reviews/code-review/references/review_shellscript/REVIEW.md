@@ -1,10 +1,11 @@
 # Shell script review
 
 What to look for in shell scripts (`sh`, `bash`, `zsh`, `ksh`), beyond `../CROSS_LANGUAGE.md`,
-including shell embedded in CI workflows, Dockerfiles, Makefiles and `package.json` scripts.
-Shell fails quietly and expands eagerly: most serious findings are an unquoted expansion, an
-unchecked failure, or input reaching `eval`. `PATTERNS.md` has the fix for the common items,
-`TOOLING.md` the commands.
+including shell embedded in CI workflows, Dockerfiles, Makefiles and `package.json` scripts. Shell
+fails quietly and expands eagerly: most serious findings are an unquoted expansion, an unchecked
+failure, or input reaching `eval`. `PATTERNS.md` has the fix for the common items, `TOOLING.md`
+the commands, `SECURITY.md` the security scope, and `WISDOM.md` the constraints and traps to keep
+in mind for every review.
 
 ## Before you start
 
@@ -98,27 +99,11 @@ unchecked failure, or input reaching `eval`. `PATTERNS.md` has the fix for the c
 
 ## Security
 
-- **Command injection** through any of the re-parsing forms above, with a value from
-  arguments, environment, file names, file contents, network responses or CI inputs (in GitHub
-  Actions, `${{ github.event.* }}` interpolated into a `run:` block: pass it through `env:`).
-- **`curl … | sh`, `wget -O- … | bash`,** or downloading and executing without verifying a
-  checksum or signature, over anything but HTTPS, or from a mutable URL (a branch, `latest`).
-- **Secrets on the command line** are visible to every local user through `ps` and end up in
-  shell history and CI logs: pass them by environment variable, file or stdin. `set -x`
-  prints them too; switch tracing off around them.
-- **Temp files with predictable names** (`/tmp/out.$$`, `/tmp/myscript.tmp`): symlink attacks
-  and collisions. Use `mktemp` (and `mktemp -d`), with a restrictive `umask` for sensitive data.
-- **Permissions:** `chmod 777`, world-writable directories, secrets written before
-  permissions are tightened, files created as root in a user's directory.
-- **`sudo` inside the script,** especially with a constructed command; scripts run as root
-  that read files or `PATH` entries a non-root user can modify.
-- **Trusting `PATH` and the environment** in privileged or cron scripts: set `PATH`
-  explicitly; don't `source` files from the working directory.
-- **Unvalidated input in paths, arithmetic and tests:** `$(( user_value ))` and
-  `[[ $x -eq $user_value ]]` evaluate arbitrary expressions, including array subscripts that
-  run commands.
-- **`rm -rf`, `mv`, `chown -R`, `git clean`, `dd`, `mkfs`** with computed arguments: check the
-  value, and prefer a dry-run flag for anything destructive.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: command injection through the re-parsing forms above
+(`eval`, `sh -c`, unquoted expansions, CI `${{ }}` interpolation), `curl … | sh`, secrets on
+command lines and in `set -x` output, predictable temp files, `sudo` and untrusted `PATH`,
+and `rm -rf` with a computed argument.
 
 ## Portability
 

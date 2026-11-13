@@ -1,13 +1,13 @@
 ---
 name: code-review
-description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell and SQL, each with its own checklist, before/after fix patterns and tool commands under references/review_<language>/; files in other languages get the cross-language review only. Use this whenever the user asks to review code, review a PR or merge request, do a code review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
+description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
 license: MIT
-compatibility: "Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
+compatibility: "Read access to the code under review. git for diff-based scope. python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
 metadata:
   name: code-review
   type: skill
   author: sugatoray
-  version: "1.0.0"
+  version: "1.1.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/reviews/code-review"
 ---
 
@@ -46,6 +46,26 @@ they do differently:
 - **Approve when it's good.** The goal is code health improving over time, not perfection. If the
   change is sound, say so plainly and keep the nits few and marked as optional.
 
+## Options
+
+`/code-review [scope] [-l <languages>] [-s]`. With no option it reviews every supported
+language in the current branch's changes, in full.
+
+| Option | Meaning |
+| --- | --- |
+| `-l`, `--lang <list>` | Review only these languages: a comma-separated list of names or short forms, such as `py,js,ts,sh,ps1,html,sql,xml,css,rs,md,json,yaml,toml`. `-l` with no list, or no `-l` at all, means every language. |
+| `-s`, `--security` | Security review alone (see "Security-only review" below). |
+| `-p`, `--path <path>` | Review this file or folder. Repeatable. A folder means the files directly in it, unless `-r` is given. |
+| `-t`, `--reporoot` | Review every tracked file in the repository. |
+| `--local` | Review the files in the current folder. It has no short form: `-l` is `--lang`. |
+| `-r`, `--recurse` | With `-p` or `--local`: include subfolders. |
+| `--base <ref>` | Review what changed against this git ref, plus untracked files. |
+
+Use at most one of `-p`, `-t` and `--local`. `-l`, `-s` and `-r` combine with any of them, so
+`/code-review -p src -r -l py,sql -s` is a security review of the Python and SQL under `src/`.
+Both scripts take the same flags, so pass the user's options through unchanged. When the user
+describes the scope in words instead, map it to these options.
+
 ## Workflow
 
 ### 1. Fix the scope
@@ -55,9 +75,9 @@ Decide exactly what is under review before reading any code:
 | The user gave you | Review |
 | --- | --- |
 | A PR or merge request | Its diff against the base branch, plus its description, linked issues and existing review comments |
-| A branch, or "my changes" | `git diff --merge-base <base>` plus uncommitted and untracked files |
-| Files or a folder | Those files in full |
-| "The repo" or "the codebase" | Everything tracked, minus vendored and generated code; for a large repo, agree on a priority order first (entry points, auth, data access, money, public API) and say what you didn't reach |
+| A branch, or "my changes" (`--base <ref>`) | `git diff --merge-base <base>` plus uncommitted and untracked files |
+| Files or a folder (`-p`, `--local`, with `-r` for subfolders) | Those files in full |
+| "The repo" or "the codebase" (`-t`) | Everything tracked, minus vendored and generated code; for a large repo, agree on a priority order first (entry points, auth, data access, money, public API) and say what you didn't reach |
 
 If nothing is named, review the current branch against the default branch plus uncommitted work.
 If that is empty too, ask what to review. Read the PR description, linked issue and commit
@@ -65,42 +85,60 @@ messages: a review needs to know what the change is *for*.
 
 ### 2. Detect the languages and load their references
 
-Run the detector on the files in scope. It lists each supported language, its files, and the
-reference files to read:
+Run the detector on the files in scope. It lists each language, its files, and the reference
+files to read:
 
 ```bash
-python3 scripts/detect_languages.py --base origin/main      # changed files in a git checkout
-python3 scripts/detect_languages.py src/app.py db/001.sql   # explicit paths
-git ls-files | python3 scripts/detect_languages.py -        # a whole repository
+python3 scripts/detect_languages.py --base origin/main           # changed files in a git checkout
+python3 scripts/detect_languages.py -p src -r -l py,sql          # Python and SQL under src/
+python3 scripts/detect_languages.py -t -s                        # the whole repository, security only
+python3 scripts/detect_languages.py src/app.py db/001.sql        # explicit paths
 ```
+
+Run it from the project under review, giving the script's full path. It names every file from
+the folder it runs in, so with `-t` or `--base` in a subfolder a file higher up reads `../x.py`.
 
 For each language it reports, read:
 
-- `references/review_<language>/REVIEW.md` — always, before reviewing that language's files. The
+- `references/review_<language>/WISDOM.md` — first, and for every review. Constraints the
+  review must stay within, traps in the language, ditches a review falls into, and the
+  judgement that keeps it on the road.
+- `references/review_<language>/REVIEW.md` — before reviewing that language's files. The
   checklist of what to look for and why.
+- `references/review_<language>/SECURITY.md` — for the security pass in step 5. The
+  language's security scope: where untrusted data enters, what to check, which tools help,
+  and what the review does not establish.
 - `references/review_<language>/PATTERNS.md` — when you write suggested changes. Before/after
   pairs for the fixes that come up most.
 - `references/review_<language>/TOOLING.md` — before running any linter, type checker or test.
 
-| Language | Folder | Files |
-| --- | --- | --- |
-| Python | `references/review_python/` | `.py`, `.pyi` |
-| JavaScript | `references/review_javascript/` | `.js`, `.mjs`, `.cjs`, `.jsx` |
-| TypeScript | `references/review_typescript/` (and the JavaScript `REVIEW.md`) | `.ts`, `.tsx`, `.mts`, `.cts` |
-| Rust | `references/review_rust/` | `.rs` |
-| Shell (sh, bash, zsh, ksh) | `references/review_shellscript/` | `.sh`, `.bash`, `.zsh`, `.ksh` |
-| PowerShell | `references/review_powershell-script/` | `.ps1`, `.psm1`, `.psd1` |
-| SQL | `references/review_sql/` | `.sql` |
+| Language | `--lang` value | Folder | Files |
+| --- | --- | --- | --- |
+| Python | `python`, `py` | `references/review_python/` | `.py`, `.pyi` |
+| JavaScript | `javascript`, `js` | `references/review_javascript/` | `.js`, `.mjs`, `.cjs`, `.jsx` |
+| TypeScript | `typescript`, `ts` | `references/review_typescript/` (and the JavaScript `REVIEW.md` and `SECURITY.md`) | `.ts`, `.tsx`, `.mts`, `.cts` |
+| Rust | `rust`, `rs` | `references/review_rust/` | `.rs` |
+| Shell (sh, bash, zsh, ksh) | `shellscript`, `sh` | `references/review_shellscript/` | `.sh`, `.bash`, `.zsh`, `.ksh` |
+| PowerShell | `powershell-script`, `ps1` | `references/review_powershell-script/` | `.ps1`, `.psm1`, `.psd1` |
+| SQL | `sql` | `references/review_sql/` | `.sql` |
+| HTML | `html` | `references/review_html/` | `.html`, `.htm` |
+| CSS | `css` | `references/review_css/` | `.css`, `.scss`, `.less` |
+| Markdown | `markdown`, `md` | `references/review_markdown/` | `.md`, `.markdown` |
+| XML (tool-first) | `xml` | `references/review_xml/` | `.xml`, `.xsd`, `.xsl`, `.xslt` |
+| JSON (tool-first) | `json` | `references/review_json/` | `.json`, `.jsonc`, `.json5` |
+| YAML (tool-first) | `yaml`, `yml` | `references/review_yaml/` | `.yaml`, `.yml` |
+| TOML (tool-first) | `toml` | `references/review_toml/` | `.toml` |
 
 Read only the folders for languages that are present. The detector goes by file extension and
 `#!` line, so also look for code embedded in other files and load that language's references too:
 SQL inside application strings or ORM calls, shell inside CI workflows, Dockerfiles and
 Makefiles, PowerShell inside pipeline YAML.
 
-Files the detector lists as `unsupported` (Go, Java, YAML, and so on) still get the
+Files the detector lists as `unsupported` (Go, Java, Dockerfiles, and so on) still get the
 cross-language review in step 5; say in the report that no language checklist was applied to
-them. Files it lists as `skipped` are vendored or generated: don't review them, but do flag one
-that was edited by hand.
+them. Files it lists as `skipped` are vendored, generated or lock files: don't review them, but
+do flag one that was edited by hand. Files it lists as `filtered` are in a supported language
+that `--lang` left out: don't review them, and name the filter in the report.
 
 ### 3. Build context
 
@@ -124,6 +162,30 @@ command and its result. Rules:
   it, touches a real database, or needs credentials, unless the user says to.
 - A tool's output is a lead, not a finding. Confirm it in the code and judge whether it matters.
 - If you couldn't run something, say so in the report. Don't imply checks you didn't make.
+
+**Tool-first formats.** XML, JSON, YAML and TOML are marked `tool-first` by the detector. A
+parser, formatter or schema validator judges their syntax, formatting and validity better and
+far more cheaply than reading does, so for these:
+
+1. Run the syntax check, which needs nothing installed, on the same scope:
+
+   ```bash
+   python3 scripts/check_formats.py -p config -r      # same flags as the detector
+   ```
+
+   It reports each file as `ok`, `error` or `unchecked`, and lists which linters and validators
+   are on `PATH`. It parses only: it never installs, formats, fetches or expands entities.
+2. Run the further checks in the language's `TOOLING.md`, in its order of preference: the
+   tool that reads the file, then the project's own linter configuration, then a standard
+   tool that is already installed.
+3. Report each tool that ran, with its version and result. `unchecked` is not `ok`: YAML has
+   no parser in Python's standard library, and TOML has one only from Python 3.11, so name
+   the files that nothing parsed.
+4. Then read for what no tool judges: a wrong value, a compatibility break, a dangerous
+   setting, a secret. A parse `error` is a finding; confirm it and rate it like any other.
+
+Tool-first changes the order of work, not the depth. XML keeps its full review: every section
+of `references/review_xml/REVIEW.md` and `SECURITY.md` still applies after the tools have run.
 
 ### 5. Review in passes
 
@@ -182,6 +244,22 @@ least severe, each with location, problem, impact, suggested change and confiden
 template's section order so reports are comparable from one review to the next. Give the report
 in the chat by default; write it to a file only when the user asks for one or the review is too
 long to read comfortably in a message.
+
+## Security-only review
+
+With `-s`/`--security`, or when the user asks for a security review alone:
+
+- The detector lists only `SECURITY.md` and `WISDOM.md` for each language (and the JavaScript
+  `SECURITY.md` for TypeScript). Read those, and the Security section of
+  `references/CROSS_LANGUAGE.md`.
+- Steps 1 to 4 are unchanged: scope, context and the project's own checks matter as much. In
+  step 4 run the commands under "Tools" in each `SECURITY.md`.
+- In step 5 do the security pass only, across the whole scope. Follow untrusted data from where
+  it enters to where it is used. Report a correctness or reliability defect only when it has a
+  security consequence.
+- Steps 6 to 8 are unchanged. Open the report's summary by saying it is a security-only review,
+  and copy what applies from each "What this review does not establish" list into "Not run /
+  not reviewed". A clean result means no finding in what was read; it is not an audit.
 
 ## What this skill doesn't do
 

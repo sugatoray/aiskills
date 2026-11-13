@@ -27,8 +27,12 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   request, branch, diff, set of files or whole repository at a senior or staff
   engineer's bar, and returns a structured report: a verdict, findings ranked
   by severity with file and line, and suggested code changes. It ships a
-  checklist, fix patterns and tool commands for Python, JavaScript,
-  TypeScript, Rust, shell scripts, PowerShell and SQL. The package now bundles
+  checklist, fix patterns, tool commands, a security scope and review wisdom
+  for Python, JavaScript, TypeScript, Rust, shell scripts, PowerShell, SQL,
+  HTML, CSS, Markdown, XML, JSON, YAML and TOML. Options choose the languages
+  (`-l`), the files (`-p`, `-t`, `--local`, `-r`, `--base`) and a
+  security-only review (`-s`); XML, JSON, YAML and TOML are checked with
+  tools first. The package now bundles
   17 skills in 9 groups: `aiskills install -s code-review`, or
   `aiskills install -G reviews`. See the skill's own `CHANGELOG.md`.
 

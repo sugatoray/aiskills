@@ -2,7 +2,8 @@
 
 What to look for in JavaScript (Node.js and browser), beyond `../CROSS_LANGUAGE.md`. TypeScript
 reviews read this file too; `../review_typescript/REVIEW.md` adds what the type system changes.
-`PATTERNS.md` has the fix for the common items, `TOOLING.md` the commands.
+`PATTERNS.md` has the fix for the common items, `TOOLING.md` the commands, `SECURITY.md` the
+security scope, and `WISDOM.md` the constraints and traps to keep in mind for every review.
 
 ## Before you start
 
@@ -104,33 +105,11 @@ reviews read this file too; `../review_typescript/REVIEW.md` adds what the type 
 
 ## Security
 
-- **`eval`, `new Function`, `setTimeout`/`setInterval` with a string, `vm` used as a sandbox.**
-- **XSS.** Untrusted data into `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
-  `document.write`, React's `dangerouslySetInnerHTML`, Vue's `v-html`, or a `href`/`src` that
-  may be `javascript:`. Use `textContent`, framework escaping, or a sanitiser (DOMPurify).
-- **Prototype pollution.** Recursive merge, `Object.assign` or path-based `set` over parsed
-  user JSON without rejecting `__proto__`, `constructor` and `prototype`.
-- **Command injection.** `child_process.exec`/`execSync` with interpolated input. Use
-  `execFile`/`spawn` with an argument array and no `shell: true`.
-- **Path traversal.** `path.join(base, userValue)` then reading or serving the result. Resolve
-  it and check it is still inside `base`.
-- **SQL and NoSQL injection.** Template strings in queries; request bodies passed straight into
-  MongoDB filters (`{ "$gt": "" }` as a password). Use placeholders; coerce or validate types.
-- **ReDoS.** A regular expression with nested quantifiers (`(a+)+`, `(.*)*`) run on user input,
-  or a `RegExp` built from user input unescaped.
-- **`Math.random()` for tokens, IDs or passwords.** Use `crypto.randomUUID()`,
-  `crypto.randomBytes()` or `crypto.getRandomValues()`.
-- **Secret comparison with `===`.** Use `crypto.timingSafeEqual` on equal-length buffers.
-- **JWT:** `decode` used where `verify` is needed; algorithm not pinned; no expiry check.
-- **Secrets shipped to the browser:** keys in client bundles, in `NEXT_PUBLIC_`/`VITE_`
-  variables, or in source maps.
-- **Web:** permissive CORS (`*` with credentials, origin reflected), cookies without
-  `HttpOnly`/`Secure`/`SameSite`, missing CSRF protection on cookie-authenticated writes, open
-  redirects, `postMessage` handlers that don't check `event.origin`, `target="_blank"` without
-  `rel="noopener"` on old browsers.
-- **Request size and rate:** body parser with no limit, unbounded pagination, uploads to memory.
-- **Dependencies.** Lock file committed and in step with `package.json`; `npm ci` in CI; a new
-  package checked for typosquatting, install scripts and maintenance.
+Read `SECURITY.md` for the full scope; it is part of every full review. The items that most
+often matter in ordinary review: untrusted data into `innerHTML` and its relatives,
+`child_process.exec` and queries built from template strings, prototype pollution in merges,
+path traversal, `Math.random()` for tokens, secrets shipped to the browser, and a route
+missing its authorisation check.
 
 ## Node.js
 
