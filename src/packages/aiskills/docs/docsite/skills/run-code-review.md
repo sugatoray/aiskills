@@ -5,8 +5,8 @@ Runs a thorough, evidence-based code review of a pull request, branch, diff, set
 | Property | Value |
 | --- | --- |
 | Group | `review-skills` (alias `review`) |
-| Version | 1.2.0 |
-| Starts | When you type `/run-code-review`, or your agent uses it when a task fits its description |
+| Version | 1.3.0 |
+| Starts | When you ask for it: you type `/run-code-review` (your agent doesn't start it on its own) |
 | Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
 | Source | [skills/development/review/run-code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review) |
@@ -131,6 +131,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `scripts/render_report.py`
 - `tests/test_check_formats.py`
 - `tests/test_detect_languages.py`
+- `tests/test_invocation.py`
 - `tests/test_reference_code.py`
 - `tests/test_render_report.py`
 - `tests/test_report_page.py`

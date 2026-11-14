@@ -18,6 +18,15 @@ they are listed under **Changed** or **Removed** with a note.
 This file covers the package and its `aiskills` CLI. Each bundled skill keeps
 its own `CHANGELOG.md` inside its folder under `skills/`.
 
+## [Unreleased]
+
+### Changed
+
+- **Bundled skill `run-code-review` 1.3.0:** `/run-code-review` now starts
+  only when you type it, like the scrolls skills (`disable-model-invocation:
+  true`). Asking your agent to review code no longer starts it on its own. The
+  skill's docs page says so.
+
 ## [1.2.0] - 2026-11-13
 
 ### Added

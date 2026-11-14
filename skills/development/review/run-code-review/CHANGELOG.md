@@ -3,6 +3,20 @@
 All notable changes to the `run-code-review` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-11-13
+
+### Changed
+
+- `/run-code-review` now runs only when invoked by name, like the scrolls skills. `SKILL.md` sets
+  `disable-model-invocation: true`, and `agents/openai.yaml` and `agents/claude-code.yaml` set
+  `allow_implicit_invocation: false`. Asking an agent to "review this code" no longer starts it;
+  type `/run-code-review`. The description is no longer loaded into every session, which saves
+  about 350 tokens.
+
+### Added
+
+- `tests/test_invocation.py` checks both settings.
+
 ## [1.2.0] - 2026-11-13
 
 ### Added
