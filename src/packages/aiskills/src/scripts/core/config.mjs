@@ -1,4 +1,4 @@
-// `aiskills config`: persistent defaults, like `git config`.
+// `aiskills config`: persistent defaults and aliases, like `git config`.
 //
 // Two JSON files, each a flat object of key: value:
 //   user     ~/.config/sugatoray/aiskills.json   (aiskills config --global, the default)
@@ -32,8 +32,16 @@ export const CONFIG_KEYS = {
 
 const orList = (values) => (values.length === 2 ? values.join(" or ") : `${values.slice(0, -1).join(", ")} or ${values.at(-1)}`);
 
-/** Throws for a key that isn't one of CONFIG_KEYS. */
+/** alias.<name>: `aiskills <name> ...` runs the command it stands for, like `git config alias.*`. */
+const ALIAS = { env: null, kind: "alias", about: "a command and options that `aiskills <name>` runs" };
+export const isAliasKey = (key) => typeof key === "string" && key.startsWith("alias.") && key.length > 6;
+
+/** Throws for a key that isn't one of CONFIG_KEYS or alias.<name>. */
 export function assertConfigKey(key) {
+  if (isAliasKey(key)) {
+    if (!/^[a-z][a-z0-9-]*$/.test(key.slice(6))) throw new Error(`${key}: alias names are lowercase letters, digits and dashes, starting with a letter`);
+    return ALIAS;
+  }
   if (!Object.hasOwn(CONFIG_KEYS, key)) throw new Error(`unknown config key: ${key} (keys: ${Object.keys(CONFIG_KEYS).sort().join(", ")})`);
   return CONFIG_KEYS[key];
 }
@@ -52,6 +60,12 @@ export function parseConfigValue(key, raw) {
     if (!k.values.includes(low)) throw new Error(`${key} must be ${orList(k.values)}; got '${v}'`);
     return low;
   }
+  if (k.kind === "alias") {
+    if (v.startsWith("!")) throw new Error(`${key}: shell aliases (!...) aren't supported; an alias runs an aiskills command`);
+    if (!v) throw new Error(`${key} needs a value`);
+    splitArgs(v);
+    return v;
+  }
   if (k.kind === "list") {
     const items = v.split(",").map((s) => s.trim()).filter(Boolean);
     if (!items.length) throw new Error(`${key} needs at least one name`);
@@ -59,6 +73,31 @@ export function parseConfigValue(key, raw) {
   }
   if (!v) throw new Error(`${key} needs a value`);
   return v;
+}
+
+/** An alias's value as arguments: split on spaces, with '...', "..." and \\ as in a shell. */
+export function splitArgs(s) {
+  const out = [];
+  let cur = null;
+  let quote = null;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (quote) {
+      if (c === quote) quote = null;
+      else if (c === "\\" && quote === '"' && i + 1 < s.length) cur += s[++i];
+      else cur += c;
+    } else if (c === "'" || c === '"') {
+      quote = c;
+      cur ??= "";
+    } else if (c === "\\" && i + 1 < s.length) cur = (cur ?? "") + s[++i];
+    else if (/\s/.test(c)) {
+      if (cur !== null) out.push(cur);
+      cur = null;
+    } else cur = (cur ?? "") + c;
+  }
+  if (quote) throw new Error(`unclosed quote in '${s}'`);
+  if (cur !== null) out.push(cur);
+  return out;
 }
 
 /** The two config files. */
@@ -91,7 +130,7 @@ function entriesOf(origin, files = configFiles()) {
   const file = files[origin];
   const out = {};
   for (const [key, raw] of Object.entries(readConfigFile(file))) {
-    if (!Object.hasOwn(CONFIG_KEYS, key)) continue; // a key from a newer aiskills: ignored
+    if (!Object.hasOwn(CONFIG_KEYS, key) && !isAliasKey(key)) continue; // a key from a newer aiskills: ignored
     try {
       out[key] = { value: parseConfigValue(key, raw), origin, file };
     } catch (err) {

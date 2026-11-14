@@ -273,6 +273,7 @@ aiskills config <key>                 # print the value; exit 1 (and print nothi
 aiskills config <key> <value>         # set it
 aiskills config --unset <key>         # remove it
 aiskills config --list [--show-origin] [--json]
+aiskills config alias.<name> "<command> [<options>]"   # an alias, like git's
 ```
 
 <!-- verify -->
@@ -316,6 +317,28 @@ Setting, unsetting and a value that is set print nothing more and exit `0`.
 | `color` | `auto`, `always` or `never` | [`--color`](#--color) / [`--no-color`](#--no-color) |
 
 **Which value wins**, first to last: a command-line option, the `AISKILLS_*` variable (`NO_COLOR` / `FORCE_COLOR` for color), the project file, the user file, what was remembered in the install folder's `aiskills.json` (layout and stats), the default. [`aiskills info`](#info) shows where each setting comes from.
+
+#### Aliases
+
+Like `git config alias.*`: `aiskills config alias.<name> "<command> [<options>]"` makes `aiskills <name>` run that command, with any more arguments after it.
+
+<!-- verify -->
+```bash
+aiskills config alias.where path
+aiskills where
+aiskills config --unset alias.where
+```
+
+```text
+~/.config/sugatoray/aiskills
+```
+
+- `aiskills config alias.gi "install -g -a codex"`, then `aiskills gi -s scrolls-setup` runs `aiskills install -g -a codex -s scrolls-setup`.
+- The value is split like a shell would: quote an argument that has spaces (`"my skill"`).
+- An alias may use another alias; a loop (`a` → `b` → `a`) is an error.
+- Names are lowercase letters, digits and dashes. A command or its short name (`install`, `i`, `config`, ...) can't be an alias, so an alias never changes what a command does.
+- An alias runs an aiskills command only: shell aliases (`!...` in git) aren't supported, so a project's `./.aiskills.json` can't run other programs.
+- Aliases live in the same files as the defaults; `--project` makes one for the current folder, and `--list` shows them.
 
 Errors: an unknown key or a value a key doesn't take stops with a message and changes nothing (see [Config errors](errors.md#config-errors)).
 
@@ -569,7 +592,7 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
-                 --list; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
+                 --list, alias.<name>; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -652,6 +675,7 @@ config only:
       --json             With --list: as JSON
       --global           The user file, ~/.config/sugatoray/aiskills.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
+  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name)
   Order: option > AISKILLS_* variable > project file > user file > remembered > default.
 
 uninstall only:
@@ -689,6 +713,7 @@ Examples:
   aiskills config agents claude-code,codex    # always install for these agents
   aiskills config --project layout nested     # in ./.aiskills.json
   aiskills config --list --show-origin        # what is set, and where
+  aiskills config alias.gi "install -g"       # then: aiskills gi -s scrolls-setup
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills upgrade --check                    # is there a newer aiskills?

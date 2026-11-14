@@ -56,7 +56,7 @@ import {
   todayDate,
 } from "./releases.mjs";
 import { fail, ok, paint, setColorConfig, setColorFlag } from "./colors.mjs";
-import { CONFIG_KEYS, assertConfigKey, configFiles, configList, configValue, displayPath, formatConfigValue, parseConfigValue, readConfigFile, writeConfigFile } from "./config.mjs";
+import { CONFIG_KEYS, assertConfigKey, configFiles, isAliasKey, splitArgs, configList, configValue, displayPath, formatConfigValue, parseConfigValue, readConfigFile, writeConfigFile } from "./config.mjs";
 import { HOW_TO_UPGRADE, detectInstall, installCommand, npmGlobalRoot, pickTarget, refreshPlan, runInstall } from "./upgrade.mjs";
 
 const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
@@ -79,7 +79,7 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
-                 --list; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
+                 --list, alias.<name>; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -162,6 +162,7 @@ config only:
       --json             With --list: as JSON
       --global           The user file, ~/.config/sugatoray/aiskills.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
+  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name)
   Order: option > AISKILLS_* variable > project file > user file > remembered > default.
 
 uninstall only:
@@ -199,6 +200,7 @@ Examples:
   aiskills config agents claude-code,codex    # always install for these agents
   aiskills config --project layout nested     # in ./.aiskills.json
   aiskills config --list --show-origin        # what is set, and where
+  aiskills config alias.gi "install -g"       # then: aiskills gi -s scrolls-setup
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills upgrade --check                    # is there a newer aiskills?
@@ -385,7 +387,7 @@ function groups(opts) {
 const CONFIG_USAGE =
   "usage: aiskills config <key> [<value>] | --unset <key> | --list [--show-origin] [--json]  [--global | --project]";
 
-/** `aiskills config`: get, set, unset or list defaults, like `git config`. */
+/** `aiskills config`: get, set, unset or list defaults and aliases, like `git config`. */
 function config(argv) {
   let only = null;
   let unset = false;
@@ -439,6 +441,7 @@ function config(argv) {
   if (words.length === 2) {
     const [key, raw] = words;
     const value = parseConfigValue(key, raw);
+    if (isAliasKey(key) && COMMANDS.has(key.slice(6))) throw new Error(`${key}: '${key.slice(6)}' is an aiskills command; an alias can't replace it`);
     if (key === "skills-version") skillsVersionSpec(value, "skills-version");
     const file = files[only ?? "user"];
     writeConfigFile(file, { ...readConfigFile(file), [key]: value });
@@ -808,6 +811,29 @@ function upgrade(o) {
   return result;
 }
 
+/** The commands and their short names; an alias can't use one of these names. */
+const COMMANDS = new Set(["install", "i", "uninstall", "remove", "rm", "r", "installed", "ls", "find", "f", "groups", "g", "skills", "sync", "list", "info", "config", "upgrade", "releases", "rel", "path", "p", "help", "h"]);
+
+/** `aiskills <alias> ...`: the alias's command and options, then the rest; aliases may use aliases. */
+function expandAlias(argv) {
+  const seen = [];
+  while (argv.length && !argv[0].startsWith("-") && !COMMANDS.has(argv[0])) {
+    const name = argv[0];
+    if (!/^[a-z][a-z0-9-]*$/.test(name)) break;
+    let found;
+    try {
+      found = configValue(`alias.${name}`);
+    } catch {
+      break; // a broken config file is reported by the command that reads it
+    }
+    if (!found) break;
+    if (seen.includes(name)) throw new Error(`alias loop: ${[...seen, name].join(" → ")}`);
+    seen.push(name);
+    argv = [...splitArgs(found.value), ...argv.slice(1)];
+  }
+  return argv;
+}
+
 function main() {
   // '--route', '--nested' and '--flat' may come before the command
   // (aiskills --route install ..., aiskills --nested).
@@ -830,7 +856,7 @@ function main() {
   try {
     setColorConfig(configValue("color")?.value);
   } catch {}
-  let [cmd = "install", ...rest] = argv;
+  let [cmd = "install", ...rest] = expandAlias(argv);
   if (!["skills", "find", "f"].includes(cmd)) {
     const end = rest.includes("--") ? rest.indexOf("--") : rest.length;
     rest = [...rest.slice(0, end).filter((a) => !colorFlag(a)), ...rest.slice(end)];
