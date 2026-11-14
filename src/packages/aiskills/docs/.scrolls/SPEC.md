@@ -40,6 +40,14 @@ With `--route` (before or after the command, or `AISKILLS_ROUTE=1`), or always w
 ## User documentation
 Full user docs live in the repo at `src/packages/aiskills/docs/docsite/` (not in the npm package): getting started, a page for every bundled skill, a 5-step tutorial, how-to guides (including use from AI agents and scripts), concepts with diagrams, an exhaustive reference (every command, option, environment variable, file format, and error with its cause and fix), and an FAQ. The same docs come as one HTML page with tabs, search and 11 colour themes (`index.html`; gear menu, Lights Out by default), and as `llms.txt` / `llms-full.txt` for AI agents. Every example that shows output was run, and the tests fail if the docs drift from the code or the skills.
 
+## Versioned docs website
+The website https://sugatoray.github.io/aiskills/ keeps the docs of several versions:
+- the latest release at the root;
+- the releases before it under `/v/x.y.z/` (the newest 5 in all, `npm run docs:site -- --releases <n>|all`);
+- while `package.json` is `x.y.z-dev`, the version in development under `/dev/`.
+
+Each page's header has a version menu with a **Find a version** box (partial or fuzzy match, ranked; Enter opens the best match). Switching keeps the page you're on. The dev page says it isn't released yet, older pages say they're older releases, and both link to the latest. Each release's page is built from its `aiskills-vX.Y.Z` tag with today's builder. A pushed release tag rebuilds the site. Without a version in development, `/dev/` redirects to the root. Merged in [#234](https://github.com/sugatoray/aiskills/pull/234) (`58c1e52`) and deployed. Code: `src/scripts/docs/build-site.mjs`, `build-docs-html.mjs` (`--version`, `--menu`).
+
 ## Banner
 The package README and the docs' landing page open with a banner (1280 × 640): the version, Node range, license, skill and group counts, the install command, a terminal demo of real `ais`/`aix` output, and the skill groups. Its values come from the package and the bundled skills, so it stays accurate across releases. Maintainers edit it in `docs/banner/config.yaml`, or in the browser (`docs/banner/aiskills-banner.html`), and export PNGs for dark, white, black or transparent backgrounds; text that wouldn't be readable on a background can't be chosen.
 

@@ -44,12 +44,12 @@ jobs:
       run:
         working-directory: src/packages/aiskills
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # the release tags: the stable docs are read from the newest one
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
       # --ref: links from the docs to files outside docs/docsite/ point at GitHub on the branch being built.
       # The builder has no npm dependencies, so there is no npm install step.
       - run: npm run docs:site -- --ref ${{ github.ref_name }}

@@ -63,6 +63,17 @@ describe("docs publishing workflow", () => {
     assert.match(yml, /uses: actions\/setup-node@v\d+/);
   });
 
+  test("uses actions that run on a current Node.js, and builds with Node 22", () => {
+    // v4 of checkout and setup-node target Node 20, which GitHub has deprecated (the runs warned about it).
+    const yml = read();
+    for (const action of ["actions/checkout", "actions/setup-node"]) {
+      const m = yml.match(new RegExp(`uses: ${action}@v(\\d+)`));
+      assert.ok(m, `${action} is used`);
+      assert.ok(Number(m[1]) >= 5, `${action}@v${m[1]} targets Node 20; use v5 or later`);
+    }
+    assert.match(yml, /node-version: "22"/);
+  });
+
   test("checks out the full history, so the release tags are there", () => {
     assert.match(read(), /uses: actions\/checkout@v\d+\n\s+with:\n\s+fetch-depth: 0(?: #.*)?\n/);
   });
