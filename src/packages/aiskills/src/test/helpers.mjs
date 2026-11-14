@@ -285,7 +285,8 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
     rmSync(log, { force: true });
     const res = spawnSync(process.execPath, [script, ...args], {
       cwd: dir,
-      env: { ...baseEnv(), ...env },
+      // A variable set to undefined is left out (e.g. { AISKILLS_HOME: undefined }: the default install root).
+      env: Object.fromEntries(Object.entries({ ...baseEnv(), ...env }).filter(([, v]) => v !== undefined)),
       encoding: "utf8",
     });
     return { status: res.status, out: (res.stdout ?? "") + (res.stderr ?? ""), calls: calls() };

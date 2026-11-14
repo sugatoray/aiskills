@@ -33,8 +33,8 @@ src/packages/aiskills/
     │   ├── vendor-skills.mjs prepack: builds the shipped skills/ and .aiskills/
     │   └── skillsignore.mjs  .skillsignore parser/matcher
     └── docs/                 docs and banner builders (not published)
-        ├── build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs
-        └── templates/        docs-template.html, banner-template.html
+        ├── build-skills-docs.mjs, build-docs-html.mjs, build-site.mjs, create-banner.mjs, create-cli-outputs.mjs, themes.mjs
+        └── templates/        docs-template.html, banner-template.html, cli-outputs-template.html
 ```
 
 Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `core/`, and `core/` uses neither (it ships on its own). `packaging.test.mjs` checks this.
@@ -56,6 +56,7 @@ Imports only point down: `docs/` may use `pack/` and `core/`, `pack/` may use `c
 | `docs/build-skills-docs.mjs` | The Skills pages, from what the package really ships | `bundled` (vendors into a temp folder), `render`, `frontmatter` |
 | `docs/build-docs-html.mjs` | `docs/docsite/index.html` | `collect` (tabs from the landing page's `### Section` lists), `bannerParts`, `skinMenuHtml`, `build` |
 | `docs/create-banner.mjs` | The banner page and `banner_2x.png` | `parseConfig`, `resolveValues` ("auto" values), `render`, `renderPng`, `addPngText` |
+| `docs/create-cli-outputs.mjs` | `docs/docsite/reference/cli-outputs.html`: every command's colored output | `capture` (runs `docs/cli-outputs/commands.json` in the test sandbox from `src/test/helpers.mjs`), `ansiToHtml`, `render`, `mask` (Node.js version, save times), `main` (`--check`) |
 | `docs/themes.mjs` | The 11 themes (default first) | `THEMES`, `DEFAULT_THEME`, `pageSkinCss`, `bannerSkinCss`, `fontsHref` |
 
 The `colors.mjs`, `installer.mjs`, `releases.mjs`, `upgrade.mjs` and `cli.mjs` rows are `core/`. All

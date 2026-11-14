@@ -104,6 +104,7 @@ aiskills install -G scrolls -a claude-code
 ### Reference
 
 - [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
+- [CLI outputs](reference/cli-outputs.md): what every command prints, in color, side by side.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
 - [Environment variables](reference/environment.md): every variable `aiskills` reads.
 - [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
@@ -3757,6 +3758,40 @@ Everything after `--` is appended to the `npx skills add` (install) or `npx skil
 
 See also: [Environment variables](environment.md) · [Errors and exit codes](errors.md) · [Patterns](patterns.md)
 
+<!-- source: reference/cli-outputs.md -->
+# CLI outputs
+
+What every `aiskills` command prints, in color, as it looks on a terminal. Each command ran in a fresh home folder against the same sample data as the examples in these docs, so the page is the same every time it's rebuilt. For what each option means, see the [CLI reference](cli.md).
+
+<iframe data-page="cli-outputs.html" title="What every aiskills command prints, in color" loading="lazy" style="width:100%;height:900px;border:1px solid #2a3440;border-radius:10px;background:#15191d"></iframe>
+
+[Open the CLI outputs full-size](cli-outputs.html) (full screen; close it with ✕ or `Esc`)
+
+## How to use it
+
+- **Pick a command** from the list on the left (at the top on a phone), or scroll. The commands are grouped: help and setup, skills, install and remove, releases and upgrades, `npx skills` passed through, and errors.
+- **Turn Colors off** to see the output as it reads when piped, or with [`--no-color`](cli.md#--no-color). Which parts are colored is described under [Colored output](cli.md#colored-output).
+- **Copy a command** with the button next to it, to try it yourself.
+
+## What the sample shows
+
+- The npm registry data and download counts are the docs' samples, as of 2026-11-21, not npm's live data.
+- `npx skills` is a stand-in that prints nothing of its own, so for `list`, `install` and `skills` only the lines `aiskills` prints itself appear. With the real `npx skills`, its own output follows them.
+- Paths show a global npm install (`/usr/local/lib/node_modules/@sugatoray-ai/aiskills`) and `~` for the home folder.
+
+## Rebuild it
+
+The page is generated. After changing a command's output, rebuild it from `src/packages/aiskills/`:
+
+```bash
+npm run cli-outputs          # rebuild docs/docsite/reference/cli-outputs.html
+npm run cli-outputs:check    # exit 1 if it is out of date
+```
+
+`npm run docs` rebuilds it too. Which commands appear, their groups and notes are set in `docs/cli-outputs/commands.json`.
+
+See also: [CLI reference](cli.md) · [Environment variables](environment.md)
+
 <!-- source: reference/patterns.md -->
 # Patterns reference
 
@@ -4640,6 +4675,16 @@ version menu: <version> is not one of its versions
 ```
 
 **Fix:** `--menu` is JSON: `{"current": "<this page's version>", "base": "<path to the site root>", "entries": [{"version", "path", "kind"}]}`, with one `latest` entry, and the current version among the entries. `npm run docs:site` writes it for you.
+
+### CLI outputs page
+
+```text
+usage: create-cli-outputs.mjs [--check] [--out <file>]
+<file> is out of date: run npm run cli-outputs
+create-cli-outputs needs a POSIX shell for the stand-in npx and npm
+```
+
+**Fix:** run `npm run cli-outputs` (or `npm run docs`) after a change that alters what a command prints, and commit `docs/docsite/reference/cli-outputs.html`. The page is built by running every command in `docs/cli-outputs/commands.json` with stand-in `npx` and `npm` scripts, so build it on macOS, Linux or WSL.
 
 ### Site build usage
 

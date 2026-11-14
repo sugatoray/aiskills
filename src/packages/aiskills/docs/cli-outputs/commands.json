@@ -1,0 +1,60 @@
+{
+  "today": "2026-11-21",
+  "groups": [
+    {
+      "id": "help",
+      "label": "Help and setup",
+      "items": [
+        { "args": ["--help"], "note": "Every command, option and environment variable. The title and section headings are bold." },
+        { "args": ["--version"], "note": "Just the version, for scripts." },
+        { "args": ["path"], "note": "The folder that holds the saved skills." },
+        { "args": ["info"], "note": "This setup at a glance, offline: labels dim, values bold, where each value comes from dim." },
+        { "args": ["info", "--full"], "list": ["scrolls-setup", "scrolls-update"], "note": "The same, plus what npm and npx skills report: the latest release and the installed skills per agent." }
+      ]
+    },
+    {
+      "id": "skills",
+      "label": "Skills",
+      "items": [
+        { "args": ["sync"], "note": "Saves or refreshes the skills folder without running npx skills." },
+        { "args": ["groups"], "note": "Skill groups from marketplace.json: names bold, aliases dim, the command to run cyan." },
+        { "args": ["list"], "note": "Hands the saved folder to npx skills, which lists its skills (the stand-in npx used here prints nothing of its own)." },
+        { "args": ["installed"], "list": ["scrolls-explainer", "scrolls-help", "scrolls-hide", "scrolls-remove", "scrolls-restore", "scrolls-setup", "scrolls-unhide", "scrolls-update"], "note": "The skills installed from the saved folder: names bold, groups dim." }
+      ]
+    },
+    {
+      "id": "install",
+      "label": "Install and remove",
+      "items": [
+        { "args": ["install", "-G", "scrolls", "-a", "claude-code", "--dry-run"], "note": "What would run, without installing anything." },
+        { "args": ["install", "-G", "scrolls", "-a", "claude-code"], "note": "Installs the scrolls group for Claude Code, then adds the install to the skills.sh count in the background." },
+        { "args": ["uninstall", "-s", "scrolls-hide", "--dry-run"], "list": ["scrolls-hide", "scrolls-setup"], "note": "What removing one skill would run." }
+      ]
+    },
+    {
+      "id": "releases",
+      "label": "Releases and upgrades",
+      "items": [
+        { "args": ["rel"], "today": true, "note": "The latest releases on npm: the header row bold, the latest tag green." },
+        { "args": ["rel", "3", "--downloads", "7d"], "today": true, "api": true, "note": "Three releases with download counts: the last 7 days per version, and a chart by day." },
+        { "args": ["upgrade", "--check"], "note": "Is there a newer aiskills? Here the installed version is ahead of npm." }
+      ]
+    },
+    {
+      "id": "npx",
+      "label": "npx skills, passed through",
+      "items": [
+        { "args": ["find", "scrolls"], "find": "sugatoray/aiskills@scrolls-setup 1.2K installs\nsugatoray/aiskills@scrolls-update 1.2K installs", "note": "A registry search through npx skills (sample results)." },
+        { "args": ["skills", "--version"], "note": "Any npx skills command, passed through with the pinned version." }
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Errors",
+      "items": [
+        { "args": ["install", "--bogus"], "note": "An option the command doesn't take: the error in red on stderr. Exit code 1." },
+        { "args": ["bogus"], "note": "An unknown command: the error in red, then the help. Exit code 1." }
+      ]
+    }
+  ]
+}
