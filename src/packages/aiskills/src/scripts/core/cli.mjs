@@ -55,7 +55,8 @@ import {
   renderSeries,
   todayDate,
 } from "./releases.mjs";
-import { fail, ok, paint, setColorFlag } from "./colors.mjs";
+import { fail, ok, paint, setColorConfig, setColorFlag } from "./colors.mjs";
+import { CONFIG_KEYS, assertConfigKey, configFiles, configList, configValue, displayPath, formatConfigValue, parseConfigValue, readConfigFile, writeConfigFile } from "./config.mjs";
 import { HOW_TO_UPGRADE, detectInstall, installCommand, npmGlobalRoot, pickTarget, refreshPlan, runInstall } from "./upgrade.mjs";
 
 const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
@@ -77,6 +78,8 @@ Commands:
   path, p        Print the folder that holds skills/
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
+  config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
+                 --list; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -150,6 +153,17 @@ upgrade only:
   -n, --dry-run          Print what would run; change nothing
   -y, --yes              Allow a downgrade without asking
 
+config only:
+  <key>                  Print the value (exit 1 when it isn't set)
+  <key> <value>          Set it. Keys: ${Object.keys(CONFIG_KEYS).sort().join(", ")}
+      --unset <key>      Remove it
+  -l, --list             Every key that is set (the project file wins over the user file)
+      --show-origin      With --list: which file each value comes from
+      --json             With --list: as JSON
+      --global           The user file, ~/.config/sugatoray/aiskills.json (the default for set and unset)
+      --project          The project file, ./.aiskills.json
+  Order: option > AISKILLS_* variable > project file > user file > remembered > default.
+
 uninstall only:
       --purge            Also delete ${ROOT} (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -182,6 +196,9 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ${ROOT}
+  aiskills config agents claude-code,codex    # always install for these agents
+  aiskills config --project layout nested     # in ./.aiskills.json
+  aiskills config --list --show-origin        # what is set, and where
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills upgrade --check                    # is there a newer aiskills?
@@ -365,6 +382,71 @@ function groups(opts) {
   return 0;
 }
 
+const CONFIG_USAGE =
+  "usage: aiskills config <key> [<value>] | --unset <key> | --list [--show-origin] [--json]  [--global | --project]";
+
+/** `aiskills config`: get, set, unset or list defaults, like `git config`. */
+function config(argv) {
+  let only = null;
+  let unset = false;
+  let list = false;
+  let showOrigin = false;
+  let json = false;
+  const words = [];
+  for (const a of argv) {
+    if (a === "--global") only = "user";
+    else if (a === "--project") only = "project";
+    else if (a === "--unset") unset = true;
+    else if (a === "-l" || a === "--list") list = true;
+    else if (a === "--show-origin") showOrigin = true;
+    else if (a === "--json") json = true;
+    else if (a.startsWith("-")) throw new Error(`option ${a} is not valid here`);
+    else words.push(a);
+  }
+  const files = configFiles();
+  if (list) {
+    if (words.length || unset) throw new Error(CONFIG_USAGE);
+    const entries = configList({ only });
+    if (json) {
+      console.log(JSON.stringify(Object.fromEntries(entries.map(({ key, ...e }) => [key, e])), null, 2));
+      return 0;
+    }
+    const ow = Math.max(0, ...entries.map((e) => e.origin.length));
+    const fw = Math.max(0, ...entries.map((e) => displayPath(e.file).length));
+    for (const e of entries) {
+      const kv = `${paint.out.bold(e.key)}=${formatConfigValue(e.value)}`;
+      console.log(showOrigin ? `${paint.out.dim(e.origin.padEnd(ow))}  ${paint.out.dim(displayPath(e.file).padEnd(fw))}  ${kv}` : kv);
+    }
+    return 0;
+  }
+  if (unset) {
+    if (words.length !== 1) throw new Error(CONFIG_USAGE);
+    const [key] = words;
+    assertConfigKey(key);
+    const file = files[only ?? "user"];
+    const data = readConfigFile(file);
+    if (!Object.hasOwn(data, key)) throw new Error(`${key} is not set in ${displayPath(file)}`);
+    delete data[key];
+    writeConfigFile(file, data);
+    return 0;
+  }
+  if (words.length === 1) {
+    const found = configValue(words[0], { only });
+    if (!found) return 1;
+    console.log(formatConfigValue(found.value));
+    return 0;
+  }
+  if (words.length === 2) {
+    const [key, raw] = words;
+    const value = parseConfigValue(key, raw);
+    if (key === "skills-version") skillsVersionSpec(value, "skills-version");
+    const file = files[only ?? "user"];
+    writeConfigFile(file, { ...readConfigFile(file), [key]: value });
+    return 0;
+  }
+  throw new Error(CONFIG_USAGE);
+}
+
 const ON = (b) => (b ? "on" : "off");
 
 /** `aiskills info`: this setup, each setting with where it comes from. Offline unless --full. */
@@ -391,6 +473,17 @@ function info(opts) {
     };
   }
   const libVar = e[SKILLS_LIB_VERSION_VAR]?.trim() ? SKILLS_LIB_VERSION_VAR : null;
+  // Where a setting comes from: its AISKILLS_* variable, then a config file, then `fallback`.
+  const files = configFiles();
+  const conf = (key) => {
+    try {
+      return configValue(key);
+    } catch {
+      return undefined; // a broken config file shows in the settings that read it
+    }
+  };
+  const from = (key, fallback) => (CONFIG_KEYS[key].env && e[CONFIG_KEYS[key].env]?.trim() ? CONFIG_KEYS[key].env : conf(key) ? `${conf(key).origin} config` : fallback);
+  const skillsCfg = libVar ? null : conf("skills-version");
   const statsOff = ["DO_NOT_TRACK", "DISABLE_TELEMETRY", "CI", "GITHUB_ACTIONS"].find((k) => e[k]);
   const env = envOptions();
   const data = {
@@ -399,20 +492,27 @@ function info(opts) {
     saved,
     settings: {
       skillsCli: {
-        value: tryOr(() => `skills@${skillsVersionSpec(libVar ? e[libVar].trim() : SKILLS_CLI_VERSION, libVar ?? SKILLS_LIB_VERSION_VAR)}`),
-        source: libVar ?? "pinned, tested",
+        value: tryOr(() => `skills@${skillsVersionSpec(libVar ? e[libVar].trim() : skillsCfg?.value ?? SKILLS_CLI_VERSION, libVar ?? (skillsCfg ? "skills-version" : SKILLS_LIB_VERSION_VAR))}`),
+        source: libVar ?? (skillsCfg ? `${skillsCfg.origin} config` : "pinned, tested"),
       },
-      scope: { value: env.global ? "global" : "project", source: e.AISKILLS_SCOPE ? "AISKILLS_SCOPE" : "default" },
+      scope: { value: env.global ? "global" : "project", source: from("scope", "default") },
       layout: {
         value: tryOr(() => resolveLayout(undefined, ROOT)),
-        source: e.AISKILLS_LAYOUT ? "AISKILLS_LAYOUT" : meta?.layout ? "remembered" : "default",
+        source: from("layout", meta?.layout ? "remembered" : "default"),
       },
       stats: {
         value: tryOr(() => ON(resolveStats(undefined, ROOT))),
-        source: statsOff ?? (e.AISKILLS_STATS?.trim() ? "AISKILLS_STATS" : typeof meta?.stats === "boolean" ? "remembered" : "default"),
+        source: statsOff ?? from("stats", typeof meta?.stats === "boolean" ? "remembered" : "default"),
       },
-      route: { value: ON(env.route), source: e.AISKILLS_ROUTE ? "AISKILLS_ROUTE" : "default" },
+      route: { value: ON(env.route), source: from("route", "default") },
+      // The setting in effect: NO_COLOR / FORCE_COLOR override the config (--color/--no-color are per run).
+      color: e.NO_COLOR
+        ? { value: "never", source: "NO_COLOR" }
+        : e.FORCE_COLOR && !["0", "false"].includes(e.FORCE_COLOR.toLowerCase())
+          ? { value: "always", source: "FORCE_COLOR" }
+          : { value: conf("color")?.value ?? "auto", source: from("color", "default") },
     },
+    config: Object.fromEntries(["user", "project"].map((o) => [o, { path: files[o], exists: existsSync(files[o]) }])),
     skillsLock: { path: skillsLockPath(), exists: existsSync(skillsLockPath()), lastPickedAgents: lastSelectedAgents() },
     env: Object.fromEntries(Object.entries(e).filter(([k]) => k.startsWith("AISKILLS_")).sort(([a], [b]) => a.localeCompare(b))),
   };
@@ -456,6 +556,7 @@ function info(opts) {
   kv("node version", `${process.version} (${data.aiskills.platform})`);
   gap();
   kv("install root", ROOT, data.installRoot.source + (data.installRoot.exists ? "" : "; not created yet"));
+  for (const o of ["user", "project"]) kv(`${o} config`, displayPath(data.config[o].path), data.config[o].exists ? null : "not created");
   if (saved) {
     kv("saved skills", `${saved.skills} skills in ${saved.groups} groups, ${saved.layout ?? "?"} layout`);
     const when = saved.savedAt ? `, ${saved.savedAt.slice(0, 16).replace("T", " ")} UTC` : "";
@@ -470,6 +571,7 @@ function info(opts) {
   kv("layout", st.layout.value, st.layout.source);
   kv("stats", st.stats.value, st.stats.source);
   kv("route", st.route.value, st.route.source);
+  kv("color", st.color.value, st.color.source);
   gap();
   kv("skills lock file", data.skillsLock.path, data.skillsLock.exists ? null : "not created yet");
   kv("last-picked agents", data.skillsLock.lastPickedAgents.join(", ") || "none", "used by install -l");
@@ -724,6 +826,10 @@ function main() {
     else break;
     argv = argv.slice(1);
   }
+  // `aiskills config color`; a broken config file is reported by the command that reads it.
+  try {
+    setColorConfig(configValue("color")?.value);
+  } catch {}
   let [cmd = "install", ...rest] = argv;
   if (!["skills", "find", "f"].includes(cmd)) {
     const end = rest.includes("--") ? rest.indexOf("--") : rest.length;
@@ -834,6 +940,8 @@ function main() {
       return skillsAdd(syncSkills({ version }), { list: true });
     case "info":
       return info(parse(rest, ["json", "full"]));
+    case "config":
+      return config(rest);
     case "upgrade":
       return upgrade(parseUpgrade(rest));
     case "releases":

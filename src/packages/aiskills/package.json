@@ -34,6 +34,7 @@
     "bin/",
     "src/scripts/core/cli.mjs",
     "src/scripts/core/colors.mjs",
+    "src/scripts/core/config.mjs",
     "src/scripts/core/installer.mjs",
     "src/scripts/core/releases.mjs",
     "src/scripts/core/upgrade.mjs",

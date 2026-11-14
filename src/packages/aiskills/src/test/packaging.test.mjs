@@ -155,7 +155,7 @@ describe("npm pack", () => {
   test("ships only the bin/ entry points and the runtime files under src/scripts/core/", (t) => {
     if (!copy) return t.skip("git not available");
     const code = files.filter((p) => /\.(m?js|cjs)$/.test(p) && !p.startsWith("skills/"));
-    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/core/cli.mjs", "src/scripts/core/colors.mjs", "src/scripts/core/installer.mjs", "src/scripts/core/releases.mjs", "src/scripts/core/upgrade.mjs"]);
+    assert.deepEqual(code.sort(), ["bin/aiskills.mjs", "bin/aix.mjs", "src/scripts/core/cli.mjs", "src/scripts/core/colors.mjs", "src/scripts/core/config.mjs", "src/scripts/core/installer.mjs", "src/scripts/core/releases.mjs", "src/scripts/core/upgrade.mjs"]);
   });
 
   test("installing the package runs nothing: no install-time lifecycle scripts", () => {
@@ -211,7 +211,7 @@ describe("npm pack", () => {
   test("src/scripts/ holds three groups: core/ (runtime), pack/ (packaging) and docs/ (docs and banner)", () => {
     const list = (rel) => readdirSync(join(PKG_SRC, "src", "scripts", rel), { withFileTypes: true }).map((e) => (e.isDirectory() ? e.name + "/" : e.name)).sort();
     assert.deepEqual(list("."), ["README.md", "core/", "docs/", "pack/"]);
-    assert.deepEqual(list("core"), ["cli.mjs", "colors.mjs", "installer.mjs", "releases.mjs", "upgrade.mjs"]);
+    assert.deepEqual(list("core"), ["cli.mjs", "colors.mjs", "config.mjs", "installer.mjs", "releases.mjs", "upgrade.mjs"]);
     assert.deepEqual(list("pack"), ["audit-skills.mjs", "skillsignore.mjs", "vendor-skills.mjs"]);
     assert.deepEqual(list("docs"), ["build-docs-html.mjs", "build-site.mjs", "build-skills-docs.mjs", "create-banner.mjs", "create-cli-outputs.mjs", "templates/", "themes.mjs"]);
     assert.deepEqual(list("docs/templates"), ["banner-template.html", "cli-outputs-template.html", "docs-template.html"]);

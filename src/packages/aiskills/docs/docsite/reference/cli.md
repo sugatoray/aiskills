@@ -26,6 +26,7 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 | [`list`](#list) | | List the skills in the saved folder, via `npx skills` |
 | [`path`](#path) | `p` | Print the install folder |
 | [`info`](#info) | | Show this setup: versions, folders, settings and where each comes from |
+| [`config`](#config) | | Get and set defaults, like `git config` |
 | [`releases`](#releases) | `rel` | Show the latest releases on npm, optionally with download counts |
 | [`upgrade`](#upgrade) | | Install the latest aiskills globally and update the skills your agents have |
 | [`skills`](#skills) | | Pass arguments to `npx skills` |
@@ -219,6 +220,8 @@ aiskills info
   aiskills version : 1.3.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
+       user config : ~/.config/sugatoray/aiskills.json  (not created)
+    project config : ./.aiskills.json  (not created)
       saved skills : 17 skills in 9 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
@@ -226,6 +229,7 @@ aiskills info
             layout : flat  (remembered)
              stats : on  (default)
              route : off  (default)
+             color : auto  (default)
 
   skills lock file : ~/.agents/.skill-lock.json  (not created yet)
 last-picked agents : none  (used by install -l)
@@ -240,9 +244,11 @@ What each line means:
 | --- | --- | --- |
 | `aiskills version`, `package path`, `node version` | This package, the folder npm installed it in, Node and the platform | |
 | `install root` | The install folder; `not created yet` before the first `install` or `sync` | `default` or `AISKILLS_HOME` |
+| `user config`, `project config` | The two [`aiskills config`](#config) files; `not created` until a value is set in one | |
 | `saved skills`, `saved by` | What the last `install`/`sync` saved, and which aiskills version saved it; `not this version` means run `aiskills install` again | `aiskills.json` |
-| `skills CLI` | The `skills` package `npx` runs | `pinned, tested`, or the variable that overrides it |
-| `scope`, `layout`, `stats`, `route` | The defaults `install` would use with no options | `default`, an `AISKILLS_*` variable, `remembered` (in `aiskills.json`), or, for stats, `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` or `GITHUB_ACTIONS` |
+| `skills CLI` | The `skills` package `npx` runs | `pinned, tested`, the variable that overrides it, or `user config` / `project config` |
+| `scope`, `layout`, `stats`, `route` | The defaults `install` would use with no options | `default`, an `AISKILLS_*` variable, `project config` or `user config` ([`aiskills config`](#config)), `remembered` (in `aiskills.json`), or, for stats, `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` or `GITHUB_ACTIONS` |
+| `color` | Whether output is colored: `auto` (on a terminal), `always` or `never` | `default`, `user config` / `project config`, or `NO_COLOR` / `FORCE_COLOR`, which override it; see [Colored output](#colored-output) |
 | `skills lock file`, `last-picked agents` | The lock file `npx skills` keeps, and the agents [`-l`](#-l---last-agents) would use | |
 | `env overrides` | Every `AISKILLS_*` variable that is set, one per line | |
 
@@ -257,6 +263,61 @@ With [`--full`](#--full) it also asks npm and `npx skills` (a few seconds; needs
 `latest on npm` says `up to date`, `update available: run aiskills upgrade`, or that this version is not published; if npm can't be reached it says `unavailable` and why, and the command still succeeds. `installed skills` counts what `npx skills list` reports for the current scope.
 
 See also: [Use aiskills from an AI agent or a script](../guides/use-from-an-agent.md)
+
+### `config`
+
+Get and set defaults that last, like `git config`. Without `--global` or `--project`, reading a key gives the value in effect: the project file wins over the user file.
+
+```text
+aiskills config <key>                 # print the value; exit 1 (and print nothing) when it isn't set
+aiskills config <key> <value>         # set it
+aiskills config --unset <key>         # remove it
+aiskills config --list [--show-origin] [--json]
+```
+
+<!-- verify -->
+```bash
+aiskills config agents claude-code,codex
+aiskills config layout nested
+aiskills config agents
+aiskills config --list --show-origin
+aiskills config --unset agents
+aiskills config --unset layout
+```
+
+```text
+claude-code,codex
+user  ~/.config/sugatoray/aiskills.json  agents=claude-code,codex
+user  ~/.config/sugatoray/aiskills.json  layout=nested
+```
+
+Setting, unsetting and a value that is set print nothing more and exit `0`.
+
+**Files.** Both are plain JSON objects (`{"layout": "nested"}`), and each key is checked when it's set:
+
+| File | Option | Holds |
+| --- | --- | --- |
+| `~/.config/sugatoray/aiskills.json` | [`--global`](#--global-config) (the default) | Your defaults, for every project. It sits next to the install folder, not in it, so [`uninstall --purge`](#--purge) keeps it. |
+| `./.aiskills.json` | [`--project`](#--project-config) | Defaults for the current folder. They win over the user file. |
+
+**Keys.** Each stands for an [`AISKILLS_*`](environment.md) variable, except `color`:
+
+| Key | Values | Same as |
+| --- | --- | --- |
+| `scope` | `global` or `project` | [`AISKILLS_SCOPE`](environment.md#aiskills_scope), `-g` / `-p` |
+| `agents` | comma-separated names or patterns | [`AISKILLS_AGENTS`](environment.md#aiskills_agents), `-a` |
+| `skills` | comma-separated names or patterns | [`AISKILLS_SKILLS`](environment.md#aiskills_skills), `-s` |
+| `groups` | comma-separated groups | [`AISKILLS_GROUPS`](environment.md#aiskills_groups), `-G` |
+| `copy` | `true` or `false` (also `yes`/`no`, `on`/`off`, `1`/`0`) | [`AISKILLS_COPY`](environment.md#aiskills_copy), `--copy` |
+| `route` | `true` or `false` | [`AISKILLS_ROUTE`](environment.md#aiskills_route), `--route` |
+| `layout` | `flat` or `nested` | [`AISKILLS_LAYOUT`](environment.md#aiskills_layout), `--flat` / `--nested` |
+| `stats` | `true` or `false` | [`AISKILLS_STATS`](environment.md#aiskills_stats), `--stats` / `--no-stats` |
+| `skills-version` | a version, `latest`, `next`, a range or an interval | [`AISKILLS_SKILLS_LIB_VERSION`](environment.md#aiskills_skills_lib_version) |
+| `color` | `auto`, `always` or `never` | [`--color`](#--color) / [`--no-color`](#--no-color) |
+
+**Which value wins**, first to last: a command-line option, the `AISKILLS_*` variable (`NO_COLOR` / `FORCE_COLOR` for color), the project file, the user file, what was remembered in the install folder's `aiskills.json` (layout and stats), the default. [`aiskills info`](#info) shows where each setting comes from.
+
+Errors: an unknown key or a value a key doesn't take stops with a message and changes nothing (see [Config errors](errors.md#config-errors)).
 
 ### `releases`
 
@@ -507,6 +568,8 @@ Commands:
   path, p        Print the folder that holds skills/
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
+  config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
+                 --list; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -580,6 +643,17 @@ upgrade only:
   -n, --dry-run          Print what would run; change nothing
   -y, --yes              Allow a downgrade without asking
 
+config only:
+  <key>                  Print the value (exit 1 when it isn't set)
+  <key> <value>          Set it. Keys: agents, color, copy, groups, layout, route, scope, skills, skills-version, stats
+      --unset <key>      Remove it
+  -l, --list             Every key that is set (the project file wins over the user file)
+      --show-origin      With --list: which file each value comes from
+      --json             With --list: as JSON
+      --global           The user file, ~/.config/sugatoray/aiskills.json (the default for set and unset)
+      --project          The project file, ./.aiskills.json
+  Order: option > AISKILLS_* variable > project file > user file > remembered > default.
+
 uninstall only:
       --purge            Also delete ~/.config/sugatoray/aiskills (only with a full uninstall)
   -f, --force            Allow -s names that this package does not provide
@@ -612,6 +686,9 @@ Examples:
   aiskills uninstall -s scrolls-hide,prodigy  # remove just these
   aiskills uninstall -a codex                 # unlink from Codex only
   aiskills uninstall --purge                  # remove all, then delete ~/.config/sugatoray/aiskills
+  aiskills config agents claude-code,codex    # always install for these agents
+  aiskills config --project layout nested     # in ./.aiskills.json
+  aiskills config --list --show-origin        # what is set, and where
   aiskills info                               # this setup, offline
   aiskills rel 10 --downloads 1m              # latest 10 releases, downloads of the last 30 days
   aiskills upgrade --check                    # is there a newer aiskills?
@@ -666,7 +743,7 @@ Values for `-a`, `-s` and `-G` are comma-separated, may be [glob patterns](patte
 | `--purge`, `-f` | | ✓ | | | |
 | `--json` | | | | ✓ | |
 
-`info` takes `--full` and `--json`; `upgrade` takes `--check`, `--json`, `--no-refresh`, `-n` and `-y`; `releases` takes `-L`, `--downloads`, `--chart`, `--table`, `--by`, `--ascii` and `--json` (see their headings below).
+`info` takes `--full` and `--json`; `config` takes `--unset`, `-l`/`--list`, `--show-origin`, `--json`, `--global` and `--project`; `upgrade` takes `--check`, `--json`, `--no-refresh`, `-n` and `-y`; `releases` takes `-L`, `--downloads`, `--chart`, `--table`, `--by`, `--ascii` and `--json` (see their headings below).
 | `--` | ✓ | ✓ | | | |
 
 ### `-g`, `--global`
@@ -813,6 +890,26 @@ Never color the output. Wins over `--color` given earlier, and over `FORCE_COLOR
 #### Colored output
 
 On a terminal, `aiskills` colors its output: the `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade green, commands to run cyan; in `--help` the headings, in `info` the labels and values, in `releases` the header row, the `latest` tag and the `← installed` mark, and in `groups` and `installed` the names. Piped or redirected output is plain, so scripts and `grep` see the same text as before; `--json` is never colored. stdout and stderr are decided separately. In order, what decides: `--no-color`, `--color`, [`NO_COLOR`](environment.md#no_color), [`FORCE_COLOR`](environment.md#force_color), then whether the output is a terminal (and `TERM` isn't `dumb`). `skills` and `find` pass `--color`/`--no-color` on to `npx skills` instead.
+
+### `--unset`
+
+`config` only: remove a key from the user file, or from `./.aiskills.json` with `--project`. A key that isn't set there exits `1`.
+
+### `--list`
+
+`config` only (also `-l`): every key that is set, as `key=value`, sorted; the project file's value wins when both set a key. With `--global` or `--project`, only that file. With [`--json`](#--json), an object of `{ "value", "origin", "file" }` per key.
+
+### `--show-origin`
+
+`config --list` only: start each line with where the value comes from (`user` or `project`) and the file.
+
+#### `--global` (config)
+
+With `config`: read or write the user file, `~/.config/sugatoray/aiskills.json` (the default for setting and unsetting). For other commands, [`-g`, `--global`](#-g---global) is the scope.
+
+#### `--project` (config)
+
+With `config`: read or write `./.aiskills.json` in the current folder. For other commands, [`-p`, `--project`](#-p---project) is the scope.
 
 ### `--`
 

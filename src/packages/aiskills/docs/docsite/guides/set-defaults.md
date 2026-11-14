@@ -34,10 +34,26 @@ Use `AISKILLS_*` environment variables when you run `aiskills` with the same cho
 
 ### Make them your defaults everywhere
 
-Put them in your shell profile (`~/.bashrc`, `~/.zshrc`, ...):
+Save them with [`aiskills config`](../reference/cli.md#config), which keeps them in `~/.config/sugatoray/aiskills.json`:
+
+```bash
+aiskills config agents claude-code,codex
+aiskills config --list
+```
+
+Or put the variables in your shell profile (`~/.bashrc`, `~/.zshrc`, ...); a variable wins over the config file:
 
 ```bash
 export AISKILLS_AGENTS=claude-code,codex
+```
+
+### Defaults for one project
+
+`aiskills config --project` writes `./.aiskills.json` in the current folder; there it wins over your own defaults:
+
+```bash
+aiskills config --project scope project
+aiskills config --project agents cursor
 ```
 
 ### Override a default for one command
@@ -50,7 +66,7 @@ aiskills install -a codex
 
 ## Troubleshooting
 
-- **A command installs for fewer agents or skills than expected**: a variable is set in your shell. `env | grep AISKILLS_` shows them.
+- **A command installs for fewer agents or skills than expected**: a variable is set in your shell, or a value in a config file. `env | grep AISKILLS_` shows the variables, `aiskills config --list --show-origin` the config, and `aiskills info` where each setting comes from.
 - **A name in `AISKILLS_SKILLS` isn't bundled**: `aiskills install` stops with `not provided by this package`. Fix the name, or set `AISKILLS_ROUTE=1` to look it up in the skills registry.
 
 See also: [Environment variables](../reference/environment.md) · [Installation](../getting-started/installation.md)

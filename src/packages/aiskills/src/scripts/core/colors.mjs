@@ -1,23 +1,36 @@
 // Colored output for the aiskills CLI, with no dependencies.
 //
 // Color is on when the output stream is a terminal, and can be forced either way:
-//   --no-color / --color (setColorFlag)  >  NO_COLOR  >  FORCE_COLOR  >  a terminal (not TERM=dumb)
+//   --no-color / --color (setColorFlag)  >  NO_COLOR  >  FORCE_COLOR
+//   >  `aiskills config color` always|never (setColorConfig)  >  a terminal (not TERM=dumb)
 // stdout and stderr are decided separately, so `aiskills info | less` is plain while
 // errors on the terminal stay red. JSON output never goes through these painters.
 
 const CODES = { bold: [1, 22], dim: [2, 22], red: [31, 39], green: [32, 39], yellow: [33, 39], cyan: [36, 39] };
 const set = (v) => v !== undefined && v !== "";
 
-/** Whether to color: flag (true/false from --color/--no-color, or null), the environment, and whether the stream is a terminal. */
-export function colorChoice({ flag = null, env = process.env, isTTY = false } = {}) {
+/**
+ * Whether to color: flag (true/false from --color/--no-color, or null), the environment,
+ * config ("auto", "always" or "never" from `aiskills config color`), and whether the stream is a terminal.
+ */
+export function colorChoice({ flag = null, env = process.env, config = "auto", isTTY = false } = {}) {
   if (flag === true || flag === false) return flag;
   if (set(env.NO_COLOR)) return false;
   if (set(env.FORCE_COLOR)) return !["0", "false"].includes(String(env.FORCE_COLOR).toLowerCase());
+  if (config === "always") return true;
+  if (config === "never") return false;
   return Boolean(isTTY) && env.TERM !== "dumb";
 }
 
 let flag = null;
+let configured = "auto";
 const decided = new Map();
+
+/** `aiskills config color`: "auto", "always" or "never". */
+export function setColorConfig(value) {
+  configured = value ?? "auto";
+  decided.clear();
+}
 
 /** --color (true), --no-color (false), or back to automatic (null). */
 export function setColorFlag(value) {
@@ -26,7 +39,7 @@ export function setColorFlag(value) {
 }
 
 function enabled(stream) {
-  if (!decided.has(stream)) decided.set(stream, colorChoice({ flag, isTTY: stream.isTTY }));
+  if (!decided.has(stream)) decided.set(stream, colorChoice({ flag, config: configured, isTTY: stream.isTTY }));
   return decided.get(stream);
 }
 
