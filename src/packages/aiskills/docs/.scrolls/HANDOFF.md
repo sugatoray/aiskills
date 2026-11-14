@@ -29,13 +29,17 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
+- **Docs site with two versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (open, stacked on #230; merge #230 first). While `package.json` is `x.y.z-dev`, `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds two pages:
+  - the newest `aiskills-vX.Y.Z` tag's docs (read with `git archive`) into `site/`;
+  - the working tree's docs into `site/dev/`.
+
+  `build-docs-html.mjs` gained `--version` and `--channel stable|dev --stable <v> --dev <v>`: a header version menu that keeps the `#page`, and a "not released yet" notice on dev. On a release, or with no tag, the site has one version and `site/dev/` redirects to the root. The workflow uses `fetch-depth: 0` and rebuilds on `aiskills-v*` tag pushes. Red/Green throughout, plus a browser test for switching versions and for the phone header (two bugs found by hand). 442 tests pass. The deploy itself is untested.
 - **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub** (pushed by the user on 2026-11-13). Each tag is checked: it is annotated, its commit equals npm's `gitHead`, the commit's `package.json` has that version, the commit is on `master`, and the message carries the npm publish time. MAINTAINERS → Releasing step 6 tags each future release the same way.
 - **`package.json` is `1.3.0-dev`** (on #230; the user's call on 2026-11-13). Changes collect under `## [1.3.0] - Unreleased` until the user releases 1.3.0. npm rejects `1.3.0.dev`, so the version uses SemVer pre-release form. The first entry is `run-code-review` 1.3.0, which now starts only when typed. Regenerated: banner, `index.html` and the version examples in `reference/cli.md` and `installation.md`. `aiskills rel` now prints `installed: 1.3.0-dev (not published on npm)` and marks no row as installed. MAINTAINERS → Releasing documents the `-dev` convention. 428 tests pass.
 - **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
-- **[#230](https://github.com/sugatoray/aiskills/pull/230) (open, not this package's PR):**
-  - adds `make link-skills`, with 24 relative symlinks that put the scrolls family, `create-issues-update-pr`, `create-lib-docs`, `network-flow` and `run-code-review` into the repo root's `.agents/skills/` and `.claude/skills/`;
-  - adds repo-wide scrolls at the root `docs/.scrolls/`.
-  - Nothing in this package changed. Its file list is the same with the links in place, and `npm test` passes all 428 tests after the rebase onto `master` `089f938`.
+- **[#230](https://github.com/sugatoray/aiskills/pull/230) (open):**
+  - Repo-wide: `make link-skills`, with 24 links into the repo root's `.agents/skills/` and `.claude/skills/`, and the root `docs/.scrolls/`.
+  - For this package: the `run-code-review` 1.3.0 docs page ("starts when you type it"), `1.3.0-dev`, and MAINTAINERS → Releasing step 6 (tag each release on its `gitHead`). 428 tests pass there.
 - **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
 
 ## Known issues / open threads

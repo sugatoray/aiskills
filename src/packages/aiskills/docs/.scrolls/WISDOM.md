@@ -21,6 +21,8 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - **Docs examples that show `aiskills` output need `<!-- verify -->`** (or `<!-- verify: list=… find=… -->`); the docs test runs them against the real skills and compares exactly. A version bump changes the `--version`/`--help` examples and the HTML.
 - The `files` list in `package.json` decides what ships. The scrolls files, `CLAUDE.md` etc. must stay out of the tarball. Anything `"files"` lists can't be excluded by `.npmignore` (npm's documented rule), so `.npmignore` only matters for paths outside `"files"`; its root-anchored memory-file entries (`/CLAUDE.md`, …) are a safety net for if `"files"` is removed. Keep the leading `/`, or same-named files inside bundled skills would be dropped too.
 
+- **The docs builder must keep reading the newest release's docs.** `build-site.mjs` builds the stable page from the newest `aiskills-vX.Y.Z` tag's `docs/` with the current `build-docs-html.mjs`. So a change to what the builder expects (the landing page's `### Section` lists, `images/`, the banner markers) must still accept that release's docs, or the website's stable page breaks until the next release. Check with `npm run docs:site` while `package.json` is `-dev`. The workflow test does this whenever the clone has the tags.
+
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.
 
