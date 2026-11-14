@@ -2,14 +2,14 @@
 
 The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ ]` → `[x]`) as work completes, and re-prioritize when new requests change the calculus — this file reflects what's next, not a permanent record (that's what git history is for).
 
-- [ ] Owner reviews [#223](https://github.com/sugatoray/aiskills/pull/223) (1.2.0) and decides on the merge into `master`; merging closes #226–#229. Not to be merged without being asked.
+- [x] #223 merged into `master` (squash `089f938`), closing #226–#229.
 - [x] Search and the docs site's light/dark switch in the HTML report.
 - [x] The owner's mockup annotations: pinned header and collapsible verdict in `assets/report-template.html`, with `tests/test_report_page.py`.
 - [x] #223 retargeted to #215's branch, retitled and described as the 1.2.0 PR; issues #226–#228 filed.
 - [x] #215 merged into `master` (squash `7c0afec`), closing #216–#222, #224 and #225; #223 retargeted to `master` and rebased onto it.
 - [x] After #215 merged: `HANDOFF.md` and `SPEC.md`'s opening note say 1.0.0–1.1.0 is on `master`.
 - [x] `@sugatoray-ai/aiskills` 1.2.0 prepared in #223 (`eaeba06`), the owner's choice.
-- [ ] After #223 merges: the owner publishes 1.2.0 to npm; record it in the package's SPEC release note.
+- [x] `@sugatoray-ai/aiskills` 1.2.0 published to npm (2026-11-13, `latest`); recorded in the package's SPEC release note.
 - [x] Build `/run-code-review` 1.0.0 under `skills/development/review/`: workflow, shared references, seven languages, detector with tests, `review-skills` plugin, npm package docs.
 - [x] 1.1.0: `-l`/`--lang`, `-s`/`--security`, scope flags, `SECURITY.md` and `WISDOM.md` in every language folder, HTML/CSS/Markdown/XML.
 - [x] 1.1.0: tool-first XML, JSON, YAML and TOML with `scripts/check_formats.py`; XML keeps its full review.

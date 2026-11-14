@@ -3,11 +3,12 @@ name: run-code-review
 description: "Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed; -o writes it as HTML, Markdown or JSON with line links. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked."
 license: MIT
 compatibility: "Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required."
+disable-model-invocation: true
 metadata:
   name: run-code-review
   type: skill
   author: sugatoray
-  version: "1.2.0"
+  version: "1.3.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review"
 ---
 

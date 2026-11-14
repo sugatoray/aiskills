@@ -336,3 +336,14 @@ npx skills add sugatoray/aiskills --skill commentdrop
 ```
 
 For Claude Code, use `/plugin marketplace add sugatoray/aiskills` and `/plugin install image-styles-skills@sugatoray`. Choose one installation route.
+
+## Working on this repository
+
+The skills in `skills/` can be linked into `.agents/skills/` and `.claude/skills/`, so agents working in this repository use the source directly: an edit to a skill takes effect without reinstalling it. The scrolls family and `create-issues-update-pr` are linked. To link more, or check the links:
+
+```sh
+make link-skills SKILL=skills/scrolls      # one skill, or every skill below a folder
+make check-skill-links                     # every link resolves to a skill of the same name
+```
+
+See [scripts/README.md](scripts/README.md).

@@ -2,4 +2,4 @@ interface:
   display_name: "Run-Code-Review"
   short_description: "Reviews a PR, diff, files or repo at a staff engineer's bar and returns a structured report: verdict, findings by severity with file and line, and suggested code changes."
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false
