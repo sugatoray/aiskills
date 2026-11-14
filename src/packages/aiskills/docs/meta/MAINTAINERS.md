@@ -266,7 +266,7 @@ every `npx` call runs. To move to a newer one:
    the `aiskills.json` sample).
 3. **Date the section** (`## [x.y.z] - YYYY-MM-DD`) and make sure `npm test`
    and `npm run test:e2e` pass. Commit.
-4. `npm run pack:dry` and check the file list (only `bin/`, the three
+4. `npm run pack:dry` and check the file list (only `bin/`, the
    `src/scripts/core/` files, the skills, metadata and the root docs), then
    `npm run clean`.
 5. `npm publish`, logged in as a member of the `sugatoray-ai` npm org.

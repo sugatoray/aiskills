@@ -75,7 +75,19 @@ The base URL of the npm download counts API that [`aiskills releases --downloads
 
 ### `TERM`
 
-Set by your terminal. When it is `dumb`, [`aiskills releases`](cli.md#releases) draws the downloads chart with `#`, as with [`--ascii`](cli.md#--ascii).
+Set by your terminal. When it is `dumb`, [`aiskills releases`](cli.md#releases) draws the downloads chart with `#`, as with [`--ascii`](cli.md#--ascii), and the output isn't colored.
+
+## Colored output
+
+On a terminal, `aiskills` colors its output; piped output is plain. See [Colored output](cli.md#colored-output). Both variables are also passed on to `npx skills`.
+
+### `NO_COLOR`
+
+Any non-empty value turns color off, as [`--no-color`](cli.md#--no-color) does. Wins over `FORCE_COLOR`; `--color` wins over it. The [NO_COLOR](https://no-color.org) convention.
+
+### `FORCE_COLOR`
+
+Any non-empty value except `0` or `false` turns color on even when the output isn't a terminal, as [`--color`](cli.md#--color) does. `NO_COLOR` and `--no-color` win over it.
 
 ## Read by `npx skills`, passed through
 
