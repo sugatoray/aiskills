@@ -184,7 +184,7 @@
             "layout",
             "nested"
           ],
-          "note": "Sets a default in the user file, ~/.config/sugatoray/aiskills.json; prints nothing."
+          "note": "Sets a default in the user file, ~/.config/sugatoray/aiskills-config.json; prints nothing."
         },
         {
           "args": [

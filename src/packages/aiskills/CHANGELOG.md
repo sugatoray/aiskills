@@ -29,7 +29,7 @@ and date this section.
 - **`aiskills config`**, like `git config`: `aiskills config <key>` prints a
   default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it,
   and `--list` (with `--show-origin` or `--json`) shows what is set. Defaults
-  live in `~/.config/sugatoray/aiskills.json`, or with `--project` in
+  live in `~/.config/sugatoray/aiskills-config.json`, or with `--project` in
   `./.aiskills.json`, which wins over it. Keys: `scope`, `agents`, `skills`,
   `groups`, `copy`, `route`, `layout`, `stats`, `skills-version` (the same
   defaults as the `AISKILLS_*` variables) and `color`; each value is checked

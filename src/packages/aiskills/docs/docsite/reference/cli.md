@@ -220,7 +220,7 @@ aiskills info
   aiskills version : 1.3.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
-       user config : ~/.config/sugatoray/aiskills.json  (not created)
+       user config : ~/.config/sugatoray/aiskills-config.json  (not created)
     project config : ./.aiskills.json  (not created)
       saved skills : 17 skills in 9 groups, flat layout
 …
@@ -288,8 +288,8 @@ aiskills config --unset layout
 
 ```text
 claude-code,codex
-user  ~/.config/sugatoray/aiskills.json  agents=claude-code,codex
-user  ~/.config/sugatoray/aiskills.json  layout=nested
+user  ~/.config/sugatoray/aiskills-config.json  agents=claude-code,codex
+user  ~/.config/sugatoray/aiskills-config.json  layout=nested
 ```
 
 Setting, unsetting and a value that is set print nothing more and exit `0`.
@@ -298,7 +298,7 @@ Setting, unsetting and a value that is set print nothing more and exit `0`.
 
 | File | Option | Holds |
 | --- | --- | --- |
-| `~/.config/sugatoray/aiskills.json` | [`--global`](#--global-config) (the default) | Your defaults, for every project. It sits next to the install folder, not in it, so [`uninstall --purge`](#--purge) keeps it. |
+| `~/.config/sugatoray/aiskills-config.json` | [`--global`](#--global-config) (the default) | Your defaults, for every project. It sits next to the install folder, not in it, so [`uninstall --purge`](#--purge) keeps it. |
 | `./.aiskills.json` | [`--project`](#--project-config) | Defaults for the current folder. They win over the user file. |
 
 **Keys.** Each stands for an [`AISKILLS_*`](environment.md) variable, except `color`:
@@ -592,7 +592,7 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
-                 --list, alias.<name>; in ~/.config/sugatoray/aiskills.json (or ./.aiskills.json with --project)
+                 --list, alias.<name>; in ~/.config/sugatoray/aiskills-config.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -673,7 +673,7 @@ config only:
   -l, --list             Every key that is set (the project file wins over the user file)
       --show-origin      With --list: which file each value comes from
       --json             With --list: as JSON
-      --global           The user file, ~/.config/sugatoray/aiskills.json (the default for set and unset)
+      --global           The user file, ~/.config/sugatoray/aiskills-config.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
   alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name)
   Order: option > AISKILLS_* variable > project file > user file > remembered > default.
@@ -930,7 +930,7 @@ On a terminal, `aiskills` colors its output: the `[aiskills]` prefix dim, errors
 
 #### `--global` (config)
 
-With `config`: read or write the user file, `~/.config/sugatoray/aiskills.json` (the default for setting and unsetting). For other commands, [`-g`, `--global`](#-g---global) is the scope.
+With `config`: read or write the user file, `~/.config/sugatoray/aiskills-config.json` (the default for setting and unsetting). For other commands, [`-g`, `--global`](#-g---global) is the scope.
 
 #### `--project` (config)
 

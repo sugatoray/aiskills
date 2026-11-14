@@ -1,7 +1,7 @@
 // `aiskills config`: persistent defaults and aliases, like `git config`.
 //
 // Two JSON files, each a flat object of key: value:
-//   user     ~/.config/sugatoray/aiskills.json   (aiskills config --global, the default)
+//   user     ~/.config/sugatoray/aiskills-config.json   (aiskills config --global, the default)
 //   project  ./.aiskills.json                    (aiskills config --project)
 // The user file sits next to the install folder, not in it, so `uninstall --purge`
 // keeps it. A setting is looked up in this order:
@@ -102,7 +102,7 @@ export function splitArgs(s) {
 
 /** The two config files. */
 export function configFiles({ home = homedir(), cwd = process.cwd() } = {}) {
-  return { user: join(home, ".config", "sugatoray", "aiskills.json"), project: join(cwd, ".aiskills.json") };
+  return { user: join(home, ".config", "sugatoray", "aiskills-config.json"), project: join(cwd, ".aiskills.json") };
 }
 
 /** A config file's contents ({} when it doesn't exist). */

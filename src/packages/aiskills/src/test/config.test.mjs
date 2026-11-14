@@ -5,7 +5,7 @@
 //   aiskills config --unset <key>         remove it
 //   aiskills config --list [--show-origin] [--json]
 //
-// Files: ~/.config/sugatoray/aiskills.json (user, --global) and ./.aiskills.json
+// Files: ~/.config/sugatoray/aiskills-config.json (user, --global) and ./.aiskills.json
 // (project, --project). Precedence: option > AISKILLS_* > project > user >
 // remembered (aiskills.json in the install root) > default.
 import assert from "node:assert/strict";
@@ -47,9 +47,16 @@ describe("config keys and values", () => {
   });
 });
 
+describe("config files", () => {
+  test("the user file is aiskills-config.json, next to the install folder, so it isn't mistaken for the install folder's aiskills.json", async () => {
+    const { configFiles } = await import(CONFIG);
+    assert.deepEqual(configFiles({ home: "/h", cwd: "/w" }), { user: join("/h", ".config", "sugatoray", "aiskills-config.json"), project: join("/w", ".aiskills.json") });
+  });
+});
+
 describe("aiskills config", posixOnly, () => {
   let sb;
-  const userFile = () => join(sb.home, ".config", "sugatoray", "aiskills.json");
+  const userFile = () => join(sb.home, ".config", "sugatoray", "aiskills-config.json");
   const projectFile = () => join(sb.dir, ".aiskills.json");
   const reset = () => {
     rmSync(userFile(), { force: true });
@@ -106,7 +113,7 @@ describe("aiskills config", posixOnly, () => {
     assert.equal(run(["config", "--list"]).out, "agents=codex\nlayout=nested\n");
     assert.equal(run(["config", "-l"]).out, "agents=codex\nlayout=nested\n");
     const origin = run(["config", "--list", "--show-origin"]).out.replaceAll(sb.home, "~").replaceAll(sb.dir, ".");
-    assert.equal(origin, "project  ./.aiskills.json                   agents=codex\nuser     ~/.config/sugatoray/aiskills.json  layout=nested\n");
+    assert.equal(origin, "project  ./.aiskills.json                          agents=codex\nuser     ~/.config/sugatoray/aiskills-config.json  layout=nested\n");
     const json = JSON.parse(run(["config", "--list", "--json"]).out);
     assert.deepEqual(json.agents, { value: "codex", origin: "project", file: projectFile() });
     assert.deepEqual(json.layout, { value: "nested", origin: "user", file: userFile() });
@@ -136,7 +143,7 @@ describe("aiskills config", posixOnly, () => {
     writeFileSync(userFile(), "{ nope");
     const r = run(["config", "layout", "nested"]);
     assert.equal(r.status, 1);
-    assert.match(r.out, /aiskills\.json is not valid JSON/);
+    assert.match(r.out, /aiskills-config\.json is not valid JSON/);
     assert.equal(readFileSync(userFile(), "utf8"), "{ nope");
   });
 });
@@ -148,7 +155,7 @@ describe("config values take effect", posixOnly, () => {
   });
   after(() => sb.cleanup());
   beforeEach(() => {
-    rmSync(join(sb.home, ".config", "sugatoray", "aiskills.json"), { force: true });
+    rmSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json"), { force: true });
     rmSync(join(sb.dir, ".aiskills.json"), { force: true });
     rmSync(sb.root, { recursive: true, force: true });
   });
@@ -201,7 +208,7 @@ describe("config values take effect", posixOnly, () => {
     run(["config", "layout", "nested"]);
     run(["config", "--project", "scope", "project"]);
     const out = run(["info"], { NO_COLOR: "1" }).out.replaceAll(sb.home, "~").replaceAll(sb.dir, ".");
-    assert.match(out, /user config : ~\/\.config\/sugatoray\/aiskills\.json\n/);
+    assert.match(out, /user config : ~\/\.config\/sugatoray\/aiskills-config\.json\n/);
     assert.match(out, /project config : \.\/\.aiskills\.json\n/);
     assert.match(out, /scope : project {2}\(project config\)/);
     assert.match(out, /layout : nested {2}\(user config\)/);
@@ -231,7 +238,7 @@ describe("aiskills <alias>", posixOnly, () => {
   });
   after(() => sb.cleanup());
   beforeEach(() => {
-    rmSync(join(sb.home, ".config", "sugatoray", "aiskills.json"), { force: true });
+    rmSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json"), { force: true });
     rmSync(join(sb.dir, ".aiskills.json"), { force: true });
   });
   const run = (args, env = {}) => sb.run(args, { env });
