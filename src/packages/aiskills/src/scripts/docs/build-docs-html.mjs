@@ -161,7 +161,8 @@ export function versionParts(version, menu) {
     .join("");
   const html =
     `<details class="ver-menu"><summary class="brand-ver" title="Docs version">v${escHtml(version)}</summary>` +
-    `<div class="ver-list">${links}</div></details>`;
+    `<div class="ver-list"><input class="ver-find" type="search" placeholder="Find a version" aria-label="Find a version" autocomplete="off" spellcheck="false">` +
+    `${links}<p class="ver-none" hidden>No version matches</p></div></details>`;
   const toLatest = `<a href="${href(latest[0])}">${escHtml(latest[0].version)} docs</a>`;
   const note =
     here.kind === "dev"
