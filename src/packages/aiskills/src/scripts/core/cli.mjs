@@ -162,7 +162,8 @@ config only:
       --json             With --list: as JSON
       --global           The user file, ~/.config/sugatoray/aiskills-config.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
-  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name)
+  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name);
+                         '!<shell command>' runs it in the shell (user file only, not --project)
   Order: option > AISKILLS_* variable > project file > user file > remembered > default.
 
 uninstall only:
@@ -440,7 +441,7 @@ function config(argv) {
   }
   if (words.length === 2) {
     const [key, raw] = words;
-    const value = parseConfigValue(key, raw);
+    const value = parseConfigValue(key, raw, { origin: only ?? "user" });
     if (isAliasKey(key) && COMMANDS.has(key.slice(6))) throw new Error(`${key}: '${key.slice(6)}' is an aiskills command; an alias can't replace it`);
     if (key === "skills-version") skillsVersionSpec(value, "skills-version");
     const file = files[only ?? "user"];
@@ -814,7 +815,10 @@ function upgrade(o) {
 /** The commands and their short names; an alias can't use one of these names. */
 const COMMANDS = new Set(["install", "i", "uninstall", "remove", "rm", "r", "installed", "ls", "find", "f", "groups", "g", "skills", "sync", "list", "info", "config", "upgrade", "releases", "rel", "path", "p", "help", "h"]);
 
-/** `aiskills <alias> ...`: the alias's command and options, then the rest; aliases may use aliases. */
+/**
+ * `aiskills <alias> ...`: the alias's command and options, then the rest; aliases may use aliases.
+ * Returns { argv }, or { shell, args } for a shell alias (!...), which only the user file can hold.
+ */
 function expandAlias(argv) {
   const seen = [];
   while (argv.length && !argv[0].startsWith("-") && !COMMANDS.has(argv[0])) {
@@ -823,15 +827,31 @@ function expandAlias(argv) {
     let found;
     try {
       found = configValue(`alias.${name}`);
-    } catch {
+    } catch (err) {
+      // A shell alias in a project file is refused here, before anything runs.
+      if (/shell aliases/.test(err.message)) throw err;
       break; // a broken config file is reported by the command that reads it
     }
     if (!found) break;
+    if (found.value.startsWith("!")) {
+      if (seen.includes(name)) throw new Error(`alias loop: ${[...seen, name].join(" → ")}`);
+      return { shell: found.value.slice(1), args: argv.slice(1) };
+    }
     if (seen.includes(name)) throw new Error(`alias loop: ${[...seen, name].join(" → ")}`);
     seen.push(name);
     argv = [...splitArgs(found.value), ...argv.slice(1)];
   }
-  return argv;
+  return { argv };
+}
+
+/** Run a shell alias: its command, then the arguments after it ("$@"), like git's ! aliases. */
+function runShellAlias(command, args) {
+  const r =
+    process.platform === "win32"
+      ? spawnSync([command, ...args.map((a) => `"${a.replace(/"/g, '\\"')}"`)].join(" "), { stdio: "inherit", shell: true })
+      : spawnSync("sh", ["-c", `${command} "$@"`, command, ...args], { stdio: "inherit" });
+  if (r.error) throw r.error;
+  return r.status ?? 1;
 }
 
 function main() {
@@ -856,7 +876,9 @@ function main() {
   try {
     setColorConfig(configValue("color")?.value);
   } catch {}
-  let [cmd = "install", ...rest] = expandAlias(argv);
+  const alias = expandAlias(argv);
+  if (alias.shell !== undefined) return runShellAlias(alias.shell, alias.args);
+  let [cmd = "install", ...rest] = alias.argv;
   if (!["skills", "find", "f"].includes(cmd)) {
     const end = rest.includes("--") ? rest.indexOf("--") : rest.length;
     rest = [...rest.slice(0, end).filter((a) => !colorFlag(a)), ...rest.slice(end)];

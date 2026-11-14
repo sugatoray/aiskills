@@ -337,7 +337,8 @@ aiskills config --unset alias.where
 - The value is split like a shell would: quote an argument that has spaces (`"my skill"`).
 - An alias may use another alias; a loop (`a` → `b` → `a`) is an error.
 - Names are lowercase letters, digits and dashes. A command or its short name (`install`, `i`, `config`, ...) can't be an alias, so an alias never changes what a command does.
-- An alias runs an aiskills command only: shell aliases (`!...` in git) aren't supported, so a project's `./.aiskills.json` can't run other programs.
+- **Shell aliases**, as in git: a value starting with `!` runs through the shell (`sh -c`; `cmd` on Windows), with the arguments after the alias passed on as `"$@"`, and exits with the command's exit code. `aiskills config alias.where-skills '!ls ~/.config/sugatoray/aiskills/skills'`, then `aiskills where-skills`.
+- **Only in your user file.** A shell alias can be set in `~/.config/sugatoray/aiskills-config.json` only. A project's `./.aiskills.json` usually comes with someone else's folder, so it can't hold one: `aiskills config --project alias.x '!...'` is refused, and a `!` alias written into that file by hand stops with an error instead of running. (git keeps its aliases in files you write, not in the repository, for the same reason.)
 - Aliases live in the same files as the defaults; `--project` makes one for the current folder, and `--list` shows them.
 
 Errors: an unknown key or a value a key doesn't take stops with a message and changes nothing (see [Config errors](errors.md#config-errors)).
@@ -675,7 +676,8 @@ config only:
       --json             With --list: as JSON
       --global           The user file, ~/.config/sugatoray/aiskills-config.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
-  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name)
+  alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name);
+                         '!<shell command>' runs it in the shell (user file only, not --project)
   Order: option > AISKILLS_* variable > project file > user file > remembered > default.
 
 uninstall only:

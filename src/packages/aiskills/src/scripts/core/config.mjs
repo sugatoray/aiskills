@@ -46,8 +46,11 @@ export function assertConfigKey(key) {
   return CONFIG_KEYS[key];
 }
 
-/** A value as given on the command line (or found in a file), checked and normalized for <key>. */
-export function parseConfigValue(key, raw) {
+/**
+ * A value as given on the command line (or found in a file), checked and normalized for <key>.
+ * origin: the file it is for, "user" or "project"; a shell alias (!...) is only allowed in the user file.
+ */
+export function parseConfigValue(key, raw, { origin = "user" } = {}) {
   const k = assertConfigKey(key);
   const v = String(raw).trim();
   if (k.kind === "bool") {
@@ -61,7 +64,13 @@ export function parseConfigValue(key, raw) {
     return low;
   }
   if (k.kind === "alias") {
-    if (v.startsWith("!")) throw new Error(`${key}: shell aliases (!...) aren't supported; an alias runs an aiskills command`);
+    if (v.startsWith("!")) {
+      // A project's ./.aiskills.json comes with the folder (often someone else's repo),
+      // so it must not be able to run programs: shell aliases only from the user's own file.
+      if (origin !== "user") throw new Error(`${key}: shell aliases (!...) are only allowed in the user file, ${displayPath(configFiles().user)}`);
+      if (!v.slice(1).trim()) throw new Error(`${key} needs a value`);
+      return `!${v.slice(1).trim()}`;
+    }
     if (!v) throw new Error(`${key} needs a value`);
     splitArgs(v);
     return v;
@@ -132,7 +141,7 @@ function entriesOf(origin, files = configFiles()) {
   for (const [key, raw] of Object.entries(readConfigFile(file))) {
     if (!Object.hasOwn(CONFIG_KEYS, key) && !isAliasKey(key)) continue; // a key from a newer aiskills: ignored
     try {
-      out[key] = { value: parseConfigValue(key, raw), origin, file };
+      out[key] = { value: parseConfigValue(key, raw, { origin }), origin, file };
     } catch (err) {
       throw new Error(`${file}: ${err.message}`);
     }

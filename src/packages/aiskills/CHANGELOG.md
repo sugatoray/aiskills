@@ -38,8 +38,9 @@ and date this section.
   a setting comes from one, and has a new `color` line.
   Aliases, like `git config alias.*`: `aiskills config alias.gi "install -g"`
   makes `aiskills gi ...` run `aiskills install -g ...`. An alias may use
-  another alias (a loop is an error), can't replace a command, and runs only
-  aiskills commands (no `!` shell aliases).
+  another alias (a loop is an error) and can't replace a command. Shell
+  aliases (`!...`), as in git, are allowed in the user file only: a project's
+  `./.aiskills.json` can't run programs.
 - **Colored output.** On a terminal, `aiskills` colors its output: the
   `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
   green, and commands to run cyan; the headings in `--help`, the labels and

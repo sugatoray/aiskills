@@ -225,7 +225,10 @@ describe("config aliases, like git config alias.*", () => {
     assert.throws(() => assertConfigKey("alias.Bad_Name"), /alias names are lowercase letters, digits and dashes/);
     assert.equal(parseConfigValue("alias.gi", "  install -g  "), "install -g");
     assert.throws(() => parseConfigValue("alias.gi", " "), /alias\.gi needs a value/);
-    assert.throws(() => parseConfigValue("alias.sh", "!rm -rf /"), /shell aliases \(!\.\.\.\) aren't supported/);
+    assert.equal(parseConfigValue("alias.hi", " !echo hi "), "!echo hi", "a shell alias, in the user file");
+    assert.equal(parseConfigValue("alias.hi", "!echo hi", { origin: "user" }), "!echo hi");
+    assert.throws(() => parseConfigValue("alias.hi", "!echo hi", { origin: "project" }), /alias\.hi: shell aliases \(!\.\.\.\) are only allowed in the user file/);
+    assert.throws(() => parseConfigValue("alias.hi", "! "), /alias\.hi needs a value/);
     assert.deepEqual(splitArgs(`install -s "my skill" -a 'claude-code' x\\ y`), ["install", "-s", "my skill", "-a", "claude-code", "x y"]);
     assert.throws(() => splitArgs(`install "open`), /unclosed quote/);
   });
@@ -278,6 +281,36 @@ describe("aiskills <alias>", posixOnly, () => {
     const r = run(["nope"]);
     assert.equal(r.status, 1);
     assert.match(r.out, /unknown command: nope/);
+  });
+
+  test("a shell alias (!...) in the user file runs through the shell, with the arguments after it, and passes on the exit code", () => {
+    assert.equal(run(["config", "alias.hello", "!echo hello"]).status, 0);
+    const r = run(["hello", "big world"]);
+    assert.equal(r.status, 0, r.out);
+    assert.equal(r.out, "hello big world\n");
+    run(["config", "alias.three", "!exit 3"]);
+    assert.equal(run(["three"]).status, 3);
+    run(["config", "alias.sh-of-alias", "hello"]);
+    assert.equal(run(["sh-of-alias", "again"]).out, "hello again\n", "an alias may use a shell alias");
+  });
+
+  test("a project's ./.aiskills.json can't have a shell alias: refused when set, and never run when written by hand", () => {
+    const set = run(["config", "--project", "alias.boom", "!touch pwned"]);
+    assert.equal(set.status, 1);
+    assert.match(set.out, /alias\.boom: shell aliases \(!\.\.\.\) are only allowed in the user file/);
+    assert.ok(!existsSync(join(sb.dir, ".aiskills.json")), "nothing written");
+    writeFileSync(join(sb.dir, ".aiskills.json"), JSON.stringify({ "alias.setup": "!touch pwned" }));
+    const r = run(["setup"]);
+    assert.equal(r.status, 1);
+    assert.match(r.out, /shell aliases \(!\.\.\.\) are only allowed in the user file/);
+    assert.ok(!existsSync(join(sb.dir, "pwned")), "the shell command did not run");
+    rmSync(join(sb.dir, ".aiskills.json"));
+  });
+
+  test("a project alias of the same name wins over a user shell alias", () => {
+    run(["config", "alias.where", "!echo user"]);
+    run(["config", "--project", "alias.where", "path"]);
+    assert.equal(run(["where"]).out.trim(), sb.root);
   });
 
   test("--unset removes an alias", () => {
