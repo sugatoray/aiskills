@@ -87,7 +87,9 @@ describe("the CLI in color", { skip: process.platform === "win32" && "stand-in n
       const [plain, colored] = both(args, { AISKILLS_TODAY: "2026-11-12" });
       assert.ok(!plain.out.includes(ESC), `${args.join(" ")}: no color when piped`);
       assert.ok(colored.out.includes(ESC), `${args.join(" ")}: FORCE_COLOR colors it`);
-      assert.equal(strip(colored.out), plain.out, `${args.join(" ")}: same text and alignment`);
+      // info's "color" line reports FORCE_COLOR itself, so it differs by design.
+      const noColorLine = (s) => s.replace(/^ *color : .*\n/m, "");
+      assert.equal(noColorLine(strip(colored.out)), noColorLine(plain.out), `${args.join(" ")}: same text and alignment`);
     }
   });
 

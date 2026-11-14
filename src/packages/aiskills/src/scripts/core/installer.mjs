@@ -29,6 +29,7 @@ export function installRoot() {
 }
 
 import { log, warn } from "./colors.mjs";
+import { configValue } from "./config.mjs";
 export { log, warn };
 
 // Reverse of the renames done by src/scripts/pack/vendor-skills.mjs.
@@ -61,10 +62,12 @@ export const packageLayout = (pkgDir = PKG_DIR) => readJson(join(pkgDir, LAYOUT_
 
 /**
  * Which layout to write: an explicit --nested/--flat wins, then
- * AISKILLS_LAYOUT, then whatever the last sync used, then "flat".
+ * AISKILLS_LAYOUT, then `aiskills config layout`, then whatever the last sync
+ * used, then "flat".
  */
 export function resolveLayout(explicit, root = installRoot()) {
-  const pick = explicit ?? process.env.AISKILLS_LAYOUT?.toLowerCase() ?? readJson(join(root, "aiskills.json"))?.layout ?? "flat";
+  const pick =
+    explicit ?? process.env.AISKILLS_LAYOUT?.toLowerCase() ?? configValue("layout")?.value ?? readJson(join(root, "aiskills.json"))?.layout ?? "flat";
   if (!LAYOUTS.includes(pick)) throw new Error(`unknown layout '${pick}' (use ${LAYOUTS.join(" or ")})`);
   return pick;
 }
@@ -238,11 +241,13 @@ let announced = false;
  * profile, .envrc or CI variable can't happen silently.
  */
 export function skillsPackageSpec() {
-  const current = process.env[SKILLS_LIB_VERSION_VAR]?.trim();
-  const spec = skillsVersionSpec(current || SKILLS_CLI_VERSION, SKILLS_LIB_VERSION_VAR);
+  const fromEnv = process.env[SKILLS_LIB_VERSION_VAR]?.trim();
+  const fromConfig = fromEnv ? null : configValue("skills-version")?.value;
+  const source = fromEnv ? SKILLS_LIB_VERSION_VAR : "aiskills config skills-version";
+  const spec = skillsVersionSpec(fromEnv || fromConfig || SKILLS_CLI_VERSION, fromEnv ? SKILLS_LIB_VERSION_VAR : fromConfig ? "skills-version" : SKILLS_LIB_VERSION_VAR);
   if (spec !== SKILLS_CLI_VERSION && !announced) {
     announced = true;
-    log(`using skills@${spec} from ${SKILLS_LIB_VERSION_VAR}, not the tested ${SKILLS_CLI_VERSION}`);
+    log(`using skills@${spec} from ${source}, not the tested ${SKILLS_CLI_VERSION}`);
   }
   return `skills@${spec}`;
 }
@@ -776,8 +781,8 @@ const FALSE = /^(0|false|no|off)$/i;
 
 /**
  * Whether `aiskills install` adds the install to the skills.sh count:
- * --stats / --no-stats, then AISKILLS_STATS, then the choice remembered in
- * <root>/aiskills.json, then on. DO_NOT_TRACK, DISABLE_TELEMETRY (which the
+ * --stats / --no-stats, then AISKILLS_STATS, then `aiskills config stats`, then
+ * the choice remembered in <root>/aiskills.json, then on. DO_NOT_TRACK, DISABLE_TELEMETRY (which the
  * skills CLI honours too) and CI (CI, GITHUB_ACTIONS) always turn it off.
  */
 export function resolveStats(explicit, root = installRoot()) {
@@ -790,6 +795,8 @@ export function resolveStats(explicit, root = installRoot()) {
     if (FALSE.test(v)) return false;
     throw new Error(`AISKILLS_STATS must be 1 or 0 (or true/false, yes/no, on/off); got '${v}'`);
   }
+  const configured = configValue("stats");
+  if (configured) return configured.value;
   const saved = readJson(join(root, "aiskills.json"))?.stats;
   return typeof saved === "boolean" ? saved : true;
 }
@@ -871,13 +878,16 @@ const csv = (v) => (v ? v.split(",").map((s) => s.trim()).filter(Boolean) : []);
 /** Options for skillsAdd() taken from AISKILLS_* environment variables. */
 export function envOptions() {
   const e = process.env;
+  // An AISKILLS_* variable wins over `aiskills config`, which wins over the default.
+  const cfg = (key) => configValue(key)?.value;
+  const flag = (v, key) => (v ? /^(1|true|yes)$/i.test(v) : cfg(key) === true);
   return {
-    global: (e.AISKILLS_SCOPE || "global").toLowerCase() !== "project",
-    agents: csv(e.AISKILLS_AGENTS),
-    skills: csv(e.AISKILLS_SKILLS),
-    groups: csv(e.AISKILLS_GROUPS),
-    copy: /^(1|true|yes)$/i.test(e.AISKILLS_COPY || ""),
-    route: /^(1|true|yes)$/i.test(e.AISKILLS_ROUTE || ""),
+    global: (e.AISKILLS_SCOPE || cfg("scope") || "global").toLowerCase() !== "project",
+    agents: csv(e.AISKILLS_AGENTS || cfg("agents")),
+    skills: csv(e.AISKILLS_SKILLS || cfg("skills")),
+    groups: csv(e.AISKILLS_GROUPS || cfg("groups")),
+    copy: flag(e.AISKILLS_COPY, "copy"),
+    route: flag(e.AISKILLS_ROUTE, "route"),
     layout: undefined, // --nested / --flat; AISKILLS_LAYOUT is read by resolveLayout()
   };
 }

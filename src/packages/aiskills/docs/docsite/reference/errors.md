@@ -345,6 +345,55 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 **Cause:** [`AISKILLS_TODAY`](environment.md#aiskills_today) is set to something that isn't a real date. **Fix:** a date like `2026-11-12`, or unset it.
 
+## Config errors
+
+From [`aiskills config`](cli.md#config), and from any command that reads a config file.
+
+### Unknown config key
+
+```text
+unknown config key: <key> (keys: agents, color, copy, groups, layout, route, scope, skills, skills-version, stats)
+```
+
+**Fix:** use one of the listed keys. Keys are lowercase and use a hyphen (`skills-version`).
+
+### Value not valid for the key
+
+```text
+<key> must be <values>; got '<value>'
+<key> must be true or false (or yes/no, on/off, 1/0); got '<value>'
+<key> needs at least one name
+<key> needs a value
+skills-version must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
+```
+
+**Fix:** give a value the key takes; the [keys table](cli.md#config) lists them. Nothing is written.
+
+### Not set
+
+```text
+<key> is not set in <file>
+```
+
+**Fix:** `--unset` only removes what that file holds. Check with `aiskills config --list --show-origin`, and add `--project` for `./.aiskills.json`.
+
+### Config file not valid JSON
+
+```text
+<file> is not valid JSON; fix it or delete it
+<file>: <key> must be ...
+```
+
+**Fix:** a config file is a JSON object such as `{"layout": "nested"}`. Correct the file, or delete it and set the values again. Any command that reads settings stops on it, so the broken file doesn't silently stop counting.
+
+### Config usage
+
+```text
+usage: aiskills config <key> [<value>] | --unset <key> | --list [--show-origin] [--json]  [--global | --project]
+```
+
+**Fix:** pass a key (to read), a key and a value (to set), `--unset <key>`, or `--list`.
+
 ## Upgrade
 
 ### Can't upgrade

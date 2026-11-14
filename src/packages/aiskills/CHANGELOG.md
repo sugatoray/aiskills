@@ -26,6 +26,16 @@ and date this section.
 
 ### Added
 
+- **`aiskills config`**, like `git config`: `aiskills config <key>` prints a
+  default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it,
+  and `--list` (with `--show-origin` or `--json`) shows what is set. Defaults
+  live in `~/.config/sugatoray/aiskills.json`, or with `--project` in
+  `./.aiskills.json`, which wins over it. Keys: `scope`, `agents`, `skills`,
+  `groups`, `copy`, `route`, `layout`, `stats`, `skills-version` (the same
+  defaults as the `AISKILLS_*` variables) and `color`; each value is checked
+  when it's set. Order: option > `AISKILLS_*` variable > project file > user
+  file > remembered > default. `aiskills info` lists both files and shows when
+  a setting comes from one, and has a new `color` line.
 - **Colored output.** On a terminal, `aiskills` colors its output: the
   `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
   green, and commands to run cyan; the headings in `--help`, the labels and

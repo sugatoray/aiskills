@@ -37,6 +37,17 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 | `installedAt` | string (ISO 8601) | When the folder was last synced. |
 | `skills` | string (absolute path) | The `skills/` folder. |
 
+## Config files
+
+Written by [`aiskills config`](cli.md#config). Each is a JSON object of key → value, for example `{"agents": "claude-code,codex", "layout": "nested"}`; the keys and values are listed under [`config`](cli.md#config).
+
+| File | Written by | Notes |
+| --- | --- | --- |
+| `~/.config/sugatoray/aiskills.json` | `aiskills config <key> <value>` (`--global`) | Your defaults. Outside the install folder, so `uninstall --purge` keeps it, and `AISKILLS_HOME` doesn't move it. |
+| `./.aiskills.json` | `aiskills config --project <key> <value>` | Defaults for the current folder; win over the user file. Commit it to share them with a project. |
+
+Keys `aiskills` doesn't know (from a newer version) are ignored. A file that isn't valid JSON stops every command that reads settings, with [`is not valid JSON`](errors.md#config-file-not-valid-json).
+
 ## `.aiskills/layout.json`
 
 Written when the package is built, and copied to the install folder.

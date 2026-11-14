@@ -87,8 +87,9 @@ describe("the committed page", () => {
       for (const i of g.items) {
         const bad = i.args.includes("--bogus") || i.args[0] === "bogus";
         assert.equal(i.code, bad ? 1 : 0, `aiskills ${i.args.join(" ")} exited ${i.code}:\n${i.out}`);
-        // --version and path print a bare value for scripts; everything else has color.
-        if (!["--version", "path"].includes(i.args[0])) assert.ok(i.out.includes("\x1b["), `aiskills ${i.args.join(" ")}: captured without color`);
+        // --version, path and config's get/set print a bare value (or nothing), like git config; everything else has color.
+        const bare = ["--version", "path"].includes(i.args[0]) || (i.args[0] === "config" && !i.args.includes("--list"));
+        if (!bare) assert.ok(i.out.includes("\x1b["), `aiskills ${i.args.join(" ")}: captured without color`);
         assert.ok(!i.out.includes("/tmp/") && !i.out.includes("aiskills-test-"), `aiskills ${i.args.join(" ")}: a sandbox path leaked`);
       }
     }
