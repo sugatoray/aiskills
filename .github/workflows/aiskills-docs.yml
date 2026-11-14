@@ -1,5 +1,7 @@
 # Publishes the @sugatoray-ai/aiskills user docs (src/packages/aiskills/docs/docsite/, bundled by
 # `npm run docs:site` into one page) on GitHub Pages at https://sugatoray.github.io/aiskills/.
+# The root shows the latest release, v/<version>/ the releases before it (from the aiskills-vX.Y.Z
+# tags), and dev/ master while package.json is a pre-release (src/scripts/docs/build-site.mjs).
 # Same pipeline shape as sugatoray/callai's docs.yml: build on master, upload a Pages artifact, deploy
 # it with actions/deploy-pages. There is no gh-pages branch; the site is deployed straight from master.
 #
@@ -10,6 +12,9 @@ name: aiskills-docs
 on:
   push:
     branches: [master]
+    # A pushed release tag rebuilds the site, so the root shows the new release. (GitHub doesn't apply
+    # the paths filter below to tag pushes.)
+    tags: ["aiskills-v*"]
     paths:
       - "src/packages/aiskills/docs/docsite/**"
       - "src/packages/aiskills/docs/banner/**"
@@ -40,6 +45,8 @@ jobs:
         working-directory: src/packages/aiskills
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the release tags: the stable docs are read from the newest one
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

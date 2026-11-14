@@ -330,6 +330,44 @@ main { min-width: 0; padding-block: 28px 80px; }
 
 /* Theme menu (the gear at the top right) */
 .top-row { position: relative; }
+/* Version menu (stable / in development), only when the site has both. */
+.ver-menu { position: relative; flex: none; }
+.ver-menu > summary { list-style: none; cursor: pointer; }
+.ver-menu > summary.brand-ver { display: inline-block; } /* stays visible on phones, unlike the plain badge */
+.ver-menu > summary::-webkit-details-marker { display: none; }
+.ver-menu > summary::after { content: " \25BE"; }
+.ver-menu > summary:hover, .ver-menu[open] > summary { border-color: var(--accent); color: var(--fg); }
+.ver-list {
+  position: absolute; left: 0; top: calc(100% + 6px); z-index: 30; min-width: 240px; background: var(--bg); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 48px rgba(0, 0, 0, .22); padding: 6px; display: grid; gap: 2px;
+}
+.ver-list a {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 10px; border-radius: 8px;
+  text-decoration: none; color: var(--fg); font-family: var(--font-mono); font-size: 13px;
+}
+.ver-list a small { font-family: var(--font-body); font-size: 12px; color: var(--muted); }
+.ver-list a:hover, .ver-list a:focus-visible { background: var(--surface-2); outline: none; }
+.ver-list a[aria-current="page"] { background: var(--surface); }
+.ver-list a[hidden] { display: none; }
+.ver-find {
+  width: 100%; height: 34px; margin-bottom: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--fg); font-family: var(--font-mono); font-size: 13px;
+}
+.ver-find:focus { outline: none; border-color: var(--accent); }
+.ver-none { margin: 4px 10px 6px; font-size: 13px; color: var(--muted); }
+@media (max-width: 560px) {
+  /* Room for the version button: a smaller button, and no GitHub button (the docs link to GitHub anyway). */
+  .ver-menu > summary.brand-ver { font-size: 11px; padding: 1px 6px; }
+  .top-row:has(.ver-menu) .gh-btn { display: none; }
+  .top-row:has(.ver-menu) { gap: 8px; }
+  .top-row:has(.ver-menu) .search { flex: 0 0 36px; min-width: 36px; }
+  .top-row:has(.ver-menu) .search input { padding: 0 0 0 34px; } /* an icon-sized box; it still takes typing */
+  .ver-list { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 62px); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); min-width: 0; }
+}
+.channel-note {
+  margin: 0 0 18px; padding: 10px 14px; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface);
+  font-size: 14px; line-height: 1.5;
+}
 .skin-menu {
   position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; width: 340px; max-width: calc(100vw - 32px);
   max-height: min(72vh, 600px); overflow-y: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--line);
@@ -378,7 +416,7 @@ body.explainer-open{overflow:hidden}
     <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open page list" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-    <a class="brand" href="#home"><span class="brand-name">aiskills</span><span class="brand-ver">v{{VERSION}}</span></a>
+    <a class="brand" href="#home"><span class="brand-name">aiskills</span>{{VERSION_BADGE}}</a>{{VERSION_MENU}}
     <span class="cmd">$ aiskills install <b>-G</b> scrolls <b>-a</b> claude-code</span>
     <span class="spacer"></span>
     <label class="search" for="q">
@@ -406,7 +444,7 @@ body.explainer-open{overflow:hidden}
 
 <div class="shell">
   <aside class="side" id="side" aria-label="Pages"></aside>
-  <main id="main">
+  <main id="main">{{CHANNEL_NOTE}}
     <div class="crumbs" id="crumbs"></div>
     <div class="hero" id="hero" role="img" hidden></div>
     <details class="mobile-toc" id="mobile-toc" hidden><summary>On this page</summary><ol></ol></details>
@@ -851,6 +889,58 @@ const DATA = /*__DOCS_DATA__*/null;
   function closeNav() { document.body.classList.remove("nav-open"); $("#menu-btn").setAttribute("aria-expanded", "false"); }
   $("#menu-btn").addEventListener("click", () => document.body.classList.contains("nav-open") ? closeNav() : openNav());
   $("#scrim").addEventListener("click", closeNav);
+
+  /* ---------- version menu: keep the page when switching, close like a menu ---------- */
+  const verMenu = $(".ver-menu");
+  if (verMenu) {
+    document.querySelectorAll(".ver-list a, .channel-note a").forEach(a => a.addEventListener("click", () => {
+      a.href = a.getAttribute("href").split("#")[0] + location.hash;
+    }));
+    document.addEventListener("click", e => { if (verMenu.open && !verMenu.contains(e.target)) verMenu.open = false; });
+
+    /* Find a version: partial match ("1.1", "dev", "older") or fuzzy (the characters in order: "11", "13d"),
+       on the version and its label, case-insensitive. Best first: starts with, contains, then fuzzy. */
+    const find = $(".ver-find", verMenu), none = $(".ver-none", verMenu);
+    const items = [...verMenu.querySelectorAll(".ver-list a")];
+    const textOf = a => a.textContent.toLowerCase().replace(/\s+/g, " ").trim();
+    const inOrder = (q, t) => { let i = 0; for (const c of t) if (c === q[i]) i++; return i === q.length; };
+    const rank = (q, a) => {
+      const v = $("span", a).textContent.toLowerCase(), all = textOf(a);
+      if (!q) return 0;
+      if (v.startsWith(q)) return 1;
+      if (all.includes(q)) return 2;
+      if (inOrder(q, v)) return 3;
+      if (inOrder(q.replace(/\s+/g, ""), all.replace(/\s+/g, ""))) return 4;
+      return -1;
+    };
+    const visible = () => items.filter(a => !a.hidden);
+    function filterVersions() {
+      const q = find.value.toLowerCase().trim();
+      const scored = items.map((a, i) => ({ a, i, r: rank(q, a) }));
+      scored.sort((x, y) => (x.r < 0) - (y.r < 0) || x.r - y.r || x.i - y.i);
+      for (const { a, r } of scored) { a.hidden = r < 0; none.before(a); }
+      none.hidden = scored.some(s => s.r >= 0);
+    }
+    find.addEventListener("input", filterVersions);
+    find.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); const best = visible()[0]; if (best) best.click(); }
+      if (e.key === "ArrowDown") { e.preventDefault(); visible()[0]?.focus(); }
+    });
+    for (const a of items) a.addEventListener("keydown", e => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      e.preventDefault();
+      const list = visible(), i = list.indexOf(a);
+      if (e.key === "ArrowDown") (list[i + 1] ?? a).focus();
+      else (i > 0 ? list[i - 1] : find).focus();
+    });
+    verMenu.addEventListener("toggle", () => {
+      if (!verMenu.open) return;
+      find.value = "";
+      filterVersions();
+      if (window.matchMedia("(pointer: fine)").matches) find.focus();
+    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && verMenu.open) { verMenu.open = false; verMenu.querySelector("summary").focus(); } });
+  }
 
   show(location.hash.slice(1) || "home");
 })();

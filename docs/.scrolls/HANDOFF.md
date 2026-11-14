@@ -3,34 +3,19 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`master` is at `089f938`:** `/run-code-review` 1.2.0 (#215, #223) is merged, and `@sugatoray-ai/aiskills` 1.2.0 is published to npm as `latest`.
-- **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub.** The user pushed them. Each is annotated and sits on the commit npm records as that version's `gitHead`, which was the `master` head when it was published. Their messages carry the npm publish time.
-- **[#230](https://github.com/sugatoray/aiskills/pull/230) (`claude/skill-symlinks`, open)** holds, as 11 commits directly on `master`:
-  - `make link-skills` with 24 links (12 skills);
-  - the scrolls commit (1.2.0 release record, these root scrolls, package scrolls);
-  - `/run-code-review` 1.3.0: starts only when typed (`disable-model-invocation: true`);
-  - the npm package at `1.3.0-dev`, with changes collecting under `## [1.3.0] - Unreleased`;
-  - MAINTAINERS step 6, which tags each release on its `gitHead`;
-  - scrolls notes.
-
-  Issues #231 (parent), #232 and #233 cover the links.
-- **[#234](https://github.com/sugatoray/aiskills/pull/234) (`claude/docs-stable-and-dev`, open; based on `master`):** the docs website shows two versions while `package.json` is `x.y.z-dev`.
-  - The root shows the newest release tag's docs, read with `git archive`.
-  - `/dev/` shows `master`'s docs. Each page has a version menu, and `/dev/` has a notice that it isn't released yet.
-  - Pieces: `build-site.mjs` (`npm run docs:site`), `--version`/`--channel` on `build-docs-html.mjs`, and `fetch-depth: 0` plus a tag trigger in `aiskills-docs.yml`.
-  - 442 package tests pass, including browser tests. The deploy itself is untested.
-  - Its scrolls notes are here on purpose: editing the package scrolls on #234 would conflict with #230.
-- **The root `docs/.scrolls/`** live only on #230's branch until it merges.
+- **`master` is at `8028d62`:** #230 was squash-merged. It brought `make link-skills` with 24 links, these root scrolls, `/run-code-review` 1.3.0 (starts only when typed), the npm package at `1.3.0-dev` and the release-tagging step. `@sugatoray-ai/aiskills` 1.2.0 is still the latest on npm.
+- **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub.** Each sits on its npm `gitHead` and has been verified.
+- **[#234](https://github.com/sugatoray/aiskills/pull/234) (`claude/docs-stable-and-dev`, open, targets `master`):** the versioned docs site: the latest release at the root, older releases under `/v/<version>/` (default 5 in all), and `/dev/`. After #230's squash merge it was rebased with `--onto` (3 commits). Its files are identical to before, and 442 tests pass. Once it merges and deploys, the site shows 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, and 1.3.0-dev at `/dev/`. The deploy itself is untested. Titled "Docs site: versioned docs (latest, older releases, dev)". Its version menu has a **Find a version** box with partial and fuzzy matching. Issues: parent #235, with children #236 (builder menu), #237 (site build and workflow), #238 (scrolls), #239 (older releases under `v/x.y.z/`) and #240 (the find box); its description lists them as `Closes`.
 
 ## What just happened
-- Added `run-code-review` to the links, and shortened #233's title to "Link the first skills into .agents and .claude".
-- `/run-code-review` 1.3.0 and the package at `1.3.0-dev`: the user's calls. npm rejects `1.3.0.dev`.
-- Listed the npm releases against `master` commits. Every release was published 3–16 minutes after its PR merged (0.6.0: 2 h 18 min), from the `master` head.
-- Created the nine tags here. This session can't push tags (HTTP 403), so the user pushed them, and they were then verified against npm.
-- Built #234. A browser check found two bugs, both fixed and now covered by a test: the notice link dropped the page anchor, and the phone header was 36px too wide.
+- The user squash-merged #230 (`8028d62`). GitHub moved #234 to `master`, where it showed a conflict, because its branch still carried #230's 11 commits.
+- Checked that `8028d62`'s tree equals #230's last head `72dd391`, then ran `git rebase --onto origin/master 72dd391`. It replayed only #234's 3 commits, with no conflicts. The result has the same files as before, and 442 tests and `make check-skill-links` pass.
+- Recorded #230 as shipped: `make link-skills` and the release tags in `SPEC.md`, and `run-code-review` 1.3.0 in the review family's `SPEC.md`.
+
+- Filed #235–#239 for #234 with `/create-issues-update-pr` and retitled the PR to match #235. #239's first title lost `<version>`, which GitHub strips like an HTML tag, so it was renamed `v/x.y.z/`.
+- Added a find box to the version menu (`b475a47`, issue #240). It does partial matches (`1.1`, `dev`, `older`) and fuzzy matches (characters in order: `11` finds 1.1.0, `13d` finds 1.3.0-dev). Results are ranked: starts with, then contains, then fuzzy. Enter opens the best match on the same page. Red/Green; 449 package tests pass.
 
 ## Known issues / open threads
-- **Merge order:** #230 and #234 both regenerate `src/packages/aiskills/docs/docsite/index.html` and `llms-full.txt`. Whichever merges second needs a rebase and `npm run docs`. Once both are in, the site shows 1.2.0 at the root and 1.3.0-dev at `/dev/`.
 - **#234's deploy:** it runs only on `master` or a tag. A manual workflow run with "deploy" unticked builds the site as a downloadable artifact first.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered.
 - `claude/keen-babbage-2khhu9` (this session's designated branch) still holds merged #215-era history. Reusing it needs a reset from `master` and a force push, which the user must approve.

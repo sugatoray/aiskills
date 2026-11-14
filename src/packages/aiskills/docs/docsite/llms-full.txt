@@ -4592,10 +4592,31 @@ pages not linked from a section of README.md: <pages>
 ### Usage
 
 ```text
-usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]
+usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>] [--version <v>] [--menu <json>]
 ```
 
 **Fix:** pass the docs folder and `--out`, or use `npm run docs:html`.
+
+### Version menu
+
+```text
+version menu: --menu is not valid JSON
+version menu: unknown kind: <kind> (dev, latest or older)
+version menu: needs exactly one latest release
+version menu: <version> is not one of its versions
+```
+
+**Fix:** `--menu` is JSON: `{"current": "<this page's version>", "base": "<path to the site root>", "entries": [{"version", "path", "kind"}]}`, with one `latest` entry, and the current version among the entries. `npm run docs:site` writes it for you.
+
+### Site build usage
+
+```text
+usage: build-site.mjs --out <dir> [--ref <branch>] [--releases <n>|all]
+unknown argument: <argument>
+--releases must be a whole number of at least 1, or all: <value>
+```
+
+**Fix:** pass the output folder, or use `npm run docs:site`, which writes `site/`. `--releases` is how many releases the site shows, the latest included (default 5). It reads the release tags (`aiskills-vX.Y.Z`) with git, so run it in a clone that has them (`git fetch --tags`).
 
 ## Banner build errors (maintainers)
 

@@ -189,6 +189,114 @@ describe("build-docs-html", () => {
   });
 });
 
+describe("build-docs-html: the version menu", () => {
+  // The site: dev/ (in development), the root (latest release), v/<version>/ (older releases).
+  const ENTRIES = [
+    { version: "1.3.0-dev", path: "dev/", kind: "dev" },
+    { version: "1.2.0", path: "", kind: "latest" },
+    { version: "1.1.0", path: "v/1.1.0/", kind: "older" },
+  ];
+  const menuFor = (current, base) => ({ current, base, entries: ENTRIES });
+  /** The version menu's links, as [href, text, current]. */
+  const menu = (html) =>
+    [...(/<div class="ver-list">([\s\S]*?)<\/div>/.exec(html)?.[1] ?? "").matchAll(/<a href="([^"]+)"( aria-current="page")?>([\s\S]*?)<\/a>/g)].map(
+      (m) => [m[1], m[3].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), Boolean(m[2])],
+    );
+  const note = (html) => /<div class="channel-note" role="note">([\s\S]*?)<\/div>/.exec(html)?.[1];
+
+  test("by default the header shows package.json's version, with no menu or notice", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS);
+    assert.ok(html.includes(`<span class="brand-ver">v${version}</span>`));
+    assert.ok(!html.includes('class="ver-menu"') && !html.includes('class="channel-note"'));
+  });
+
+  test("--version sets the version the page shows", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "9.9.9" });
+    assert.ok(html.includes('<span class="brand-ver">v9.9.9</span>'));
+    if (version !== "9.9.9") assert.ok(!html.includes(`<span class="brand-ver">v${version}</span>`));
+  });
+
+  test("the latest release's page (the site root) lists every version and has no notice", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.2.0", menu: menuFor("1.2.0", "") });
+    assert.match(html, /<details class="ver-menu"><summary class="brand-ver" title="Docs version">v1\.2\.0<\/summary>/);
+    assert.deepEqual(menu(html), [
+      ["dev/", "1.3.0-dev in development", false],
+      ["./", "1.2.0 latest release", true],
+      ["v/1.1.0/", "1.1.0 older release", false],
+    ]);
+    assert.equal(note(html), undefined);
+    assert.ok(!html.includes('<span class="brand-ver">'), "the menu replaces the plain badge");
+  });
+
+  test("the menu opens with a find box and a no-match message", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.2.0", menu: menuFor("1.2.0", "") });
+    const list = /<div class="ver-list">([\s\S]*?)<\/div><\/details>/.exec(html)?.[1] ?? "";
+    assert.match(list, /^<input class="ver-find" type="search" placeholder="Find a version" aria-label="Find a version" autocomplete="off" spellcheck="false">/);
+    assert.match(list, /<p class="ver-none" hidden>No version matches<\/p>$/);
+  });
+
+  test("the dev page links up to the root and says it isn't released yet", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.3.0-dev", menu: menuFor("1.3.0-dev", "../") });
+    assert.match(html, /<summary class="brand-ver" title="Docs version">v1\.3\.0-dev<\/summary>/);
+    assert.deepEqual(menu(html), [
+      ["../dev/", "1.3.0-dev in development", true],
+      ["../", "1.2.0 latest release", false],
+      ["../v/1.1.0/", "1.1.0 older release", false],
+    ]);
+    assert.match(note(html), /<b>1\.3\.0-dev<\/b>, which is not released yet/);
+    assert.match(note(html), /<a href="\.\.\/">1\.2\.0 docs<\/a>/);
+  });
+
+  test("an older release's page says so and links to the latest", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.1.0", menu: menuFor("1.1.0", "../../") });
+    assert.deepEqual(menu(html).map((l) => [l[0], l[2]]), [
+      ["../../dev/", false],
+      ["../../", false],
+      ["../../v/1.1.0/", true],
+    ]);
+    assert.match(note(html), /<b>1\.1\.0<\/b>, an older release/);
+    assert.match(note(html), /<a href="\.\.\/\.\.\/">1\.2\.0 docs<\/a>/);
+  });
+
+  test("a site without a version in development has no dev entry", async () => {
+    const { build } = await load();
+    const entries = ENTRIES.filter((e) => e.kind !== "dev");
+    const { html } = build(DOCS, { version: "1.2.0", menu: { current: "1.2.0", base: "", entries } });
+    assert.deepEqual(menu(html).map((l) => l[0]), ["./", "v/1.1.0/"]);
+  });
+
+  test("a bad menu is an error", async () => {
+    const { build } = await load();
+    assert.throws(() => build(DOCS, { menu: menuFor("9.9.9", "") }), /version menu: 9\.9\.9 is not one of its versions/);
+    assert.throws(() => build(DOCS, { menu: { current: "1.2.0", base: "", entries: [{ version: "1.2.0", path: "", kind: "beta" }] } }), /version menu: unknown kind: beta/);
+    assert.throws(() => build(DOCS, { menu: { current: "1.1.0", base: "", entries: [ENTRIES[2]] } }), /version menu: needs exactly one latest release/);
+  });
+
+  test("the command line takes --version and --menu (JSON)", async () => {
+    const { main } = await load();
+    const dir = tempDir();
+    const err = console.error;
+    console.error = () => {};
+    try {
+      const out = join(dir, "v", "1.1.0", "index.html");
+      main([DOCS, "--out", out, "--version", "1.1.0", "--menu", JSON.stringify(menuFor("1.1.0", "../../"))]);
+      const html = readFileSync(out, "utf8");
+      assert.deepEqual(menu(html).map((l) => l[0]), ["../../dev/", "../../", "../../v/1.1.0/"]);
+      assert.ok(html.includes('class="channel-note"'));
+      assert.throws(() => main([DOCS, "--out", out, "--menu", "{nope"]), /version menu: --menu is not valid JSON/);
+    } finally {
+      console.error = err;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 // ------------------------------------------------------------ in a browser
 
 const require = createRequire(import.meta.url);
@@ -426,5 +534,139 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
     } finally {
       await browser.close();
     }
+  });
+});
+
+describe("the versioned pages in a browser", { skip: noBrowser }, () => {
+  const ENTRIES = [
+    { version: "1.3.0-dev", path: "dev/", kind: "dev" },
+    { version: "1.2.0", path: "", kind: "latest" },
+    { version: "1.1.0", path: "v/1.1.0/", kind: "older" },
+    { version: "0.9.0", path: "v/0.9.0/", kind: "older" },
+  ];
+
+  /** Build a page per entry into a temporary site, serve it, and run fn(base URL, browser). */
+  async function withSite(fn) {
+    const { main } = await load();
+    const { createServer } = await import("node:http");
+    const site = tempDir();
+    const err = console.error;
+    console.error = () => {};
+    try {
+      for (const e of ENTRIES) {
+        const base = "../".repeat(e.path.split("/").filter(Boolean).length);
+        main([DOCS, "--out", join(site, e.path, "index.html"), "--version", e.version, "--menu", JSON.stringify({ current: e.version, base, entries: ENTRIES })]);
+      }
+    } finally {
+      console.error = err;
+    }
+    const server = createServer((req, res) => {
+      const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+      const file = join(site, path.endsWith("/") ? path + "index.html" : path);
+      if (!existsSync(file)) return res.writeHead(404).end();
+      res.writeHead(200, { "content-type": file.endsWith(".html") ? "text/html" : "application/octet-stream" }).end(readFileSync(file));
+    });
+    await new Promise((r) => server.listen(0, "127.0.0.1", r));
+    const browser = await playwright.chromium.launch();
+    try {
+      await fn(`http://127.0.0.1:${server.address().port}`, browser);
+    } finally {
+      await browser.close();
+      server.close();
+      rmSync(site, { recursive: true, force: true });
+    }
+  }
+
+  test("the menu and the notices switch versions on the same page, and the phone header fits", async () => {
+    await withSite(async (base, browser) => {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      const pick = async (href, url) => {
+        await page.click(".ver-menu summary");
+        await page.click(`.ver-list a[href="${href}"]`);
+        await page.waitForURL(url);
+        await page.waitForSelector("#doc h1");
+      };
+      await page.goto(`${base}/#reference-cli`);
+      await page.waitForSelector("#doc h1");
+      await pick("dev/", `${base}/dev/#reference-cli`);
+      assert.equal(await page.textContent(".ver-menu summary"), "v1.3.0-dev");
+      await pick("../v/1.1.0/", `${base}/v/1.1.0/#reference-cli`);
+      assert.match(await page.textContent(".channel-note"), /an older release/);
+      await page.click(".ver-menu summary");
+      await page.keyboard.press("Escape");
+      assert.equal(await page.isVisible(".ver-list"), false, "Escape closes the menu");
+      await page.click(".channel-note a");
+      await page.waitForURL(`${base}/#reference-cli`);
+      assert.deepEqual(errors, []);
+
+      const phone = await browser.newPage({ ...playwright.devices["iPhone 13"] });
+      for (const url of [`${base}/`, `${base}/dev/`, `${base}/v/1.1.0/`]) {
+        await phone.goto(url);
+        await phone.waitForSelector("#doc h1");
+        const fit = await phone.evaluate(() => {
+          const box = (s) => document.querySelector(s).getBoundingClientRect();
+          return {
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            searchEnd: box("#q").right,
+            gear: box(".skin-btn").left,
+            menu: box(".ver-menu summary").width > 0,
+          };
+        });
+        assert.equal(fit.overflow, 0, `${url}: the page scrolls sideways on a phone`);
+        assert.ok(fit.searchEnd <= fit.gear, `${url}: the search box covers the theme button`);
+        assert.ok(fit.menu, `${url}: the version button is hidden on a phone`);
+      }
+    });
+  });
+
+  test("the find box narrows the versions by partial and fuzzy match, and Enter opens the best one", async () => {
+    await withSite(async (base, browser) => {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(`${base}/v/0.9.0/#reference-cli`);
+      await page.waitForSelector("#doc h1");
+      await page.click(".ver-menu summary");
+      // The menu's toggle event (which focuses the box) fires just after the click.
+      await page.waitForFunction(() => document.activeElement?.className === "ver-find", null, { timeout: 2000 });
+      const shown = () => page.$$eval(".ver-list a:not([hidden]) span", (s) => s.map((e) => e.textContent));
+      const find = async (q) => {
+        await page.fill(".ver-find", q);
+        return shown();
+      };
+      assert.deepEqual(await find(""), ["1.3.0-dev", "1.2.0", "1.1.0", "0.9.0"], "an empty box shows every version");
+      assert.deepEqual(await find("1.1"), ["1.1.0"], "partial match");
+      assert.deepEqual(await find("11"), ["1.1.0"], "fuzzy: the characters in order");
+      assert.deepEqual(await find("13d"), ["1.3.0-dev"], "fuzzy across the version");
+      assert.deepEqual(await find("DEV"), ["1.3.0-dev"], "case doesn't matter; labels match too");
+      assert.deepEqual(await find("older"), ["1.1.0", "0.9.0"], "the label: older release");
+      assert.deepEqual(await find("latest"), ["1.2.0"]);
+      assert.equal(await page.isVisible(".ver-none"), false);
+      assert.deepEqual(await find("zzz"), []);
+      assert.equal(await page.isVisible(".ver-none"), true, "no match says so");
+      // The best match comes first: a version that starts with the text beats a fuzzy one.
+      assert.deepEqual(await find("1"), ["1.3.0-dev", "1.2.0", "1.1.0"]);
+      assert.deepEqual(await find("0.9"), ["0.9.0"]);
+      // Arrow keys move through the matches; Enter in the box opens the best one, on the same page.
+      await find("1");
+      await page.keyboard.press("ArrowDown");
+      assert.equal(await page.evaluate(() => document.activeElement?.querySelector("span")?.textContent), "1.3.0-dev");
+      await page.keyboard.press("ArrowDown");
+      assert.equal(await page.evaluate(() => document.activeElement?.querySelector("span")?.textContent), "1.2.0");
+      await page.keyboard.press("ArrowUp");
+      await page.keyboard.press("ArrowUp");
+      assert.equal(await page.evaluate(() => document.activeElement?.className), "ver-find", "ArrowUp from the first match returns to the box");
+      await find("12");
+      await page.keyboard.press("Enter");
+      await page.waitForURL(`${base}/#reference-cli`);
+      await page.waitForSelector("#doc h1");
+      // The box starts empty again when the menu reopens.
+      await page.click(".ver-menu summary");
+      assert.equal(await page.inputValue(".ver-find"), "");
+      assert.equal((await shown()).length, 4);
+      assert.deepEqual(errors, []);
+    });
   });
 });
