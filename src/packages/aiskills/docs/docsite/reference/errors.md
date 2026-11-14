@@ -520,10 +520,27 @@ pages not linked from a section of README.md: <pages>
 ### Usage
 
 ```text
-usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>]
+usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>] [--version <v>] [--channel stable|dev --stable <v> --dev <v>]
 ```
 
 **Fix:** pass the docs folder and `--out`, or use `npm run docs:html`.
+
+### Version channel
+
+```text
+unknown channel: <name> (stable or dev)
+a channel needs both versions: stable and dev
+```
+
+**Fix:** `--channel` is `stable` (the page at the site root) or `dev` (the page in `dev/`), and it needs `--stable <version>` and `--dev <version>` for the version menu. `npm run docs:site` passes them for you.
+
+### Site build usage
+
+```text
+usage: build-site.mjs --out <dir> [--ref <branch>]
+```
+
+**Fix:** pass the output folder, or use `npm run docs:site`, which writes `site/`. It reads the release tags (`aiskills-vX.Y.Z`) with git, so run it in a clone that has them (`git fetch --tags`).
 
 ## Banner build errors (maintainers)
 

@@ -33,6 +33,7 @@ describe("docs publishing workflow", () => {
   test("runs on pushes to master and by hand, with an opt-out deploy input", () => {
     const yml = read();
     assert.match(yml, /\n {2}push:\n {4}branches: \[master\]/);
+    assert.match(yml, /\n {4}tags: \["aiskills-v\*"\]/, "a pushed release tag rebuilds the site");
     assert.match(yml, /\n {2}workflow_dispatch:/);
     assert.match(yml, /\n {6}deploy:\n(?: {8}.+\n)*? {8}type: boolean/);
     assert.match(yml, /if: github\.event_name != 'workflow_dispatch' \|\| inputs\.deploy/);
@@ -62,15 +63,18 @@ describe("docs publishing workflow", () => {
     assert.match(yml, /uses: actions\/setup-node@v\d+/);
   });
 
-  test("docs:site builds docs/docsite into site/index.html with the real builder", () => {
+  test("checks out the full history, so the release tags are there", () => {
+    assert.match(read(), /uses: actions\/checkout@v\d+\n\s+with:\n\s+fetch-depth: 0(?: #.*)?\n/);
+  });
+
+  test("docs:site builds the site into site/ with build-site.mjs", () => {
     const script = pkg().scripts["docs:site"];
     assert.ok(script, 'package.json needs a "docs:site" script');
-    const m = script.match(/^node (\S+) (\S+) --out (\S+)$/);
+    const m = script.match(/^node (\S+) --out (\S+)$/);
     assert.ok(m, `unexpected docs:site script: ${script}`);
-    assert.equal(m[1], "src/scripts/docs/build-docs-html.mjs");
+    assert.equal(m[1], "src/scripts/docs/build-site.mjs");
     assert.ok(existsSync(join(PKG_SRC, m[1])));
-    assert.equal(m[2], "docs/docsite");
-    assert.equal(m[3], "site/index.html");
+    assert.equal(m[2], "site");
   });
 
   test("uploads the folder docs:site writes, and deploys it to GitHub Pages", () => {
@@ -91,26 +95,29 @@ describe("docs publishing workflow", () => {
     assert.ok(!pkg().files.some((f) => f.replace(/^\//, "").startsWith("site")), "site/ must not be in files");
   });
 
-  test("the build command the workflow runs writes a working page", async () => {
-    const { main } = await import(new URL("../scripts/docs/build-docs-html.mjs", import.meta.url).href);
-    const out = join(tempDir(), "site", "index.html");
-    const [, , docs] = pkg().scripts["docs:site"].split(" ");
+  test("the build command the workflow runs writes a working site", async () => {
+    const { main } = await import(new URL("../scripts/docs/build-site.mjs", import.meta.url).href);
+    const site = join(tempDir(), "site");
     const err = console.error;
     console.error = () => {};
+    let result;
     try {
-      main([join(PKG_SRC, docs), "--out", out, "--ref", "some-branch"]);
+      result = main(["--out", site, "--ref", "some-branch"]);
     } finally {
       console.error = err;
     }
-    const html = readFileSync(out, "utf8");
+    // The working tree's docs are at the root (one version) or in dev/ (two versions).
+    const current = result.both ? join(site, "dev") : site;
+    const html = readFileSync(join(current, "index.html"), "utf8");
     assert.match(html, /<title>[^<]*aiskills/i);
     assert.match(html, /github\.com\/sugatoray\/aiskills\/blob\/some-branch\//);
-    const explainer = join(out, "..", "explainers", "scrolls-explainer.html");
+    const explainer = join(current, "explainers", "scrolls-explainer.html");
     assert.ok(existsSync(explainer), "the explainer page is published next to index.html");
     assert.equal(
       readFileSync(explainer, "utf8"),
-      readFileSync(join(PKG_SRC, docs, "explainers", "scrolls-explainer.html"), "utf8"),
+      readFileSync(join(PKG_SRC, "docs", "docsite", "explainers", "scrolls-explainer.html"), "utf8"),
       "an exact copy of the one in docs/docsite/",
     );
+    assert.ok(existsSync(join(site, "index.html")) && existsSync(join(site, "dev", "index.html")));
   });
 });

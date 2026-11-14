@@ -211,6 +211,18 @@ code:
 - **A version bump** changes the `--version` and `--help` examples, the
   banner and the version in `index.html`: run `npm run banner:png` and
   `npm run docs`; the tests show what else to update.
+- **The website** (https://sugatoray.github.io/aiskills/) is built by
+  `npm run docs:site` (`src/scripts/docs/build-site.mjs`) into `site/`, and
+  deployed by `.github/workflows/aiskills-docs.yml` on pushes to `master` and
+  on release tags. While `package.json` is a pre-release (`x.y.z-dev`), the
+  site has two versions: the newest release tag's docs (`aiskills-vX.Y.Z`,
+  read with `git archive`) at the root, and `master`'s in `dev/`. Each page's
+  header has a version menu, and `dev/` says it isn't released yet. On a
+  release (`x.y.z`), or with no release tag, the site has one version and
+  `dev/` sends readers to the root. Both pages are built by the current
+  builder, so an old release's docs get today's page design. To preview it:
+  `npm run docs:site`, then serve `site/` (for example
+  `python3 -m http.server -d site`); `dev/` needs a server, not `file://`.
 - Diagrams are hand-written SVG in `docs/docsite/images/`; render one to PNG
   and look at it after editing.
 

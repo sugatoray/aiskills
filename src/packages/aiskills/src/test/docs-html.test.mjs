@@ -189,6 +189,80 @@ describe("build-docs-html", () => {
   });
 });
 
+describe("build-docs-html: stable and in-development versions", () => {
+  const BOTH = { stable: "1.2.0", dev: "1.3.0-dev" };
+  /** The version menu's links, as [href, text, current]. */
+  const menu = (html) =>
+    [...(/<div class="ver-list">([\s\S]*?)<\/div>/.exec(html)?.[1] ?? "").matchAll(/<a href="([^"]+)"( aria-current="page")?>([\s\S]*?)<\/a>/g)].map(
+      (m) => [m[1], m[3].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), Boolean(m[2])],
+    );
+
+  test("by default the header shows package.json's version, with no menu or notice", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS);
+    assert.ok(html.includes(`<span class="brand-ver">v${version}</span>`));
+    assert.ok(!html.includes('class="ver-menu"') && !html.includes('class="channel-note"'));
+  });
+
+  test("--version sets the version the page shows", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "9.9.9" });
+    assert.ok(html.includes('<span class="brand-ver">v9.9.9</span>'));
+    if (version !== "9.9.9") assert.ok(!html.includes(`<span class="brand-ver">v${version}</span>`));
+  });
+
+  test("the stable page links to itself and to dev/, and has no notice", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.2.0", channel: { current: "stable", ...BOTH } });
+    assert.match(html, /<details class="ver-menu"><summary class="brand-ver" title="Docs version">v1\.2\.0<\/summary>/);
+    assert.deepEqual(menu(html), [
+      ["./", "1.2.0 stable release", true],
+      ["dev/", "1.3.0-dev in development", false],
+    ]);
+    assert.ok(!html.includes('class="channel-note"'));
+    assert.ok(!html.includes('<span class="brand-ver">'), "the menu replaces the plain badge");
+  });
+
+  test("the dev page links back to ../ and says it isn't released yet", async () => {
+    const { build } = await load();
+    const { html } = build(DOCS, { version: "1.3.0-dev", channel: { current: "dev", ...BOTH } });
+    assert.match(html, /<summary class="brand-ver" title="Docs version">v1\.3\.0-dev<\/summary>/);
+    assert.deepEqual(menu(html), [
+      ["../", "1.2.0 stable release", false],
+      ["./", "1.3.0-dev in development", true],
+    ]);
+    const note = /<div class="channel-note" role="note">([\s\S]*?)<\/div>/.exec(html);
+    assert.ok(note, "the dev page needs a notice");
+    assert.match(note[1], /1\.3\.0-dev/);
+    assert.match(note[1], /not released yet/);
+    assert.match(note[1], /<a href="\.\.\/">[^<]*1\.2\.0[^<]*<\/a>/);
+  });
+
+  test("a channel needs both versions and a known name", async () => {
+    const { build } = await load();
+    assert.throws(() => build(DOCS, { channel: { current: "beta", ...BOTH } }), /channel/);
+    assert.throws(() => build(DOCS, { channel: { current: "stable", stable: "1.2.0" } }), /stable and dev/);
+  });
+
+  test("the command line takes --version, --channel, --stable and --dev", async () => {
+    const { main } = await load();
+    const dir = tempDir();
+    const err = console.error;
+    console.error = () => {};
+    try {
+      const out = join(dir, "dev", "index.html");
+      main([DOCS, "--out", out, "--version", "1.3.0-dev", "--channel", "dev", "--stable", "1.2.0", "--dev", "1.3.0-dev"]);
+      const html = readFileSync(out, "utf8");
+      assert.deepEqual(menu(html).map((l) => l[0]), ["../", "./"]);
+      assert.ok(html.includes('class="channel-note"'));
+      assert.throws(() => main([DOCS, "--out", out, "--channel", "dev"]), /stable and dev/);
+    } finally {
+      console.error = err;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 // ------------------------------------------------------------ in a browser
 
 const require = createRequire(import.meta.url);
@@ -425,6 +499,72 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       assert.equal(await page.getAttribute("html", "data-effective"), "dark");
     } finally {
       await browser.close();
+    }
+  });
+});
+
+describe("the stable and dev pages in a browser", { skip: noBrowser }, () => {
+  test("the menu and the notice switch versions on the same page, and the phone header fits", async () => {
+    const { main } = await load();
+    const { createServer } = await import("node:http");
+    const site = tempDir();
+    const both = ["--stable", "1.2.0", "--dev", "1.3.0-dev"];
+    const err = console.error;
+    console.error = () => {};
+    try {
+      main([DOCS, "--out", join(site, "index.html"), "--version", "1.2.0", "--channel", "stable", ...both]);
+      main([DOCS, "--out", join(site, "dev", "index.html"), "--version", "1.3.0-dev", "--channel", "dev", ...both]);
+    } finally {
+      console.error = err;
+    }
+    const server = createServer((req, res) => {
+      const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+      const file = join(site, path.endsWith("/") ? path + "index.html" : path);
+      if (!existsSync(file)) return res.writeHead(404).end();
+      res.writeHead(200, { "content-type": file.endsWith(".html") ? "text/html" : "application/octet-stream" }).end(readFileSync(file));
+    });
+    await new Promise((r) => server.listen(0, "127.0.0.1", r));
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(`${base}/#reference-cli`);
+      await page.waitForSelector("#doc h1");
+      await page.click(".ver-menu summary");
+      await page.click('.ver-list a[href="dev/"]');
+      await page.waitForURL(`${base}/dev/#reference-cli`);
+      await page.waitForSelector("#doc h1");
+      assert.equal(await page.textContent(".ver-menu summary"), "v1.3.0-dev");
+      await page.click(".ver-menu summary");
+      await page.keyboard.press("Escape");
+      assert.equal(await page.isVisible(".ver-list"), false, "Escape closes the menu");
+      await page.click(".channel-note a");
+      await page.waitForURL(`${base}/#reference-cli`);
+      assert.deepEqual(errors, []);
+
+      const phone = await browser.newPage({ ...playwright.devices["iPhone 13"] });
+      for (const url of [`${base}/`, `${base}/dev/`]) {
+        await phone.goto(url);
+        await phone.waitForSelector("#doc h1");
+        const fit = await phone.evaluate(() => {
+          const box = (s) => document.querySelector(s).getBoundingClientRect();
+          return {
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            searchEnd: box("#q").right,
+            gear: box(".skin-btn").left,
+            menu: box(".ver-menu summary").width > 0,
+          };
+        });
+        assert.equal(fit.overflow, 0, `${url}: the page scrolls sideways on a phone`);
+        assert.ok(fit.searchEnd <= fit.gear, `${url}: the search box covers the theme button`);
+        assert.ok(fit.menu, `${url}: the version button is hidden on a phone`);
+      }
+    } finally {
+      await browser.close();
+      server.close();
+      rmSync(site, { recursive: true, force: true });
     }
   });
 });
