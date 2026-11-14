@@ -28,5 +28,6 @@ Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code.
 - Edit a skill at its source under `skills/`, and make it available here with `make link-skills SKILL=<path>`. Check links with `make check-skill-links`. Claude Code picks up a new link live, within the running session.
+- **When two PRs touch the same generated files, stack them.** Rebase the second onto the first and point it at the first's branch, so each diff is its own work. Regenerate conflicting generated files (`npm run docs`) instead of hand-merging them. Put later scrolls notes on the top branch, so the lower one doesn't move and force another rebase.
 - **Each npm release maps to a commit through `gitHead`** (`npm view @sugatoray-ai/aiskills@<v> gitHead`). Use it for tags and for anything that needs "the source of release X"; don't guess from dates.
 - Repo-wide lessons go here. A lesson about one family goes in that family's scrolls under `src/`; point to it from here rather than copying it.
