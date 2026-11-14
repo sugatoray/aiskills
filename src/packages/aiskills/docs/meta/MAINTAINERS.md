@@ -240,8 +240,13 @@ every `npx` call runs. To move to a newer one:
    breaks existing use, MINOR adds (including new or updated skills), PATCH
    fixes. If the newest version section is still "Unreleased", it is the one
    to release; otherwise move the `Unreleased` entries under a new version.
+   Between releases, `package.json` may carry the next version as a SemVer
+   pre-release, `x.y.z-dev` (e.g. `1.3.0-dev`; npm rejects `1.3.0.dev`), with
+   its CHANGELOG section headed `## [x.y.z] - Unreleased`. Don't publish a
+   `-dev` version; if one ever has to go out, use `npm publish --tag next` so
+   `latest` doesn't move.
 2. **Bump** `package.json` (`npm version <major|minor|patch> --no-git-tag-version`,
-   or edit it), then `npm run banner:png` and `npm run docs`: the version
+   or edit it; from `x.y.z-dev`, set `x.y.z`), then `npm run banner:png` and `npm run docs`: the version
    appears in the banner, `index.html` and the docs examples, and the tests
    point at anything else to update (`SECURITY.md`'s supported versions,
    the `aiskills.json` sample).

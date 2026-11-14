@@ -29,6 +29,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
+- **`package.json` is `1.3.0-dev`** (on #230; the user's call on 2026-11-13). Changes collect under `## [1.3.0] - Unreleased` until the user releases 1.3.0. npm rejects `1.3.0.dev`, so the version uses SemVer pre-release form. The first entry is `run-code-review` 1.3.0, which now starts only when typed. Regenerated: banner, `index.html` and the version examples in `reference/cli.md` and `installation.md`. `aiskills rel` now prints `installed: 1.3.0-dev (not published on npm)` and marks no row as installed. MAINTAINERS → Releasing documents the `-dev` convention. 428 tests pass.
 - **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
 - **[#230](https://github.com/sugatoray/aiskills/pull/230) (open, not this package's PR):**
   - adds `make link-skills`, with 24 relative symlinks that put the scrolls family, `create-issues-update-pr`, `create-lib-docs`, `network-flow` and `run-code-review` into the repo root's `.agents/skills/` and `.claude/skills/`;

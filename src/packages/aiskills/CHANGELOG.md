@@ -18,7 +18,11 @@ they are listed under **Changed** or **Removed** with a note.
 This file covers the package and its `aiskills` CLI. Each bundled skill keeps
 its own `CHANGELOG.md` inside its folder under `skills/`.
 
-## [Unreleased]
+## [1.3.0] - Unreleased
+
+In development: `package.json` is `1.3.0-dev` (a SemVer pre-release, so it
+sorts below `1.3.0`) while changes collect here. At release, set it to `1.3.0`
+and date this section.
 
 ### Changed
 

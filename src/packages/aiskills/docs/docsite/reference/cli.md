@@ -215,7 +215,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.2.0
+  aiskills version : 1.3.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
       saved skills : 17 skills in 9 groups, flat layout
@@ -283,10 +283,11 @@ aiskills rel 3
 @sugatoray-ai/aiskills: latest 3 of 9 releases
 
   VERSION  PUBLISHED                TAG
-  1.2.0    2026-11-21 (today)       latest  ← installed
+  1.2.0    2026-11-21 (today)       latest
   1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
 
+installed: 1.3.0-dev (not published on npm)
 more: aiskills rel all
 
 changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
@@ -310,12 +311,13 @@ aiskills rel --downloads
 @sugatoray-ai/aiskills: latest 5 of 9 releases
 
   VERSION  PUBLISHED                TAG     DOWNLOADS (7 DAYS)
-  1.2.0    2026-11-21 (today)       latest                   –  ← installed
+  1.2.0    2026-11-21 (today)       latest                   –
   1.1.0    2026-11-20 (1 day ago)                            –
   1.0.0    2026-11-18 (3 days ago)                           –
   0.9.0    2026-11-15 (6 days ago)                           –
   0.8.0    2026-11-12 (9 days ago)                           –
 
+installed: 1.3.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
@@ -346,8 +348,9 @@ aiskills rel 1 --downloads 7d --table
 @sugatoray-ai/aiskills: latest 1 of 9 releases
 
   VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
-  1.2.0    2026-11-21 (today)  latest                   –  ← installed
+  1.2.0    2026-11-21 (today)  latest                   –
 
+installed: 1.3.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
@@ -487,7 +490,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.2.0 — Sugato Ray's agent skills
+aiskills 1.3.0-dev — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -635,7 +638,7 @@ ais -v
 ```
 
 ```text
-1.2.0
+1.3.0-dev
 ```
 
 ## Options
