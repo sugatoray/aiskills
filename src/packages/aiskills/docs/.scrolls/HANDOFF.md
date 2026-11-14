@@ -29,11 +29,12 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- **Docs site with two versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (open, targets `master`; rebased with `--onto` after #230's squash merge). While `package.json` is `x.y.z-dev`, `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds two pages:
-  - the newest `aiskills-vX.Y.Z` tag's docs (read with `git archive`) into `site/`;
-  - the working tree's docs into `site/dev/`.
+- **Docs site with versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (open, targets `master`). `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds:
+  - the latest release at `site/` (the newest `aiskills-vX.Y.Z` tag while `-dev`; the working tree on a release);
+  - the releases before it at `site/v/<version>/` (`--releases`, default 5 in all);
+  - the working tree at `site/dev/` while `-dev`.
 
-  `build-docs-html.mjs` gained `--version` and `--channel stable|dev --stable <v> --dev <v>`: a header version menu that keeps the `#page`, and a "not released yet" notice on dev. On a release, or with no tag, the site has one version and `site/dev/` redirects to the root. The workflow uses `fetch-depth: 0` and rebuilds on `aiskills-v*` tag pushes. Red/Green throughout, plus a browser test for switching versions and for the phone header (two bugs found by hand). 442 tests pass. The deploy itself is untested.
+  Tagged docs are read with `git archive`. `build-docs-html.mjs` has `--version` and `--menu <json>`: every page's header menu lists all versions and keeps the `#page`. Dev and older pages get a notice linking to the latest. Without a dev version, `site/dev/` redirects to the root. The workflow uses `fetch-depth: 0` and rebuilds on `aiskills-v*` tag pushes. Red/Green throughout, plus a browser test. A real build from the nine tags is 2.4 MB. 447 tests pass. The deploy itself is untested.
 - **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub** (pushed by the user on 2026-11-13). Each tag is checked: it is annotated, its commit equals npm's `gitHead`, the commit's `package.json` has that version, the commit is on `master`, and the message carries the npm publish time. MAINTAINERS → Releasing step 6 tags each future release the same way.
 - **`package.json` is `1.3.0-dev`** (on #230; the user's call on 2026-11-13). Changes collect under `## [1.3.0] - Unreleased` until the user releases 1.3.0. npm rejects `1.3.0.dev`, so the version uses SemVer pre-release form. The first entry is `run-code-review` 1.3.0, which now starts only when typed. Regenerated: banner, `index.html` and the version examples in `reference/cli.md` and `installation.md`. `aiskills rel` now prints `installed: 1.3.0-dev (not published on npm)` and marks no row as installed. MAINTAINERS → Releasing documents the `-dev` convention. 428 tests pass.
 - **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.

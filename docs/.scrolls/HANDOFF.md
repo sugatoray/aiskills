@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 - **`master` is at `8028d62`:** #230 was squash-merged. It brought `make link-skills` with 24 links, these root scrolls, `/run-code-review` 1.3.0 (starts only when typed), the npm package at `1.3.0-dev` and the release-tagging step. `@sugatoray-ai/aiskills` 1.2.0 is still the latest on npm.
 - **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub.** Each sits on its npm `gitHead` and has been verified.
-- **[#234](https://github.com/sugatoray/aiskills/pull/234) (`claude/docs-stable-and-dev`, open, targets `master`):** the two-version docs site. After #230's squash merge it was rebased with `--onto` (3 commits). Its files are identical to before, and 442 tests pass. Once it merges and deploys, the site shows 1.2.0 at the root and 1.3.0-dev at `/dev/`. The deploy itself is untested.
+- **[#234](https://github.com/sugatoray/aiskills/pull/234) (`claude/docs-stable-and-dev`, open, targets `master`):** the versioned docs site: the latest release at the root, older releases under `/v/<version>/` (default 5 in all), and `/dev/`. After #230's squash merge it was rebased with `--onto` (3 commits). Its files are identical to before, and 442 tests pass. Once it merges and deploys, the site shows 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, and 1.3.0-dev at `/dev/`. The deploy itself is untested.
 
 ## What just happened
 - The user squash-merged #230 (`8028d62`). GitHub moved #234 to `master`, where it showed a conflict, because its branch still carried #230's 11 commits.
