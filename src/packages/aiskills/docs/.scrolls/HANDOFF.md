@@ -31,7 +31,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ## What just happened (this session)
 - **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
 - **[#230](https://github.com/sugatoray/aiskills/pull/230) (open, not this package's PR):**
-  - adds `make link-skills`, with 22 relative symlinks that put the scrolls family, `create-issues-update-pr`, `create-lib-docs` and `network-flow` into the repo root's `.agents/skills/` and `.claude/skills/`;
+  - adds `make link-skills`, with 24 relative symlinks that put the scrolls family, `create-issues-update-pr`, `create-lib-docs`, `network-flow` and `run-code-review` into the repo root's `.agents/skills/` and `.claude/skills/`;
   - adds repo-wide scrolls at the root `docs/.scrolls/`.
   - Nothing in this package changed. Its file list is the same with the links in place, and `npm test` passes all 428 tests after the rebase onto `master` `089f938`.
 - **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
@@ -44,5 +44,5 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **The user's `~/.npmrc`:** `skills` in their `min-release-age-exclude[]` line does nothing for `npx`; they can drop it.
 - **Awaiting the user:** delete the leftover remote branch `claude/focused-faraday-nqvduf`? Should the bundled skills move from MIT too (repo-wide; not done)?
 - `--route` lookups still only tested against a fake registry (AIS-2).
-- Once #230 merges, `/scrolls-*`, `/create-issues-update-pr`, `/create-lib-docs` and `/network-flow` load in this repo through the links in `.claude/skills/`.
+- Once #230 merges, `/scrolls-*`, `/create-issues-update-pr`, `/create-lib-docs`, `/network-flow` and `/run-code-review` load in this repo through the links in `.claude/skills/`.
 - See `GAP_ANALYSIS.md` for the rest.
