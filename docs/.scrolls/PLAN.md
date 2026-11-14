@@ -1,0 +1,8 @@
+# PLAN.md — Prioritized Backlog
+
+The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ ]` → `[x]`) as work completes, and re-prioritize when new requests change the calculus — this file reflects what's next, not a permanent record (that's what git history is for).
+
+- [x] ROOT-1: Set up the repo-root scrolls (`/scrolls-setup -t`). On #230.
+- [ ] ROOT-2: Merge #230 (`make link-skills`, the skill links, the release record, the root scrolls). Afterwards, add `make link-skills` to `SPEC.md`.
+- [ ] ROOT-3: Optional. File an issue under #231 for #230's scrolls commit, if the user wants it tracked.
+- [ ] ROOT-4: Link more skills with `make link-skills` as they're worked on here. Only the scrolls family and `create-issues-update-pr` are linked so far.

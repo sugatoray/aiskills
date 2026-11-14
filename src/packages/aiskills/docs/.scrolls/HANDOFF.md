@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 `@sugatoray-ai/aiskills` **`1.0.0` is published on npm** (dist-tag `latest`; published 2026-11-12T01:06Z, i.e. the evening of 2026-11-11 US Eastern, so the CHANGELOG date `2026-11-11` stands; checked with `npm view` 2026-11-12). It is the first stable release (strict SemVer from here). It came from [#141](https://github.com/sugatoray/aiskills/pull/141) (the `image-styles-skills` group with `artwallbg` and `commentdrop`, AIS-16; `AISKILLS_SKILLS_VERSION` removed, AIS-11), squash-merged to `master` as `28aee02`, and bundles **15 skills in 8 groups**. Published versions: `0.4.0`–`0.9.0`, `1.0.0` (plus npm's hidden `0.0.0-stage` placeholder). Source in `src/packages/aiskills/`. `npm test`: 421 offline tests, all pass. Docs live at https://sugatoray.github.io/aiskills/, redeployed by `.github/workflows/aiskills-docs.yml` on pushes to `master`.
 
-**`1.1.0` is published on npm** (`latest`, checked with `npm view` 2026-11-13); it came from [#206](https://github.com/sugatoray/aiskills/pull/206), which added `scrolls-explainer` (16 skills in 8 groups). **`1.2.0` is prepared in [#223](https://github.com/sugatoray/aiskills/pull/223)** (`eaeba06` on `claude/keen-babbage-2khhu9`): it bundles `/run-code-review` (from #215, merged as `7c0afec`) and its 1.2.0 `-o` reports, in the new `review-skills` group: **17 skills in 9 groups**. Release changes: `package.json`, CHANGELOG `[1.2.0] - 2026-11-13`, SECURITY `1.2.x` current, banner and docs, `DOCS_VIEW` with 1.2.0 as `latest` and the docs examples it drives. Not published yet.
+**`1.2.0` is published on npm** (`latest`, published 2026-11-14T02:22Z, i.e. the evening of 2026-11-13 US Eastern, so the CHANGELOG date `2026-11-13` stands; checked with `npm view`). It came from [#223](https://github.com/sugatoray/aiskills/pull/223) (squash `089f938`), which bundles `/run-code-review` (from #215, `7c0afec`) and its 1.2.0 `-o` reports in the new `review-skills` group: **17 skills in 9 groups**. Release changes: `package.json`, CHANGELOG `[1.2.0] - 2026-11-13`, SECURITY `1.2.x` current, banner and docs, `DOCS_VIEW` with 1.2.0 as `latest` and the docs examples it drives. `1.1.0` (from #206) was published 2026-11-12.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -29,14 +29,14 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- **Added the `/run-code-review` skill** in a new subgroup, `skills/development/review/` (plugin `review-skills`, alias `review`, registered in the root `marketplace.json` after `repo-related-skills`). It is the first bundled skill with per-language reference folders (`references/review_<language>/{REVIEW,PATTERNS,TOOLING,SECURITY,WISDOM}.md` for python, javascript, typescript, rust, shellscript, powershell-script, sql, html, css, markdown, xml, json, yaml, toml) and ships `scripts/detect_languages.py` and `scripts/check_formats.py` with pytest tests. The skill's own story is in its `meta/MAINTAINERS.md` and `CHANGELOG.md`.
-- **`/run-code-review` went to 1.1.0 in the same PR** (and the `review-skills` plugin with it): options `-l/--lang`, `-s/--security` (security review alone) and the scope flags `-p`, `-t`, `--local`, `-r`; `SECURITY.md` and `WISDOM.md` in every language folder; seven more languages; XML, JSON, YAML and TOML are tool-first. For the package this changed only descriptions: the skill and group counts are the same, so the generated docs and banner were regenerated and no test count moved.
-- **`/run-code-review` gained `assets/EXAMPLE.md`** (ten examples on one demo repository, in the form of the `image-styles` example files; linked from its `SKILL.md`, `README.md` and `CHANGELOG.md`). For the package this added one line to the generated `docs/docsite/skills/run-code-review.md` file list; stage a new skill file before `npm run docs`, because the generator lists tracked files.
-- **The package now bundles 17 skills in 9 groups, released as `1.2.0` in #223:** Package changes, led by the failing tests as before: `banner.test.mjs` counts (`17 skills`, `9 groups`), `npm run docs` and `npm run banner:png`, then the hand-written pages with `<!-- verify -->` output that lists groups or skills (`tutorial/01`, `02`, `04`, `guides/use-from-an-agent.md`, `reference/cli.md`), the group tables in `concepts/skill-groups.md` and the README.
-- The banner's group pills now wrap onto a second row (nine groups); it still fits.
+- **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
+- **[#230](https://github.com/sugatoray/aiskills/pull/230) (open, not this package's PR):**
+  - adds `make link-skills`, with 18 relative symlinks that put the scrolls family and `create-issues-update-pr` into the repo root's `.agents/skills/` and `.claude/skills/`;
+  - adds repo-wide scrolls at the root `docs/.scrolls/`.
+  - Nothing in this package changed. Its file list is the same with the links in place, and `npm test` passes all 428 tests after the rebase onto `master` `089f938`.
+- **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
 
 ## Known issues / open threads
-- **Publish `1.2.0` after #223 merges:** `npm run audit:skills`, `npm test` + `npm run test:e2e`, `npm run pack:dry`, `npm publish`, `npm stage approve`; update SPEC's release note; re-date the CHANGELOG if it ships later than 2026-11-13.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
@@ -44,5 +44,5 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **The user's `~/.npmrc`:** `skills` in their `min-release-age-exclude[]` line does nothing for `npx`; they can drop it.
 - **Awaiting the user:** delete the leftover remote branch `claude/focused-faraday-nqvduf`? Should the bundled skills move from MIT too (repo-wide; not done)?
 - `--route` lookups still only tested against a fake registry (AIS-2).
-- `/scrolls-update`, `/create-lib-docs` and `/create-issues-update-pr` aren't installed commands in these sessions; follow their `SKILL.md` files from the repo by hand.
+- Once #230 merges, `/scrolls-*` and `/create-issues-update-pr` load in this repo through the links in `.claude/skills/`. `/create-lib-docs` isn't linked yet: run `make link-skills SKILL=<its path>` from the repo root, or follow its `SKILL.md` by hand.
 - See `GAP_ANALYSIS.md` for the rest.
