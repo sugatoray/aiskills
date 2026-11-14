@@ -2,7 +2,7 @@
 
 What review (aiskills) does, feature by feature. Add a section per feature when it ships — describe *what* it does and *why* it matters to a user, not the implementation detail (that belongs in code comments or `WISDOM.md`).
 
-Everything below is built, tested and pushed on branch `devin/1794523707-code-review-skill` ([#215](https://github.com/sugatoray/aiskills/pull/215), open, not merged), so none of it is on `master` yet. The version-by-version record is `skills/development/review/run-code-review/CHANGELOG.md`; this file says what a user gets.
+Up to 1.1.0, everything below is on `master`: [#215](https://github.com/sugatoray/aiskills/pull/215) was squash-merged as `7c0afec` on 2026-11-13. The 1.2.0 section is in [#223](https://github.com/sugatoray/aiskills/pull/223), open into `master`. The version-by-version record is `skills/development/review/run-code-review/CHANGELOG.md`; this file says what a user gets.
 
 ## `/run-code-review`: a structured review at a staff engineer's bar (1.0.0)
 
@@ -35,6 +35,10 @@ Maps the files in scope to languages and to the reference files to read, and lis
 ## Worked examples: `assets/EXAMPLE.md` (1.1.0)
 
 Ten examples on one small demo repository: a full review with the complete report, each option, the options combined, plain-language requests, what a wrong flag returns, and follow-ups (apply the fixes, post to a PR). Linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
+
+## `-o` / `--output`: the report as a page, Markdown or JSON, with line links (1.2.0)
+
+In [#223](https://github.com/sugatoray/aiskills/pull/223), not yet on `master`. Besides the report in the chat, `-o review.html` writes a self-contained page (offline; severity, file and text filters; copy buttons; light and dark; prints cleanly), `-o review.md` the Markdown report and `-o review.json` the report as data (`references/report.schema.json`, `schema_version` 1) for other tools. A folder or bare `-o` gets a dated `.html`; `-f` overwrites a different file, `--open` opens the page. Each finding links to its line at the reviewed commit on GitHub or GitLab, chosen from the URL of the remote the branch tracks; `--host-type github|gitlab` covers a self-hosted server whose name doesn't say. A link is left out, with the reason shown, when it would be wrong (commit not pushed, file changed since or untracked, host unknown). Quoted code in the report is shown, never run, and credentials in a remote URL never reach it. Done by `scripts/render_report.py`, which also refuses a report whose verdict disagrees with its findings.
 
 ## Packaging: the `review-skills` plugin (1.0.0)
 

@@ -9,5 +9,8 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - Only the fourteen listed languages are reviewed with a checklist; files in any other language (Go, Java, C#, …) are listed as `unsupported`.
 - No workflow runs the skill's tests: the repository's only workflow runs on pushes to `master` that touch the npm package's docs.
 - The subgroup has no `CHANGELOG.md`, so `src/development/review/` has no `CHANGELOG.md` symlink where `src/scrolls/` has one.
+- Line links cover GitHub and GitLab only; Bitbucket, Gitea/Forgejo and Azure DevOps remotes get no links.
+- The HTML report's filters and copy buttons are checked by hand in a browser; `tests/test_report_page.py` covers the pinned header, the collapsible verdict, the search, the light/dark switch and the phone layout.
+- `run-code-review/SKILL.md` is 291 lines (its MAINTAINERS asks for about 250) and its `description` is 1,389 characters, over the 1,024 some agents allow.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.

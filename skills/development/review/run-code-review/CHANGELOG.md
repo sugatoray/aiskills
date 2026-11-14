@@ -3,6 +3,36 @@
 All notable changes to the `run-code-review` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-11-13
+
+### Added
+
+- `-o`/`--output [<path>]`: write the report to a file as well as giving it in the chat. The
+  extension sets the format: `.html` (a self-contained page), `.md` or `.json`. A folder, or `-o`
+  alone, gets `run-code-review-<title>-<YYYYMMDD-HHMM>.html`. Repeatable. `-f`/`--force` overwrites a
+  different file (without it the file is kept, exit 3); `--open` opens the page.
+- Line links: each finding links to its line at the reviewed commit on GitHub or GitLab, chosen
+  from the URL of the remote the branch tracks (else `origin`). `--host-type github|gitlab` is for
+  a self-hosted server whose name doesn't say. A link is left out where it would be wrong (commit
+  not pushed, file changed since or untracked, host unknown), and the report says why.
+  Credentials in a remote URL never reach the report.
+- `scripts/render_report.py`: renders the report, written as JSON, to Markdown, HTML or JSON. It
+  checks the report first, including that the verdict agrees with the findings
+  (`references/SEVERITY.md`), and writes nothing if it is invalid. Standard library only.
+- `references/report.schema.json` (`schema_version` 1) and `assets/report-example.json`
+  (Example-01's report). `assets/report-template.html`: the HTML page, with severity, file and
+  text filters, copy buttons, light and dark themes, and print styles. The title bar, the verdict
+  and the severity counts stay pinned at the top while the page scrolls; the verdict card
+  collapses to its badge and one-line reason (remembered; collapsed by default on a phone). A
+  search box in the header (`/` to focus) searches the whole report, with highlighted results,
+  arrow keys and Enter; a hit opens and scrolls to its finding or section, resetting any filter
+  that hid it. The light/dark switch is the docs site's: a moon or sun button that follows the
+  system until used, then remembers the choice. The report is embedded as escaped JSON and shown as text only, so code quoted from the reviewed
+  project cannot run.
+- `tests/test_render_report.py`, and `tests/test_report_page.py`, which checks the pinned header
+  and the collapsible verdict, the search and the light/dark switch in Chromium (skipped
+  without Node and Playwright).
+
 ## [1.1.0] - 2026-11-12
 
 ### Changed

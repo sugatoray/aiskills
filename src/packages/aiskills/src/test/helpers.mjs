@@ -180,16 +180,17 @@ export const SAMPLE_VIEW = {
   "dist-tags": { latest: "0.8.0" },
 };
 
-/** SAMPLE_VIEW plus 0.9.0, 1.0.0 and a 1.1.0 release (latest), for the docs' examples of the current version. */
+/** SAMPLE_VIEW plus 0.9.0, 1.0.0, 1.1.0 and a 1.2.0 release (latest), for the docs' examples of the current version. */
 export const DOCS_VIEW = {
   time: {
     ...SAMPLE_VIEW.time,
-    modified: "2026-11-20T10:00:00.000Z",
+    modified: "2026-11-21T10:00:00.000Z",
     "0.9.0": "2026-11-15T10:00:00.000Z",
     "1.0.0": "2026-11-18T10:00:00.000Z",
     "1.1.0": "2026-11-20T10:00:00.000Z",
+    "1.2.0": "2026-11-21T10:00:00.000Z",
   },
-  "dist-tags": { latest: "1.1.0" },
+  "dist-tags": { latest: "1.2.0" },
 };
 
 /** Sample download counts (the real ones up to 2026-11-10). */

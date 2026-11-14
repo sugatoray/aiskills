@@ -16,7 +16,8 @@ structured report.
   `--base`.
 - **Report:** a verdict, then findings ranked `blocker`, `major`, `minor`, `nit`, each with file
   and line, the failure it causes, a confidence level, and a suggested code change where the fix
-  is clear.
+  is clear. In the chat by default; with `-o`, also as a self-contained HTML page, Markdown or
+  JSON, with each finding linked to its line on GitHub or GitLab.
 - **Evidence:** every finding is traced or reproduced before it is reported; what wasn't run or
   read is listed.
 - **Read-only by default:** it suggests changes. It edits files or posts PR comments only when
@@ -30,12 +31,15 @@ run-code-review/
 │   ├── claude-code.yaml          display name and invocation policy
 │   └── openai.yaml
 ├── assets/
-│   └── EXAMPLE.md                example prompts and their outputs, one per option
+│   ├── EXAMPLE.md                example prompts and their outputs, one per option
+│   ├── report-example.json       a complete report as JSON (Example-01's)
+│   └── report-template.html      the page render_report.py fills in for -o report.html
 ├── meta/
 │   └── MAINTAINERS.md
 ├── references/
 │   ├── CROSS_LANGUAGE.md         the questions for each review pass, for any language
 │   ├── REPORT_TEMPLATE.md        the report structure and the rules for filling it in
+│   ├── report.schema.json        the report as JSON, for -o and for other tools
 │   ├── SEVERITY.md               severities, confidence levels, and the verdict they produce
 │   └── review_<language>/        REVIEW.md  PATTERNS.md  TOOLING.md  SECURITY.md  WISDOM.md
 │                                 one folder each for: python, javascript, typescript, rust,
@@ -43,10 +47,12 @@ run-code-review/
 │                                 xml, json, yaml, toml
 ├── scripts/
 │   ├── check_formats.py          syntax check for the tool-first formats; lists linters on PATH
-│   └── detect_languages.py       files under review -> languages and the references to read
+│   ├── detect_languages.py       files under review -> languages and the references to read
+│   └── render_report.py          report JSON -> HTML, Markdown or JSON, with line links
 ├── tests/
 │   ├── test_check_formats.py
-│   └── test_detect_languages.py
+│   ├── test_detect_languages.py
+│   └── test_render_report.py
 ├── CHANGELOG.md
 ├── README.md
 └── SKILL.md
@@ -96,6 +102,10 @@ each option, the options combined, and a complete report.
 | `--local` | The current folder. No short form: `-l` is `--lang`. |
 | `-r`, `--recurse` | With `-p` or `--local`: include subfolders. |
 | `--base <ref>` | What changed against a git ref, plus untracked files. |
+| `-o`, `--output [<path>]` | Also write the report: `.html`, `.md` or `.json` by extension; a folder (or `-o` alone) gets a dated `.html`. Repeatable. |
+| `-f`, `--force` | With `-o`: overwrite a different file. |
+| `--open` | With `-o`: open the HTML report. |
+| `--host-type github\|gitlab` | With `-o`: the code host for line links, when its name doesn't say. |
 
 At most one of `-p`, `-t` and `--local`; `-l`, `-s` and `-r` combine with any of them.
 
@@ -134,3 +144,26 @@ linters and validators are on `PATH`. It installs nothing and runs no external p
 python3 scripts/check_formats.py -t                         # every tracked json, toml, xml, yaml file
 python3 scripts/check_formats.py -p config -r -l yaml       # YAML under config/
 ```
+
+`scripts/render_report.py` turns the report, written as JSON (`references/report.schema.json`), into
+the files `-o` asks for. It checks the report first (required fields; a verdict that agrees with the
+findings) and writes nothing if it is invalid:
+
+```bash
+python3 scripts/render_report.py report.json                       # Markdown to stdout
+python3 scripts/render_report.py report.json -o review.html        # a self-contained page
+python3 scripts/render_report.py report.json -o . -o review.json   # dated .html here, plus JSON
+python3 scripts/render_report.py report.json -o r.html --host-type gitlab   # a self-hosted GitLab
+```
+
+The HTML page needs no network and runs nothing from the report: the report is embedded as
+escaped JSON and every element is built as text, so code quoted from the reviewed project is
+shown, never run. Its title bar, verdict and severity counts stay pinned while you scroll, and the
+verdict card collapses to one line. A search box (press `/`) searches the whole report and jumps to
+each hit. It has severity and file filters, a text filter, copy buttons, the checks that ran, and a
+light/dark switch like the docs site's. Each finding links to its line at the reviewed commit, on the
+remote the branch tracks (else `origin`): GitHub or GitLab by the host name, or `--host-type` for
+a server whose name doesn't say. A link is left out when it would be wrong (the commit is not
+pushed, the file changed since it or is untracked), and the report says why. Credentials in a
+remote URL never reach the report. Exit codes: 0 written, 2 usage error or invalid report, 3 a
+different file is already there (`-f` overwrites).

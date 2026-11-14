@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "title": "branch `feature/search` against `main` (\"Add user search\")",
+  "mode": "Full review",
+  "verdict": "Request changes",
+  "reason": "the new search is open to SQL injection and returns other searches' rows, and the new workflow runs pull-request code with the repository's token.",
+  "summary": "The branch adds a user search (`search_users`), a results renderer, a deploy script, a settings change and a CI workflow. The search works for a plain name on its first call only. Fix findings 1 to 3 before merge; 4 to 6 are small changes that belong in the same pull request.",
+  "scope": {
+    "reviewed": "`main..feature/search` (5 files, 33 lines added, 1 removed) and 1 untracked file",
+    "languages": "python (1 file), javascript (1), shellscript (1), json (1), yaml (1), xml (1)",
+    "not_run": "the project has no tests to run. No Python or JavaScript linter is installed, and none was added. The workflow was not run on GitHub."
+  },
+  "checks": [
+    {"command": "check_formats.py", "version": "", "result": "2 ok, 1 error (finding 6)", "status": "error"},
+    {"command": "shellcheck", "version": "0.11.0", "result": "2 notes, used in finding 5", "status": "warning"},
+    {"command": "actionlint", "version": "1.7.12", "result": "1 error, used in finding 3", "status": "error"},
+    {"command": "xmllint --noout notes.xml", "version": "libxml 2.9.13", "result": "well-formed", "status": "ok"},
+    {"command": "reproductions", "version": "", "result": "findings 1, 2 and 5 reproduced by running the code; finding 4 reproduced in Chromium", "status": "ok"}
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "severity": "blocker",
+      "title": "The search text is pasted into the SQL statement",
+      "file": "app/users.py",
+      "lines": "13",
+      "symbol": "search_users",
+      "language": "python",
+      "confidence": "confirmed",
+      "confidence_note": "ran it against an in-memory database with a third column, `secret`.",
+      "problem": "`name` goes into the statement through an f-string, so it is read as SQL. `find_user`, just above it, uses a `?` parameter.",
+      "impact": "`search_users(conn, \"x' UNION SELECT secret, name FROM users --\")` returned `[('s1', 'ann'), ('s2', 'bob')]`: any column of any table. An honest name fails too: `o'brien` raises `OperationalError: near \"brien\": syntax error`.",
+      "suggestion": {
+        "diff": "-    rows = conn.execute(f\"SELECT id, name FROM users WHERE name LIKE '%{name}%'\").fetchall()\n+    rows = conn.execute(\n+        \"SELECT id, name FROM users WHERE name LIKE ?\", (f\"%{name}%\",)\n+    ).fetchall()",
+        "note": "With this change the injection returns `[]` and `o'brien` is found. `%` and `_` in `name` still act as wildcards; escape them if that matters. Add a test for a name with a quote."
+      }
+    },
+    {
+      "id": 2,
+      "severity": "blocker",
+      "title": "A shared default list makes each search return earlier searches' rows",
+      "file": "app/users.py",
+      "lines": "12-15",
+      "symbol": "search_users",
+      "language": "python",
+      "confidence": "confirmed",
+      "confidence_note": "two calls in one process.",
+      "problem": "`seen=[]` is created once, when the function is defined. Every call that leaves out `seen` appends to that same list and returns it.",
+      "impact": "after one earlier search, a search for `ann` (one match) returned 3 rows. In a server, one user's results are returned to the next user, and the list grows until restart.",
+      "suggestion": {
+        "diff": "-def search_users(conn, name, seen=[]):\n-    rows = conn.execute(...).fetchall()\n-    seen.extend(rows)\n-    return seen\n+def search_users(conn, name):\n+    return conn.execute(...).fetchall()",
+        "note": "Nothing in the repository passes `seen`. If a caller needs to accumulate, it can do so itself."
+      }
+    },
+    {
+      "id": 3,
+      "severity": "blocker",
+      "title": "`pull_request_target` checks out and runs the pull request's code",
+      "file": ".github/workflows/ci.yml",
+      "lines": "2, 7-11",
+      "language": "yaml",
+      "confidence": "likely",
+      "confidence_note": "`actionlint` reports line 10. What the trigger grants is from GitHub's documentation; the workflow was not run.",
+      "problem": "`pull_request_target` runs with the base repository's token and secrets. The job then checks out the pull request's head and runs `python -m pytest` on it. Line 10 also puts the pull request title into a shell command.",
+      "impact": "anyone who can open a pull request, from a fork too, runs their own code with a token that can write to the repository. A title such as `\"; curl … | sh #` runs as well.",
+      "suggestion": {
+        "diff": "-on: pull_request_target\n+on: pull_request\n+permissions:\n+  contents: read\n jobs:\n   test:\n     runs-on: ubuntu-latest\n     steps:\n       - uses: actions/checkout@v4\n-        with:\n-          ref: ${{ github.event.pull_request.head.sha }}\n-      - run: echo \"Testing ${{ github.event.pull_request.title }}\"\n+      - run: echo \"Testing $PR_TITLE\"\n+        env:\n+          PR_TITLE: ${{ github.event.pull_request.title }}\n       - run: python -m pytest",
+        "note": "`actionlint` passes on this version."
+      }
+    },
+    {
+      "id": 4,
+      "severity": "major",
+      "title": "The query is written into the page as HTML",
+      "file": "web/render.js",
+      "lines": "2",
+      "symbol": "showResults",
+      "language": "javascript",
+      "confidence": "confirmed",
+      "confidence_note": "for the function — in Chromium, a query of `<img src=x onerror=\"…\">` ran its script. No caller exists yet, so where `query` comes from is not known; a search query is normally user input, often from the URL.",
+      "problem": "`innerHTML` parses `query` as markup. The user names on line 5 use `textContent` and are safe.",
+      "impact": "a link with a crafted query runs script in the page of whoever opens it.",
+      "suggestion": {
+        "diff": "-  container.innerHTML = `<h2>Results for ${query}</h2>`;\n+  const heading = document.createElement(\"h2\");\n+  heading.textContent = `Results for ${query}`;\n+  container.replaceChildren(heading);"
+      }
+    },
+    {
+      "id": 5,
+      "severity": "major",
+      "title": "With no argument the script deletes `/releases/old` and reports success",
+      "file": "scripts/deploy.sh",
+      "lines": "2-5",
+      "language": "shellscript",
+      "confidence": "confirmed",
+      "confidence_note": "ran it with no argument in an empty folder: `cp` failed, the script printed `deployed to` and exited 0.",
+      "problem": "`$1` is not checked, `$TARGET` is not quoted (ShellCheck SC2086, lines 3 and 4), and nothing stops the script when a command fails.",
+      "impact": "an empty `TARGET` turns line 3 into `rm -rf /releases/old`. A failed copy is reported as a deploy. A target path with a space deletes the wrong folders.",
+      "suggestion": {
+        "diff": " #!/bin/bash\n-TARGET=$1\n-rm -rf $TARGET/releases/old\n-cp -r build $TARGET/releases/current\n+set -euo pipefail\n+TARGET=${1:?usage: deploy.sh <target-dir>}\n+rm -rf -- \"$TARGET/releases/old\"\n+cp -r build \"$TARGET/releases/current\"\n echo \"deployed to $TARGET\"",
+        "note": "With this change, no argument prints the usage line and exits 1, and ShellCheck is clean."
+      }
+    },
+    {
+      "id": 6,
+      "severity": "major",
+      "title": "`debug` is set twice; the second value, `true`, wins",
+      "file": "config/settings.json",
+      "lines": "3, 5",
+      "language": "json",
+      "confidence": "confirmed",
+      "confidence_note": "Python's `json`, `jq` 1.6 and Node's `JSON.parse` all read `debug` as `true`.",
+      "problem": "line 3 says `\"debug\": false`; line 5, added by this branch, says `\"debug\": true`.",
+      "impact": "debug mode ships on, while a reader of the top of the file sees it off.",
+      "suggestion": {
+        "diff": "   \"debug\": false,\n-  \"search\": {\"limit\": 50},\n-  \"debug\": true\n+  \"search\": {\"limit\": 50}\n }"
+      }
+    }
+  ],
+  "questions": [],
+  "tests": {
+    "summary": "The branch adds no tests, and the project has none. Add at least:",
+    "cases": [
+      "`search_users`: a plain name; a name with `'`; two calls in a row return only their own rows.",
+      "`showResults`: a query that contains markup is shown as text.",
+      "`deploy.sh`: no argument exits non-zero and deletes nothing."
+    ]
+  },
+  "preexisting": [],
+  "works_well": [],
+  "order_of_work": [
+    "Findings 1 and 2 together (one function), then 3.",
+    "Findings 4, 5 and 6, with the tests above."
+  ]
+}

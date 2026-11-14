@@ -198,7 +198,7 @@ aiskills path
 ```
 
 ```text
-1.1.0
+1.2.0
 ~/.config/sugatoray/aiskills
 ```
 
@@ -355,7 +355,7 @@ Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`run-code-review`](run-code-review.md) | 1.1.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
+| [`run-code-review`](run-code-review.md) | 1.2.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 
@@ -833,14 +833,14 @@ See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiski
 <!-- source: skills/run-code-review.md -->
 # run-code-review
 
-Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked.
+Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds at a large engineering organisation, and returns a structured report: a verdict, findings ranked by severity (blocker, major, minor, nit) with file and line, the failure each one causes, and a concrete suggested code change wherever a fix is clear. Covers Python, JavaScript, TypeScript, Rust, shell scripts (sh, bash, zsh), PowerShell, SQL, HTML, CSS, Markdown, XML, JSON, YAML and TOML, each with its own checklist, fix patterns, tool commands, security scope and review wisdom under references/review_<language>/; XML, JSON, YAML and TOML are checked with tools first; files in other languages get the cross-language review only. Options: -l/--lang limits the review to chosen languages, -s/--security runs a security review alone, and -p, -t, --local, -r and --base choose which files are reviewed; -o writes it as HTML, Markdown or JSON with line links. Use this whenever the user asks to review code, review a PR or merge request, do a code review or security review, audit or critique code, check a change before merging, look for bugs, security problems or bad practices in code, or invokes /run-code-review, even when they don't name a language. It reviews and suggests; it changes files or posts review comments only when asked.
 
 | Property | Value |
 | --- | --- |
 | Group | `review-skills` (alias `review`) |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Starts | When you type `/run-code-review`, or your agent uses it when a task fits its description |
-| Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py and scripts/check_formats.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
+| Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
 | Source | [skills/development/review/run-code-review](https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review) |
 
@@ -882,10 +882,13 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `agents/claude-code.yaml`
 - `agents/openai.yaml`
 - `assets/EXAMPLE.md`
+- `assets/report-example.json`
+- `assets/report-template.html`
 - `meta/MAINTAINERS.md`
 - `references/CROSS_LANGUAGE.md`
 - `references/REPORT_TEMPLATE.md`
 - `references/SEVERITY.md`
+- `references/report.schema.json`
 - `references/review_css/PATTERNS.md`
 - `references/review_css/REVIEW.md`
 - `references/review_css/SECURITY.md`
@@ -958,9 +961,12 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `references/review_yaml/WISDOM.md`
 - `scripts/check_formats.py`
 - `scripts/detect_languages.py`
+- `scripts/render_report.py`
 - `tests/test_check_formats.py`
 - `tests/test_detect_languages.py`
 - `tests/test_reference_code.py`
+- `tests/test_render_report.py`
+- `tests/test_report_page.py`
 - `tests/test_skill_name.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
@@ -3145,7 +3151,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.1.0
+  aiskills version : 1.2.0
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
       saved skills : 17 skills in 9 groups, flat layout
@@ -3210,12 +3216,12 @@ aiskills rel 3
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 3 of 8 releases
+@sugatoray-ai/aiskills: latest 3 of 9 releases
 
   VERSION  PUBLISHED                TAG
-  1.1.0    2026-11-20 (1 day ago)   latest  ← installed
+  1.2.0    2026-11-21 (today)       latest  ← installed
+  1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
-  0.9.0    2026-11-15 (6 days ago)
 
 more: aiskills rel all
 
@@ -3237,14 +3243,14 @@ aiskills rel --downloads
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 5 of 8 releases
+@sugatoray-ai/aiskills: latest 5 of 9 releases
 
-  VERSION  PUBLISHED                 TAG     DOWNLOADS (7 DAYS)
-  1.1.0    2026-11-20 (1 day ago)    latest                   –  ← installed
-  1.0.0    2026-11-18 (3 days ago)                            –
-  0.9.0    2026-11-15 (6 days ago)                            –
-  0.8.0    2026-11-12 (9 days ago)                            –
-  0.7.0    2026-11-11 (10 days ago)                           –
+  VERSION  PUBLISHED                TAG     DOWNLOADS (7 DAYS)
+  1.2.0    2026-11-21 (today)       latest                   –  ← installed
+  1.1.0    2026-11-20 (1 day ago)                            –
+  1.0.0    2026-11-18 (3 days ago)                           –
+  0.9.0    2026-11-15 (6 days ago)                           –
+  0.8.0    2026-11-12 (9 days ago)                           –
 
 more: aiskills rel all
 
@@ -3273,10 +3279,10 @@ aiskills rel 1 --downloads 7d --table
 ```
 
 ```text
-@sugatoray-ai/aiskills: latest 1 of 8 releases
+@sugatoray-ai/aiskills: latest 1 of 9 releases
 
-  VERSION  PUBLISHED               TAG     DOWNLOADS (7 DAYS)
-  1.1.0    2026-11-20 (1 day ago)  latest                   –  ← installed
+  VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
+  1.2.0    2026-11-21 (today)  latest                   –  ← installed
 
 more: aiskills rel all
 
@@ -3323,7 +3329,7 @@ aiskills upgrade --check
 ```
 
 ```text
-[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.2.0 (published 2026-11-21)
 [aiskills] update available: run 'aiskills upgrade'
 ```
 
@@ -3335,16 +3341,16 @@ aiskills upgrade
 ```
 
 ```text
-[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.2.0 (published 2026-11-21)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] running: npm install -g @sugatoray-ai/aiskills@1.1.0
+[aiskills] running: npm install -g @sugatoray-ai/aiskills@1.2.0
 changed 1 package in 1s
-[aiskills] refreshing 2 skills for claude-code (global) with aiskills 1.1.0
+[aiskills] refreshing 2 skills for claude-code (global) with aiskills 1.2.0
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] bundled: scrolls-setup, scrolls-update
 [aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-setup --skill scrolls-update --agent claude-code --yes
 [aiskills] project installs aren't refreshed: run 'aiskills install -p' in each project that uses them
-[aiskills] upgraded 1.0.0 → 1.1.0
+[aiskills] upgraded 1.0.0 → 1.2.0
 ```
 
 What it does, in order:
@@ -3382,9 +3388,9 @@ aiskills upgrade -n
 ```
 
 ```text
-[aiskills] installed: 1.0.0 (npm, global) · latest: 1.1.0 (published 2026-11-20)
+[aiskills] installed: 1.0.0 (npm, global) · latest: 1.2.0 (published 2026-11-21)
 [aiskills] changes: https://github.com/sugatoray/aiskills/blob/master/src/packages/aiskills/CHANGELOG.md
-[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@1.1.0
+[aiskills] [dry-run] npm install -g @sugatoray-ai/aiskills@1.2.0
 [aiskills] [dry-run] then: aiskills install -g -s scrolls-setup,scrolls-update -a claude-code
 ```
 
@@ -3417,7 +3423,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.1.0 — Sugato Ray's agent skills
+aiskills 1.2.0 — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -3565,7 +3571,7 @@ ais -v
 ```
 
 ```text
-1.1.0
+1.2.0
 ```
 
 ## Options
