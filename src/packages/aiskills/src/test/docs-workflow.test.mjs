@@ -106,8 +106,8 @@ describe("docs publishing workflow", () => {
     } finally {
       console.error = err;
     }
-    // The working tree's docs are at the root (one version) or in dev/ (two versions).
-    const current = result.both ? join(site, "dev") : site;
+    // The working tree's docs are in dev/ while package.json is -dev, else at the root.
+    const current = join(site, result.find((p) => p.source === null).path);
     const html = readFileSync(join(current, "index.html"), "utf8");
     assert.match(html, /<title>[^<]*aiskills/i);
     assert.match(html, /github\.com\/sugatoray\/aiskills\/blob\/some-branch\//);

@@ -136,36 +136,48 @@ export function skinMenuHtml() {
 
 const escHtml = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
 
+const KIND_LABEL = { dev: "in development", latest: "latest release", older: "older release" };
+
 /**
- * The header's version badge, version menu and the dev notice.
- * channel: null (one version: a plain badge), or { current: "stable" | "dev",
- * stable, dev } when the site has both: the stable docs at the site root and
- * the in-development docs in dev/ below it.
+ * The header's version badge, version menu and notice.
+ * menu: null (one version: a plain badge), or the site's versions:
+ *   { current: "<version of this page>", base: "<path from this page to the site root>",
+ *     entries: [{ version, path: "<folder under the site root, '' for the root>", kind: "dev" | "latest" | "older" }] }
+ * e.g. the site root (latest release, base ""), dev/ (base "../"), v/1.1.0/ (base "../../").
+ * The dev page and older releases' pages get a notice that links to the latest release.
  */
-export function versionParts(version, channel) {
-  if (!channel) return { badge: `<span class="brand-ver">v${escHtml(version)}</span>`, menu: "", note: "" };
-  if (channel.current !== "stable" && channel.current !== "dev") throw new Error(`unknown channel: ${channel.current} (stable or dev)`);
-  if (!channel.stable || !channel.dev) throw new Error("a channel needs both versions: stable and dev");
-  const onDev = channel.current === "dev";
-  const link = (href, v, label, current) =>
-    `<a href="${href}"${current ? ' aria-current="page"' : ""}><span>${escHtml(v)}</span> <small>${label}</small></a>`;
-  const menu =
+export function versionParts(version, menu) {
+  if (!menu) return { badge: `<span class="brand-ver">v${escHtml(version)}</span>`, menu: "", note: "" };
+  const entries = menu.entries ?? [];
+  for (const e of entries) if (!KIND_LABEL[e.kind]) throw new Error(`version menu: unknown kind: ${e.kind} (dev, latest or older)`);
+  const latest = entries.filter((e) => e.kind === "latest");
+  if (latest.length !== 1) throw new Error("version menu: needs exactly one latest release");
+  const here = entries.find((e) => e.version === menu.current);
+  if (!here) throw new Error(`version menu: ${menu.current} is not one of its versions`);
+  const base = menu.base ?? "";
+  const href = (e) => escHtml(base + e.path) || "./";
+  const links = entries
+    .map((e) => `<a href="${href(e)}"${e === here ? ' aria-current="page"' : ""}><span>${escHtml(e.version)}</span> <small>${KIND_LABEL[e.kind]}</small></a>`)
+    .join("");
+  const html =
     `<details class="ver-menu"><summary class="brand-ver" title="Docs version">v${escHtml(version)}</summary>` +
-    `<div class="ver-list">${link(onDev ? "../" : "./", channel.stable, "stable release", !onDev)}` +
-    `${link(onDev ? "./" : "dev/", channel.dev, "in development", onDev)}</div></details>`;
-  const note = onDev
-    ? `<div class="channel-note" role="note">These docs are for <b>${escHtml(channel.dev)}</b>, which is not released yet. ` +
-      `For the current release, read the <a href="../">${escHtml(channel.stable)} docs</a>.</div>`
-    : "";
-  return { badge: "", menu, note };
+    `<div class="ver-list">${links}</div></details>`;
+  const toLatest = `<a href="${href(latest[0])}">${escHtml(latest[0].version)} docs</a>`;
+  const note =
+    here.kind === "dev"
+      ? `<div class="channel-note" role="note">These docs are for <b>${escHtml(here.version)}</b>, which is not released yet. For the current release, read the ${toLatest}.</div>`
+      : here.kind === "older"
+        ? `<div class="channel-note" role="note">These docs are for <b>${escHtml(here.version)}</b>, an older release. For the latest release, read the ${toLatest}.</div>`
+        : "";
+  return { badge: "", menu: html, note };
 }
 
 /**
  * Fill the template with the docs' pages, images and version. Returns { html, count }.
- * version: the version the page shows (default: package.json's). channel: see versionParts.
+ * version: the version the page shows (default: package.json's). menu: see versionParts.
  */
-export function build(docs, { ref = "master", banner = BANNER, version: shown = version(), channel = null } = {}) {
-  const parts = versionParts(shown, channel);
+export function build(docs, { ref = "master", banner = BANNER, version: shown = version(), menu = null } = {}) {
+  const parts = versionParts(shown, menu);
   const { tabs, pages } = collect(docs);
   const images = {};
   for (const f of readdirSync(join(docs, "images")).filter((f) => f.endsWith(".svg")).sort()) {
@@ -210,7 +222,7 @@ export function build(docs, { ref = "master", banner = BANNER, version: shown = 
 
 /**
  * Command line: <docs> --out <file> [--ref <branch>] [--banner <file> | --no-banner]
- * [--version <v>] [--channel stable|dev --stable <v> --dev <v>].
+ * [--version <v>] [--menu <json>] (see versionParts).
  */
 export function main(argv = process.argv.slice(2)) {
   let docs = null;
@@ -218,25 +230,26 @@ export function main(argv = process.argv.slice(2)) {
   let ref = "master";
   let banner = BANNER;
   let shown;
-  let current = null;
-  let stable = null;
-  let dev = null;
+  let menu = null;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--out") out = argv[++i];
     else if (argv[i] === "--version") shown = argv[++i];
-    else if (argv[i] === "--channel") current = argv[++i];
-    else if (argv[i] === "--stable") stable = argv[++i];
-    else if (argv[i] === "--dev") dev = argv[++i];
+    else if (argv[i] === "--menu") {
+      try {
+        menu = JSON.parse(argv[++i]);
+      } catch {
+        throw new Error("version menu: --menu is not valid JSON");
+      }
+    }
     else if (argv[i] === "--ref") ref = argv[++i];
     else if (argv[i] === "--banner") banner = argv[++i];
     else if (argv[i] === "--no-banner") banner = null;
     else docs = argv[i];
   }
   if (!docs || !out) {
-    throw new Error("usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>] [--version <v>] [--channel stable|dev --stable <v> --dev <v>]");
+    throw new Error("usage: build-docs-html.mjs <docs-dir> --out <file.html> [--ref <branch>] [--version <v>] [--menu <json>]");
   }
-  const channel = current ? { current, stable, dev } : null;
-  const { html, count, statics } = build(docs, { ref, banner, version: shown, channel });
+  const { html, count, statics } = build(docs, { ref, banner, version: shown, menu });
   const outDir = dirname(resolve(out));
   mkdirSync(outDir, { recursive: true });
   writeFileSync(out, html);

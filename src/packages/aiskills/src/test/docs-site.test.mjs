@@ -1,8 +1,9 @@
 // Tests for the GitHub Pages site build (src/scripts/docs/build-site.mjs,
-// npm run docs:site). While package.json is a pre-release (x.y.z-dev), the
-// site has two versions: the newest release tag's docs at the root and the
-// working tree's docs in dev/. Otherwise it has one, and dev/ sends readers
-// to the root.
+// npm run docs:site). The site root shows the latest release, v/<version>/
+// the releases before it (the newest few, --releases), and, while package.json
+// is a pre-release (x.y.z-dev), dev/ shows the working tree. Every page has a
+// version menu listing them all. Without a version in development, dev/ sends
+// readers to the root.
 //
 // The end-to-end tests build a throwaway git repository with release tags,
 // so they don't depend on this clone's tags or history.
@@ -29,30 +30,33 @@ const summary = (html) => /<summary class="brand-ver"[^>]*>([^<]+)<\/summary>/.e
 const git = (cwd, ...args) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", ...args], { cwd, stdio: "pipe" }).toString();
 
 /**
- * A git repository holding a copy of this package's docs under pkg/, with
- * package.json at `released`, tagged aiskills-v<released>; then, if `next`
- * is given, a commit that marks the landing page and sets package.json to
- * `next`. Returns { repo, pkg, dir }.
+ * A git repository holding a copy of this package's docs under pkg/. One
+ * commit per entry of `releases`, each marking the landing page with
+ * RELEASE-<v> and tagged aiskills-v<v> (unless tag is false); then, if
+ * `next` is given, a commit that marks it DEV-ONLY-MARKER and sets
+ * package.json to `next`. Returns { repo, pkg, dir }.
  */
-function fixtureRepo({ released = "2.0.0", next = null, tag = true } = {}) {
+function fixtureRepo({ releases = ["2.0.0"], next = null, tag = true } = {}) {
   const dir = tempDir();
   const repo = join(dir, "repo");
   const pkg = join(repo, "pkg");
   mkdirSync(pkg, { recursive: true });
   cpSync(join(PKG_SRC, "docs", "docsite"), join(pkg, "docs", "docsite"), { recursive: true });
   cpSync(join(PKG_SRC, "docs", "banner"), join(pkg, "docs", "banner"), { recursive: true });
+  const landing = join(pkg, "docs", "docsite", "README.md");
+  const original = readFileSync(landing, "utf8");
   const setVersion = (v) => writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "fixture", version: v }) + "\n");
-  setVersion(released);
   git(repo, "init", "-q", "-b", "master");
-  git(repo, "add", "-A");
-  git(repo, "commit", "-q", "-m", `release ${released}`);
-  if (tag) {
-    git(repo, "tag", "-a", `aiskills-v${released}`, "-m", released);
-    git(repo, "tag", "other-v9.0.0"); // not an aiskills release
+  for (const v of releases) {
+    writeFileSync(landing, original + `\nRELEASE-${v}\n`);
+    setVersion(v);
+    git(repo, "add", "-A");
+    git(repo, "commit", "-q", "-m", `release ${v}`);
+    if (tag) git(repo, "tag", "-a", `aiskills-v${v}`, "-m", v);
   }
+  if (tag) git(repo, "tag", "other-v9.0.0"); // not an aiskills release
   if (next) {
-    const landing = join(pkg, "docs", "docsite", "README.md");
-    writeFileSync(landing, readFileSync(landing, "utf8") + "\nDEV-ONLY-MARKER\n");
+    writeFileSync(landing, original + "\nDEV-ONLY-MARKER\n");
     setVersion(next);
     git(repo, "commit", "-q", "-am", `start ${next}`);
   }
@@ -80,37 +84,74 @@ describe("build-site: which versions the site shows", () => {
     ]);
   });
 
-  test("a pre-release with a release tag gets both versions; anything else gets one", async () => {
+  test("while package.json is -dev: dev/, the newest tag at the root, and older tags under v/", async () => {
     const { plan } = await load();
-    const tags = ["aiskills-v1.2.0", "aiskills-v1.1.0"];
-    assert.deepEqual(plan({ version: "1.3.0-dev", tags }), { both: true, stable: { tag: "aiskills-v1.2.0", version: "1.2.0" }, dev: "1.3.0-dev" });
-    assert.deepEqual(plan({ version: "1.3.0", tags }), { both: false, reason: "1.3.0 is a release" });
-    assert.deepEqual(plan({ version: "1.3.0-dev", tags: [] }), { both: false, reason: "no aiskills-vX.Y.Z release tag" });
+    const tags = ["aiskills-v1.0.0", "aiskills-v1.2.0", "aiskills-v1.1.0"];
+    assert.deepEqual(plan({ version: "1.3.0-dev", tags, releases: 2 }), [
+      { kind: "dev", version: "1.3.0-dev", source: null, path: "dev/" },
+      { kind: "latest", version: "1.2.0", source: "aiskills-v1.2.0", path: "" },
+      { kind: "older", version: "1.1.0", source: "aiskills-v1.1.0", path: "v/1.1.0/" },
+    ]);
+    assert.equal(plan({ version: "1.3.0-dev", tags, releases: "all" }).length, 4);
+  });
+
+  test("on a release: the working tree at the root, older tags under v/, no dev/", async () => {
+    const { plan } = await load();
+    // Its own tag (pushed after the release) isn't listed twice; a tag newer than it is ignored.
+    const tags = ["aiskills-v1.2.0", "aiskills-v1.3.0", "aiskills-v1.1.0", "aiskills-v9.0.0"];
+    assert.deepEqual(plan({ version: "1.3.0", tags, releases: 3 }), [
+      { kind: "latest", version: "1.3.0", source: null, path: "" },
+      { kind: "older", version: "1.2.0", source: "aiskills-v1.2.0", path: "v/1.2.0/" },
+      { kind: "older", version: "1.1.0", source: "aiskills-v1.1.0", path: "v/1.1.0/" },
+    ]);
+  });
+
+  test("a -dev version with no release tag yet is the only page", async () => {
+    const { plan } = await load();
+    assert.deepEqual(plan({ version: "0.2.0-dev", tags: [] }), [{ kind: "latest", version: "0.2.0-dev", source: null, path: "" }]);
+  });
+
+  test("--releases counts the latest release too, and defaults to 5", async () => {
+    const { plan } = await load();
+    const tags = ["0.1.0", "0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0"].map((v) => `aiskills-v${v}`);
+    assert.deepEqual(plan({ version: "0.8.0-dev", tags }).map((p) => p.version), ["0.8.0-dev", "0.7.0", "0.6.0", "0.5.0", "0.4.0", "0.3.0"]);
+    assert.deepEqual(plan({ version: "0.8.0-dev", tags, releases: 1 }).map((p) => p.version), ["0.8.0-dev", "0.7.0"]);
+    assert.throws(() => plan({ version: "1.0.0", tags, releases: 0 }), /--releases/);
   });
 });
 
 describe("build-site: the built site", () => {
-  test("while package.json is -dev: the release tag's docs at the root, the working tree's in dev/", async () => {
+  const menuLinks = (html) => [...(/<div class="ver-list">([\s\S]*?)<\/div>/.exec(html)?.[1] ?? "").matchAll(/<a href="([^"]+)"/g)].map((m) => m[1]);
+
+  test("while package.json is -dev: the latest release at the root, older ones under v/, the working tree in dev/", async () => {
     const { main } = await load();
-    const { repo, pkg, dir } = fixtureRepo({ released: "2.0.0", next: "2.1.0-dev" });
+    const { repo, pkg, dir } = fixtureRepo({ releases: ["1.0.0", "2.0.0", "2.1.0"], next: "2.2.0-dev" });
     try {
       const out = join(dir, "site");
-      quiet(() => main(["--out", out, "--ref", "master"], { pkgDir: pkg, repo }));
+      quiet(() => main(["--out", out, "--ref", "master", "--releases", "2"], { pkgDir: pkg, repo }));
 
-      const stable = readFileSync(join(out, "index.html"), "utf8");
-      assert.equal(summary(stable), "v2.0.0");
-      assert.ok(stable.includes('<a href="dev/"><span>2.1.0-dev</span>'));
-      assert.ok(!stable.includes('class="channel-note"'));
-      assert.ok(!data(stable).pages[0].md.includes("DEV-ONLY-MARKER"), "the root shows the tagged docs");
-      assert.match(data(stable).repoBase, /\/blob\/aiskills-v2\.0\.0\//, "its links point at the tag");
+      const root = readFileSync(join(out, "index.html"), "utf8");
+      assert.equal(summary(root), "v2.1.0");
+      assert.deepEqual(menuLinks(root), ["dev/", "./", "v/2.0.0/"]);
+      assert.ok(!root.includes('class="channel-note"'));
+      assert.ok(data(root).pages[0].md.includes("RELEASE-2.1.0"), "the root shows the newest tag's docs");
+      assert.match(data(root).repoBase, /\/blob\/aiskills-v2\.1\.0\//, "its links point at the tag");
+
+      const older = readFileSync(join(out, "v", "2.0.0", "index.html"), "utf8");
+      assert.equal(summary(older), "v2.0.0");
+      assert.deepEqual(menuLinks(older), ["../../dev/", "../../", "../../v/2.0.0/"]);
+      assert.match(older, /an older release/);
+      assert.ok(data(older).pages[0].md.includes("RELEASE-2.0.0"));
+      assert.match(data(older).repoBase, /\/blob\/aiskills-v2\.0\.0\//);
+      assert.ok(!existsSync(join(out, "v", "1.0.0")), "--releases 2 leaves out 1.0.0");
 
       const dev = readFileSync(join(out, "dev", "index.html"), "utf8");
-      assert.equal(summary(dev), "v2.1.0-dev");
-      assert.ok(dev.includes('class="channel-note"'));
+      assert.equal(summary(dev), "v2.2.0-dev");
+      assert.match(dev, /which is not released yet/);
       assert.ok(data(dev).pages[0].md.includes("DEV-ONLY-MARKER"), "dev/ shows the working tree");
       assert.match(data(dev).repoBase, /\/blob\/master\//);
 
-      for (const d of [out, join(out, "dev")]) {
+      for (const d of [out, join(out, "v", "2.0.0"), join(out, "dev")]) {
         assert.ok(existsSync(join(d, "explainers", "scrolls-explainer.html")), `explainer missing next to ${d}`);
       }
     } finally {
@@ -118,15 +159,16 @@ describe("build-site: the built site", () => {
     }
   });
 
-  test("on a release: one version at the root, and dev/ sends readers there", async () => {
+  test("on a release: it at the root, older releases under v/, and dev/ sends readers to the root", async () => {
     const { main } = await load();
-    const { repo, pkg, dir } = fixtureRepo({ released: "2.0.0" });
+    const { repo, pkg, dir } = fixtureRepo({ releases: ["1.0.0", "2.0.0"] });
     try {
       const out = join(dir, "site");
       quiet(() => main(["--out", out, "--ref", "master"], { pkgDir: pkg, repo }));
       const root = readFileSync(join(out, "index.html"), "utf8");
-      assert.ok(root.includes('<span class="brand-ver">v2.0.0</span>'));
-      assert.ok(!root.includes('class="ver-menu"'));
+      assert.equal(summary(root), "v2.0.0");
+      assert.deepEqual(menuLinks(root), ["./", "v/1.0.0/"]);
+      assert.ok(existsSync(join(out, "v", "1.0.0", "index.html")));
       const redirect = readFileSync(join(out, "dev", "index.html"), "utf8");
       assert.match(redirect, /<meta http-equiv="refresh" content="0; url=\.\.\/">/);
       assert.match(redirect, /location\.replace\("\.\.\/" \+ location\.hash\)/);
@@ -135,9 +177,9 @@ describe("build-site: the built site", () => {
     }
   });
 
-  test("a -dev version with no release tag yet builds one version", async () => {
+  test("a -dev version with no release tag yet builds one page, without a menu", async () => {
     const { main } = await load();
-    const { repo, pkg, dir } = fixtureRepo({ released: "0.1.0", next: "0.2.0-dev", tag: false });
+    const { repo, pkg, dir } = fixtureRepo({ releases: ["0.1.0"], next: "0.2.0-dev", tag: false });
     try {
       const out = join(dir, "site");
       quiet(() => main(["--out", out], { pkgDir: pkg, repo }));
@@ -152,5 +194,6 @@ describe("build-site: the built site", () => {
   test("--out is required", async () => {
     const { main } = await load();
     assert.throws(() => main([]), /usage: build-site\.mjs --out <dir>/);
+    assert.throws(() => main(["--out", "x", "--releases", "none"]), /--releases/);
   });
 });

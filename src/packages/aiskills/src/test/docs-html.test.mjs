@@ -189,13 +189,20 @@ describe("build-docs-html", () => {
   });
 });
 
-describe("build-docs-html: stable and in-development versions", () => {
-  const BOTH = { stable: "1.2.0", dev: "1.3.0-dev" };
+describe("build-docs-html: the version menu", () => {
+  // The site: dev/ (in development), the root (latest release), v/<version>/ (older releases).
+  const ENTRIES = [
+    { version: "1.3.0-dev", path: "dev/", kind: "dev" },
+    { version: "1.2.0", path: "", kind: "latest" },
+    { version: "1.1.0", path: "v/1.1.0/", kind: "older" },
+  ];
+  const menuFor = (current, base) => ({ current, base, entries: ENTRIES });
   /** The version menu's links, as [href, text, current]. */
   const menu = (html) =>
     [...(/<div class="ver-list">([\s\S]*?)<\/div>/.exec(html)?.[1] ?? "").matchAll(/<a href="([^"]+)"( aria-current="page")?>([\s\S]*?)<\/a>/g)].map(
       (m) => [m[1], m[3].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), Boolean(m[2])],
     );
+  const note = (html) => /<div class="channel-note" role="note">([\s\S]*?)<\/div>/.exec(html)?.[1];
 
   test("by default the header shows package.json's version, with no menu or notice", async () => {
     const { build } = await load();
@@ -211,51 +218,70 @@ describe("build-docs-html: stable and in-development versions", () => {
     if (version !== "9.9.9") assert.ok(!html.includes(`<span class="brand-ver">v${version}</span>`));
   });
 
-  test("the stable page links to itself and to dev/, and has no notice", async () => {
+  test("the latest release's page (the site root) lists every version and has no notice", async () => {
     const { build } = await load();
-    const { html } = build(DOCS, { version: "1.2.0", channel: { current: "stable", ...BOTH } });
+    const { html } = build(DOCS, { version: "1.2.0", menu: menuFor("1.2.0", "") });
     assert.match(html, /<details class="ver-menu"><summary class="brand-ver" title="Docs version">v1\.2\.0<\/summary>/);
     assert.deepEqual(menu(html), [
-      ["./", "1.2.0 stable release", true],
       ["dev/", "1.3.0-dev in development", false],
+      ["./", "1.2.0 latest release", true],
+      ["v/1.1.0/", "1.1.0 older release", false],
     ]);
-    assert.ok(!html.includes('class="channel-note"'));
+    assert.equal(note(html), undefined);
     assert.ok(!html.includes('<span class="brand-ver">'), "the menu replaces the plain badge");
   });
 
-  test("the dev page links back to ../ and says it isn't released yet", async () => {
+  test("the dev page links up to the root and says it isn't released yet", async () => {
     const { build } = await load();
-    const { html } = build(DOCS, { version: "1.3.0-dev", channel: { current: "dev", ...BOTH } });
+    const { html } = build(DOCS, { version: "1.3.0-dev", menu: menuFor("1.3.0-dev", "../") });
     assert.match(html, /<summary class="brand-ver" title="Docs version">v1\.3\.0-dev<\/summary>/);
     assert.deepEqual(menu(html), [
-      ["../", "1.2.0 stable release", false],
-      ["./", "1.3.0-dev in development", true],
+      ["../dev/", "1.3.0-dev in development", true],
+      ["../", "1.2.0 latest release", false],
+      ["../v/1.1.0/", "1.1.0 older release", false],
     ]);
-    const note = /<div class="channel-note" role="note">([\s\S]*?)<\/div>/.exec(html);
-    assert.ok(note, "the dev page needs a notice");
-    assert.match(note[1], /1\.3\.0-dev/);
-    assert.match(note[1], /not released yet/);
-    assert.match(note[1], /<a href="\.\.\/">[^<]*1\.2\.0[^<]*<\/a>/);
+    assert.match(note(html), /<b>1\.3\.0-dev<\/b>, which is not released yet/);
+    assert.match(note(html), /<a href="\.\.\/">1\.2\.0 docs<\/a>/);
   });
 
-  test("a channel needs both versions and a known name", async () => {
+  test("an older release's page says so and links to the latest", async () => {
     const { build } = await load();
-    assert.throws(() => build(DOCS, { channel: { current: "beta", ...BOTH } }), /channel/);
-    assert.throws(() => build(DOCS, { channel: { current: "stable", stable: "1.2.0" } }), /stable and dev/);
+    const { html } = build(DOCS, { version: "1.1.0", menu: menuFor("1.1.0", "../../") });
+    assert.deepEqual(menu(html).map((l) => [l[0], l[2]]), [
+      ["../../dev/", false],
+      ["../../", false],
+      ["../../v/1.1.0/", true],
+    ]);
+    assert.match(note(html), /<b>1\.1\.0<\/b>, an older release/);
+    assert.match(note(html), /<a href="\.\.\/\.\.\/">1\.2\.0 docs<\/a>/);
   });
 
-  test("the command line takes --version, --channel, --stable and --dev", async () => {
+  test("a site without a version in development has no dev entry", async () => {
+    const { build } = await load();
+    const entries = ENTRIES.filter((e) => e.kind !== "dev");
+    const { html } = build(DOCS, { version: "1.2.0", menu: { current: "1.2.0", base: "", entries } });
+    assert.deepEqual(menu(html).map((l) => l[0]), ["./", "v/1.1.0/"]);
+  });
+
+  test("a bad menu is an error", async () => {
+    const { build } = await load();
+    assert.throws(() => build(DOCS, { menu: menuFor("9.9.9", "") }), /version menu: 9\.9\.9 is not one of its versions/);
+    assert.throws(() => build(DOCS, { menu: { current: "1.2.0", base: "", entries: [{ version: "1.2.0", path: "", kind: "beta" }] } }), /version menu: unknown kind: beta/);
+    assert.throws(() => build(DOCS, { menu: { current: "1.1.0", base: "", entries: [ENTRIES[2]] } }), /version menu: needs exactly one latest release/);
+  });
+
+  test("the command line takes --version and --menu (JSON)", async () => {
     const { main } = await load();
     const dir = tempDir();
     const err = console.error;
     console.error = () => {};
     try {
-      const out = join(dir, "dev", "index.html");
-      main([DOCS, "--out", out, "--version", "1.3.0-dev", "--channel", "dev", "--stable", "1.2.0", "--dev", "1.3.0-dev"]);
+      const out = join(dir, "v", "1.1.0", "index.html");
+      main([DOCS, "--out", out, "--version", "1.1.0", "--menu", JSON.stringify(menuFor("1.1.0", "../../"))]);
       const html = readFileSync(out, "utf8");
-      assert.deepEqual(menu(html).map((l) => l[0]), ["../", "./"]);
+      assert.deepEqual(menu(html).map((l) => l[0]), ["../../dev/", "../../", "../../v/1.1.0/"]);
       assert.ok(html.includes('class="channel-note"'));
-      assert.throws(() => main([DOCS, "--out", out, "--channel", "dev"]), /stable and dev/);
+      assert.throws(() => main([DOCS, "--out", out, "--menu", "{nope"]), /version menu: --menu is not valid JSON/);
     } finally {
       console.error = err;
       rmSync(dir, { recursive: true, force: true });
@@ -503,17 +529,23 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
   });
 });
 
-describe("the stable and dev pages in a browser", { skip: noBrowser }, () => {
-  test("the menu and the notice switch versions on the same page, and the phone header fits", async () => {
+describe("the versioned pages in a browser", { skip: noBrowser }, () => {
+  test("the menu and the notices switch versions on the same page, and the phone header fits", async () => {
     const { main } = await load();
     const { createServer } = await import("node:http");
     const site = tempDir();
-    const both = ["--stable", "1.2.0", "--dev", "1.3.0-dev"];
+    const entries = [
+      { version: "1.3.0-dev", path: "dev/", kind: "dev" },
+      { version: "1.2.0", path: "", kind: "latest" },
+      { version: "1.1.0", path: "v/1.1.0/", kind: "older" },
+    ];
     const err = console.error;
     console.error = () => {};
     try {
-      main([DOCS, "--out", join(site, "index.html"), "--version", "1.2.0", "--channel", "stable", ...both]);
-      main([DOCS, "--out", join(site, "dev", "index.html"), "--version", "1.3.0-dev", "--channel", "dev", ...both]);
+      for (const e of entries) {
+        const base = "../".repeat(e.path.split("/").filter(Boolean).length);
+        main([DOCS, "--out", join(site, e.path, "index.html"), "--version", e.version, "--menu", JSON.stringify({ current: e.version, base, entries })]);
+      }
     } finally {
       console.error = err;
     }
@@ -530,13 +562,18 @@ describe("the stable and dev pages in a browser", { skip: noBrowser }, () => {
       const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
+      const pick = async (href, url) => {
+        await page.click(".ver-menu summary");
+        await page.click(`.ver-list a[href="${href}"]`);
+        await page.waitForURL(url);
+        await page.waitForSelector("#doc h1");
+      };
       await page.goto(`${base}/#reference-cli`);
       await page.waitForSelector("#doc h1");
-      await page.click(".ver-menu summary");
-      await page.click('.ver-list a[href="dev/"]');
-      await page.waitForURL(`${base}/dev/#reference-cli`);
-      await page.waitForSelector("#doc h1");
+      await pick("dev/", `${base}/dev/#reference-cli`);
       assert.equal(await page.textContent(".ver-menu summary"), "v1.3.0-dev");
+      await pick("../v/1.1.0/", `${base}/v/1.1.0/#reference-cli`);
+      assert.match(await page.textContent(".channel-note"), /an older release/);
       await page.click(".ver-menu summary");
       await page.keyboard.press("Escape");
       assert.equal(await page.isVisible(".ver-list"), false, "Escape closes the menu");
@@ -545,7 +582,7 @@ describe("the stable and dev pages in a browser", { skip: noBrowser }, () => {
       assert.deepEqual(errors, []);
 
       const phone = await browser.newPage({ ...playwright.devices["iPhone 13"] });
-      for (const url of [`${base}/`, `${base}/dev/`]) {
+      for (const url of [`${base}/`, `${base}/dev/`, `${base}/v/1.1.0/`]) {
         await phone.goto(url);
         await phone.waitForSelector("#doc h1");
         const fit = await phone.evaluate(() => {

@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 // Build the GitHub Pages site (npm run docs:site; .github/workflows/aiskills-docs.yml).
 //
-// Usage: node src/scripts/docs/build-site.mjs --out site [--ref BRANCH]
+// Usage: node src/scripts/docs/build-site.mjs --out site [--ref BRANCH] [--releases N|all]
 //
-// While package.json is a pre-release (x.y.z-dev) and a release tag exists, the
-// site has two versions:
-//   <out>/index.html      the newest release's docs, from its tag aiskills-vX.Y.Z
-//   <out>/dev/index.html  the docs in the working tree (the version in development)
-// Each page's header has a menu to switch between them, and dev/ says it isn't
-// released yet. Otherwise (a release, or no tag yet) the site has one version,
-// the working tree's, and <out>/dev/index.html sends readers to the root, so a
-// link to dev/ keeps working after the release.
+//   <out>/index.html             the latest release
+//   <out>/v/<version>/index.html the releases before it, newest first (--releases
+//                                counts the latest too; default 5)
+//   <out>/dev/index.html         while package.json is a pre-release (x.y.z-dev):
+//                                the docs in the working tree
+// While package.json is -dev, the latest release is the newest release tag
+// (aiskills-vX.Y.Z); on a release it is the working tree itself. Every page's
+// header has a menu listing all of them, and the dev and older pages say what
+// they are, with a link to the latest. Without a version in development,
+// <out>/dev/index.html sends readers to the root, so a link to dev/ keeps working.
 //
-// The tagged docs are read with `git archive`, so the workflow needs the tags
-// (actions/checkout with fetch-depth: 0). Both pages are built by this
+// Tagged docs are read with `git archive`, so the workflow needs the tags
+// (actions/checkout with fetch-depth: 0). Every page is built by this
 // checkout's build-docs-html.mjs, so they share one page design and menu.
 // Used only to build the docs, so it is not published.
 
@@ -38,15 +40,37 @@ export function releaseTags(tags) {
     .map(([tag, m]) => ({ tag, version: `${m[1]}.${m[2]}.${m[3]}` }));
 }
 
+export const DEFAULT_RELEASES = 5;
+
+/** Compare two x.y.z versions (pre-release suffix ignored): negative, 0 or positive. */
+function cmp(a, b) {
+  const [x, y] = [a, b].map((v) => v.split("-")[0].split(".").map(Number));
+  return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+}
+
 /**
- * Whether the site shows two versions. { both: true, stable: { tag, version }, dev }
- * or { both: false, reason }.
+ * The site's pages, in menu order: [{ kind: "dev" | "latest" | "older", version,
+ * source: <tag> | null (the working tree), path: <folder under the site root> }].
+ * releases: how many releases to show, the latest included (a number, or "all").
  */
-export function plan({ version, tags }) {
-  if (!version.includes("-")) return { both: false, reason: `${version} is a release` };
-  const [stable] = releaseTags(tags);
-  if (!stable) return { both: false, reason: "no aiskills-vX.Y.Z release tag" };
-  return { both: true, stable, dev: version };
+export function plan({ version, tags, releases = DEFAULT_RELEASES }) {
+  const limit = releases === "all" ? Infinity : Number(releases);
+  if (!(limit >= 1) || (limit !== Infinity && !Number.isInteger(limit))) throw new Error(`--releases must be a whole number of at least 1, or all: ${releases}`);
+  const tagged = releaseTags(tags);
+  const pages = [];
+  let past;
+  if (version.includes("-")) {
+    if (!tagged.length) return [{ kind: "latest", version, source: null, path: "" }];
+    pages.push({ kind: "dev", version, source: null, path: "dev/" });
+    pages.push({ kind: "latest", version: tagged[0].version, source: tagged[0].tag, path: "" });
+    past = tagged.slice(1);
+  } else {
+    pages.push({ kind: "latest", version, source: null, path: "" });
+    past = tagged.filter((t) => cmp(t.version, version) < 0);
+  }
+  const room = limit - 1;
+  for (const t of past.slice(0, room)) pages.push({ kind: "older", version: t.version, source: t.tag, path: `v/${t.version}/` });
+  return pages;
 }
 
 /** A page for dev/ when nothing is in development: it sends readers to the root, keeping the #page. */
@@ -73,46 +97,51 @@ function docsAtTag(repo, tag, pkgRel) {
   return { dir, docs: join(dir, pkgRel, "docs") };
 }
 
-/** Command line: --out <dir> [--ref <branch>]. opts.pkgDir and opts.repo are for tests. */
+const USAGE = "usage: build-site.mjs --out <dir> [--ref <branch>] [--releases <n>|all]";
+
+/** Command line: --out <dir> [--ref <branch>] [--releases <n>|all]. opts.pkgDir and opts.repo are for tests. */
 export function main(argv = process.argv.slice(2), { pkgDir = PKG_DIR, repo = null } = {}) {
   let out = null;
   let ref = "master";
+  let releases = DEFAULT_RELEASES;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--out") out = argv[++i];
     else if (argv[i] === "--ref") ref = argv[++i];
-    else throw new Error(`unknown argument: ${argv[i]}\nusage: build-site.mjs --out <dir> [--ref <branch>]`);
+    else if (argv[i] === "--releases") releases = argv[++i];
+    else throw new Error(`unknown argument: ${argv[i]}\n${USAGE}`);
   }
-  if (!out) throw new Error("usage: build-site.mjs --out <dir> [--ref <branch>]");
+  if (!out) throw new Error(USAGE);
   repo ??= git(pkgDir, "rev-parse", "--show-toplevel").toString().trim();
   const version = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8")).version;
   const tags = git(repo, "tag", "--list", "aiskills-v*").toString().split("\n").filter(Boolean);
-  const site = plan({ version, tags });
-  const docs = join(pkgDir, "docs", "docsite");
-  const banner = join(pkgDir, "docs", "banner", "aiskills-banner.html");
+  const pages = plan({ version, tags, releases });
+  const pkgRel = relative(repo, pkgDir).split("\\").join("/");
+  const entries = pages.map(({ kind, version: v, path }) => ({ version: v, path, kind }));
 
-  if (!site.both) {
-    buildPage([docs, "--out", join(out, "index.html"), "--ref", ref, "--banner", banner, "--version", version]);
+  for (const page of pages) {
+    const base = page.path ? "../".repeat(page.path.split("/").filter(Boolean).length) : "";
+    const pageOut = join(out, page.path, "index.html");
+    const menu = pages.length > 1 ? ["--menu", JSON.stringify({ current: page.version, base, entries })] : [];
+    if (!page.source) {
+      buildPage([join(pkgDir, "docs", "docsite"), "--out", pageOut, "--ref", ref,
+        "--banner", join(pkgDir, "docs", "banner", "aiskills-banner.html"), "--version", page.version, ...menu]);
+      continue;
+    }
+    const tagged = docsAtTag(repo, page.source, pkgRel);
+    try {
+      const banner = join(tagged.docs, "banner", "aiskills-banner.html");
+      buildPage([join(tagged.docs, "docsite"), "--out", pageOut, "--ref", page.source,
+        ...(existsSync(banner) ? ["--banner", banner] : ["--no-banner"]), "--version", page.version, ...menu]);
+    } finally {
+      rmSync(tagged.dir, { recursive: true, force: true });
+    }
+  }
+  if (!pages.some((p) => p.kind === "dev")) {
     mkdirSync(join(out, "dev"), { recursive: true });
     writeFileSync(join(out, "dev", "index.html"), DEV_REDIRECT);
-    console.error(`one version (${site.reason}): ${version} at ${out}/, ${out}/dev/ points there`);
-    return site;
   }
-
-  const both = ["--stable", site.stable.version, "--dev", site.dev];
-  const tagged = docsAtTag(repo, site.stable.tag, relative(repo, pkgDir).split("\\").join("/"));
-  try {
-    const tagBanner = join(tagged.docs, "banner", "aiskills-banner.html");
-    buildPage([
-      join(tagged.docs, "docsite"), "--out", join(out, "index.html"), "--ref", site.stable.tag,
-      ...(existsSync(tagBanner) ? ["--banner", tagBanner] : ["--no-banner"]),
-      "--version", site.stable.version, "--channel", "stable", ...both,
-    ]);
-  } finally {
-    rmSync(tagged.dir, { recursive: true, force: true });
-  }
-  buildPage([docs, "--out", join(out, "dev", "index.html"), "--ref", ref, "--banner", banner, "--version", site.dev, "--channel", "dev", ...both]);
-  console.error(`two versions: ${site.stable.version} (${site.stable.tag}) at ${out}/, ${site.dev} at ${out}/dev/`);
-  return site;
+  console.error(`site: ${pages.map((p) => `${p.version} at ${out}/${p.path}`).join(", ")}`);
+  return pages;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
