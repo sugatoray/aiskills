@@ -29,6 +29,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
+- **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub** (pushed by the user on 2026-11-13). Each tag is checked: it is annotated, its commit equals npm's `gitHead`, the commit's `package.json` has that version, the commit is on `master`, and the message carries the npm publish time. MAINTAINERS → Releasing step 6 tags each future release the same way.
 - **`package.json` is `1.3.0-dev`** (on #230; the user's call on 2026-11-13). Changes collect under `## [1.3.0] - Unreleased` until the user releases 1.3.0. npm rejects `1.3.0.dev`, so the version uses SemVer pre-release form. The first entry is `run-code-review` 1.3.0, which now starts only when typed. Regenerated: banner, `index.html` and the version examples in `reference/cli.md` and `installation.md`. `aiskills rel` now prints `installed: 1.3.0-dev (not published on npm)` and marks no row as installed. MAINTAINERS → Releasing documents the `-dev` convention. 428 tests pass.
 - **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
 - **[#230](https://github.com/sugatoray/aiskills/pull/230) (open, not this package's PR):**
@@ -38,7 +39,6 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
 
 ## Known issues / open threads
-- **Release tags aren't on GitHub yet.** MAINTAINERS → Releasing step 6 now tags each release as `aiskills-v<version>` on its npm `gitHead`. The nine tags for `0.4.0`–`1.2.0` were made in a cloud session (2026-11-13), but its git access can only push branches (HTTP 403 on tags). The user is to create and push them from their own clone. Each `gitHead` is the `master` head at publish time, 3–16 minutes after the merge (0.6.0: 2 h 18 min). Once they're pushed, check them with `git ls-remote --tags origin 'aiskills-v*'` against `npm view @sugatoray-ai/aiskills@<v> gitHead`.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
