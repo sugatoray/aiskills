@@ -264,7 +264,23 @@ every `npx` call runs. To move to a newer one:
    `npm stage approve <stage-id>` (npm 11.15+, Node 22.14+), or **Approve** in
    the package's Staged Packages tab on npmjs.com. Check with
    `npm view @sugatoray-ai/aiskills version`.
-6. `npm run clean`, then update the release note in
+6. **Tag the release** on the commit it was packed from: npm records it as
+   `gitHead`, so the tag can't point at the wrong commit.
+
+   ```bash
+   v=1.3.0
+   h=$(npm view @sugatoray-ai/aiskills@$v gitHead)
+   t=$(npm view @sugatoray-ai/aiskills time --json | node -p "JSON.parse(require('fs').readFileSync(0))['$v']")
+   git tag -a "aiskills-v$v" "$h" -m "@sugatoray-ai/aiskills $v" -m "Published to npm $t from this commit (npm gitHead $h)."
+   git push origin "refs/tags/aiskills-v$v"
+   ```
+
+   Tags are `aiskills-v<version>`. The prefix keeps them apart from tags for
+   anything else in this repository. Publish from an up-to-date `master` with a
+   clean tree, so that `gitHead` is a `master` commit; every release so far
+   was. Releases `0.4.0` to `1.2.0` get the same tags after the fact, each on
+   its `gitHead`. A `-dev` version is never tagged.
+7. `npm run clean`, then update the release note in
    `docs/.scrolls/SPEC.md` and run `/scrolls-update`.
 
 The first published release is `0.4.0` (2026-11-09; `0.3.0`, `0.2.0` and `0.1.0` were never

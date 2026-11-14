@@ -38,6 +38,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
 
 ## Known issues / open threads
+- **Release tags aren't on GitHub yet.** MAINTAINERS → Releasing step 6 now tags each release as `aiskills-v<version>` on its npm `gitHead`. The nine tags for `0.4.0`–`1.2.0` were made in a cloud session (2026-11-13), but its git access can only push branches (HTTP 403 on tags). The user is to create and push them from their own clone. Each `gitHead` is the `master` head at publish time, 3–16 minutes after the merge (0.6.0: 2 h 18 min). Once they're pushed, check them with `git ls-remote --tags origin 'aiskills-v*'` against `npm view @sugatoray-ai/aiskills@<v> gitHead`.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
