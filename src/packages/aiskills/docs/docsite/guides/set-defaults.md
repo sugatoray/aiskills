@@ -56,6 +56,15 @@ aiskills config --project scope project
 aiskills config --project agents cursor
 ```
 
+### Name a command you run often
+
+An alias, as in `git config alias.*`, saves typing a command and its options:
+
+```bash
+aiskills config alias.gi "install -g -a claude-code,codex"
+aiskills gi -s scrolls-setup
+```
+
 ### Override a default for one command
 
 Options win over variables. With `AISKILLS_AGENTS=claude-code` set, this installs for Codex only:

@@ -209,3 +209,73 @@ describe("config values take effect", posixOnly, () => {
     assert.match(run(["info"], { NO_COLOR: "1" }).out, /project config : .*\.aiskills\.json {2}\(not created\)/);
   });
 });
+
+describe("config aliases, like git config alias.*", () => {
+  test("alias.<name> keys: names checked, values split like a shell", async () => {
+    const { assertConfigKey, parseConfigValue, splitArgs } = await import(CONFIG);
+    assert.equal(assertConfigKey("alias.gi").kind, "alias");
+    assert.throws(() => assertConfigKey("alias."), /unknown config key: alias\./);
+    assert.throws(() => assertConfigKey("alias.Bad_Name"), /alias names are lowercase letters, digits and dashes/);
+    assert.equal(parseConfigValue("alias.gi", "  install -g  "), "install -g");
+    assert.throws(() => parseConfigValue("alias.gi", " "), /alias\.gi needs a value/);
+    assert.throws(() => parseConfigValue("alias.sh", "!rm -rf /"), /shell aliases \(!\.\.\.\) aren't supported/);
+    assert.deepEqual(splitArgs(`install -s "my skill" -a 'claude-code' x\\ y`), ["install", "-s", "my skill", "-a", "claude-code", "x y"]);
+    assert.throws(() => splitArgs(`install "open`), /unclosed quote/);
+  });
+});
+
+describe("aiskills <alias>", posixOnly, () => {
+  let sb;
+  before(() => {
+    sb = sandbox();
+  });
+  after(() => sb.cleanup());
+  beforeEach(() => {
+    rmSync(join(sb.home, ".config", "sugatoray", "aiskills.json"), { force: true });
+    rmSync(join(sb.dir, ".aiskills.json"), { force: true });
+  });
+  const run = (args, env = {}) => sb.run(args, { env });
+
+  test("an alias runs its command, with the rest of the arguments after it", () => {
+    assert.equal(run(["config", "alias.gi", "install -g -a codex"]).status, 0);
+    assert.equal(run(["config", "alias.gi"]).out, "install -g -a codex\n");
+    const r = run(["gi", "-n", "-s", "a1"]);
+    assert.equal(r.status, 0, r.out);
+    assert.match(r.out, /\[dry-run\] npx .*--global .*--agent '?codex'?/);
+  });
+
+  test("aliases of aliases work; a loop is an error", () => {
+    run(["config", "alias.gi", "install -g"]);
+    run(["config", "alias.gin", "gi -n"]);
+    assert.match(run(["gin"]).out, /\[dry-run\] npx .*--global/);
+    run(["config", "alias.a", "b"]);
+    run(["config", "alias.b", "a"]);
+    const loop = run(["a"]);
+    assert.equal(loop.status, 1);
+    assert.match(loop.out, /alias loop: a → b → a/);
+  });
+
+  test("a project alias wins over a user alias; --list shows aliases", () => {
+    run(["config", "alias.where", "info"]);
+    run(["config", "--project", "alias.where", "path"]);
+    assert.equal(run(["where"]).out.trim(), sb.root);
+    assert.match(run(["config", "--list"]).out, /^alias\.where=path$/m);
+  });
+
+  test("an alias can't shadow a command, and an unknown command is still an error", () => {
+    for (const name of ["install", "i", "config", "help"]) {
+      const r = run(["config", `alias.${name}`, "info"]);
+      assert.equal(r.status, 1, name);
+      assert.match(r.out, new RegExp(`alias\\.${name}: '${name}' is an aiskills command`));
+    }
+    const r = run(["nope"]);
+    assert.equal(r.status, 1);
+    assert.match(r.out, /unknown command: nope/);
+  });
+
+  test("--unset removes an alias", () => {
+    run(["config", "alias.gi", "install -g"]);
+    assert.equal(run(["config", "--unset", "alias.gi"]).status, 0);
+    assert.match(run(["gi"]).out, /unknown command: gi/);
+  });
+});

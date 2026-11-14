@@ -377,6 +377,25 @@ skills-version must be a version (e.g. 1.7.6), "latest", "next", an npm range (e
 
 **Fix:** `--unset` only removes what that file holds. Check with `aiskills config --list --show-origin`, and add `--project` for `./.aiskills.json`.
 
+### Alias not valid
+
+```text
+alias.<name>: alias names are lowercase letters, digits and dashes, starting with a letter
+alias.<name>: shell aliases (!...) aren't supported; an alias runs an aiskills command
+alias.<name>: '<name>' is an aiskills command; an alias can't replace it
+unclosed quote in '<value>'
+```
+
+**Fix:** name the alias something like `gi` or `dry-run`, not a command or its short name (`install`, `i`, ...), and make the value an aiskills command with its options, e.g. `aiskills config alias.gi "install -g"`. Quotes must be closed. Nothing is written.
+
+### Alias loop
+
+```text
+alias loop: <name> → <name> → <name>
+```
+
+**Fix:** aliases may use other aliases, but not in a circle. Change or `--unset` one of the aliases named.
+
 ### Config file not valid JSON
 
 ```text
