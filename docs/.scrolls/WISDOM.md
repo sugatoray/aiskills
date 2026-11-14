@@ -16,6 +16,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
 
 - **Cloud sessions can push branches but not tags** (HTTP 403 from the git proxy), and the GitHub tools here can't create tags either. Make the tags locally, check them, and give the user one command to recreate and push them from their own clone. Then verify what reached GitHub.
+- **This session's network can't reach `sugatoray.github.io`** (403 at the proxy). To verify a docs deploy, read the workflow's build job log (`get_job_logs`): `build-site.mjs` prints each page it wrote and a `site:` summary line, and the artifact step lists every file. Then ask the user to look at the live pages.
 - **GitHub strips `<...>` from issue and PR titles** as if it were an HTML tag: "under v/<version>/" became "under v//". Write placeholders as `x.y.z` or `VERSION` in titles; bodies with backticks are safe. Read a title back after creating it.
 - **Adding a control to the docs header breaks the phone layout.** The search input can't render narrower than its padding (about 68px), so it overlaps the next button rather than shrinking. Check the header at iPhone width for sideways scroll and overlap; the docs browser tests do this for the version menu.
 
