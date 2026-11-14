@@ -7,6 +7,8 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 **`1.2.0` is published on npm** (`latest`, published 2026-11-14T02:22Z, i.e. the evening of 2026-11-13 US Eastern, so the CHANGELOG date `2026-11-13` stands; checked with `npm view`). It came from [#223](https://github.com/sugatoray/aiskills/pull/223) (squash `089f938`), which bundles `/run-code-review` (from #215, `7c0afec`) and its 1.2.0 `-o` reports in the new `review-skills` group: **17 skills in 9 groups**. Release changes: `package.json`, CHANGELOG `[1.2.0] - 2026-11-13`, SECURITY `1.2.x` current, banner and docs, `DOCS_VIEW` with 1.2.0 as `latest` and the docs examples it drives. `1.1.0` (from #206) was published 2026-11-12.
 
+**On `master` (`58c1e52`), not yet released:** `package.json` is `1.3.0-dev`. `## [1.3.0] - Unreleased` holds `run-code-review` 1.3.0 (starts only when typed). The versioned docs website (#234) is live, deployed by [run 16](https://github.com/sugatoray/aiskills/actions/runs/43614530086): 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, 1.3.0-dev at `/dev/`. The working branch is `claude/next-updates`.
+
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
 ```text
@@ -29,7 +31,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- **Docs site with versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (open, targets `master`). `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds:
+- **Docs site with versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (merged as `58c1e52`; deployed, and issues #235–#240 closed). `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds:
   - the latest release at `site/` (the newest `aiskills-vX.Y.Z` tag while `-dev`; the working tree on a release);
   - the releases before it at `site/v/<version>/` (`--releases`, default 5 in all);
   - the working tree at `site/dev/` while `-dev`.
@@ -44,6 +46,8 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
 
 ## Known issues / open threads
+- **Look at the live docs site:** this session can't reach `sugatoray.github.io`. The build log confirms all six pages were built and deployed, but nobody has viewed them in a browser yet. Check the menu, the find box, switching to `/v/0.8.0/` on a `#page`, and the notices.
+- **The docs workflow's actions target Node 20** (deprecated; GitHub forces Node 24). Moving to the v5 actions and Node 22 is root ROOT-8.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
