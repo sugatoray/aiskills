@@ -33,6 +33,7 @@
   "files": [
     "bin/",
     "src/scripts/core/cli.mjs",
+    "src/scripts/core/colors.mjs",
     "src/scripts/core/installer.mjs",
     "src/scripts/core/releases.mjs",
     "src/scripts/core/upgrade.mjs",
@@ -53,7 +54,9 @@
     "banner": "node src/scripts/docs/create-banner.mjs",
     "banner:check": "node src/scripts/docs/create-banner.mjs --check",
     "banner:png": "node src/scripts/docs/create-banner.mjs --png",
-    "docs": "npm run banner && npm run docs:skills && python3 ../../../skills/docs/create-lib-docs/scripts/build_llms_txt.py docs/docsite && npm run docs:html",
+    "cli-outputs": "node src/scripts/docs/create-cli-outputs.mjs",
+    "cli-outputs:check": "node src/scripts/docs/create-cli-outputs.mjs --check",
+    "docs": "npm run banner && npm run docs:skills && python3 ../../../skills/docs/create-lib-docs/scripts/build_llms_txt.py docs/docsite && npm run cli-outputs && npm run docs:html",
     "prepack": "node src/scripts/pack/vendor-skills.mjs",
     "pack:dry": "npm pack --dry-run",
     "test": "node --test src/test/*.test.mjs",

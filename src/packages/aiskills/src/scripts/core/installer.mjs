@@ -28,8 +28,8 @@ export function installRoot() {
     : join(homedir(), ".config", "sugatoray", "aiskills");
 }
 
-export const log = (...a) => console.log("[aiskills]", ...a);
-export const warn = (...a) => console.warn("[aiskills]", ...a);
+import { log, warn } from "./colors.mjs";
+export { log, warn };
 
 // Reverse of the renames done by src/scripts/pack/vendor-skills.mjs.
 const DOTFILES = { _gitignore: ".gitignore", _npmignore: ".npmignore" };

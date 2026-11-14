@@ -24,6 +24,18 @@ In development: `package.json` is `1.3.0-dev` (a SemVer pre-release, so it
 sorts below `1.3.0`) while changes collect here. At release, set it to `1.3.0`
 and date this section.
 
+### Added
+
+- **Colored output.** On a terminal, `aiskills` colors its output: the
+  `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
+  green, and commands to run cyan; the headings in `--help`, the labels and
+  values in `info`, the header row, `latest` tag and `← installed` mark in
+  `releases`, and the names in `groups` and `installed`. Piped or redirected
+  output stays plain, and `--json` is never colored. New options for every
+  command: `--color` (color even when piped, e.g. into `less -R`) and
+  `--no-color`. The standard `NO_COLOR` and `FORCE_COLOR` variables work too.
+  No new dependencies.
+
 ### Changed
 
 - **Bundled skill `run-code-review` 1.3.0:** `/run-code-review` now starts

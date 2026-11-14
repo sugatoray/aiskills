@@ -55,6 +55,7 @@ import {
   renderSeries,
   todayDate,
 } from "./releases.mjs";
+import { fail, ok, paint, setColorFlag } from "./colors.mjs";
 import { HOW_TO_UPGRADE, detectInstall, installCommand, npmGlobalRoot, pickTarget, refreshPlan, runInstall } from "./upgrade.mjs";
 
 const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
@@ -154,6 +155,12 @@ uninstall only:
   -f, --force            Allow -s names that this package does not provide
   -n, --dry-run          Print what would run; change nothing
 
+Output (any command; may also go before the command):
+      --color            Color the output even when it isn't a terminal (e.g. piped into less -R)
+      --no-color         Never color the output
+                         By default the output is colored on a terminal and plain when piped.
+                         'skills' and 'find' pass both on to 'npx skills'.
+
 Anything after '--' is appended to the underlying 'npx skills' command.
 
 Examples:
@@ -196,7 +203,13 @@ Environment:
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
+  NO_COLOR=1                    Same as --no-color
+  FORCE_COLOR=1                 Same as --color (NO_COLOR wins if both are set)
 `;
+
+/** The help text, its title and section headings bold when colored. */
+const helpText = () =>
+  HELP.replace(/^[^\n]*/, (title) => paint.out.bold(title)).replace(/^[A-Za-z][^\n]*:$/gm, (h) => paint.out.bold(h));
 
 const split = (v) => (v ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
@@ -330,7 +343,7 @@ function installed(opts) {
     const bundled = isFromRoot(r, ROOT);
     const group = bundled ? groupOf.get(r.name) ?? "-" : "-";
     const source = opts.route ? `${(bundled ? "bundled" : r.source ?? "?").padEnd(30)} ` : "";
-    console.log(`${r.name.padEnd(26)} ${source}${group.padEnd(22)} ${(r.agents ?? []).join(", ")}`);
+    console.log(`${paint.out.bold(r.name.padEnd(26))} ${source}${paint.out.dim(group.padEnd(22))} ${(r.agents ?? []).join(", ")}`);
   }
   return 0;
 }
@@ -343,12 +356,12 @@ function groups(opts) {
     return 0;
   }
   for (const g of gs) {
-    console.log(`${g.name}  (alias: ${g.alias})`);
+    console.log(`${paint.out.bold(g.name)}  ${paint.out.dim(`(alias: ${g.alias})`)}`);
     if (g.description) console.log(`  ${g.description.length > 110 ? g.description.slice(0, 107) + "..." : g.description}`);
     console.log(`  skills: ${g.skills.join(", ") || "(none)"}\n`);
   }
   if (ungrouped.length) console.log(`(ungrouped; use -s or -G all)\n  skills: ${ungrouped.join(", ")}\n`);
-  console.log(`Install a group:  aiskills install --group <name|alias> --global --agent <agent>`);
+  console.log(`Install a group:  ${paint.out.cyan("aiskills install --group <name|alias> --global --agent <agent>")}`);
   return 0;
 }
 
@@ -436,7 +449,7 @@ function info(opts) {
   }
 
   const lines = [];
-  const kv = (key, value, source) => lines.push([key, source ? `${value}  (${source})` : value]);
+  const kv = (key, value, source) => lines.push([key, value, source]);
   const gap = () => lines.push(null);
   kv("aiskills version", version);
   kv("package path", PKG_DIR);
@@ -480,7 +493,11 @@ function info(opts) {
     }
   }
   const w = Math.max(...lines.filter(Boolean).map(([k]) => k.length));
-  for (const l of lines) console.log(l ? `${l[0].padStart(w)}${l[0] ? " : " : "   "}${l[1]}` : "");
+  const c = paint.out;
+  for (const l of lines) {
+    if (!l) console.log("");
+    else console.log(`${l[0] ? c.dim(l[0].padStart(w)) : " ".repeat(w)}${l[0] ? " : " : "   "}${c.bold(l[1])}${l[2] ? `  ${c.dim(`(${l[2]})`)}` : ""}`);
+  }
   return 0;
 }
 
@@ -656,8 +673,8 @@ function upgrade(o) {
   let result = 0;
   if (!o.refresh) {
     log(`your agents still have the ${version} skills; to update them:`);
-    for (const g of groups) console.log(`  ${refreshCmd(g)}`);
-    if (!groups.length) console.log("  aiskills install");
+    for (const g of groups) console.log(`  ${paint.out.cyan(refreshCmd(g))}`);
+    if (!groups.length) console.log(`  ${paint.out.cyan("aiskills install")}`);
   } else if (plan) {
     if (!installed.length) log(`no skills installed from ${ROOT} (global); install them with: aiskills install`);
     for (const g of groups) {
@@ -676,16 +693,16 @@ function upgrade(o) {
   if (added.length) {
     const agents = [...new Set(groups.flatMap((g) => g.agents))].sort();
     log(`new in ${newVersion}, not installed: ${added.join(", ")}`);
-    console.log(`  to install them:      aiskills install -s ${csvList(added)}${agents.length ? ` -a ${csvList(agents)}` : ""}`);
-    console.log("  or pick from a list:  aiskills install -i");
+    console.log(`  to install them:      ${paint.out.cyan(`aiskills install -s ${csvList(added)}${agents.length ? ` -a ${csvList(agents)}` : ""}`)}`);
+    console.log(`  or pick from a list:  ${paint.out.cyan("aiskills install -i")}`);
   }
   const dropped = installed.filter((n) => !newNames.has(n));
   if (dropped.length) {
     log(`no longer in ${newVersion} but still installed: ${dropped.join(", ")}`);
-    console.log(`  to remove:  aiskills uninstall -s ${csvList(dropped)}`);
+    console.log(`  to remove:  ${paint.out.cyan(`aiskills uninstall -s ${csvList(dropped)}`)}`);
   }
   if (o.refresh) log("project installs aren't refreshed: run 'aiskills install -p' in each project that uses them");
-  log(`${t.change === "downgrade" ? "downgraded" : "upgraded"} ${version} → ${newVersion}`);
+  ok(`${t.change === "downgrade" ? "downgraded" : "upgraded"} ${version} → ${newVersion}`);
   return result;
 }
 
@@ -693,13 +710,25 @@ function main() {
   // '--route', '--nested' and '--flat' may come before the command
   // (aiskills --route install ..., aiskills --nested).
   let argv = process.argv.slice(2);
+  // --color / --no-color: before the command, or anywhere before '--' in its options
+  // (except for 'skills' and 'find', which pass their options on to npx skills).
+  const colorFlag = (a) => {
+    if (a !== "--color" && a !== "--no-color") return false;
+    setColorFlag(a === "--color");
+    return true;
+  };
   for (;;) {
-    if (argv[0] === "--route") process.env.AISKILLS_ROUTE = "1";
+    if (colorFlag(argv[0])) {}
+    else if (argv[0] === "--route") process.env.AISKILLS_ROUTE = "1";
     else if (argv[0] === "--nested" || argv[0] === "--flat") process.env.AISKILLS_LAYOUT = argv[0].slice(2);
     else break;
     argv = argv.slice(1);
   }
-  const [cmd = "install", ...rest] = argv;
+  let [cmd = "install", ...rest] = argv;
+  if (!["skills", "find", "f"].includes(cmd)) {
+    const end = rest.includes("--") ? rest.indexOf("--") : rest.length;
+    rest = [...rest.slice(0, end).filter((a) => !colorFlag(a)), ...rest.slice(end)];
+  }
   switch (cmd) {
     case "install":
     case "i": {
@@ -818,14 +847,14 @@ function main() {
     case "h":
     case "-h":
     case "--help":
-      console.log(HELP);
+      console.log(helpText());
       return 0;
     case "-v":
     case "--version":
       console.log(version);
       return 0;
     default:
-      console.error(`unknown command: ${cmd}\n\n${HELP}`);
+      console.error(`${paint.err.red(`unknown command: ${cmd}`)}\n\n${HELP}`);
       return 1;
   }
 }
@@ -833,6 +862,6 @@ function main() {
 try {
   process.exitCode = main();
 } catch (err) {
-  console.error(`[aiskills] ${err?.message ?? err}`);
+  fail(err?.message ?? err);
   process.exitCode = 1;
 }

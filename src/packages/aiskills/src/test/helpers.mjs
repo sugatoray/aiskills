@@ -257,7 +257,7 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
   const baseEnv = () => {
     const env = {};
     for (const [k, v] of Object.entries(process.env)) {
-      if (/^(AISKILLS_|npm_)/i.test(k) || ["CI", "DO_NOT_TRACK", "DISABLE_TELEMETRY"].includes(k)) continue;
+      if (/^(AISKILLS_|npm_)/i.test(k) || ["CI", "DO_NOT_TRACK", "DISABLE_TELEMETRY", "NO_COLOR", "FORCE_COLOR"].includes(k)) continue;
       env[k] = v;
     }
     return {
@@ -285,7 +285,8 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
     rmSync(log, { force: true });
     const res = spawnSync(process.execPath, [script, ...args], {
       cwd: dir,
-      env: { ...baseEnv(), ...env },
+      // A variable set to undefined is left out (e.g. { AISKILLS_HOME: undefined }: the default install root).
+      env: Object.fromEntries(Object.entries({ ...baseEnv(), ...env }).filter(([, v]) => v !== undefined)),
       encoding: "utf8",
     });
     return { status: res.status, out: (res.stdout ?? "") + (res.stderr ?? ""), calls: calls() };
@@ -306,7 +307,8 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
       // Type the answer only once the [y/N] prompt is on screen, as a person would.
       const driver = join(dir, "tty-driver.mjs");
       writeFileSync(driver, TTY_DRIVER);
-      const res = spawnSync(process.execPath, [driver, cmd, answer], { cwd: dir, env: { ...baseEnv(), ...env }, encoding: "utf8" });
+      // A terminal colors the output; these runs compare plain text, so NO_COLOR (src/test/colors.test.mjs checks color).
+      const res = spawnSync(process.execPath, [driver, cmd, answer], { cwd: dir, env: { ...baseEnv(), NO_COLOR: "1", ...env }, encoding: "utf8" });
       return { status: res.status, out: (res.stdout ?? "").replace(/\r\n?/g, "\n") + (res.stderr ?? ""), calls: calls() };
     },
     calls,

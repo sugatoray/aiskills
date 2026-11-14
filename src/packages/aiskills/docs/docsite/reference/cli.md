@@ -10,6 +10,7 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 - **`aix`** is `aiskills --route`: `aix i -s pdf` = `aiskills --route install -s pdf`.
 - With no command, `aiskills` runs `install`.
 - `--route`, `--nested` and `--flat` can also go **before** the command: `aiskills --route installed`, `aiskills --nested` (= `install --nested`).
+- [`--color`](#--color) and [`--no-color`](#--no-color) work with every command, before it or among its options.
 - Options are checked per command. An option a command doesn't take fails with `option <x> is not valid here`.
 
 ## Commands
@@ -584,6 +585,12 @@ uninstall only:
   -f, --force            Allow -s names that this package does not provide
   -n, --dry-run          Print what would run; change nothing
 
+Output (any command; may also go before the command):
+      --color            Color the output even when it isn't a terminal (e.g. piped into less -R)
+      --no-color         Never color the output
+                         By default the output is colored on a terminal and plain when piped.
+                         'skills' and 'find' pass both on to 'npx skills'.
+
 Anything after '--' is appended to the underlying 'npx skills' command.
 
 Examples:
@@ -626,6 +633,8 @@ Environment:
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
+  NO_COLOR=1                    Same as --no-color
+  FORCE_COLOR=1                 Same as --color (NO_COLOR wins if both are set)
 ```
 
 ### `-v`, `--version`
@@ -792,6 +801,18 @@ On [`releases`](#releases), the row size of the downloads breakdown: `day`, `wee
 ### `--ascii`
 
 On [`releases`](#releases), draw the chart's bars with `#` instead of block characters, for terminals or fonts without them. Also used when `TERM=dumb`. Implies `--downloads`.
+
+### `--color`
+
+Color the output even when it isn't a terminal, e.g. `aiskills info --color | less -R`. Works with every command, before it (`aiskills --color rel`) or among its options. Env: [`FORCE_COLOR`](environment.md#force_color). See [Colored output](#colored-output).
+
+### `--no-color`
+
+Never color the output. Wins over `--color` given earlier, and over `FORCE_COLOR`. Env: [`NO_COLOR`](environment.md#no_color).
+
+#### Colored output
+
+On a terminal, `aiskills` colors its output: the `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade green, commands to run cyan; in `--help` the headings, in `info` the labels and values, in `releases` the header row, the `latest` tag and the `← installed` mark, and in `groups` and `installed` the names. Piped or redirected output is plain, so scripts and `grep` see the same text as before; `--json` is never colored. stdout and stderr are decided separately. In order, what decides: `--no-color`, `--color`, [`NO_COLOR`](environment.md#no_color), [`FORCE_COLOR`](environment.md#force_color), then whether the output is a terminal (and `TERM` isn't `dumb`). `skills` and `find` pass `--color`/`--no-color` on to `npx skills` instead.
 
 ### `--`
 

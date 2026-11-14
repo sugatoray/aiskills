@@ -7,7 +7,14 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 **`1.2.0` is published on npm** (`latest`, published 2026-11-14T02:22Z, i.e. the evening of 2026-11-13 US Eastern, so the CHANGELOG date `2026-11-13` stands; checked with `npm view`). It came from [#223](https://github.com/sugatoray/aiskills/pull/223) (squash `089f938`), which bundles `/run-code-review` (from #215, `7c0afec`) and its 1.2.0 `-o` reports in the new `review-skills` group: **17 skills in 9 groups**. Release changes: `package.json`, CHANGELOG `[1.2.0] - 2026-11-13`, SECURITY `1.2.x` current, banner and docs, `DOCS_VIEW` with 1.2.0 as `latest` and the docs examples it drives. `1.1.0` (from #206) was published 2026-11-12.
 
-**On `master` (`58c1e52`), not yet released:** `package.json` is `1.3.0-dev`. `## [1.3.0] - Unreleased` holds `run-code-review` 1.3.0 (starts only when typed). The versioned docs website (#234) is live, deployed by [run 16](https://github.com/sugatoray/aiskills/actions/runs/43614530086): 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, 1.3.0-dev at `/dev/`. The working branch is `claude/next-updates`.
+**On `master` (`75700d3`), not yet released:** `package.json` is `1.3.0-dev`, and `## [1.3.0] - Unreleased` holds `run-code-review` 1.3.0 (starts only when typed).
+- The versioned docs website (#234) is live: 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, 1.3.0-dev at `/dev/`.
+- #241 moved its workflow to `actions/checkout@v5` / `setup-node@v5` and Node 22. [Run 17](https://github.com/sugatoray/aiskills/actions/runs/43618384405) was clean.
+
+**On `claude/cli-colors` (pushed, no PR yet):**
+- **Colored CLI output** (`6c4697a`), with a CHANGELOG `[1.3.0]` Added entry.
+- **The reproducible CLI outputs page** (`714984b`).
+- 471 tests pass.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -31,23 +38,22 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- **Docs site with versions: [#234](https://github.com/sugatoray/aiskills/pull/234)** (merged as `58c1e52`; deployed, and issues #235–#240 closed). `npm run docs:site` (new `src/scripts/docs/build-site.mjs`) builds:
-  - the latest release at `site/` (the newest `aiskills-vX.Y.Z` tag while `-dev`; the working tree on a release);
-  - the releases before it at `site/v/<version>/` (`--releases`, default 5 in all);
-  - the working tree at `site/dev/` while `-dev`.
-
-  Tagged docs are read with `git archive`. `build-docs-html.mjs` has `--version` and `--menu <json>`: every page's header menu lists all versions and keeps the `#page`. Dev and older pages get a notice linking to the latest. The menu has a **Find a version** box (`b475a47`): partial matches on the version or label, fuzzy matches with the characters in order, ranked; Enter opens the best match on the same page. Without a dev version, `site/dev/` redirects to the root. The workflow uses `fetch-depth: 0` and rebuilds on `aiskills-v*` tag pushes. Red/Green throughout, plus a browser test. A real build from the nine tags is 2.4 MB. 449 tests pass. The deploy itself is untested.
-- **Release tags `aiskills-v0.4.0`–`aiskills-v1.2.0` are on GitHub** (pushed by the user on 2026-11-13). Each tag is checked: it is annotated, its commit equals npm's `gitHead`, the commit's `package.json` has that version, the commit is on `master`, and the message carries the npm publish time. MAINTAINERS → Releasing step 6 tags each future release the same way.
-- **`package.json` is `1.3.0-dev`** (on #230; the user's call on 2026-11-13). Changes collect under `## [1.3.0] - Unreleased` until the user releases 1.3.0. npm rejects `1.3.0.dev`, so the version uses SemVer pre-release form. The first entry is `run-code-review` 1.3.0, which now starts only when typed. Regenerated: banner, `index.html` and the version examples in `reference/cli.md` and `installation.md`. `aiskills rel` now prints `installed: 1.3.0-dev (not published on npm)` and marks no row as installed. MAINTAINERS → Releasing documents the `-dev` convention. 428 tests pass.
-- **1.2.0 release recorded** (commit `9103d74` on [#230](https://github.com/sugatoray/aiskills/pull/230)): AIS-18 done, along with the `SPEC.md` release note and this file.
-- **[#230](https://github.com/sugatoray/aiskills/pull/230) (merged as `8028d62`):**
-  - Repo-wide: `make link-skills`, with 24 links into the repo root's `.agents/skills/` and `.claude/skills/`, and the root `docs/.scrolls/`.
-  - For this package: the `run-code-review` 1.3.0 docs page ("starts when you type it"), `1.3.0-dev`, and MAINTAINERS → Releasing step 6 (tag each release on its `gitHead`). 428 tests pass there.
-- **Root vs. package scrolls:** the root scrolls cover repo-wide work (tooling, cross-family conventions, the overall backlog). This package's own state stays here.
+- **Colored output** (`6c4697a`, Red/Green, `src/test/colors.test.mjs`).
+  - New shipped module `src/scripts/core/colors.mjs`, imports nothing. It provides `colorChoice` (`--no-color` > `--color` > `NO_COLOR` > `FORCE_COLOR` > a terminal, not `TERM=dumb`; stdout and stderr decided separately), the `paint.out`/`paint.err` painters, and `log`/`ok`/`warn`/`fail`. `installer.mjs` re-exports `log`/`warn`.
+  - Colored: the `[aiskills]` prefix dim, errors red (first line only), warnings yellow, upgrade success green, commands cyan; `--help` headings bold; `info` labels dim, values bold, sources dim; `rel`'s header bold, `latest` green, `← installed` bold; names bold in `groups`/`installed`.
+  - `--json` and piped output stay plain. `--color`/`--no-color` work before the command or among its options; `skills` and `find` pass them on to `npx skills`.
+  - Docs: `--help` (Output section, `NO_COLOR`/`FORCE_COLOR`), `reference/cli.md` (both options, "Colored output"), `reference/environment.md`, ARCHITECTURE, MAINTAINERS, `src/scripts/README.md`; `package.json` "files" lists `colors.mjs`.
+- **The CLI outputs page** (`714984b`, Red/Green, `src/test/cli-outputs.test.mjs`).
+  - `npm run cli-outputs` (`src/scripts/docs/create-cli-outputs.mjs`) runs the 19 commands in `docs/cli-outputs/commands.json` in the docs examples' sandbox, with `FORCE_COLOR=1`, and writes `docs/docsite/reference/cli-outputs.html` from `templates/cli-outputs-template.html`.
+  - `reference/cli-outputs.md` embeds it, listed after the CLI reference. `cli-outputs:check` checks it, and `npm run docs` runs it.
+  - The Node.js version and save times are masked in comparisons, and an unchanged page isn't rewritten. `docs/cli-outputs/README.md` explains it all.
+- **Before that:** a live capture of every command was published as a private artifact ([aiskills Command Outputs](https://claude.ai/artifact/FEsS7FdbmoDJe4rcG71SUY)). The docs page is its reproducible version.
+- **#241** merged; this package's `docs-workflow.test.mjs` pins the v5 actions and Node 22.
 
 ## Known issues / open threads
+- **`claude/cli-colors` has no PR yet** (AIS-21).
+- **The CLI outputs page shows the stand-in `npx skills`,** which prints nothing of its own. So `list`, `install` and `skills` show only aiskills's lines; the live artifact shows the real `npx skills` output.
 - **Look at the live docs site:** this session can't reach `sugatoray.github.io`. The build log confirms all six pages were built and deployed, but nobody has viewed them in a browser yet. Check the menu, the find box, switching to `/v/0.8.0/` on a `#page`, and the notices.
-- **The docs workflow's actions target Node 20** (deprecated; GitHub forces Node 24). Moving to the v5 actions and Node 22 is root ROOT-8.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
 - **Try by hand on a real machine:** `aiskills install -i` (the real pickers were never driven; with `-p`, `npx skills` also asks for the scope).
 - **`info --full` has no detected-agents list** (not exposed by `npx skills`); `--downloads` behind a proxy needs Node 22.21+/24+ (see GAP_ANALYSIS).
