@@ -210,10 +210,9 @@ An agent that can't run this skill can use the plain git commands that `COMPACT.
 
 ## Examples
 
-- `assets/EXAMPLE.md`: an exhaustive set of prompts and their **real** outputs, one or more per flag, refusal and exit code, all run on one small demo repository. A test replays every one of them, so the outputs are exactly what the script prints.
-- `assets/EXAMPLES.md`: short worked scenarios, each with a premise, the usage, caveats and the expected output.
+`assets/EXAMPLES.md` has 23 worked examples, covering every flag, refusal and exit code, all run on one small demo repository. Each has a premise, caveats, the prompt, and its **real** output: a test replays every one, so the outputs are exactly what the script prints.
 
-Read them only when you need them: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
+Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
 
 ## Development
 

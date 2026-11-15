@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check assets/EXAMPLE.md: its structure, its coverage, and that every
+"""Check assets/EXAMPLES.md: its structure, its coverage, and that every
 documented output is what the skill really prints.
 
 Each example is replayed, in order, in a fresh demo repository:
@@ -39,7 +39,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
-EXAMPLE = SKILL / "assets" / "EXAMPLE.md"
+EXAMPLE = SKILL / "assets" / "EXAMPLES.md"
 SCRIPT = SKILL / "scripts" / "compact.sh"
 SHOWN_ROOT = "/work/shop"
 S = "docs/.scrolls"
@@ -386,7 +386,7 @@ def replay(ex, printing: bool):
 
 def main() -> int:
     printing = "--print" in sys.argv
-    if not check(EXAMPLE.is_file(), "assets/EXAMPLE.md exists"):
+    if not check(EXAMPLE.is_file(), "assets/EXAMPLES.md exists"):
         return 1
     text = EXAMPLE.read_text(encoding="utf-8")
     examples, problems = parse(text)

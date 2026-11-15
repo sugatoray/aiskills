@@ -9,19 +9,18 @@ For people developing this skill. It isn't read when answering a
 - `../README.md`: a short, human-facing pointer. Not read at invocation time.
 - `../CHANGELOG.md`: this skill's version history. Update it alongside
   `metadata.version` in `SKILL.md`.
-- `../assets/EXAMPLE.md`: every flag, refusal and exit code as a prompt with
-  its real output, in the format of the image-styles skills' `EXAMPLE.md`
+- `../assets/EXAMPLES.md`: every flag, refusal and exit code as an example
+  with a **Premise**, **Caveats**, the prompt and its real output, in the
+  marker format of the image-styles skills' `EXAMPLE.md`
   (`example:start fixture=…`, `setup-block`, `prompt-block`,
-  `prompt-output` markers). `tests/test_examples.sh` replays each example
+  `prompt-output`). Follow the writing rule at its top (ASD-STE100, about
+  80%) for the prose. `tests/test_examples.sh` replays each example
   in a demo repository with a pinned clock and fails on any difference.
   When you add or change an example, leave its output as a placeholder,
   watch the test fail, run `python3 tests/check_examples.py --print`,
   **read** the actual output, and paste it only if it shows what the
   example claims. A behavior change in `compact.py` shows up here as
   failures to review, never as outputs to regenerate blindly.
-- `../assets/EXAMPLES.md`: worked examples. Follow the writing rule at
-  its top (ASD-STE100, about 80%), and keep expected output true to what
-  the script really prints.
 - `../assets/templates/COMPACT.md`: the `COMPACT.md` written on the first
   compaction (`{{SCROLLS_PATH}}` is substituted). `compact.py` embeds a
   copy as `COMPACT_TEMPLATE_FALLBACK`; scenario 12 of `test_compact.sh`
@@ -31,7 +30,7 @@ For people developing this skill. It isn't read when answering a
   They find Python and pass `"$@"` / `@args` through unchanged. A flag or
   behavior change goes in `compact.py`, never in only one launcher.
 - `../tests/`: `test_compact.sh` is the full Red/Green behavior suite.
-  `test_examples.sh` (with `check_examples.py`) checks `assets/EXAMPLE.md`.
+  `test_examples.sh` (with `check_examples.py`) checks `assets/EXAMPLES.md`.
   `test_compact.ps1` is a parity harness for the PowerShell launcher.
 - `../agents/openai.yaml`: OpenAI-agent interface metadata.
 - `DESIGN.md`: the design and the decisions behind it.
@@ -65,7 +64,7 @@ After touching anything under `scripts/` or `assets/templates/`:
 
 ```
 bash tests/test_compact.sh
-bash tests/test_examples.sh   # assets/EXAMPLE.md, replayed
+bash tests/test_examples.sh   # assets/EXAMPLES.md, replayed
 pwsh tests/test_compact.ps1   # where pwsh is available
 ```
 

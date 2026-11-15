@@ -47,7 +47,6 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scro
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
 - `assets/EXAMPLES.md`
 - `assets/templates/COMPACT.md`
 - `meta/DESIGN.md`
