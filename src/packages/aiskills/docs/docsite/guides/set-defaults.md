@@ -34,7 +34,7 @@ Use `AISKILLS_*` environment variables when you run `aiskills` with the same cho
 
 ### Make them your defaults everywhere
 
-Save them with [`aiskills config`](../reference/cli.md#config), which keeps them in `~/.config/sugatoray/aiskills-config.json`:
+Save them with [`aiskills config`](../reference/cli.md#config), which keeps them in `~/.config/sugatoray/aiskillsconfig.json`:
 
 ```bash
 aiskills config agents claude-code,codex

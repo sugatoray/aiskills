@@ -79,7 +79,7 @@ Commands:
   info           Show this setup: versions, folders, settings and where each comes from
                  (offline); --full also asks npx skills and npm; --json for scripts
   config         Get and set defaults, like git config: config <key> [<value>], --unset <key>,
-                 --list, alias.<name>; in ~/.config/sugatoray/aiskills-config.json (or ./.aiskills.json with --project)
+                 --list, alias.<name>; in ~/.config/sugatoray/aiskillsconfig.json (or ./.aiskills.json with --project)
   releases, rel  Show the latest releases on npm (default 5): rel 10, rel all, -L/--last <n|all>
   upgrade        Install the latest aiskills (or <version|tag>) globally, then re-add the
                  installed skills for the same agents with the new version
@@ -160,7 +160,7 @@ config only:
   -l, --list             Every key that is set (the project file wins over the user file)
       --show-origin      With --list: which file each value comes from
       --json             With --list: as JSON
-      --global           The user file, ~/.config/sugatoray/aiskills-config.json (the default for set and unset)
+      --global           The user file, ~/.config/sugatoray/aiskillsconfig.json (the default for set and unset)
       --project          The project file, ./.aiskills.json
   alias.<name> <cmd>     An alias: 'aiskills <name> ...' runs 'aiskills <cmd> ...' (not a command name);
                          '!<shell command>' runs it in the shell (user file only, not --project)
@@ -211,7 +211,7 @@ Examples:
 
 Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
-  AISKILLS_USER_CONFIG   The user config file (default ~/.config/sugatoray/aiskills-config.json)
+  AISKILLS_USER_CONFIG   The user config file (default ~/.config/sugatoray/aiskillsconfig.json)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route

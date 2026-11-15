@@ -5,7 +5,7 @@
 //   aiskills config --unset <key>         remove it
 //   aiskills config --list [--show-origin] [--json]
 //
-// Files: ~/.config/sugatoray/aiskills-config.json (user, --global) and ./.aiskills.json
+// Files: ~/.config/sugatoray/aiskillsconfig.json (user, --global) and ./.aiskills.json
 // (project, --project). Precedence: option > AISKILLS_* > project > user >
 // remembered (aiskills.json in the install root) > default.
 import assert from "node:assert/strict";
@@ -52,18 +52,18 @@ describe("config files", () => {
     const { configFiles } = await import(CONFIG);
     assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: "/x/mine.json" } }).user, join("/x", "mine.json"));
     assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: "conf/mine.json" } }).user, join("/w", "conf", "mine.json"));
-    assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: " " } }).user, join("/h", ".config", "sugatoray", "aiskills-config.json"));
+    assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: " " } }).user, join("/h", ".config", "sugatoray", "aiskillsconfig.json"));
   });
 
-  test("the user file is aiskills-config.json, next to the install folder, so it isn't mistaken for the install folder's aiskills.json", async () => {
+  test("the user file is aiskillsconfig.json, next to the install folder, so it isn't mistaken for the install folder's aiskills.json", async () => {
     const { configFiles } = await import(CONFIG);
-    assert.deepEqual(configFiles({ home: "/h", cwd: "/w" }), { user: join("/h", ".config", "sugatoray", "aiskills-config.json"), project: join("/w", ".aiskills.json") });
+    assert.deepEqual(configFiles({ home: "/h", cwd: "/w" }), { user: join("/h", ".config", "sugatoray", "aiskillsconfig.json"), project: join("/w", ".aiskills.json") });
   });
 });
 
 describe("aiskills config", posixOnly, () => {
   let sb;
-  const userFile = () => join(sb.home, ".config", "sugatoray", "aiskills-config.json");
+  const userFile = () => join(sb.home, ".config", "sugatoray", "aiskillsconfig.json");
   const projectFile = () => join(sb.dir, ".aiskills.json");
   const reset = () => {
     rmSync(userFile(), { force: true });
@@ -120,7 +120,7 @@ describe("aiskills config", posixOnly, () => {
     assert.equal(run(["config", "--list"]).out, "agents=codex\nlayout=nested\n");
     assert.equal(run(["config", "-l"]).out, "agents=codex\nlayout=nested\n");
     const origin = run(["config", "--list", "--show-origin"]).out.replaceAll(sb.home, "~").replaceAll(sb.dir, ".");
-    assert.equal(origin, "project  ./.aiskills.json                          agents=codex\nuser     ~/.config/sugatoray/aiskills-config.json  layout=nested\n");
+    assert.equal(origin, "project  ./.aiskills.json                         agents=codex\nuser     ~/.config/sugatoray/aiskillsconfig.json  layout=nested\n");
     const json = JSON.parse(run(["config", "--list", "--json"]).out);
     assert.deepEqual(json.agents, { value: "codex", origin: "project", file: projectFile() });
     assert.deepEqual(json.layout, { value: "nested", origin: "user", file: userFile() });
@@ -150,7 +150,7 @@ describe("aiskills config", posixOnly, () => {
     writeFileSync(userFile(), "{ nope");
     const r = run(["config", "layout", "nested"]);
     assert.equal(r.status, 1);
-    assert.match(r.out, /aiskills-config\.json is not valid JSON/);
+    assert.match(r.out, /aiskillsconfig\.json is not valid JSON/);
     assert.equal(readFileSync(userFile(), "utf8"), "{ nope");
   });
 });
@@ -162,7 +162,7 @@ describe("config values take effect", posixOnly, () => {
   });
   after(() => sb.cleanup());
   beforeEach(() => {
-    rmSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json"), { force: true });
+    rmSync(join(sb.home, ".config", "sugatoray", "aiskillsconfig.json"), { force: true });
     rmSync(join(sb.dir, ".aiskills.json"), { force: true });
     rmSync(sb.root, { recursive: true, force: true });
   });
@@ -215,7 +215,7 @@ describe("config values take effect", posixOnly, () => {
     run(["config", "layout", "nested"]);
     run(["config", "--project", "scope", "project"]);
     const out = run(["info"], { NO_COLOR: "1" }).out.replaceAll(sb.home, "~").replaceAll(sb.dir, ".");
-    assert.match(out, /user config : ~\/\.config\/sugatoray\/aiskills-config\.json\n/);
+    assert.match(out, /user config : ~\/\.config\/sugatoray\/aiskillsconfig\.json\n/);
     assert.match(out, /project config : \.\/\.aiskills\.json\n/);
     assert.match(out, /scope : project {2}\(project config\)/);
     assert.match(out, /layout : nested {2}\(user config\)/);
@@ -248,7 +248,7 @@ describe("aiskills <alias>", posixOnly, () => {
   });
   after(() => sb.cleanup());
   beforeEach(() => {
-    rmSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json"), { force: true });
+    rmSync(join(sb.home, ".config", "sugatoray", "aiskillsconfig.json"), { force: true });
     rmSync(join(sb.dir, ".aiskills.json"), { force: true });
   });
   const run = (args, env = {}) => sb.run(args, { env });
@@ -305,7 +305,7 @@ describe("aiskills <alias>", posixOnly, () => {
     const set = run(["config", "--project", "alias.boom", "!touch pwned"]);
     assert.equal(set.status, 1);
     assert.match(set.out, /alias\.boom: shell aliases \(!\.\.\.\) are only allowed in the user file/);
-    assert.match(set.out, /aiskills-config\.json/);
+    assert.match(set.out, /aiskillsconfig\.json/);
     assert.match(set.out, /AISKILLS_USER_CONFIG/);
     assert.ok(!existsSync(join(sb.dir, ".aiskills.json")), "nothing written");
   });
@@ -317,7 +317,7 @@ describe("aiskills <alias>", posixOnly, () => {
     assert.equal(get.status, 0, get.out);
     assert.match(get.out, /^nested$/m, "the other settings in the file still count");
     assert.match(get.out, warning);
-    assert.match(get.out, /define it in ~\/\.config\/sugatoray\/aiskills-config\.json instead \(or in the file AISKILLS_USER_CONFIG names\)/);
+    assert.match(get.out, /define it in ~\/\.config\/sugatoray\/aiskillsconfig\.json instead \(or in the file AISKILLS_USER_CONFIG names\)/);
     assert.equal(get.out.match(/is ignored/g).length, 1, "warned once per run");
     const where = run(["where"]);
     assert.equal(where.status, 0, where.out);
@@ -336,7 +336,7 @@ describe("aiskills <alias>", posixOnly, () => {
     const env = { AISKILLS_USER_CONFIG: mine };
     assert.equal(run(["config", "alias.hi", "!echo hi"], env).status, 0);
     assert.deepEqual(JSON.parse(readFileSync(mine, "utf8")), { "alias.hi": "!echo hi" });
-    assert.ok(!existsSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json")), "not the default file");
+    assert.ok(!existsSync(join(sb.home, ".config", "sugatoray", "aiskillsconfig.json")), "not the default file");
     assert.equal(run(["hi", "there"], env).out, "hi there\n");
     assert.match(run(["config", "--list", "--show-origin"], env).out, /^user +\.\/my-aiskills\.json +alias\.hi=!echo hi$/m);
     assert.match(run(["info"], { ...env, NO_COLOR: "1" }).out, /user config : \.\/my-aiskills\.json {2}\(AISKILLS_USER_CONFIG\)/);

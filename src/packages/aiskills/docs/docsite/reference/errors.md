@@ -381,8 +381,8 @@ skills-version must be a version (e.g. 1.7.6), "latest", "next", an npm range (e
 
 ```text
 alias.<name>: alias names are lowercase letters, digits and dashes, starting with a letter
-alias.<name>: shell aliases (!...) are only allowed in the user file, ~/.config/sugatoray/aiskills-config.json (or in the file AISKILLS_USER_CONFIG names)
-alias.<name> in ./.aiskills.json is a shell alias, which a project can't define; define it in ~/.config/sugatoray/aiskills-config.json instead (or in the file AISKILLS_USER_CONFIG names)
+alias.<name>: shell aliases (!...) are only allowed in the user file, ~/.config/sugatoray/aiskillsconfig.json (or in the file AISKILLS_USER_CONFIG names)
+alias.<name> in ./.aiskills.json is a shell alias, which a project can't define; define it in ~/.config/sugatoray/aiskillsconfig.json instead (or in the file AISKILLS_USER_CONFIG names)
 alias.<name>: '<name>' is an aiskills command; an alias can't replace it
 unclosed quote in '<value>'
 ```
@@ -392,7 +392,7 @@ unclosed quote in '<value>'
 ### Shell alias in a project file (warning)
 
 ```text
-warning: alias.<name> in ./.aiskills.json is ignored: an alias that starts with '!' isn't allowed in a project's .aiskills.json; define it in ~/.config/sugatoray/aiskills-config.json instead (or in the file AISKILLS_USER_CONFIG names)
+warning: alias.<name> in ./.aiskills.json is ignored: an alias that starts with '!' isn't allowed in a project's .aiskills.json; define it in ~/.config/sugatoray/aiskillsconfig.json instead (or in the file AISKILLS_USER_CONFIG names)
 ```
 
 Printed once per run, on stderr, by any command that reads the project file. The alias is skipped; the file's other settings and aliases, and every command, keep working. **Fix:** if you trust it, move the alias to your user file (`aiskills config alias.<name> '!...'`), and remove it from `./.aiskills.json`.

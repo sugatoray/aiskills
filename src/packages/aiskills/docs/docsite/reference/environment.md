@@ -59,7 +59,7 @@ The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is 
 
 ### `AISKILLS_USER_CONFIG`
 
-The user config file that [`aiskills config`](cli.md#config) reads and writes. Default: `~/.config/sugatoray/aiskills-config.json`. A relative path is resolved from the current folder. Like the default file, it may hold shell aliases (`!...`), which a project's `./.aiskills.json` can't. [`aiskills info`](cli.md#info) shows `user config : <path>  (AISKILLS_USER_CONFIG)` when it's set.
+The user config file that [`aiskills config`](cli.md#config) reads and writes. Default: `~/.config/sugatoray/aiskillsconfig.json`. A relative path is resolved from the current folder. Like the default file, it may hold shell aliases (`!...`), which a project's `./.aiskills.json` can't. [`aiskills info`](cli.md#info) shows `user config : <path>  (AISKILLS_USER_CONFIG)` when it's set.
 
 ### `AISKILLS_SKILLS_LIB_VERSION`
 

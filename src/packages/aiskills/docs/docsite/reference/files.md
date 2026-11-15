@@ -43,10 +43,10 @@ Written by [`aiskills config`](cli.md#config). Each is a JSON object of key → 
 
 | File | Written by | Notes |
 | --- | --- | --- |
-| `~/.config/sugatoray/aiskills-config.json` | `aiskills config <key> <value>` (`--global`) | Your defaults and aliases. Outside the install folder, so `uninstall --purge` keeps it, and `AISKILLS_HOME` doesn't move it; [`AISKILLS_USER_CONFIG`](environment.md#aiskills_user_config) names a different file. |
+| `~/.config/sugatoray/aiskillsconfig.json` | `aiskills config <key> <value>` (`--global`) | Your defaults and aliases. Outside the install folder, so `uninstall --purge` keeps it, and `AISKILLS_HOME` doesn't move it; [`AISKILLS_USER_CONFIG`](environment.md#aiskills_user_config) names a different file. |
 | `./.aiskills.json` | `aiskills config --project <key> <value>` | Defaults for the current folder; win over the user file. Commit it to share them with a project. |
 
-The user file is named `aiskills-config.json` so it isn't mistaken for the install folder's own [`aiskills.json`](#aiskillsjson): that one is written by aiskills on every sync and records the folder; the config file holds only what you set.
+The user file is named `aiskillsconfig.json` so it isn't mistaken for the install folder's own [`aiskills.json`](#aiskillsjson): that one is written by aiskills on every sync and records the folder; the config file holds only what you set.
 
 Keys `aiskills` doesn't know (from a newer version) are ignored. A file that isn't valid JSON stops every command that reads settings, with [`is not valid JSON`](errors.md#config-file-not-valid-json).
 

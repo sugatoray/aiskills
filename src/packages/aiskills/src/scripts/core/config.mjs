@@ -1,7 +1,7 @@
 // `aiskills config`: persistent defaults and aliases, like `git config`.
 //
 // Two JSON files, each a flat object of key: value:
-//   user     ~/.config/sugatoray/aiskills-config.json   (aiskills config --global, the default)
+//   user     ~/.config/sugatoray/aiskillsconfig.json   (aiskills config --global, the default)
 //   project  ./.aiskills.json                    (aiskills config --project)
 // The user file sits next to the install folder, not in it, so `uninstall --purge`
 // keeps it. A setting is looked up in this order:
@@ -19,7 +19,7 @@ import { warn } from "./colors.mjs";
 
 /** The variable that names a different user config file. */
 export const USER_CONFIG_VAR = "AISKILLS_USER_CONFIG";
-const defaultUserFile = (home = homedir()) => join(home, ".config", "sugatoray", "aiskills-config.json");
+const defaultUserFile = (home = homedir()) => join(home, ".config", "sugatoray", "aiskillsconfig.json");
 /** Where a shell alias can go instead, for messages. */
 const shellAliasHome = () => `${displayPath(defaultUserFile())} (or in the file ${USER_CONFIG_VAR} names)`;
 
