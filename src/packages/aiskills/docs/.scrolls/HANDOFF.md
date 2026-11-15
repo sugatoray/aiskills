@@ -7,13 +7,14 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 **`1.2.0` is published on npm** (`latest`, published 2026-11-14T02:22Z, i.e. the evening of 2026-11-13 US Eastern, so the CHANGELOG date `2026-11-13` stands; checked with `npm view`). It came from [#223](https://github.com/sugatoray/aiskills/pull/223) (squash `089f938`), which bundles `/run-code-review` (from #215, `7c0afec`) and its 1.2.0 `-o` reports in the new `review-skills` group: **17 skills in 9 groups**. Release changes: `package.json`, CHANGELOG `[1.2.0] - 2026-11-13`, SECURITY `1.2.x` current, banner and docs, `DOCS_VIEW` with 1.2.0 as `latest` and the docs examples it drives. `1.1.0` (from #206) was published 2026-11-12.
 
-**On `master` (`75700d3`), not yet released:** `package.json` is `1.3.0-dev`, and `## [1.3.0] - Unreleased` holds `run-code-review` 1.3.0 (starts only when typed).
+**On `master` (`73af49b`), not yet released:** `package.json` is `1.3.0-dev`, and `## [1.3.0] - Unreleased` holds `run-code-review` 1.3.0 (starts only when typed), colored output and the CLI outputs page.
+- **#245** was squash-merged as `73af49b`.
 - The versioned docs website (#234) is live: 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, 1.3.0-dev at `/dev/`.
-- #241 moved its workflow to `actions/checkout@v5` / `setup-node@v5` and Node 22. [Run 17](https://github.com/sugatoray/aiskills/actions/runs/43618384405) was clean.
+- **#241** moved the docs workflow to `actions/checkout@v5` / `setup-node@v5` and Node 22.
 
-**On `claude/cli-colors`, in [#245](https://github.com/sugatoray/aiskills/pull/245)** (issues #246–#249; not merged): colored CLI output (`6c4697a`) and the reproducible CLI outputs page (`714984b`), with CHANGELOG `[1.3.0]` Added entries.
-
-**On `claude/cli-config`, on top of #245 (pushed to `c0e5510`, no PR yet):** `aiskills config`, like `git config`. `npm test`: 504 tests, all pass.
+**On `claude/cli-config`, in [#250](https://github.com/sugatoray/aiskills/pull/250)** (issues #251–#257, base `master`): `aiskills config`, like `git config`.
+- **Rebased** onto `73af49b` and force-pushed, with the user's approval; GitHub had already retargeted #250 to `master`.
+- **The latest fix** is `b8916c0`. `npm test`: 506 tests, all pass.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -49,6 +50,10 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **`0adc935`, `058de0f` shell aliases:**
   - `!` aliases run `sh -c '<cmd> "$@"'` and pass the exit code back. They're allowed only in the user file.
   - In `./.aiskills.json`, `--project` refuses them. One written there by hand is skipped with one warning per run, and running it fails with a hint. `AISKILLS_USER_CONFIG` (new) names a different user file.
+- **`b8916c0` fix, from reviewing #250:**
+  - `config` now takes an alias value that starts with `-` (`alias.cg "--color groups"`).
+  - The options that go before a command are read again after each expansion, so `--color` / `--route` / `--version` at the start of an alias work.
+  - A new test keeps `COMMANDS` in step with `main()`'s `switch`.
 - **`c0e5510` example file:** `examples/sample_aiskillsconfig.json` sets every key and has each kind of alias. It's in package.json `"files"`, and `syncSkills` copies it to `<root>/sample_aiskillsconfig.json`, where it's never read as config.
 - **Docs:**
   - `reference/cli.md`: `### config` plus `#### Aliases`, and the regenerated `--help` block.
@@ -57,7 +62,8 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
   - Regenerate with `npm run docs`.
 
 ## Known issues / open threads
-- **`claude/cli-colors` is in #245, not merged** (AIS-21). **`claude/cli-config` has no PR or issues yet** (AIS-22): base it on `claude/cli-colors`, or rebase onto `master` after #245 merges.
+- **#250 awaits review and merge** (AIS-22).
+- **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.3.0-dev.tgz`). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.
 - **Try `aiskills config` on a real machine:** set a few keys and a shell alias, run `aiskills info`, and clone a repo with a `.aiskills.json` to see the project file win and a `!` alias warn.
 - **The CLI outputs page shows the stand-in `npx skills`,** which prints nothing of its own. So `list`, `install` and `skills` show only aiskills's lines; the live artifact shows the real `npx skills` output.
 - **Look at the live docs site:** this session can't reach `sugatoray.github.io`. The build log confirms all six pages were built and deployed, but nobody has viewed them in a browser yet. Check the menu, the find box, switching to `/v/0.8.0/` on a `#page`, and the notices.

@@ -14,18 +14,14 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] **AIS-17** Bundle the new `scrolls-explainer` skill (scrolls group; 16 skills in 8 groups) as **`1.1.0`** (the user's call, 2026-11-12; MINOR under strict SemVer). Done on `claude/brave-mccarthy-m6aut0`: version, CHANGELOG, SECURITY, README and docs lists, `DOCS_VIEW` + version/upgrade examples, banner, generated docs; and the explainer on the docs site (`explainers/scrolls.md`, embedded in `index.html`); 427 tests pass. In [#206](https://github.com/sugatoray/aiskills/pull/206). Left: merge, publish.
 - [x] **AIS-18** Release **`1.2.0`** bundling `/run-code-review` (new `review-skills` group; 17 skills in 9 groups), the user's call on 2026-11-13: prepared in [#223](https://github.com/sugatoray/aiskills/pull/223) (`eaeba06`, issue #229). Merged as `089f938` and published 2026-11-13 (`latest`).
 - [x] **AIS-19** Versioned docs site ([#234](https://github.com/sugatoray/aiskills/pull/234)): merged as `58c1e52` and deployed. The build log shows `/` = 1.2.0, `/v/1.1.0/`–`/v/0.8.0/` and `/dev/` = 1.3.0-dev. The user checks the live pages.
-- [ ] **AIS-21** Merge `claude/cli-colors`, in [#245](https://github.com/sugatoray/aiskills/pull/245) (issues #246–#249):
-  - colored CLI output with `--color`/`--no-color` (CHANGELOG `[1.3.0]` Added);
-  - the reproducible CLI outputs page under Reference.
-
-  After the merge, add both to `SPEC.md`, and check the deployed `/dev/` shows Reference → CLI outputs.
-- [ ] **AIS-22** Merge `claude/cli-config` (on top of #245; pushed, no PR yet): `aiskills config` like `git config` (the user's request, 2026-11-14/15), with these parts:
+- [x] **AIS-21** Merge `claude/cli-colors`: colored CLI output and the CLI outputs page. Squash-merged as `73af49b` ([#245](https://github.com/sugatoray/aiskills/pull/245), issues #246–#249); in `SPEC.md`. Left: check the deployed `/dev/` shows Reference → CLI outputs.
+- [ ] **AIS-22** Merge `claude/cli-config`, in [#250](https://github.com/sugatoray/aiskills/pull/250) (issues #251–#257; rebased onto `master` after #245): `aiskills config` like `git config` (the user's request, 2026-11-14/15), with these parts:
   - **Settings:** `<key> [<value>]`, `--unset`, `--list [--show-origin] [--json]`, `--global`/`--project`. The keys are every `AISKILLS_*` default plus `color`.
   - **Files:** the user file is `~/.config/sugatoray/aiskillsconfig.json`, or the file `AISKILLS_USER_CONFIG` names; the project file is `./.aiskills.json`, which wins.
   - **Aliases:** `alias.<name>`. `!` shell aliases are allowed in the user file only; a project's `!` alias is skipped with a warning.
   - **Example file:** `examples/sample_aiskillsconfig.json` ships and is copied into the install folder.
 
-  Open the PR (base `claude/cli-colors`, or `master` once #245 merges, rebasing onto it) and file its issues when the user asks; after the merge, add it to `SPEC.md`.
+  After the merge, add it to `SPEC.md`.
 - [ ] **AIS-20** Release **1.3.0** when the user says so: `package.json` `1.3.0-dev` → `1.3.0`, date `## [1.3.0]`, SECURITY `1.3.x`, `npm run banner:png` and `npm run docs`, publish, then tag `aiskills-v1.3.0` on its `gitHead` (MAINTAINERS → Releasing step 6). The tag push rebuilds the site with one version.
 - [ ] **AIS-2** Try `aiskills --route install -s <real skill>` and `aiskills find <query>` against the live skills.sh service; fix the parser if the output differs.
 - [x] **AIS-3** Add a `node:test` suite: unit tests for the glob, group and selection helpers, plus an end-to-end test (pack, install into a throwaway `HOME`/prefix, uninstall) using the `SKILLS_API_URL` fake for `--route`.
