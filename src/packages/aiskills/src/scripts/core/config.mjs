@@ -7,11 +7,21 @@
 // keeps it. A setting is looked up in this order:
 //   command-line option > AISKILLS_* variable > project file > user file
 //   > remembered (aiskills.json in the install folder) > default.
-// Imports nothing from the other core modules, so every one of them can use it.
+// AISKILLS_USER_CONFIG names a different user file. A shell alias (!...) may only be in
+// the user file: one in a project file is skipped, with a warning.
+// Imports only colors.mjs (which imports nothing), so every core module can use it.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, sep } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
+
+import { warn } from "./colors.mjs";
+
+/** The variable that names a different user config file. */
+export const USER_CONFIG_VAR = "AISKILLS_USER_CONFIG";
+const defaultUserFile = (home = homedir()) => join(home, ".config", "sugatoray", "aiskills-config.json");
+/** Where a shell alias can go instead, for messages. */
+const shellAliasHome = () => `${displayPath(defaultUserFile())} (or in the file ${USER_CONFIG_VAR} names)`;
 
 const TRUE = /^(1|true|yes|on)$/i;
 const FALSE = /^(0|false|no|off)$/i;
@@ -67,7 +77,7 @@ export function parseConfigValue(key, raw, { origin = "user" } = {}) {
     if (v.startsWith("!")) {
       // A project's ./.aiskills.json comes with the folder (often someone else's repo),
       // so it must not be able to run programs: shell aliases only from the user's own file.
-      if (origin !== "user") throw new Error(`${key}: shell aliases (!...) are only allowed in the user file, ${displayPath(configFiles().user)}`);
+      if (origin !== "user") throw new Error(`${key}: shell aliases (!...) are only allowed in the user file, ${shellAliasHome()}`);
       if (!v.slice(1).trim()) throw new Error(`${key} needs a value`);
       return `!${v.slice(1).trim()}`;
     }
@@ -109,9 +119,19 @@ export function splitArgs(s) {
   return out;
 }
 
-/** The two config files. */
-export function configFiles({ home = homedir(), cwd = process.cwd() } = {}) {
-  return { user: join(home, ".config", "sugatoray", "aiskills-config.json"), project: join(cwd, ".aiskills.json") };
+/** The two config files: AISKILLS_USER_CONFIG (from the current folder when relative), else the default user file. */
+export function configFiles({ home = homedir(), cwd = process.cwd(), env = process.env } = {}) {
+  const named = env[USER_CONFIG_VAR]?.trim();
+  return { user: named ? resolve(cwd, named) : defaultUserFile(home), project: join(cwd, ".aiskills.json") };
+}
+
+const refused = new Map(); // "file\0alias.name" -> warned, for shell aliases skipped in a project file
+
+/** A shell alias (!...) that a project file holds and that was skipped: { key, file }, or undefined. */
+export function refusedShellAlias(name, files = configFiles()) {
+  const key = `alias.${name}`;
+  const raw = readConfigFile(files.project)[key];
+  return typeof raw === "string" && raw.trim().startsWith("!") ? { key, file: files.project } : undefined;
 }
 
 /** A config file's contents ({} when it doesn't exist). */
@@ -140,6 +160,15 @@ function entriesOf(origin, files = configFiles()) {
   const out = {};
   for (const [key, raw] of Object.entries(readConfigFile(file))) {
     if (!Object.hasOwn(CONFIG_KEYS, key) && !isAliasKey(key)) continue; // a key from a newer aiskills: ignored
+    if (origin === "project" && isAliasKey(key) && String(raw).trim().startsWith("!")) {
+      // Skipped, not an error, so the rest of the file and every other command keep working.
+      const id = `${file}\0${key}`;
+      if (!refused.has(id)) {
+        refused.set(id, true);
+        warn(`warning: ${key} in ${displayPath(file)} is ignored: an alias that starts with '!' isn't allowed in a project's .aiskills.json; define it in ${displayPath(defaultUserFile())} instead (or in the file ${USER_CONFIG_VAR} names)`);
+      }
+      continue;
+    }
     try {
       out[key] = { value: parseConfigValue(key, raw, { origin }), origin, file };
     } catch (err) {
@@ -170,6 +199,7 @@ export const formatConfigValue = (v) => String(v);
 
 /** A path as aiskills shows it: ~ for the home folder, . for the current one. */
 export function displayPath(p, { home = homedir(), cwd = process.cwd() } = {}) {
+  if (p === cwd) return ".";
   if (p === home || p.startsWith(home + sep)) return "~" + p.slice(home.length);
   if (p.startsWith(cwd + sep)) return "." + p.slice(cwd.length);
   return p;

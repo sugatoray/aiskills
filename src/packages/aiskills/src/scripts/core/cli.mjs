@@ -56,7 +56,7 @@ import {
   todayDate,
 } from "./releases.mjs";
 import { fail, ok, paint, setColorConfig, setColorFlag } from "./colors.mjs";
-import { CONFIG_KEYS, assertConfigKey, configFiles, isAliasKey, splitArgs, configList, configValue, displayPath, formatConfigValue, parseConfigValue, readConfigFile, writeConfigFile } from "./config.mjs";
+import { CONFIG_KEYS, USER_CONFIG_VAR, assertConfigKey, configFiles, isAliasKey, refusedShellAlias, splitArgs, configList, configValue, displayPath, formatConfigValue, parseConfigValue, readConfigFile, writeConfigFile } from "./config.mjs";
 import { HOW_TO_UPGRADE, detectInstall, installCommand, npmGlobalRoot, pickTarget, refreshPlan, runInstall } from "./upgrade.mjs";
 
 const { name: PKG_NAME, version } = JSON.parse(readFileSync(join(PKG_DIR, "package.json"), "utf8"));
@@ -211,6 +211,7 @@ Examples:
 
 Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
+  AISKILLS_USER_CONFIG   The user config file (default ~/.config/sugatoray/aiskills-config.json)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route
@@ -516,7 +517,9 @@ function info(opts) {
           ? { value: "always", source: "FORCE_COLOR" }
           : { value: conf("color")?.value ?? "auto", source: from("color", "default") },
     },
-    config: Object.fromEntries(["user", "project"].map((o) => [o, { path: files[o], exists: existsSync(files[o]) }])),
+    config: Object.fromEntries(
+      ["user", "project"].map((o) => [o, { path: files[o], exists: existsSync(files[o]), source: o === "user" && e[USER_CONFIG_VAR]?.trim() ? USER_CONFIG_VAR : null }]),
+    ),
     skillsLock: { path: skillsLockPath(), exists: existsSync(skillsLockPath()), lastPickedAgents: lastSelectedAgents() },
     env: Object.fromEntries(Object.entries(e).filter(([k]) => k.startsWith("AISKILLS_")).sort(([a], [b]) => a.localeCompare(b))),
   };
@@ -560,7 +563,10 @@ function info(opts) {
   kv("node version", `${process.version} (${data.aiskills.platform})`);
   gap();
   kv("install root", ROOT, data.installRoot.source + (data.installRoot.exists ? "" : "; not created yet"));
-  for (const o of ["user", "project"]) kv(`${o} config`, displayPath(data.config[o].path), data.config[o].exists ? null : "not created");
+  for (const o of ["user", "project"]) {
+    const { path, exists, source } = data.config[o];
+    kv(`${o} config`, displayPath(path), [source, exists ? null : "not created"].filter(Boolean).join("; ") || null);
+  }
   if (saved) {
     kv("saved skills", `${saved.skills} skills in ${saved.groups} groups, ${saved.layout ?? "?"} layout`);
     const when = saved.savedAt ? `, ${saved.savedAt.slice(0, 16).replace("T", " ")} UTC` : "";
@@ -832,7 +838,14 @@ function expandAlias(argv) {
       if (/shell aliases/.test(err.message)) throw err;
       break; // a broken config file is reported by the command that reads it
     }
-    if (!found) break;
+    if (!found) {
+      const skipped = refusedShellAlias(name);
+      if (skipped)
+        throw new Error(
+          `${skipped.key} in ${displayPath(skipped.file)} is a shell alias, which a project can't define; define it in ${displayPath(configFiles({ env: {} }).user)} instead (or in the file ${USER_CONFIG_VAR} names)`,
+        );
+      break;
+    }
     if (found.value.startsWith("!")) {
       if (seen.includes(name)) throw new Error(`alias loop: ${[...seen, name].join(" → ")}`);
       return { shell: found.value.slice(1), args: argv.slice(1) };

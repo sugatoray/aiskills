@@ -48,6 +48,13 @@ describe("config keys and values", () => {
 });
 
 describe("config files", () => {
+  test("AISKILLS_USER_CONFIG moves the user file; a relative path is from the current folder", async () => {
+    const { configFiles } = await import(CONFIG);
+    assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: "/x/mine.json" } }).user, join("/x", "mine.json"));
+    assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: "conf/mine.json" } }).user, join("/w", "conf", "mine.json"));
+    assert.equal(configFiles({ home: "/h", cwd: "/w", env: { AISKILLS_USER_CONFIG: " " } }).user, join("/h", ".config", "sugatoray", "aiskills-config.json"));
+  });
+
   test("the user file is aiskills-config.json, next to the install folder, so it isn't mistaken for the install folder's aiskills.json", async () => {
     const { configFiles } = await import(CONFIG);
     assert.deepEqual(configFiles({ home: "/h", cwd: "/w" }), { user: join("/h", ".config", "sugatoray", "aiskills-config.json"), project: join("/w", ".aiskills.json") });
@@ -294,17 +301,47 @@ describe("aiskills <alias>", posixOnly, () => {
     assert.equal(run(["sh-of-alias", "again"]).out, "hello again\n", "an alias may use a shell alias");
   });
 
-  test("a project's ./.aiskills.json can't have a shell alias: refused when set, and never run when written by hand", () => {
+  test("a project's ./.aiskills.json can't have a shell alias: refused when set", () => {
     const set = run(["config", "--project", "alias.boom", "!touch pwned"]);
     assert.equal(set.status, 1);
     assert.match(set.out, /alias\.boom: shell aliases \(!\.\.\.\) are only allowed in the user file/);
+    assert.match(set.out, /aiskills-config\.json/);
+    assert.match(set.out, /AISKILLS_USER_CONFIG/);
     assert.ok(!existsSync(join(sb.dir, ".aiskills.json")), "nothing written");
-    writeFileSync(join(sb.dir, ".aiskills.json"), JSON.stringify({ "alias.setup": "!touch pwned" }));
+  });
+
+  test("a shell alias written into ./.aiskills.json by hand is skipped with a warning; everything else keeps working", () => {
+    writeFileSync(join(sb.dir, ".aiskills.json"), JSON.stringify({ "alias.setup": "!touch pwned", "alias.where": "path", layout: "nested" }));
+    const warning = /warning: alias\.setup in \.\/\.aiskills\.json is ignored: an alias that starts with '!' isn't allowed in a project's \.aiskills\.json/;
+    const get = run(["config", "layout"]);
+    assert.equal(get.status, 0, get.out);
+    assert.match(get.out, /^nested$/m, "the other settings in the file still count");
+    assert.match(get.out, warning);
+    assert.match(get.out, /define it in ~\/\.config\/sugatoray\/aiskills-config\.json instead \(or in the file AISKILLS_USER_CONFIG names\)/);
+    assert.equal(get.out.match(/is ignored/g).length, 1, "warned once per run");
+    const where = run(["where"]);
+    assert.equal(where.status, 0, where.out);
+    assert.match(where.out, new RegExp(`^${sb.root}$`, "m"), "the file's other aliases still work");
+    assert.equal(run(["sync"]).status, 0);
+    assert.doesNotMatch(run(["config", "--list"]).out, /alias\.setup=/);
     const r = run(["setup"]);
     assert.equal(r.status, 1);
-    assert.match(r.out, /shell aliases \(!\.\.\.\) are only allowed in the user file/);
+    assert.match(r.out, /alias\.setup in \.\/\.aiskills\.json is a shell alias, which a project can't define/);
     assert.ok(!existsSync(join(sb.dir, "pwned")), "the shell command did not run");
     rmSync(join(sb.dir, ".aiskills.json"));
+  });
+
+  test("AISKILLS_USER_CONFIG names the user file: it is read and written there, and may hold shell aliases", () => {
+    const mine = join(sb.dir, "my-aiskills.json");
+    const env = { AISKILLS_USER_CONFIG: mine };
+    assert.equal(run(["config", "alias.hi", "!echo hi"], env).status, 0);
+    assert.deepEqual(JSON.parse(readFileSync(mine, "utf8")), { "alias.hi": "!echo hi" });
+    assert.ok(!existsSync(join(sb.home, ".config", "sugatoray", "aiskills-config.json")), "not the default file");
+    assert.equal(run(["hi", "there"], env).out, "hi there\n");
+    assert.match(run(["config", "--list", "--show-origin"], env).out, /^user +\.\/my-aiskills\.json +alias\.hi=!echo hi$/m);
+    assert.match(run(["info"], { ...env, NO_COLOR: "1" }).out, /user config : \.\/my-aiskills\.json {2}\(AISKILLS_USER_CONFIG\)/);
+    assert.match(run(["hi"]).out, /unknown command: hi/, "without the variable, the default file is used");
+    rmSync(mine);
   });
 
   test("a project alias of the same name wins over a user shell alias", () => {

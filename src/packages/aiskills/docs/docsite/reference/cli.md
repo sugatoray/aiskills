@@ -244,7 +244,7 @@ What each line means:
 | --- | --- | --- |
 | `aiskills version`, `package path`, `node version` | This package, the folder npm installed it in, Node and the platform | |
 | `install root` | The install folder; `not created yet` before the first `install` or `sync` | `default` or `AISKILLS_HOME` |
-| `user config`, `project config` | The two [`aiskills config`](#config) files; `not created` until a value is set in one | |
+| `user config`, `project config` | The two [`aiskills config`](#config) files; `not created` until a value is set in one | `AISKILLS_USER_CONFIG` when it names the user file |
 | `saved skills`, `saved by` | What the last `install`/`sync` saved, and which aiskills version saved it; `not this version` means run `aiskills install` again | `aiskills.json` |
 | `skills CLI` | The `skills` package `npx` runs | `pinned, tested`, the variable that overrides it, or `user config` / `project config` |
 | `scope`, `layout`, `stats`, `route` | The defaults `install` would use with no options | `default`, an `AISKILLS_*` variable, `project config` or `user config` ([`aiskills config`](#config)), `remembered` (in `aiskills.json`), or, for stats, `DO_NOT_TRACK`, `DISABLE_TELEMETRY`, `CI` or `GITHUB_ACTIONS` |
@@ -338,7 +338,7 @@ aiskills config --unset alias.where
 - An alias may use another alias; a loop (`a` → `b` → `a`) is an error.
 - Names are lowercase letters, digits and dashes. A command or its short name (`install`, `i`, `config`, ...) can't be an alias, so an alias never changes what a command does.
 - **Shell aliases**, as in git: a value starting with `!` runs through the shell (`sh -c`; `cmd` on Windows), with the arguments after the alias passed on as `"$@"`, and exits with the command's exit code. `aiskills config alias.where-skills '!ls ~/.config/sugatoray/aiskills/skills'`, then `aiskills where-skills`.
-- **Only in your user file.** A shell alias can be set in `~/.config/sugatoray/aiskills-config.json` only. A project's `./.aiskills.json` usually comes with someone else's folder, so it can't hold one: `aiskills config --project alias.x '!...'` is refused, and a `!` alias written into that file by hand stops with an error instead of running. (git keeps its aliases in files you write, not in the repository, for the same reason.)
+- **Only in your user file.** A shell alias can be set in `~/.config/sugatoray/aiskills-config.json`, or in the file [`AISKILLS_USER_CONFIG`](environment.md#aiskills_user_config) names, only. A project's `./.aiskills.json` usually comes with someone else's folder, so it can't hold one: `aiskills config --project alias.x '!...'` is refused. A `!` alias written into that file by hand is skipped with a [warning](errors.md#shell-alias-in-a-project-file-warning) (once per run); the file's other settings and every command keep working, and running that alias stops with an error instead of running it. (git keeps its aliases in files you write, not in the repository, for the same reason.)
 - Aliases live in the same files as the defaults; `--project` makes one for the current folder, and `--list` shows them.
 
 Errors: an unknown key or a value a key doesn't take stops with a message and changes nothing (see [Config errors](errors.md#config-errors)).
@@ -725,6 +725,7 @@ Examples:
 
 Environment:
   AISKILLS_HOME          Override the install root (default ~/.config/sugatoray/aiskills)
+  AISKILLS_USER_CONFIG   The user config file (default ~/.config/sugatoray/aiskills-config.json)
   AISKILLS_SCOPE, AISKILLS_AGENTS, AISKILLS_SKILLS, AISKILLS_GROUPS, AISKILLS_COPY
                          Defaults for the options above
   AISKILLS_ROUTE=1              Same as --route

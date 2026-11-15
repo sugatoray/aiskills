@@ -40,7 +40,9 @@ and date this section.
   makes `aiskills gi ...` run `aiskills install -g ...`. An alias may use
   another alias (a loop is an error) and can't replace a command. Shell
   aliases (`!...`), as in git, are allowed in the user file only: a project's
-  `./.aiskills.json` can't run programs.
+  `./.aiskills.json` can't run programs (a `!` alias there is skipped with a
+  warning, and everything else keeps working). `AISKILLS_USER_CONFIG` names a
+  different user file.
 - **Colored output.** On a terminal, `aiskills` colors its output: the
   `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
   green, and commands to run cyan; the headings in `--help`, the labels and
