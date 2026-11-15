@@ -120,11 +120,43 @@ export function collect(docs) {
     for (const rel of tab.pages) tally.set(folderOf(rel), (tally.get(folderOf(rel)) ?? 0) + 1);
     const main = [...tally].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
     tab.count = tab.pages.filter((rel) => folderOf(rel) === main && rel !== (main ? `${main}/README.md` : "README.md")).length;
+    const nav = groupedNav(docs, tab, main, folderOf);
+    if (nav) tab.nav = nav;
   }
   const listed = new Set(pages.map((p) => p.path));
   const unlisted = mdFiles(docs).filter((p) => !listed.has(p)).sort();
   if (unlisted.length) throw new Error(`pages not linked from a section of README.md: ${unlisted.join(", ")}`);
   return { tabs, pages };
+}
+
+/**
+ * A tab whose folder overview (<folder>/README.md) lists its pages under `## <group>` headings gets a grouped
+ * page list: { top: [the overview and pages in no group], groups: [{ id, label, pages }], extra: [{ label, pages }]
+ * for the tab's pages from other folders }. The Skills tab: one group per skill group, then the explainers.
+ */
+function groupedNav(docs, tab, main, folderOf) {
+  const overview = main ? `${main}/README.md` : null;
+  if (!overview || !tab.pages.includes(overview)) return null;
+  const inTab = new Set(tab.pages);
+  const groups = readFileSync(join(docs, overview), "utf8")
+    .split(/^## /m)
+    .slice(1)
+    .map((sec) => {
+      const label = sec.split("\n")[0].trim();
+      const pages = [...sec.matchAll(/\]\(([^)#:]+\.md)\)/g)].map((m) => `${main}/${m[1]}`).filter((p, i, all) => inTab.has(p) && all.indexOf(p) === i);
+      return { id: label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), label, pages };
+    })
+    .filter((g) => g.pages.length);
+  if (!groups.length) return null;
+  const grouped = new Set(groups.flatMap((g) => g.pages));
+  const top = tab.pages.filter((p) => folderOf(p) === main && !grouped.has(p));
+  const extra = [];
+  for (const p of tab.pages.filter((p) => folderOf(p) !== main)) {
+    const folder = folderOf(p);
+    const label = folder ? folder[0].toUpperCase() + folder.slice(1).replace(/-/g, " ") : "More";
+    (extra.find((x) => x.label === label) ?? extra[extra.push({ label, pages: [] }) - 1]).pages.push(p);
+  }
+  return { top, groups, extra };
 }
 
 /** The package version, from package.json. */
