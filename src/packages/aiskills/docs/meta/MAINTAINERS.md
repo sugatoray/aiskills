@@ -211,6 +211,11 @@ code:
 - **A version bump** changes the `--version` and `--help` examples, the
   banner and the version in `index.html`: run `npm run banner:png` and
   `npm run docs`; the tests show what else to update.
+- **The CLI outputs page** (`docs/docsite/reference/cli-outputs.html`, shown under Reference) is built by
+  `npm run cli-outputs` from `docs/cli-outputs/commands.json`, running every
+  command in the docs examples' sandbox; see `docs/cli-outputs/README.md`. A
+  change to what a command prints makes `cli-outputs.test.mjs` fail until
+  it's rebuilt; `npm run docs` rebuilds it too.
 - **The website** (https://sugatoray.github.io/aiskills/) is built by
   `npm run docs:site` (`src/scripts/docs/build-site.mjs`) into `site/`, and
   deployed by `.github/workflows/aiskills-docs.yml` on pushes to `master` and
@@ -266,7 +271,7 @@ every `npx` call runs. To move to a newer one:
    the `aiskills.json` sample).
 3. **Date the section** (`## [x.y.z] - YYYY-MM-DD`) and make sure `npm test`
    and `npm run test:e2e` pass. Commit.
-4. `npm run pack:dry` and check the file list (only `bin/`, the three
+4. `npm run pack:dry` and check the file list (only `bin/`, the
    `src/scripts/core/` files, the skills, metadata and the root docs), then
    `npm run clean`.
 5. `npm publish`, logged in as a member of the `sugatoray-ai` npm org.

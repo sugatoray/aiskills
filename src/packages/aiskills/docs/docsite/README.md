@@ -103,6 +103,7 @@ aiskills install -G scrolls -a claude-code
 ### Reference
 
 - [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
+- [CLI outputs](reference/cli-outputs.md): what every command prints, in color, side by side.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
 - [Environment variables](reference/environment.md): every variable `aiskills` reads.
 - [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.

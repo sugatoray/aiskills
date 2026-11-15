@@ -23,7 +23,12 @@ Things you must respect or conform to (external requirements, API contracts, pla
 
 - **The docs builder must keep reading the newest release's docs.** `build-site.mjs` builds the latest and older releases' pages from their `aiskills-vX.Y.Z` tags' `docs/` with the current `build-docs-html.mjs` (all nine releases, 0.4.0–1.2.0, build today). So a change to what the builder expects (the landing page's `### Section` lists, `images/`, the banner markers) must still accept those releases' docs, or their pages on the website break. Check with `npm run docs:site` while `package.json` is `-dev`. The workflow test does this whenever the clone has the tags.
 
+- **Color must never change what scripts see.** Piped output and `--json` stay plain; color is only on for a terminal, or when forced. `colors.mjs` imports nothing, so any core module can use it. `colors.test.mjs` checks that stripping the codes gives the plain output byte for byte.
+
 ## Traps — avoid them always
+- **Pad first, then color.** Escape codes count toward `padEnd`/`padStart`, so coloring a cell before padding throws every column off. `info` and the `rel` table pad the plain text, then wrap it. A cell made of parts (the `latest` tag) is colored, and the padding is added as plain spaces.
+- **A pseudo-terminal now gets colored output.** The tests that drive the CLI through `sb.tty` (the `[y/N]` prompt, the docs examples with `tty=`) compare plain text, so the sandbox's `tty()` sets `NO_COLOR`. The sandbox also drops `NO_COLOR`/`FORCE_COLOR` from the parent environment, so a CI that sets either can't change test output.
+- **`--color`/`--no-color` must not be taken from `skills` and `find`.** Their options belong to `npx skills`. `main()` strips the two flags from every other command's options, before `--` only.
 - **A `<details>` menu's `toggle` event fires a moment after the click**, as a separate task. Anything it does (like focusing the version menu's find box) isn't done yet when a test checks right after `page.click()`. The test passed alone and failed in the full suite. Wait for the result with `page.waitForFunction(...)` instead of asserting at once.
 - **`hidden` doesn't hide an element whose CSS sets `display`.** `.ver-list a { display: flex }` beats the `hidden` attribute, so filtered links stay visible unless there's an explicit `.ver-list a[hidden] { display: none }`. Add that rule whenever you filter elements that have a `display` style.
 Specific bugs that have bitten this project before — avoid repeating them.

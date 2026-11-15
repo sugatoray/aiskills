@@ -536,6 +536,16 @@ version menu: <version> is not one of its versions
 
 **Fix:** `--menu` is JSON: `{"current": "<this page's version>", "base": "<path to the site root>", "entries": [{"version", "path", "kind"}]}`, with one `latest` entry, and the current version among the entries. `npm run docs:site` writes it for you.
 
+### CLI outputs page
+
+```text
+usage: create-cli-outputs.mjs [--check] [--out <file>]
+<file> is out of date: run npm run cli-outputs
+create-cli-outputs needs a POSIX shell for the stand-in npx and npm
+```
+
+**Fix:** run `npm run cli-outputs` (or `npm run docs`) after a change that alters what a command prints, and commit `docs/docsite/reference/cli-outputs.html`. The page is built by running every command in `docs/cli-outputs/commands.json` with stand-in `npx` and `npm` scripts, so build it on macOS, Linux or WSL.
+
 ### Site build usage
 
 ```text

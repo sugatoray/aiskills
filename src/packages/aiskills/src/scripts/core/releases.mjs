@@ -4,6 +4,7 @@
 // is pure, so it can be unit-tested (src/test/releases.test.mjs).
 
 import { spawnSync } from "node:child_process";
+import { paint } from "./colors.mjs";
 
 import { childEnv } from "./installer.mjs";
 
@@ -343,10 +344,13 @@ export function renderReleases({ pkg, rows, count, installed, latest, today, per
   const dt = "DOWNLOADS (7 DAYS)";
   const dw = perVersion ? w("downloads", dt) : 0;
   const lines = [`${pkg}: ${head}`, ""];
+  const c = paint.out;
+  // Pad the plain text, then color it, so the escape codes don't throw the columns off.
+  const tagCell = (t) => t.split(",").map((x) => (x === "latest" ? c.green(x) : x)).join(",") + " ".repeat(tw - t.length);
   const row = (v, p, t, d, mark) =>
-    `  ${v.padEnd(vw)}  ${p.padEnd(pw)}  ${t.padEnd(tw)}${perVersion ? `  ${d.padStart(dw)}` : ""}${mark ? `  ${mark}` : ""}`.trimEnd();
-  lines.push(row("VERSION", "PUBLISHED", "TAG", dt));
-  for (const c of cells) lines.push(row(c.version, c.published, c.tag, c.downloads ?? "", c.installed ? "← installed" : ""));
+    `  ${v.padEnd(vw)}  ${p.padEnd(pw)}  ${tagCell(t)}${perVersion ? `  ${d.padStart(dw)}` : ""}${mark ? `  ${c.bold(mark)}` : ""}`.trimEnd();
+  lines.push(c.bold(`  ${"VERSION".padEnd(vw)}  ${"PUBLISHED".padEnd(pw)}  ${"TAG".padEnd(tw)}${perVersion ? `  ${dt.padStart(dw)}` : ""}`.trimEnd()));
+  for (const cell of cells) lines.push(row(cell.version, cell.published, cell.tag, cell.downloads ?? "", cell.installed ? "← installed" : ""));
   const notes = [];
   if (rows.some((r) => !r.published)) notes.push(`publish dates: not reported by ${registry ?? "the npm registry"}`);
   const published = rows.some((r) => r.version === installed);

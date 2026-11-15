@@ -77,23 +77,30 @@ describe("build-docs-html", () => {
     );
   });
 
-  test("explainer pages ship next to the index, and a docs page introduces and embeds each one", async () => {
+  test("pages served next to the index ship with it, and a docs page introduces and embeds each one", async () => {
     const { build } = await load();
     const d = data(build(DOCS).html);
-    assert.deepEqual(d.static, ["explainers/scrolls-explainer.html"], "the HTML pages under docs/docsite/, other than index.html");
-    const intro = d.pages.find((p) => p.path === "explainers/scrolls.md");
-    assert.ok(intro, "explainers/scrolls.md is a page in the bundle");
-    assert.match(intro.md, /<iframe[^>]+data-page="scrolls-explainer\.html"/, "it embeds the explainer");
-    assert.doesNotMatch(intro.md, /<iframe[^>]+\ssrc=/, "with no src: a viewer must never request a file that may not be there");
+    // [the HTML page, the docs page that embeds it, the tab that lists that docs page]
+    const served = [
+      ["explainers/scrolls-explainer.html", "explainers/scrolls.md", "Skills"],
+      ["reference/cli-outputs.html", "reference/cli-outputs.md", "Reference"],
+    ];
+    assert.deepEqual(d.static, served.map(([html]) => html), "the HTML pages under docs/docsite/, other than index.html");
     assert.deepEqual(Object.keys(d.staticHtml ?? {}), d.static, "each one is also embedded, so index.html works on its own");
-    assert.equal(
-      Buffer.from(d.staticHtml["explainers/scrolls-explainer.html"], "base64").toString("utf8"),
-      readFileSync(join(DOCS, "explainers", "scrolls-explainer.html"), "utf8"),
-      "embedded as base64 (raw HTML would hold <script> tags inside this page's own <script>)",
-    );
-    assert.match(intro.md, /\]\(scrolls-explainer\.html\)/, "and links to it full-size");
-    const skillsTab = d.tabs.find((t) => t.label === "Skills");
-    assert.ok(skillsTab.pages.includes("explainers/scrolls.md"), "listed in the Skills tab");
+    for (const [html, md, tab] of served) {
+      const file = html.split("/").pop().replace(/\./g, "\\.");
+      const intro = d.pages.find((p) => p.path === md);
+      assert.ok(intro, `${md} is a page in the bundle`);
+      assert.match(intro.md, new RegExp(`<iframe[^>]+data-page="${file}"`), `${md} embeds ${html}`);
+      assert.doesNotMatch(intro.md, /<iframe[^>]+\ssrc=/, "with no src: a viewer must never request a file that may not be there");
+      assert.equal(
+        Buffer.from(d.staticHtml[html], "base64").toString("utf8"),
+        readFileSync(join(DOCS, html), "utf8"),
+        "embedded as base64 (raw HTML would hold <script> tags inside this page's own <script>)",
+      );
+      assert.match(intro.md, new RegExp(`\\]\\(${file}\\)`), `${md} links to it full-size`);
+      assert.ok(d.tabs.find((t) => t.label === tab).pages.includes(md), `${md} is listed in the ${tab} tab`);
+    }
   });
 
   test("a page not linked from a section of README.md is an error", async () => {

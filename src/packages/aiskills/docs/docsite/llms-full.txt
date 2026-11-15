@@ -104,6 +104,7 @@ aiskills install -G scrolls -a claude-code
 ### Reference
 
 - [CLI](reference/cli.md): every command, alias and option of `aiskills`, `ais` and `aix`.
+- [CLI outputs](reference/cli-outputs.md): what every command prints, in color, side by side.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
 - [Environment variables](reference/environment.md): every variable `aiskills` reads.
 - [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
@@ -2947,6 +2948,7 @@ aiskills <command> [options] [-- <extra npx skills arguments>]
 - **`aix`** is `aiskills --route`: `aix i -s pdf` = `aiskills --route install -s pdf`.
 - With no command, `aiskills` runs `install`.
 - `--route`, `--nested` and `--flat` can also go **before** the command: `aiskills --route installed`, `aiskills --nested` (= `install --nested`).
+- [`--color`](#--color) and [`--no-color`](#--no-color) work with every command, before it or among its options.
 - Options are checked per command. An option a command doesn't take fails with `option <x> is not valid here`.
 
 ## Commands
@@ -3521,6 +3523,12 @@ uninstall only:
   -f, --force            Allow -s names that this package does not provide
   -n, --dry-run          Print what would run; change nothing
 
+Output (any command; may also go before the command):
+      --color            Color the output even when it isn't a terminal (e.g. piped into less -R)
+      --no-color         Never color the output
+                         By default the output is colored on a terminal and plain when piped.
+                         'skills' and 'find' pass both on to 'npx skills'.
+
 Anything after '--' is appended to the underlying 'npx skills' command.
 
 Examples:
@@ -3563,6 +3571,8 @@ Environment:
                                 Quote it: AISKILLS_SKILLS_LIB_VERSION='(..., 1.7.6]'
   AISKILLS_STATS=0|1            Same as --no-stats / --stats (not remembered)
   AISKILLS_STATS_FOREGROUND=1   Wait for the skills.sh count and show its output
+  NO_COLOR=1                    Same as --no-color
+  FORCE_COLOR=1                 Same as --color (NO_COLOR wins if both are set)
 ```
 
 ### `-v`, `--version`
@@ -3730,11 +3740,57 @@ On [`releases`](#releases), the row size of the downloads breakdown: `day`, `wee
 
 On [`releases`](#releases), draw the chart's bars with `#` instead of block characters, for terminals or fonts without them. Also used when `TERM=dumb`. Implies `--downloads`.
 
+### `--color`
+
+Color the output even when it isn't a terminal, e.g. `aiskills info --color | less -R`. Works with every command, before it (`aiskills --color rel`) or among its options. Env: [`FORCE_COLOR`](environment.md#force_color). See [Colored output](#colored-output).
+
+### `--no-color`
+
+Never color the output. Wins over `--color` given earlier, and over `FORCE_COLOR`. Env: [`NO_COLOR`](environment.md#no_color).
+
+#### Colored output
+
+On a terminal, `aiskills` colors its output: the `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade green, commands to run cyan; in `--help` the headings, in `info` the labels and values, in `releases` the header row, the `latest` tag and the `← installed` mark, and in `groups` and `installed` the names. Piped or redirected output is plain, so scripts and `grep` see the same text as before; `--json` is never colored. stdout and stderr are decided separately. In order, what decides: `--no-color`, `--color`, [`NO_COLOR`](environment.md#no_color), [`FORCE_COLOR`](environment.md#force_color), then whether the output is a terminal (and `TERM` isn't `dumb`). `skills` and `find` pass `--color`/`--no-color` on to `npx skills` instead.
+
 ### `--`
 
 Everything after `--` is appended to the `npx skills add` (install) or `npx skills remove` (uninstall) command. See [Run any `npx skills` command](../guides/run-npx-skills-directly.md#extra-flags-on-install-and-uninstall).
 
 See also: [Environment variables](environment.md) · [Errors and exit codes](errors.md) · [Patterns](patterns.md)
+
+<!-- source: reference/cli-outputs.md -->
+# CLI outputs
+
+What every `aiskills` command prints, in color, as it looks on a terminal. Each command ran in a fresh home folder against the same sample data as the examples in these docs, so the page is the same every time it's rebuilt. For what each option means, see the [CLI reference](cli.md).
+
+<iframe data-page="cli-outputs.html" title="What every aiskills command prints, in color" loading="lazy" style="width:100%;height:900px;border:1px solid #2a3440;border-radius:10px;background:#15191d"></iframe>
+
+[Open the CLI outputs full-size](cli-outputs.html) (full screen; close it with ✕ or `Esc`)
+
+## How to use it
+
+- **Pick a command** from the list on the left (at the top on a phone), or scroll. The commands are grouped: help and setup, skills, install and remove, releases and upgrades, `npx skills` passed through, and errors.
+- **Turn Colors off** to see the output as it reads when piped, or with [`--no-color`](cli.md#--no-color). Which parts are colored is described under [Colored output](cli.md#colored-output).
+- **Copy a command** with the button next to it, to try it yourself.
+
+## What the sample shows
+
+- The npm registry data and download counts are the docs' samples, as of 2026-11-21, not npm's live data.
+- `npx skills` is a stand-in that prints nothing of its own, so for `list`, `install` and `skills` only the lines `aiskills` prints itself appear. With the real `npx skills`, its own output follows them.
+- Paths show a global npm install (`/usr/local/lib/node_modules/@sugatoray-ai/aiskills`) and `~` for the home folder.
+
+## Rebuild it
+
+The page is generated. After changing a command's output, rebuild it from `src/packages/aiskills/`:
+
+```bash
+npm run cli-outputs          # rebuild docs/docsite/reference/cli-outputs.html
+npm run cli-outputs:check    # exit 1 if it is out of date
+```
+
+`npm run docs` rebuilds it too. Which commands appear, their groups and notes are set in `docs/cli-outputs/commands.json`.
+
+See also: [CLI reference](cli.md) · [Environment variables](environment.md)
 
 <!-- source: reference/patterns.md -->
 # Patterns reference
@@ -3883,7 +3939,19 @@ The base URL of the npm download counts API that [`aiskills releases --downloads
 
 ### `TERM`
 
-Set by your terminal. When it is `dumb`, [`aiskills releases`](cli.md#releases) draws the downloads chart with `#`, as with [`--ascii`](cli.md#--ascii).
+Set by your terminal. When it is `dumb`, [`aiskills releases`](cli.md#releases) draws the downloads chart with `#`, as with [`--ascii`](cli.md#--ascii), and the output isn't colored.
+
+## Colored output
+
+On a terminal, `aiskills` colors its output; piped output is plain. See [Colored output](cli.md#colored-output). Both variables are also passed on to `npx skills`.
+
+### `NO_COLOR`
+
+Any non-empty value turns color off, as [`--no-color`](cli.md#--no-color) does. Wins over `FORCE_COLOR`; `--color` wins over it. The [NO_COLOR](https://no-color.org) convention.
+
+### `FORCE_COLOR`
+
+Any non-empty value except `0` or `false` turns color on even when the output isn't a terminal, as [`--color`](cli.md#--color) does. `NO_COLOR` and `--no-color` win over it.
 
 ## Read by `npx skills`, passed through
 
@@ -4607,6 +4675,16 @@ version menu: <version> is not one of its versions
 ```
 
 **Fix:** `--menu` is JSON: `{"current": "<this page's version>", "base": "<path to the site root>", "entries": [{"version", "path", "kind"}]}`, with one `latest` entry, and the current version among the entries. `npm run docs:site` writes it for you.
+
+### CLI outputs page
+
+```text
+usage: create-cli-outputs.mjs [--check] [--out <file>]
+<file> is out of date: run npm run cli-outputs
+create-cli-outputs needs a POSIX shell for the stand-in npx and npm
+```
+
+**Fix:** run `npm run cli-outputs` (or `npm run docs`) after a change that alters what a command prints, and commit `docs/docsite/reference/cli-outputs.html`. The page is built by running every command in `docs/cli-outputs/commands.json` with stand-in `npx` and `npm` scripts, so build it on macOS, Linux or WSL.
 
 ### Site build usage
 
