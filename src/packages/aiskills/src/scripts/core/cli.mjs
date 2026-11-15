@@ -404,7 +404,8 @@ function config(argv) {
     else if (a === "-l" || a === "--list") list = true;
     else if (a === "--show-origin") showOrigin = true;
     else if (a === "--json") json = true;
-    else if (a.startsWith("-")) throw new Error(`option ${a} is not valid here`);
+    // After the key, a word that starts with '-' is the value (alias.cg "--color groups").
+    else if (a.startsWith("-") && words.length !== 1) throw new Error(`option ${a} is not valid here`);
     else words.push(a);
   }
   const files = configFiles();
@@ -825,17 +826,19 @@ const COMMANDS = new Set(["install", "i", "uninstall", "remove", "rm", "r", "ins
  * `aiskills <alias> ...`: the alias's command and options, then the rest; aliases may use aliases.
  * Returns { argv }, or { shell, args } for a shell alias (!...), which only the user file can hold.
  */
-function expandAlias(argv) {
+function expandAlias(argv, leading = (a) => a) {
   const seen = [];
-  while (argv.length && !argv[0].startsWith("-") && !COMMANDS.has(argv[0])) {
+  for (;;) {
+    // Options that go before a command (--color, --route, ...) may come before the alias,
+    // or start what an alias stands for: `alias.cg "--color groups"`.
+    argv = leading(argv);
+    if (!argv.length || argv[0].startsWith("-") || COMMANDS.has(argv[0])) break;
     const name = argv[0];
     if (!/^[a-z][a-z0-9-]*$/.test(name)) break;
     let found;
     try {
       found = configValue(`alias.${name}`);
-    } catch (err) {
-      // A shell alias in a project file is refused here, before anything runs.
-      if (/shell aliases/.test(err.message)) throw err;
+    } catch {
       break; // a broken config file is reported by the command that reads it
     }
     if (!found) {
@@ -878,18 +881,21 @@ function main() {
     setColorFlag(a === "--color");
     return true;
   };
-  for (;;) {
-    if (colorFlag(argv[0])) {}
-    else if (argv[0] === "--route") process.env.AISKILLS_ROUTE = "1";
-    else if (argv[0] === "--nested" || argv[0] === "--flat") process.env.AISKILLS_LAYOUT = argv[0].slice(2);
-    else break;
-    argv = argv.slice(1);
-  }
+  const leading = (a) => {
+    for (;;) {
+      if (colorFlag(a[0])) {}
+      else if (a[0] === "--route") process.env.AISKILLS_ROUTE = "1";
+      else if (a[0] === "--nested" || a[0] === "--flat") process.env.AISKILLS_LAYOUT = a[0].slice(2);
+      else return a;
+      a = a.slice(1);
+    }
+  };
+  argv = leading(argv);
   // `aiskills config color`; a broken config file is reported by the command that reads it.
   try {
     setColorConfig(configValue("color")?.value);
   } catch {}
-  const alias = expandAlias(argv);
+  const alias = expandAlias(argv, leading);
   if (alias.shell !== undefined) return runShellAlias(alias.shell, alias.args);
   let [cmd = "install", ...rest] = alias.argv;
   if (!["skills", "find", "f"].includes(cmd)) {

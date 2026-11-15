@@ -37,7 +37,8 @@ and date this section.
   file > remembered > default. `aiskills info` lists both files and shows when
   a setting comes from one, and has a new `color` line.
   Aliases, like `git config alias.*`: `aiskills config alias.gi "install -g"`
-  makes `aiskills gi ...` run `aiskills install -g ...`. An alias may use
+  makes `aiskills gi ...` run `aiskills install -g ...`, and an alias may
+  start with `--color`, `--route` and the like. An alias may use
   another alias (a loop is an error) and can't replace a command. Shell
   aliases (`!...`), as in git, are allowed in the user file only: a project's
   `./.aiskills.json` can't run programs (a `!` alias there is skipped with a

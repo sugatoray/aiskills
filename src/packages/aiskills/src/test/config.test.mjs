@@ -375,6 +375,33 @@ describe("aiskills <alias>", posixOnly, () => {
     assert.equal(run(["where"]).out.trim(), sb.root);
   });
 
+  test("an alias may start with options that go before a command (--color, --route, --version), as git allows", () => {
+    assert.equal(run(["config", "alias.cg", "--color groups"]).status, 0, "a value that starts with '-' is a value, not an option of config");
+    assert.equal(run(["config", "alias.cg"]).out, "--color groups\n");
+    const cg = run(["cg"]);
+    assert.equal(cg.status, 0, cg.out);
+    assert.ok(cg.out.includes(ESC), "--color from the alias took effect (the output is piped)");
+    run(["config", "alias.ri", "--route info"]);
+    assert.match(run(["ri"]).out, /route : on/);
+    run(["config", "alias.v", "--version"]);
+    assert.match(run(["v"]).out, /^\d+\.\d+\.\d+/);
+    run(["config", "alias.gi", "install -g"]);
+    run(["config", "alias.ngi", "--no-color gi -n"]);
+    const ngi = run(["ngi"], { FORCE_COLOR: "1" });
+    assert.match(ngi.out, /\[dry-run\] npx .*--global/, "an option, then another alias");
+    assert.ok(!ngi.out.includes(ESC));
+    assert.match(run(["config", "layout", "--bogus"]).out, /layout must be flat or nested; got '--bogus'/);
+  });
+
+  test("every command and short name in main() is in COMMANDS, so an alias can never take a command's name", () => {
+    const src = readFileSync(join(PKG_SRC, "src", "scripts", "core", "cli.mjs"), "utf8");
+    const main = src.slice(src.indexOf("function main()"));
+    const cases = [...main.matchAll(/^ {4}case "([a-z][a-z-]*)":/gm)].map((m) => m[1]);
+    const commands = JSON.parse(src.match(/const COMMANDS = new Set\((\[[^\]]*\])\)/)[1]);
+    assert.ok(cases.length > 20, "found the switch");
+    assert.deepEqual([...new Set(cases)].sort(), [...commands].sort());
+  });
+
   test("--unset removes an alias", () => {
     run(["config", "alias.gi", "install -g"]);
     assert.equal(run(["config", "--unset", "alias.gi"]).status, 0);
