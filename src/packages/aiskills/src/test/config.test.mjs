@@ -9,7 +9,8 @@
 // (project, --project). Precedence: option > AISKILLS_* > project > user >
 // remembered (aiskills.json in the install root) > default.
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, beforeEach, describe, test } from "node:test";
 import { pathToFileURL } from "node:url";
@@ -44,6 +45,30 @@ describe("config keys and values", () => {
     assert.throws(() => parseConfigValue("stats", "maybe"), /stats must be true or false \(or yes\/no, on\/off, 1\/0\); got 'maybe'/);
     assert.throws(() => parseConfigValue("agents", " , "), /agents needs at least one name/);
     assert.throws(() => parseConfigValue("colour", "auto"), /unknown config key: colour \(keys: agents, color, copy, /);
+  });
+});
+
+describe("examples/sample_aiskillsconfig.json", () => {
+  const SAMPLE = join(PKG_SRC, "examples", "sample_aiskillsconfig.json");
+
+  test("uses every key and each kind of alias, and every value is one aiskills config accepts", async () => {
+    const { CONFIG_KEYS, isAliasKey, parseConfigValue } = await import(CONFIG);
+    const sample = JSON.parse(readFileSync(SAMPLE, "utf8"));
+    for (const key of Object.keys(CONFIG_KEYS)) assert.ok(Object.hasOwn(sample, key), `sets ${key}`);
+    for (const [key, value] of Object.entries(sample)) {
+      assert.ok(Object.hasOwn(CONFIG_KEYS, key) || isAliasKey(key), `${key} is a config key`);
+      assert.deepEqual(parseConfigValue(key, value, { origin: "user" }), value, `${key} is stored as aiskills config would store it`);
+    }
+    const aliases = Object.entries(sample).filter(([k]) => isAliasKey(k));
+    assert.ok(aliases.some(([, v]) => v.startsWith("!")), "a shell alias");
+    assert.ok(aliases.some(([, v]) => Object.hasOwn(sample, `alias.${v.split(" ")[0]}`)), "an alias of an alias");
+  });
+
+  test("is laid out exactly as aiskills config writes a file (keys sorted, two-space indent)", async () => {
+    const { writeConfigFile } = await import(CONFIG);
+    const out = join(mkdtempSync(join(tmpdir(), "aiskills-sample-")), "c.json");
+    writeConfigFile(out, JSON.parse(readFileSync(SAMPLE, "utf8")));
+    assert.equal(readFileSync(SAMPLE, "utf8"), readFileSync(out, "utf8"));
   });
 });
 

@@ -42,7 +42,9 @@ and date this section.
   aliases (`!...`), as in git, are allowed in the user file only: a project's
   `./.aiskills.json` can't run programs (a `!` alias there is skipped with a
   warning, and everything else keeps working). `AISKILLS_USER_CONFIG` names a
-  different user file.
+  different user file. An example file, `sample_aiskillsconfig.json` (every
+  key, each kind of alias), ships in `examples/` and is copied into the
+  install folder on every sync.
 - **Colored output.** On a terminal, `aiskills` colors its output: the
   `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
   green, and commands to run cyan; the headings in `--help`, the labels and

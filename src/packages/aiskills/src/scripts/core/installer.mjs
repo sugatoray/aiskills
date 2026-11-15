@@ -78,8 +78,12 @@ export function resolveLayout(explicit, root = installRoot()) {
  *   layout "nested": <root>/skills/<group>/<name>/... plus the group-level
  *                    files: exactly the repo's skills/ folder
  * Also copies marketplace.json and layout.json next to it, and records the
- * layout in <root>/aiskills.json so later commands keep using it.
+ * layout in <root>/aiskills.json so later commands keep using it, and the
+ * example config file, sample_aiskillsconfig.json.
  */
+/** The example config file in the package; sync copies it to <root>/sample_aiskillsconfig.json. */
+export const SAMPLE_CONFIG_REL = join("examples", "sample_aiskillsconfig.json");
+
 export function syncSkills({ root = installRoot(), version, quiet = false, layout, stats, pkgDir = PKG_DIR } = {}) {
   const pkgSkills = join(pkgDir, "skills");
   if (!existsSync(pkgSkills)) {
@@ -117,6 +121,9 @@ export function syncSkills({ root = installRoot(), version, quiet = false, layou
       cpSync(join(pkgDir, rel), target);
     }
   }
+  // An example config file, refreshed on every sync. Its name isn't a config file's, so it is never read.
+  const sample = join(pkgDir, SAMPLE_CONFIG_REL);
+  if (existsSync(sample)) cpSync(sample, join(root, basename(SAMPLE_CONFIG_REL)));
   // --stats / --no-stats is remembered until changed (like the layout).
   const keepStats = stats ?? readJson(join(root, "aiskills.json"))?.stats;
   writeFileSync(

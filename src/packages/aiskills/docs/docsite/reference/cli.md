@@ -316,6 +316,8 @@ Setting, unsetting and a value that is set print nothing more and exit `0`.
 | `skills-version` | a version, `latest`, `next`, a range or an interval | [`AISKILLS_SKILLS_LIB_VERSION`](environment.md#aiskills_skills_lib_version) |
 | `color` | `auto`, `always` or `never` | [`--color`](#--color) / [`--no-color`](#--no-color) |
 
+**An example file** with every key and each kind of alias is in the install folder: `~/.config/sugatoray/aiskills/sample_aiskillsconfig.json` (see [Config files](files.md#config-files)).
+
 **Which value wins**, first to last: a command-line option, the `AISKILLS_*` variable (`NO_COLOR` / `FORCE_COLOR` for color), the project file, the user file, what was remembered in the install folder's `aiskills.json` (layout and stats), the default. [`aiskills info`](#info) shows where each setting comes from.
 
 #### Aliases

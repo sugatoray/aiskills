@@ -140,6 +140,7 @@ describe("npm pack", () => {
       "src/scripts/core/upgrade.mjs",
       ".claude-plugin/marketplace.json",
       ".aiskills/layout.json",
+      "examples/sample_aiskillsconfig.json",
     ]) {
       assert.ok(files.includes(p), p);
     }

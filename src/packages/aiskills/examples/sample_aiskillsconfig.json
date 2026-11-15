@@ -1,0 +1,19 @@
+{
+  "agents": "claude-code,codex,cursor",
+  "alias.check": "upgrade --check",
+  "alias.gi": "install -g",
+  "alias.gin": "gi -n",
+  "alias.ls-skills": "!ls \"$(aiskills path)/skills\"",
+  "alias.pi": "install -p -a claude-code",
+  "alias.scrolls": "install -G scrolls",
+  "alias.where": "path",
+  "color": "auto",
+  "copy": false,
+  "groups": "scrolls-skills",
+  "layout": "nested",
+  "route": false,
+  "scope": "global",
+  "skills": "scrolls-*,run-code-review",
+  "skills-version": "~1.7.4",
+  "stats": false
+}

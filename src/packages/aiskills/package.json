@@ -41,6 +41,7 @@
     "skills/",
     ".claude-plugin/marketplace.json",
     ".aiskills/",
+    "/examples/sample_aiskillsconfig.json",
     "/README.md",
     "/CHANGELOG.md",
     "/SECURITY.md",
