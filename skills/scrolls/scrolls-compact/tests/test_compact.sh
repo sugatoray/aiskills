@@ -159,6 +159,9 @@ assert_exit "$rc" 0 "plan exits 0" "$out"
 assert_match "$out" "base: +$expect.*rule: 20 commits" "base is the 21st first-parent commit"
 out="$(cd "$d" && bash "$SCRIPT" --keep-commits=30 2>&1)"
 assert_match "$out" "rule: 7 days" "--keep-commits=30 makes the date rule the newer one"
+out="$(cd "$d" && bash "$SCRIPT" --keep-commits=1 --keep-days=1 2>&1)"
+assert_match "$out" "rule: 1 commit\]" "singular: 1 commit"
+assert_match "$out" "1 day -> " "singular: 1 day"
 out="$(cd "$d" && bash "$SCRIPT" --keep-days=40 --keep-commits=40 2>&1)"; rc=$?
 assert_exit "$rc" 1 "nothing older than both windows -> exit 1" "$out"
 assert_match "$out" "[Nn]othing to compact" "says nothing to compact"
@@ -176,6 +179,7 @@ out="$(cd "$d" && bash "$SCRIPT" --before=20261225 --base=HEAD~1 2>&1)"
 assert_match "$out" "base: +$day10 .*rule: --base" "both given: the newer (--base) wins"
 out="$(cd "$d" && bash "$SCRIPT" --before=2026-13-45 2>&1)"; rc=$?
 assert_exit "$rc" 2 "bad date -> usage error" "$out"
+assert_no_match "$out" "Scrolls compaction plan" "a bad date fails before any plan output"
 out="$(cd "$d" && bash "$SCRIPT" -p . -t 2>&1)"; rc=$?
 assert_exit "$rc" 2 "-p with -t -> usage error" "$out"
 out="$(cd "$d" && bash "$SCRIPT" --include=WISDOM.md 2>&1)"; rc=$?
@@ -184,6 +188,7 @@ git -C "$d" checkout -q -b side HEAD~2; echo x > "$d/side.txt"; commit_at "$d" 2
 side="$(head_sha "$d")"; git -C "$d" checkout -q main
 out="$(cd "$d" && bash "$SCRIPT" --base="$side" 2>&1)"; rc=$?
 assert_exit "$rc" 3 "--base not an ancestor of HEAD -> 3" "$out"
+assert_no_match "$out" "checkpoint:" "a bad --base fails before any plan output"
 
 echo; echo "=== 4: a section with one fresh line stays new ==="
 d="$(new_repo)"; fixture "$d"
@@ -393,6 +398,20 @@ assert_match "$msg" "HANDOFF.md \(1 unit condensed," "singular 'unit' for one"
 assert_match "$msg" "SPEC.md \(2 units condensed," "plural 'units' for two"
 fallback="$(cd "$SKILL_DIR/scripts" && python3 -c 'import compact,sys; sys.stdout.write(compact.COMPACT_TEMPLATE_FALLBACK)')"
 assert "assets/templates/COMPACT.md matches the embedded fallback" test "$fallback" = "$(cat "$SKILL_DIR/assets/templates/COMPACT.md")"
+
+echo; echo "=== 13: long unit labels are cut cleanly with an ellipsis ==="
+d="$(new_repo)"; mkdir -p "$d/$S"; write_starter "$d"
+printf '# PLAN.md\n\n- [x] T-1: old done, with a long note that goes well past the seventy-two character label limit\n- [ ] T-2: open\n' > "$d/$S/PLAN.md"
+commit_at "$d" 30 "old"; echo x > "$d/app.txt"; commit_at "$d" 1 "new"
+out="$(cd "$d" && bash "$SCRIPT" 2>&1)"
+assert_match "$out" "old +L3 +- \[x\] T-1: old done, with a long note that goes well past the…   \(" "label ends with … right after a word"
+python3 - "$d/$S/PLAN.md" "$(marker_of "$out")" <<'PY2'
+import sys; p,m=sys.argv[1],sys.argv[2]; s=open(p).read()
+open(p,"w").write(s.replace([l for l in s.splitlines() if "T-1" in l][0], m))
+PY2
+( cd "$d" && bash "$SCRIPT" --finalize >/dev/null 2>&1 )
+r="$(cat "$d"/$S/compacted/*.md)"
+assert_match "$r" "  - \`- \[x\] T-1: old done, with a long note that goes well past the…\`" "report label has no trailing space"
 
 echo
 echo "=== $((TOTAL - FAILURES))/$TOTAL passed ==="

@@ -427,11 +427,12 @@ def choose_base(repo: str, args: argparse.Namespace, now: int) -> dict:
             trailer_parts.append(f"base={sha}")
     else:
         cutoff = now - args.keep_days * 86400
-        cands.append((f"{args.keep_days} days", by_date(cutoff), f"older than {ymd(cutoff)}"))
+        cands.append((f"{args.keep_days} day{'' if args.keep_days == 1 else 's'}", by_date(cutoff),
+                      f"older than {ymd(cutoff)}"))
         n = args.keep_commits
         sha = fp[n][0] if len(fp) > n else None
         note = "" if sha else f"only {len(fp)} commits on {trunk}"
-        cands.append((f"{n} commits", sha, note))
+        cands.append((f"{n} commit{'' if n == 1 else 's'}", sha, note))
         trailer_parts += [f"days={args.keep_days}", f"commits={n}"]
 
     desc_parts = []
@@ -461,7 +462,8 @@ def choose_base(repo: str, args: argparse.Namespace, now: int) -> dict:
     return {
         "base": sha, "base_short": short(sha), "label": label, "desc": desc, "trunk": trunk,
         "base_date": ymd(int(out(repo, "log", "-1", "--format=%ct", sha))),
-        "rule_trailer": rule_trailer + f" -> {label.lstrip('-').split(' ')[-1]}",
+        "rule_trailer": rule_trailer + " -> " + {"day": "days", "commit": "commits"}.get(
+            label.lstrip("-").split(" ")[-1].rstrip("s"), label.lstrip("-").split(" ")[-1]),
     }
 
 
@@ -551,6 +553,17 @@ def scope(args: argparse.Namespace) -> List[str]:
     return names
 
 
+def short_label(text: str, limit: int = 72) -> str:
+    """A unit's first line for display: whole words, with … when cut."""
+    t = text.strip()
+    if len(t) <= limit:
+        return t
+    cut = t[:limit]
+    if t[limit] != " " and " " in cut:
+        cut = cut.rsplit(" ", 1)[0]
+    return cut.rstrip(" ,;:.") + "…"
+
+
 def fmt_range(u: dict) -> str:
     a, b = u["start"], u["end"]
     return f"L{a}" if a == b else f"L{a}-{b}"
@@ -567,11 +580,11 @@ def cmd_plan(args: argparse.Namespace) -> int:
     marker = f"<!-- scrolls-compact: checkpoint={short} date={date} report={report_rel} -->"
     names = scope(args)
 
+    b = choose_base(repo, args, now)   # before any output: a bad --before/--base fails cleanly
     print("Scrolls compaction plan")
     print(f"  repository: {repo}")
     print(f"  folder:     {rel}")
     print(f"  checkpoint: {short} ({checkpoint})")
-    b = choose_base(repo, args, now)
     if not b["base"]:
         print(f"  base:       none  [{b['desc']}]")
         print("\nNothing to compact: no commit is old enough under these rules.")
@@ -605,7 +618,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
             newest = max(shas, key=lambda s: times.get(s, 0)) if shas else ""
             punits.append({
                 "kind": kind, "start": u["lines"][0], "end": u["lines"][-1],
-                "label": first.strip()[:72], "lines": [lines[i - 1].rstrip() for i in u["lines"]],
+                "label": short_label(first), "lines": [lines[i - 1].rstrip() for i in u["lines"]],
                 "newest": newest[:7], "newest_date": ymd(times[newest]) if newest in times else "",
             })
         old_n = sum(1 for u in punits if u["kind"] == "old")

@@ -1090,7 +1090,7 @@
     "note": "Shared flags: -p path · -t repo root · -l current dir · -r recurse"
   },
   "sources": {
-    "scrolls-compact": "0ba56f2eec25656181e99a04775744ea80dbd0c669e8c0b76e0dfed60139eece",
+    "scrolls-compact": "6cfb9be1bc8c2e5dd0550de8c95a4259e35b587b5c360a0af91cde9067fcbcac",
     "scrolls-help": "964aaa9f7d0f22fb7d583ca950e18217a99ca9d7fcbd265fbdbf19ecd0e095f3",
     "scrolls-hide": "6d9734dc78036b5c0bfd0f387f9bb77dd16bb69761ffdcee141c9a0a2ffa558b",
     "scrolls-remove": "1623ee1f0a5886c634857a36e9b1d12d0ebb497fabc7793216ffa683c3fe4d03",

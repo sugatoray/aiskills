@@ -19,6 +19,7 @@ scrolls-compact/
 ├── agents/
 │   └── openai.yaml
 ├── assets/
+│   ├── EXAMPLE.md
 │   ├── EXAMPLES.md
 │   └── templates/
 │       └── COMPACT.md
@@ -30,15 +31,17 @@ scrolls-compact/
 │   ├── compact.py
 │   └── compact.sh
 ├── tests/
+│   ├── check_examples.py
 │   ├── test_compact.ps1
-│   └── test_compact.sh
+│   ├── test_compact.sh
+│   └── test_examples.sh
 ├── CHANGELOG.md
 ├── README.md
 └── SKILL.md
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
-- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
+- **Examples**: [`assets/EXAMPLE.md`](assets/EXAMPLE.md): 23 example prompts and their real outputs, covering every flag, refusal and exit code, checked by `tests/test_examples.sh`; and [`assets/EXAMPLES.md`](assets/EXAMPLES.md): premise, usage, caveats and expected output for each common scenario
 - **Design**: [`meta/DESIGN.md`](meta/DESIGN.md): why it works the way it does
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)

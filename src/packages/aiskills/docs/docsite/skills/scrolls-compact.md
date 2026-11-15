@@ -47,6 +47,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scro
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
+- `assets/EXAMPLE.md`
 - `assets/EXAMPLES.md`
 - `assets/templates/COMPACT.md`
 - `meta/DESIGN.md`
@@ -54,7 +55,9 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scro
 - `scripts/compact.ps1`
 - `scripts/compact.py`
 - `scripts/compact.sh`
+- `tests/check_examples.py`
 - `tests/test_compact.ps1`
 - `tests/test_compact.sh`
+- `tests/test_examples.sh`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

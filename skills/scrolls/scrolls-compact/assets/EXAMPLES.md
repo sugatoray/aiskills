@@ -11,6 +11,8 @@
 
 `/scrolls-compact` condenses old history in the scrolls. The full old text stays in git, at a checkpoint commit.
 
+For every flag with its exact, tested output, see `EXAMPLE.md`.
+
 ---
 
 ## Example: 01 — Compact with the default rules
@@ -135,8 +137,10 @@ Dry run: nothing changed. 9 old unit(s) can be condensed.
 ### Expected Output
 
 ```
-Nothing to compact: every unit is newer than the base, or is live state.
+Nothing to compact: no commit is old enough under these rules.
 ```
+
+- If old commits exist but every old unit is live state, the message is: `Nothing to compact: every unit is newer than the base, or is live state.`
 
 ---
 

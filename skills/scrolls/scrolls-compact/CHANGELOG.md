@@ -13,4 +13,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - A read-only plan, then the agent's edits, then `--finalize`, which validates the edits against the plan and makes one `maint(memory): scrolls-compacted` commit with `Scrolls-*` trailers, including `Scrolls-Previous-Compaction` to chain checkpoints.
   - Writes `compacted/scrolls_compact_<yyyymmdd>_<githash>.md` (one marker section per file, with its blob id at the checkpoint), adds a row to `COMPACT.md`'s Compaction History table, lists `COMPACT.md` in `STARTER.md` once, and tags the checkpoint `scrolls-compact/<yyyymmdd>-<githash>` (`--no-tag` to skip).
   - `--list`, `--show` and `--extract` read old history back from git, also after a squash merge or `/scrolls-unhide`.
+  - `assets/EXAMPLE.md`: 23 examples (prompts and their real outputs) covering every flag, refusal and exit code 0–4, on one demo repository. `tests/test_examples.sh` replays them all and fails on any difference.
+  - Unit labels longer than 72 characters end at a whole word with `…`; a rule of one reads `1 day` / `1 commit`; a bad `--before`/`--base` fails before any plan output.
   - `scripts/compact.py` holds all logic; `compact.sh`/`compact.ps1` are thin launchers. `tests/test_compact.sh` (Red/Green) and `tests/test_compact.ps1` (launcher parity).
