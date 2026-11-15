@@ -734,7 +734,7 @@ const DATA = /*__DOCS_DATA__*/null;
       const b = document.createElement("button");
       b.className = "tab"; b.type = "button"; b.setAttribute("role", "tab");
       b.setAttribute("aria-selected", String(current && tabOf(current.id).id === t.id));
-      b.innerHTML = t.label + (t.pages.length > 1 ? `<span class="count">${t.pages.length}</span>` : "");
+      b.innerHTML = t.label + (t.count > 1 ? `<span class="count">${t.count}</span>` : "");
       b.addEventListener("click", () => go(byPath.get(t.pages[0]).id));
       tabs.appendChild(b);
     });

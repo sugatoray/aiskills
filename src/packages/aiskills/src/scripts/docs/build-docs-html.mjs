@@ -112,6 +112,15 @@ export function collect(docs) {
       pages.push({ id: pageId(rel), path: rel, title: title ? title[1] : rel, tab: tab.id, md });
     }
   }
+  // The number on a tab: its pages in the folder most of them are in, without that folder's
+  // overview (README.md). Skills: one per skill, not the overview or the explainer.
+  for (const tab of tabs) {
+    const folderOf = (rel) => (rel.includes("/") ? rel.slice(0, rel.indexOf("/")) : "");
+    const tally = new Map();
+    for (const rel of tab.pages) tally.set(folderOf(rel), (tally.get(folderOf(rel)) ?? 0) + 1);
+    const main = [...tally].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+    tab.count = tab.pages.filter((rel) => folderOf(rel) === main && rel !== (main ? `${main}/README.md` : "README.md")).length;
+  }
   const listed = new Set(pages.map((p) => p.path));
   const unlisted = mdFiles(docs).filter((p) => !listed.has(p)).sort();
   if (unlisted.length) throw new Error(`pages not linked from a section of README.md: ${unlisted.join(", ")}`);

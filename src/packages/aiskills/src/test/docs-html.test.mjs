@@ -53,6 +53,18 @@ describe("build-docs-html", () => {
     for (const p of d.pages) assert.equal(p.md, readFileSync(join(DOCS, p.path), "utf8"), `${p.path} changed in the bundle`);
   });
 
+  test("a tab's number counts the pages in its own folder, not that folder's overview or pages from elsewhere", async () => {
+    const { build } = await load();
+    const d = data(build(DOCS).html);
+    const tab = (id) => d.tabs.find((t) => t.id === id);
+    const skillPages = readdirSync(join(DOCS, "skills")).filter((f) => f.endsWith(".md") && f !== "README.md").length;
+    assert.equal(tab("skills").count, skillPages, "Skills: one per skill, not the overview or the explainer");
+    assert.ok(tab("skills").pages.length > skillPages, "the Skills tab also holds the overview and the explainer");
+    assert.equal(tab("tutorial").count, tab("tutorial").pages.length, "a tab without an overview counts every page");
+    assert.equal(tab("reference").count, tab("reference").pages.length);
+    assert.equal(tab("home").count, 0, "the landing page alone: no number");
+  });
+
   test("the page is a complete HTML document with the version filled in", async () => {
     const { build } = await load();
     const { html } = build(DOCS);
@@ -317,6 +329,20 @@ const online = await fetch("https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2
 const noBrowser = !playwright ? "playwright not installed" : !online ? "cdnjs.cloudflare.com unreachable" : false;
 
 describe("index.html in a browser", { skip: noBrowser }, () => {
+  test("the Skills tab shows the number of skills", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage();
+      await page.goto(pathToFileURL(OUT).href);
+      await page.waitForSelector("#tabs .tab");
+      const skills = readdirSync(join(DOCS, "skills")).filter((f) => f.endsWith(".md") && f !== "README.md").length;
+      const label = await page.locator("#tabs .tab", { hasText: "Skills" }).innerText();
+      assert.equal(label.replace(/\s+/g, " ").trim(), `Skills ${skills}`);
+    } finally {
+      await browser.close();
+    }
+  });
+
   test("every page renders, and every link goes to a page and heading that exist", async () => {
     const browser = await playwright.chromium.launch();
     try {
