@@ -11,10 +11,9 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - The versioned docs website (#234) is live: 1.2.0 at the root, 1.1.0–0.8.0 under `/v/`, 1.3.0-dev at `/dev/`.
 - #241 moved its workflow to `actions/checkout@v5` / `setup-node@v5` and Node 22. [Run 17](https://github.com/sugatoray/aiskills/actions/runs/43618384405) was clean.
 
-**On `claude/cli-colors` (pushed, no PR yet):**
-- **Colored CLI output** (`6c4697a`), with a CHANGELOG `[1.3.0]` Added entry.
-- **The reproducible CLI outputs page** (`714984b`).
-- 471 tests pass.
+**On `claude/cli-colors`, in [#245](https://github.com/sugatoray/aiskills/pull/245)** (issues #246–#249; not merged): colored CLI output (`6c4697a`) and the reproducible CLI outputs page (`714984b`), with CHANGELOG `[1.3.0]` Added entries.
+
+**On `claude/cli-config`, on top of #245 (pushed to `c0e5510`, no PR yet):** `aiskills config`, like `git config`. `npm test`: 504 tests, all pass.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -29,7 +28,8 @@ docs/meta/              ARCHITECTURE, FEATURES, MAINTAINERS (not published)
 bin/aiskills.mjs        thin entry point: imports ../src/scripts/core/cli.mjs
 bin/aix.mjs             sets AISKILLS_ROUTE=1, then imports the same CLI (aix = aiskills --route)
 src/scripts/README.md   what each scripts folder is for, the import rule (docs/ -> pack/ -> core/), what is published
-src/scripts/core/       cli.mjs, installer.mjs, releases.mjs, upgrade.mjs (published; there is no install step)
+src/scripts/core/       cli.mjs, colors.mjs, config.mjs, installer.mjs, releases.mjs, upgrade.mjs (published; there is no install step)
+examples/               sample_aiskillsconfig.json (ships; sync copies it to the install folder)
 src/scripts/pack/       vendor-skills.mjs, skillsignore.mjs (run at npm pack; never published)
 src/scripts/docs/       build-skills-docs.mjs, build-docs-html.mjs, create-banner.mjs, themes.mjs, templates/ (build time only)
 src/test/               node:test suite, incl. docs.test.mjs, docs-skills.test.mjs, docs-html.test.mjs, banner.test.mjs, themes.test.mjs
@@ -38,20 +38,27 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- **Colored output** (`6c4697a`, Red/Green, `src/test/colors.test.mjs`).
-  - New shipped module `src/scripts/core/colors.mjs`, imports nothing. It provides `colorChoice` (`--no-color` > `--color` > `NO_COLOR` > `FORCE_COLOR` > a terminal, not `TERM=dumb`; stdout and stderr decided separately), the `paint.out`/`paint.err` painters, and `log`/`ok`/`warn`/`fail`. `installer.mjs` re-exports `log`/`warn`.
-  - Colored: the `[aiskills]` prefix dim, errors red (first line only), warnings yellow, upgrade success green, commands cyan; `--help` headings bold; `info` labels dim, values bold, sources dim; `rel`'s header bold, `latest` green, `← installed` bold; names bold in `groups`/`installed`.
-  - `--json` and piped output stay plain. `--color`/`--no-color` work before the command or among its options; `skills` and `find` pass them on to `npx skills`.
-  - Docs: `--help` (Output section, `NO_COLOR`/`FORCE_COLOR`), `reference/cli.md` (both options, "Colored output"), `reference/environment.md`, ARCHITECTURE, MAINTAINERS, `src/scripts/README.md`; `package.json` "files" lists `colors.mjs`.
-- **The CLI outputs page** (`714984b`, Red/Green, `src/test/cli-outputs.test.mjs`).
-  - `npm run cli-outputs` (`src/scripts/docs/create-cli-outputs.mjs`) runs the 19 commands in `docs/cli-outputs/commands.json` in the docs examples' sandbox, with `FORCE_COLOR=1`, and writes `docs/docsite/reference/cli-outputs.html` from `templates/cli-outputs-template.html`.
-  - `reference/cli-outputs.md` embeds it, listed after the CLI reference. `cli-outputs:check` checks it, and `npm run docs` runs it.
-  - The Node.js version and save times are masked in comparisons, and an unchanged page isn't rewritten. `docs/cli-outputs/README.md` explains it all.
-- **Before that:** a live capture of every command was published as a private artifact ([aiskills Command Outputs](https://claude.ai/artifact/FEsS7FdbmoDJe4rcG71SUY)). The docs page is its reproducible version.
-- **#241** merged; this package's `docs-workflow.test.mjs` pins the v5 actions and Node 22.
+`aiskills config`, built Red/Green on `claude/cli-config` (`src/test/config.test.mjs`, 28 tests; the user's design choices: user and project files, every `AISKILLS_*` default as a key):
+- **`1e3724e` settings:** `config <key> [<value>]`, `--unset`, `-l`/`--list` with `--show-origin` and `--json`, and `--global` (the default) / `--project`.
+  - Keys: `scope`, `agents`, `skills`, `groups`, `copy`, `route`, `layout`, `stats`, `skills-version`, `color`. Values are checked and normalized when set.
+  - Precedence: option > `AISKILLS_*` > project file > user file > remembered (the install folder's `aiskills.json`) > default.
+  - Wiring: `config.mjs` is read by `envOptions`, `resolveLayout`, `resolveStats`, `skillsPackageSpec` and `setColorConfig`.
+  - `info` shows both files, settings marked `user config` / `project config`, and a new `color` line.
+- **`cc9dd0b` aliases:** `alias.<name>` is stored as a flat key and split like a shell. Aliases can use aliases, and a loop is an error. An alias can't take a command's name (`COMMANDS` in `cli.mjs`).
+- **`56f986b`, `8c87d14` file name:** the user file went `aiskills.json` → `aiskills-config.json` → `aiskillsconfig.json` (the user's choice). JSON was kept; see WISDOM → Constraints.
+- **`0adc935`, `058de0f` shell aliases:**
+  - `!` aliases run `sh -c '<cmd> "$@"'` and pass the exit code back. They're allowed only in the user file.
+  - In `./.aiskills.json`, `--project` refuses them. One written there by hand is skipped with one warning per run, and running it fails with a hint. `AISKILLS_USER_CONFIG` (new) names a different user file.
+- **`c0e5510` example file:** `examples/sample_aiskillsconfig.json` sets every key and has each kind of alias. It's in package.json `"files"`, and `syncSkills` copies it to `<root>/sample_aiskillsconfig.json`, where it's never read as config.
+- **Docs:**
+  - `reference/cli.md`: `### config` plus `#### Aliases`, and the regenerated `--help` block.
+  - `errors.md`: Config errors, alias errors and the project-alias warning.
+  - `files.md`, `environment.md` (`AISKILLS_USER_CONFIG`), `guides/set-defaults.md`, CHANGELOG `[1.3.0]`, ARCHITECTURE, and a config group in `docs/cli-outputs/commands.json`.
+  - Regenerate with `npm run docs`.
 
 ## Known issues / open threads
-- **`claude/cli-colors` has no PR yet** (AIS-21).
+- **`claude/cli-colors` is in #245, not merged** (AIS-21). **`claude/cli-config` has no PR or issues yet** (AIS-22): base it on `claude/cli-colors`, or rebase onto `master` after #245 merges.
+- **Try `aiskills config` on a real machine:** set a few keys and a shell alias, run `aiskills info`, and clone a repo with a `.aiskills.json` to see the project file win and a `!` alias warn.
 - **The CLI outputs page shows the stand-in `npx skills`,** which prints nothing of its own. So `list`, `install` and `skills` show only aiskills's lines; the live artifact shows the real `npx skills` output.
 - **Look at the live docs site:** this session can't reach `sugatoray.github.io`. The build log confirms all six pages were built and deployed, but nobody has viewed them in a browser yet. Check the menu, the find box, switching to `/v/0.8.0/` on a `#page`, and the notices.
 - **Try `aiskills upgrade` for real:** on a machine with `0.9.0` installed, run `aiskills upgrade --check`, then `aiskills upgrade`; it should go to `1.0.0` and list `artwallbg` and `commentdrop` with install commands (see GAP_CONTEXT).
