@@ -15,11 +15,10 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - Designed `/scrolls-compact` with the user (four decisions, recorded in `DESIGN.md` §11), then built it Red/Green.
 - Added the replay-tested examples. Reading their real outputs found three bugs, each fixed test-first.
 - At the user's request, merged the two example files into one `EXAMPLES.md`, then split it into the index plus per-example files, so an agent reads about 2k tokens instead of 25k.
+- Linked `scrolls-compact` (`make link-skills`) and recorded the work in the family scrolls (`src/scrolls/docs/.scrolls`). Found three places the first pass missed and fixed them: the root marketplace description, the root `README.md` skills table, and the install commands in `src/scrolls/CLAUDE.md`. The family `WISDOM.md` now lists every place a new scrolls skill must be added.
 - Published a private review page comparing the merge with both source files ([scrolls-compact Examples Merge](https://claude.ai/artifact/5kSccRSDNDVG9t1vGxZEcp)). The merge is adopted, so the page is now only a record.
 
 ## Known issues / open threads
 - **No PR for `claude/clever-mendel-k9n73h` yet** (ROOT-10). It regenerates the package docs, so rebase onto `master` and re-run `npm run docs` if another docs PR lands first.
-- **The scrolls family's own memory (`src/scrolls/docs/.scrolls`) doesn't record `/scrolls-compact` yet** (ROOT-11). Family detail belongs there, not here.
-- **`scrolls-compact` isn't linked** into `.claude/skills/` and `.agents/skills/`, unlike the rest of the family (ROOT-4).
 - **`tests/test_compact.ps1` has never run.** This session had no `pwsh`; the same scenario passed through the bash launcher.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).

@@ -11,9 +11,11 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Open a PR for `claude/brave-mccarthy-m6aut0`: [#206](https://github.com/sugatoray/aiskills/pull/206) (2026-11-12).
 - [x] File #206's issues: epic #207 with sub-issues #208–#213 (2026-11-12); PR body lists them with `Closes`.
 - [x] Show the explainer on the npm package's docs site (embedded, works from `index.html` alone and on phones); checked by the user in an artifact preview.
-- [ ] Get #206 merged. Optionally file the docs-site work as a child of #207.
-- [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
-- [ ] Optionally delete the stale remote branch `claude/confident-maxwell-d6ws37`. Its content is already on `master`; this is the user's call.
+- [x] Get #206 merged: merged as `67b771c` (2.5.0, npm 1.1.0).
+- [x] Design `/scrolls-compact` with the user (`skills/scrolls/scrolls-compact/meta/DESIGN.md`), then build it Red/Green (2.6.0, the family bumped in lockstep), with replay-tested examples split into an index + one file each. On `claude/clever-mendel-k9n73h`.
+- [ ] Open a PR for `claude/clever-mendel-k9n73h` when the user asks, file its issues, and add `/scrolls-compact` to `SPEC.md` once merged.
+- [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1`, `tests/test_compact.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
+- [x] The stale remote branch `claude/confident-maxwell-d6ws37` is gone (checked with `git ls-remote`).
 
 Longer-horizon:
 - [ ] Consider CI for the repo (explicitly out of scope unless the repo owner asks).
