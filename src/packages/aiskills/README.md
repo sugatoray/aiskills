@@ -136,6 +136,8 @@ aiskills path                # print ~/.config/sugatoray/aiskills   (alias: p)
 aiskills info [--full] [--json]   # this setup: versions, folders, settings and their sources (offline)
 aiskills upgrade [<version>|<tag>] [--check [--json]] [--no-refresh] [-n] [-y]   # install the latest aiskills, then update your agents' skills
 aiskills releases [<n>|all] [-L|--last <n|all>] [--downloads [period]] [--chart|--table] [--by day|week|month] [--ascii] [--json]   # latest releases on npm (alias: rel)
+aiskills config <key> [<value>] | --unset <key> | --list [--show-origin] [--json]  [--global|--project]   # defaults and aliases, like git config
+# any command: --color / --no-color (colored on a terminal, plain when piped; NO_COLOR, FORCE_COLOR)
 ```
 
 Short aliases, mostly following `npm`'s own:
@@ -168,6 +170,48 @@ aiskills install -i                            # pick skills and agents from a l
 aiskills install -l                            # only the agents you picked last time (--last-agents)
 aiskills sync                                  # only save the skills; don't register them
 ```
+
+## Defaults and aliases: `aiskills config`
+
+Like `git config`, `aiskills config` keeps your choices so you don't retype
+them:
+
+```sh
+aiskills config agents claude-code,codex   # always install for these agents
+aiskills config layout nested              # and in the nested layout
+aiskills config --project scope project    # in this folder: install into the project
+aiskills config alias.gi "install -g"      # then: aiskills gi -s scrolls-setup
+aiskills config --list --show-origin       # what is set, and in which file
+aiskills config --unset layout             # remove one
+```
+
+- **Files.** Your defaults go in `~/.config/sugatoray/aiskillsconfig.json`
+  (or the file `AISKILLS_USER_CONFIG` names). With `--project` they go in
+  `./.aiskills.json`, which wins in that folder. Both are plain JSON.
+  `uninstall --purge` keeps them.
+- **Keys:** `scope`, `agents`, `skills`, `groups`, `copy`, `route`,
+  `layout`, `stats`, `skills-version` (the same defaults as the `AISKILLS_*`
+  variables) and `color` (`auto`, `always`, `never`). Each value is checked
+  when it's set.
+- **Which value wins:** a command-line option, then an `AISKILLS_*`
+  variable, then the project file, then your file, then the default.
+  `aiskills info` shows where each setting comes from.
+- **Aliases** work like git's: an alias may use another alias, may start
+  with `--color` or `--route`, and can't replace a command. A shell alias
+  (`aiskills config alias.ll '!ls "$(aiskills path)/skills"'`) runs through
+  the shell. It works only from your own file: a project's `.aiskills.json`
+  usually comes with someone else's repo, so a `!` alias there is skipped
+  with a warning.
+- **An example** with every key and each kind of alias is copied to
+  `~/.config/sugatoray/aiskills/sample_aiskillsconfig.json` on every sync.
+
+## Colored output
+
+On a terminal, `aiskills` colors its output: errors red, warnings yellow,
+commands to run cyan, headings and names bold. Piped output and `--json`
+stay plain. `--color` forces color (e.g. `aiskills info --color | less -R`),
+and `--no-color` turns it off, as do the standard `NO_COLOR` and
+`FORCE_COLOR` variables. `aiskills config color never` makes it stick.
 
 ## Skill groups
 

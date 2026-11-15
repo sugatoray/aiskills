@@ -117,6 +117,14 @@ Set `HOME` per command, not with `export`: an exported `HOME` breaks the next
 - When editing with regexes in the shell, `sed` with `|` as its delimiter
   can't use `\|`; check the edit actually happened.
 
+## Adding a config key
+
+A new `AISKILLS_*` default usually becomes an `aiskills config` key too:
+
+1. Add it to `CONFIG_KEYS` in `src/scripts/core/config.mjs` (its variable, its kind: `list`, `enum`, `bool` or `string`, and a one-line `about`), and read it where the variable is read, after the variable (`configValue(key)?.value`).
+2. Add it to `examples/sample_aiskillsconfig.json`. A test fails until the sample sets every key, laid out as `aiskills config` writes it.
+3. Add a row to the keys table under `### config` in `docs/docsite/reference/cli.md`, and to `reference/environment.md` for the variable.
+
 ## Adding or changing skills
 
 Skills live in the repo's top-level `skills/` folder, not here. The package

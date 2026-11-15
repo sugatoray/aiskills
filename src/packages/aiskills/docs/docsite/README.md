@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: 16 skills in 8 groups, at the version you installed.
+- **Skills in one package**: 17 skills in 9 groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -37,6 +37,8 @@ aiskills install -G scrolls -a claude-code
 - **Two layouts**: flat (one folder per skill) or `--nested` (the repo's own folders).
 - **Check your setup and new releases**: `aiskills info` shows versions, folders and every setting with where it comes from; `aiskills rel` lists the latest releases on npm, with download counts and a chart via `--downloads`.
 - **One-step upgrades**: `aiskills upgrade` installs the latest aiskills and updates the skills your agents have; `--check` only looks.
+- **Defaults and aliases that stick**: `aiskills config`, like `git config`, saves your agents, skills, scope or layout, and aliases such as `aiskills gi` for `aiskills install -g`. See [Set default choices](guides/set-defaults.md).
+- **Colored output**: on a terminal; plain when piped, with `--color` / `--no-color` and `NO_COLOR` / `FORCE_COLOR`.
 - **Short commands**: `ais` is `aiskills`; `aix` is `aiskills --route`; `i`, `r`, `ls`, `g`, `f`, `p`, `h` are aliases.
 - **Safe by default**: a pinned `skills` CLI, checked registry results, and no runtime dependencies.
 
@@ -82,7 +84,7 @@ aiskills install -G scrolls -a claude-code
 
 ### How-to guides
 
-- [Set default choices](guides/set-defaults.md): make skills, agents and scope the defaults with `AISKILLS_*` variables.
+- [Set default choices](guides/set-defaults.md): make skills, agents and scope the defaults with `aiskills config` or `AISKILLS_*` variables, and add aliases.
 - [Use the package with `npx skills experimental_sync`](guides/use-experimental-sync.md): install the skills from a project's `node_modules`, pinned by your lockfile.
 - [Keep the repo's nested layout](guides/keep-the-nested-layout.md): browse or edit the skills in the folders they have in the repo.
 - [Run any `npx skills` command](guides/run-npx-skills-directly.md): pass arguments straight to `npx skills`, with `:root` for the install folder.
@@ -106,7 +108,7 @@ aiskills install -G scrolls -a claude-code
 - [CLI outputs](reference/cli-outputs.md): what every command prints, in color, side by side.
 - [Patterns](reference/patterns.md): the glob syntax for `-s`, `-G` and `-a`, and what each matches against.
 - [Environment variables](reference/environment.md): every variable `aiskills` reads.
-- [Files and schemas](reference/files.md): what is written where, and the fields of `aiskills.json`, `layout.json` and `npx skills list --json`.
+- [Files and schemas](reference/files.md): what is written where, the fields of `aiskills.json`, `layout.json` and `npx skills list --json`, and the `aiskills config` files.
 - [`.skillsignore`](reference/skillsignore.md): the rule syntax for leaving files out of the package.
 - [Errors and exit codes](reference/errors.md): every error and warning, with its cause and fix.
 

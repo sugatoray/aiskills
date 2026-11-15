@@ -28,6 +28,14 @@ Run `aiskills upgrade`. It installs the latest aiskills with the package manager
 
 `aiskills info` shows the aiskills version, the install folder, what was saved there and by which version, and every setting with where its value comes from (a flag's default, an `AISKILLS_*` variable, or remembered). It is offline; `aiskills info --full` also asks npm for the latest version. `aiskills rel` lists the latest releases on npm and marks the one you have; `aiskills rel --downloads` adds download counts. See [`info`](reference/cli.md#info) and [`releases`](reference/cli.md#releases).
 
+### How do I make my choices stick?
+
+With [`aiskills config`](reference/cli.md#config), like `git config`: `aiskills config agents claude-code,codex`, `aiskills config layout nested`. Add `--project` to keep them for one folder (in `./.aiskills.json`). `aiskills config --list --show-origin` shows what is set and where; [Set default choices](guides/set-defaults.md) covers the `AISKILLS_*` variables too.
+
+### How do I turn colors off (or on when piping)?
+
+`--no-color`, `NO_COLOR=1`, or for good `aiskills config color never`. To keep colors when piping, `--color` or `FORCE_COLOR=1`: `aiskills info --color | less -R`. See [Colored output](reference/cli.md#colored-output).
+
 ### Does aiskills work behind a firewall or with an npm mirror?
 
 Yes, except for download counts. Everything goes through npm and your npm config (`registry=`, proxy, `cafile`), so a company mirror (Artifactory, Nexus, Verdaccio, …) works:
@@ -120,6 +128,10 @@ or through `aix`, naming the source (pinned, so it isn't asked about): `aix inst
 
 - **Cause:** `AISKILLS_HOME` points at a folder with other files in it, which `aiskills` refuses to replace or delete.
 - **Fix:** point it at a new or empty folder. See [Errors](reference/errors.md#not-an-aiskills-folder).
+
+### `warning: alias.<name> in ./.aiskills.json is ignored`
+
+The project's `.aiskills.json` has a shell alias (`!...`), which only your own config file may hold. Everything else works; that alias doesn't run. If you trust it, add it to yours with `aiskills config alias.<name> '!...'`. See [the warning](reference/errors.md#shell-alias-in-a-project-file-warning).
 
 ### `aiskills` is gone, but the skills are still installed
 
