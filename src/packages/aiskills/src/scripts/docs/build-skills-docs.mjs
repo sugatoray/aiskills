@@ -5,6 +5,11 @@
 //   docs/docsite/README.md            the list between <!-- skills:start --> and <!-- skills:end -->
 //   docs/docsite/explainers/*.html    copies of the skills' explainer pages (EXPLAINERS below)
 //   docs/docsite/license.md           the package's license, and a table of every bundled skill's
+//   README.md and docs/docsite/**/*.md the skill and group counts between count markers, and the
+//                                     group tables between <!-- groups:start --> and <!-- groups:end -->:
+//                                       <!-- count:skills -->17<!-- /count -->      skills in the package
+//                                       <!-- count:groups -->9<!-- /count -->       groups with skills
+//                                       <!-- count:group:scrolls -->8<!-- /count --> skills in one group (by alias)
 //
 // Usage: node src/scripts/docs/build-skills-docs.mjs   (npm run docs:skills)
 //
@@ -13,9 +18,9 @@
 // .skillsignore applies), then synced the way `aiskills` saves it.
 // Used only to build the docs, so it is not published.
 
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SKILLS_CLI_VERSION, loadGroups, syncSkills } from "../core/installer.mjs";
@@ -233,16 +238,66 @@ See also: [Bundled skills](skills/README.md) · [Security model](concepts/securi
 `;
 }
 
+/** The groups that have skills, sorted by name, each with its skills sorted. */
+const filledGroups = (groups) =>
+  groups
+    .filter((g) => g.skills.length)
+    .map((g) => ({ name: g.name, alias: g.alias, skills: [...g.skills].sort() }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+/** The numbers the count markers stand for: skills, groups, group:<alias>. */
+export function counts(skills, groups) {
+  const out = { skills: skills.length, groups: filledGroups(groups).length };
+  for (const g of filledGroups(groups)) out[`group:${g.alias}`] = g.skills.length;
+  return out;
+}
+
+const COUNT_MARKER = /<!-- count:([a-z0-9:-]+) -->\d*<!-- \/count -->/g;
+const GROUPS_TABLE = /<!-- groups:start -->\n[\s\S]*?<!-- groups:end -->/g;
+
+/** The group table between <!-- groups:start --> and <!-- groups:end -->. */
+function groupsTable(skills, groups) {
+  const rows = filledGroups(groups).map((g) => `| \`${g.name}\` | \`${g.alias}\` | ${g.skills.join(", ")} |`);
+  return ["| Group | Alias | Skills |", "| --- | --- | --- |", ...rows, `| \`all\` (built in) | | all <!-- count:skills -->${skills.length}<!-- /count --> skills |`].join("\n");
+}
+
+/** <text> with every count marker and group table filled in; an unknown marker is an error. */
+export function fillMarkers(text, skills, groups, where = "a page") {
+  const n = counts(skills, groups);
+  return text
+    .replace(COUNT_MARKER, (_, key) => {
+      if (!Object.hasOwn(n, key)) throw new Error(`${where}: unknown count marker '${key}' (known: ${Object.keys(n).join(", ")})`);
+      return `<!-- count:${key} -->${n[key]}<!-- /count -->`;
+    })
+    .replace(GROUPS_TABLE, `<!-- groups:start -->\n${groupsTable(skills, groups)}\n<!-- groups:end -->`);
+}
+
+/** The package README and the hand-written docs pages (not the generated ones), relative to the package. */
+function markedPages(docs) {
+  const out = [join(PKG_DIR, "README.md")];
+  const walk = (dir, rel = "") => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) {
+        if (r !== "skills") walk(join(dir, e.name), r);
+      } else if (e.name.endsWith(".md") && r !== "license.md" && r !== "README.md") out.push(join(dir, e.name));
+    }
+  };
+  if (existsSync(docs)) walk(docs);
+  return out;
+}
+
 /** The Skills list for the landing page (between the markers). */
-function landingList(skills) {
+function landingList(skills, groups) {
   return [
-    `- [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.`,
+    `- [Bundled skills](skills/README.md): all <!-- count:skills -->${skills.length}<!-- /count --> skills in the package, in <!-- count:groups -->${filledGroups(groups).length}<!-- /count --> groups, with what each does.`,
     ...skills.map((s) => `- [${s.name}](skills/${s.name}.md): ${summary(s.fm.description)}`),
   ].join("\n");
 }
 
 /**
- * Everything the generator writes: { files: { "skills/<x>.md": text }, landing: README.md text }.
+ * Everything the generator writes: { files: { "skills/<x>.md": text }, landing: README.md text,
+ * marked: { "<path from the package>": text } for pages with count markers or a group table }.
  * <docs> is the docs folder whose README.md gets the Skills list.
  */
 export function render({ repoRoot = findRepoRoot(PKG_DIR), docs = DOCS } = {}) {
@@ -254,19 +309,27 @@ export function render({ repoRoot = findRepoRoot(PKG_DIR), docs = DOCS } = {}) {
   const i = readme.indexOf(START);
   const j = readme.indexOf(END);
   if (i < 0 || j < i) throw new Error(`${join(docs, "README.md")}: no ${START} ... ${END} markers`);
-  const landing = readme.slice(0, i + START.length) + "\n" + landingList(skills) + "\n" + readme.slice(j);
-  return { files: out, landing };
+  const landing = fillMarkers(readme.slice(0, i + START.length) + "\n" + landingList(skills, groups) + "\n" + readme.slice(j), skills, groups, "README.md");
+  const marked = {};
+  for (const file of markedPages(docs)) {
+    const text = readFileSync(file, "utf8");
+    if (!COUNT_MARKER.test(text) && !text.includes("<!-- groups:start -->")) continue;
+    COUNT_MARKER.lastIndex = 0;
+    marked[relative(PKG_DIR, file).split("\\").join("/")] = fillMarkers(text, skills, groups, relative(PKG_DIR, file));
+  }
+  return { files: out, landing, marked };
 }
 
 /** Write the pages, removing pages of skills that no longer exist. */
 export function main() {
-  const { files: out, landing } = render();
+  const { files: out, landing, marked } = render();
   const dir = join(DOCS, "skills");
   mkdirSync(dir, { recursive: true });
   for (const f of readdirSync(dir)) if (f.endsWith(".md") && !out[`skills/${f}`]) rmSync(join(dir, f));
   // license.md sits at the top of the docs, next to README.md.
   for (const [rel, text] of Object.entries(out)) writeFileSync(join(DOCS, rel), text);
   writeFileSync(join(DOCS, "README.md"), landing);
+  for (const [rel, text] of Object.entries(marked)) writeFileSync(join(PKG_DIR, rel), text);
   const repoRoot = findRepoRoot(PKG_DIR);
   for (const [rel, src] of Object.entries(EXPLAINERS)) {
     mkdirSync(dirname(join(DOCS, rel)), { recursive: true });

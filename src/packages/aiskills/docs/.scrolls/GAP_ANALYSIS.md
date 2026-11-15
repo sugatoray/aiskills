@@ -19,6 +19,5 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - The docs page needs network to render (marked and highlight.js come from cdnjs).
 - Shell aliases (`aiskills config alias.x '!...'`) never ran on Windows; the `cmd` quoting of the arguments after the alias is untested.
 - A project's `./.aiskills.json` can still change what an install does in that folder (`agents`, `skills`, `route`, `skills-version`, `copy`); only `!` aliases are refused there.
-- Hand-written skill/group lists (README intro and group table, `docs/docsite/README.md` count, `concepts/skill-groups.md` table) aren't checked by tests, so they can go stale when a skill or group is added.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.

@@ -56,6 +56,7 @@ describe("docs/docsite/skills/", () => {
     assert.equal(readFileSync(join(DOCS, "README.md"), "utf8"), landing, "README.md's Skills section is stale");
   });
 
+
   test("the landing page has a Skills section right after Getting started, listing every skill page, then the explainers", () => {
     const readme = readFileSync(join(DOCS, "README.md"), "utf8");
     const sections = [...readme.matchAll(/^### (.+)$/gm)].map((m) => m[1]);
@@ -217,6 +218,88 @@ describe("explainer pages in the docs (docs/docsite/explainers/)", () => {
       const copy = join(DOCS, rel);
       assert.ok(existsSync(copy), `${rel} is missing: run npm run docs:skills`);
       assert.equal(readFileSync(copy, "utf8"), readFileSync(join(REPO_ROOT, src), "utf8"), `${rel} is stale: run npm run docs:skills`);
+    }
+  });
+});
+
+// Skill and group counts, and the group tables, are written by the generator between
+// markers, so they can't go stale: <!-- count:skills -->17<!-- /count -->,
+// <!-- count:groups -->, <!-- count:group:<alias> -->, and <!-- groups:start --> ... <!-- groups:end -->.
+describe("skill and group counts in the docs", () => {
+  const WORDS = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty";
+  // A numeral, or a number word after "the/its/all/these/those" ("the seven skills"); not "one or two skills".
+  const COUNT = new RegExp(`\\b(?:(?:all\\s+)?\\d+|(?:the|its|all|these|those)\\s+(?:${WORDS}))\\s+(?:bundled\\s+)?(?:skills|groups)\\b`, "gi");
+  const MARKER = /<!-- count:([a-z0-9:-]+) -->(\d+)<!-- \/count -->/g;
+  /** The README and every hand-written docs page (generated pages are checked elsewhere). */
+  function pages() {
+    const out = { "README.md": readFileSync(join(PKG_SRC, "README.md"), "utf8") };
+    const walk = (dir, rel = "") => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const r = rel ? `${rel}/${e.name}` : e.name;
+        if (e.isDirectory()) {
+          if (r !== "skills") walk(join(dir, e.name), r);
+        } else if (e.name.endsWith(".md") && r !== "license.md") out[`docs/docsite/${r}`] = readFileSync(join(dir, e.name), "utf8");
+      }
+    };
+    walk(DOCS);
+    return out;
+  }
+  const prose = (md) => md.replace(/^(`{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm, ""); // drop code blocks: example output is verified separately
+  const groups = () => {
+    const seen = new Map();
+    for (const [n, g] of box.groupOf) {
+      if (!seen.has(g.name)) seen.set(g.name, { name: g.name, alias: g.alias, skills: [] });
+      seen.get(g.name).skills.push(n);
+    }
+    return [...seen.values()];
+  };
+
+  test("no count of skills or groups is typed by hand: each is a generated marker", () => {
+    const loose = [];
+    for (const [rel, md] of Object.entries(pages())) {
+      for (const m of prose(md).replace(MARKER, "N").matchAll(COUNT)) loose.push(`${rel}: "${m[0]}"`);
+    }
+    assert.deepEqual(loose, [], "write these as <!-- count:... --> markers (npm run docs:skills fills them)");
+  });
+
+  test("every count marker holds the real number", () => {
+    const expected = { skills: box.names.length, groups: groups().length };
+    for (const g of groups()) expected[`group:${g.alias}`] = g.skills.length;
+    let n = 0;
+    for (const [rel, md] of Object.entries(pages())) {
+      for (const [, key, value] of md.matchAll(MARKER)) {
+        n++;
+        assert.ok(Object.hasOwn(expected, key), `${rel}: unknown count marker '${key}'`);
+        assert.equal(Number(value), expected[key], `${rel}: count:${key}`);
+      }
+    }
+    assert.ok(n >= 5, "the README and the docs use the markers");
+  });
+
+  test("the landing page's Skills list says how many skills and groups the package has", () => {
+    const readme = readFileSync(join(DOCS, "README.md"), "utf8");
+    assert.match(readme, new RegExp(`- \\[Bundled skills\\]\\(skills/README\\.md\\): all <!-- count:skills -->${box.names.length}<!-- /count --> skills in the package, in <!-- count:groups -->${groups().length}<!-- /count --> groups`));
+  });
+
+  test("the group tables in the README and Skill groups list every group with its skills", () => {
+    const rows = groups()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((g) => `| \`${g.name}\` | \`${g.alias}\` | ${g.skills.sort().join(", ")} |`);
+    const want = ["| Group | Alias | Skills |", "| --- | --- | --- |", ...rows, `| \`all\` (built in) | | all <!-- count:skills -->${box.names.length}<!-- /count --> skills |`];
+    for (const file of [join(PKG_SRC, "README.md"), join(DOCS, "concepts", "skill-groups.md")]) {
+      const md = readFileSync(file, "utf8");
+      const block = /<!-- groups:start -->\n([\s\S]*?)\n<!-- groups:end -->/.exec(md);
+      assert.ok(block, `${file}: no <!-- groups:start --> ... <!-- groups:end --> table`);
+      assert.deepEqual(block[1].split("\n"), want, file);
+    }
+  });
+
+  test("the pages with markers are up to date (run: npm run docs:skills)", async () => {
+    const { render } = await load();
+    const { marked } = render({ repoRoot: REPO_ROOT });
+    assert.ok(Object.keys(marked).length >= 3, "the generator fills the marked pages");
+    for (const [rel, text] of Object.entries(marked)) {
+      assert.equal(readFileSync(join(PKG_SRC, rel), "utf8"), text, `${rel} is stale: run npm run docs:skills`);
     }
   });
 });

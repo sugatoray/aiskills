@@ -584,7 +584,15 @@ two skills are both named '<name>': skills/<folder> and skills/<folder>
 
 ## Docs build errors (maintainers)
 
-These come from `npm run docs:html`, which builds `docs/docsite/index.html`.
+These come from `npm run docs:html`, which builds `docs/docsite/index.html`, and `npm run docs:skills`, which writes the skill pages, the counts and the group tables.
+
+### Unknown count marker
+
+```text
+<page>: unknown count marker '<key>' (known: skills, groups, group:<alias>, ...)
+```
+
+**Fix:** a page has a `<!-- count:<key> -->N<!-- /count -->` marker that `npm run docs:skills` can't fill. Use `count:skills` (skills in the package), `count:groups` (groups with skills) or `count:group:<alias>` (one group's skills, e.g. `count:group:scrolls`). Write any count of skills or groups this way, so it can't go stale; a test fails on a number typed by hand.
 
 ### Page not in the landing page
 

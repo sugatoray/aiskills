@@ -17,18 +17,20 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 
 ## The groups in this version
 
+<!-- groups:start -->
 | Group | Alias | Skills |
 | --- | --- | --- |
-| `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
-| `stata-skills` | `stata` | stata-recipes |
+| `diagrams-skills` | `diagrams` | network-flow |
+| `docs-skills` | `docs` | create-lib-docs |
+| `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
+| `personas-skills` | `personas` | prodigy |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
 | `review-skills` | `review` | run-code-review |
-| `docs-skills` | `docs` | create-lib-docs |
-| `diagrams-skills` | `diagrams` | network-flow |
-| `personas-skills` | `personas` | prodigy |
+| `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
+| `stata-skills` | `stata` | stata-recipes |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
-| `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
-| `all` (built in) | | all 17 skills |
+| `all` (built in) | | all <!-- count:skills -->17<!-- /count --> skills |
+<!-- groups:end -->
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
 

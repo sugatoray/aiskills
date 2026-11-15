@@ -70,7 +70,7 @@ aiskills install --group scrolls --agent claude-code
 What happened, in order:
 
 1. `aiskills` refreshed the skill files in `~/.config/sugatoray/aiskills/skills/` from the package.
-2. It turned the group into its seven skills (`bundled: ...`).
+2. It turned the group into its <!-- count:group:scrolls -->8<!-- /count --> skills (`bundled: ...`).
 3. It ran `npx skills add` on that folder with one `--skill` per skill and your agent. `--global` is the default scope, and `--yes` skips `npx skills`' prompts.
 
 `npx skills` prints its own progress after that line, and the skills appear in Claude Code as `/scrolls-setup`, `/scrolls-update` and so on.

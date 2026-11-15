@@ -10,7 +10,7 @@
 
 ## Skills
 
-- [Bundled skills](skills/README.md): every skill in the package, by group, with what it does.
+- [Bundled skills](skills/README.md): all <!-- count:skills -->17<!-- /count --> skills in the package, in <!-- count:groups -->9<!-- /count --> groups, with what each does.
 - [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
 - [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
