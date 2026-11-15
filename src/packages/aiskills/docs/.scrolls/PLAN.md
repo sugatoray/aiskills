@@ -20,8 +20,12 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
   - **Files:** the user file is `~/.config/sugatoray/aiskillsconfig.json`, or the file `AISKILLS_USER_CONFIG` names; the project file is `./.aiskills.json`, which wins.
   - **Aliases:** `alias.<name>`. `!` shell aliases are allowed in the user file only; a project's `!` alias is skipped with a warning.
   - **Example file:** `examples/sample_aiskillsconfig.json` ships and is copied into the install folder.
+  - **Also on the branch, docs site:**
+    - generated skill and group counts;
+    - the Skills tab's number counting skills;
+    - the Skills tab's left pane grouped by skill group, collapsible and remembered.
 
-  After the merge, add it to `SPEC.md`.
+  Before merging, update #250's description and file issues for the docs-site work. After the merge, add config and the grouped Skills pane to `SPEC.md`.
 - [ ] **AIS-20** Release **1.3.0** when the user says so: `package.json` `1.3.0-dev` → `1.3.0`, date `## [1.3.0]`, SECURITY `1.3.x`, `npm run banner:png` and `npm run docs`, publish, then tag `aiskills-v1.3.0` on its `gitHead` (MAINTAINERS → Releasing step 6). The tag push rebuilds the site with one version.
 - [ ] **AIS-2** Try `aiskills --route install -s <real skill>` and `aiskills find <query>` against the live skills.sh service; fix the parser if the output differs.
 - [x] **AIS-3** Add a `node:test` suite: unit tests for the glob, group and selection helpers, plus an end-to-end test (pack, install into a throwaway `HOME`/prefix, uninstall) using the `SKILLS_API_URL` fake for `--route`.

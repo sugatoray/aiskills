@@ -14,7 +14,8 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 **On `claude/cli-config`, in [#250](https://github.com/sugatoray/aiskills/pull/250)** (issues #251–#257, base `master`): `aiskills config`, like `git config`.
 - **Rebased** onto `73af49b` and force-pushed, with the user's approval; GitHub had already retargeted #250 to `master`.
-- **The latest fix** is `b8916c0`. `npm test`: 506 tests, all pass.
+- **The latest commit** is `e78bf7a`. `npm test`: 515 tests, all pass.
+- **Docs and docs-site work added on top** (`7844284`, `8527567`, `4efd6b3`, `e78bf7a`) isn't in #250's description or issues yet.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -61,8 +62,25 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
   - `files.md`, `environment.md` (`AISKILLS_USER_CONFIG`), `guides/set-defaults.md`, CHANGELOG `[1.3.0]`, ARCHITECTURE, and a config group in `docs/cli-outputs/commands.json`.
   - Regenerate with `npm run docs`.
 
+Then the package docs and the docs site, all on the same branch:
+- **`7844284` docs:** README sections "Defaults and aliases: `aiskills config`" and "Colored output".
+  - SECURITY.md and `concepts/security.md`: the config files, shell aliases (user file only), and the project-file caveat.
+  - The FAQ, FEATURES.md, and MAINTAINERS ("Adding a config key").
+- **`8527567` counts, Red/Green:** a reader saw "19 skills" on the Skills tab against "17 skills in 9 groups".
+  - **Markers:** `npm run docs:skills` now fills `<!-- count:skills|groups|group:<alias> -->N<!-- /count -->` in the README and every hand-written docs page.
+  - **Group tables:** it writes both group tables (README, `concepts/skill-groups.md`) between `<!-- groups:start/end -->`.
+  - **Tests** (`docs-skills.test.mjs`) fail on any count typed by hand.
+  - **Stale counts fixed:** "16 skills in 8 groups" and "the seven skills"; the scrolls group has 8.
+- **`4efd6b3` tab number:** the number on a tab of `index.html` was its page count (Skills: 19). `build-docs-html` now gives each tab a `count`: its pages in the folder most of them are in, minus that folder's README. Skills shows 17; the other tabs are unchanged.
+- **`e78bf7a` grouped Skills pane, Red/Green:** the user approved a clickable mockup ([Skills Tab Grouped Nav](https://claude.ai/artifact/52Nhgaz1cvyxjqf4f4ouz5)) and chose all three suggestions.
+  - **Layout:** the Skills tab's left pane shows the overview, then one collapsible group per skill group with its count, then an "Explainers" section. Expand all / Collapse all; Collapse all keeps the current page's group open.
+  - **What opens:** the group of the page you're on opens, by link, search or address; on the overview, the first group.
+  - **Remembered:** open groups are kept in `localStorage` key `aiskills-docs-open-groups`.
+  - **Where the groups come from:** `build-docs-html` gives a tab a `nav` `{top, groups, extra}` when its folder README lists pages under `## <group>` headings, i.e. the generated `skills/README.md`.
+  - **Tests:** the build data and a browser test in `docs-html.test.mjs`.
+
 ## Known issues / open threads
-- **#250 awaits review and merge** (AIS-22).
+- **#250 awaits review and merge** (AIS-22). Its description still says 506 tests and covers only the config work: refresh it, and file issues for the docs-site commits, with `/create-issues-update-pr`.
 - **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.3.0-dev.tgz`). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.
 - **Try `aiskills config` on a real machine:** set a few keys and a shell alias, run `aiskills info`, and clone a repo with a `.aiskills.json` to see the project file win and a `!` alias warn.
 - **The CLI outputs page shows the stand-in `npx skills`,** which prints nothing of its own. So `list`, `install` and `skills` show only aiskills's lines; the live artifact shows the real `npx skills` output.
