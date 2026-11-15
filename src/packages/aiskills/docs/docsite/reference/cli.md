@@ -222,7 +222,7 @@ aiskills info
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
     project config : ./.aiskills.json  (not created)
-      saved skills : 17 skills in 9 groups, flat layout
+      saved skills : 18 skills in 9 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)

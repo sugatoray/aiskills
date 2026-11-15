@@ -361,8 +361,8 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       const groups = await open();
       assert.ok(groups.length >= 9);
       assert.deepEqual(groups.filter(([, e]) => e === "true").map(([g]) => g), [groups[0][0]], "on the overview, the first group starts open");
-      assert.match(await page.locator("#side .nav-group > button").first().innerText(), /scrolls-skills\s*8/);
-      assert.equal(await page.locator("#side .nav-group").first().locator("ul a").count(), 8);
+      assert.match(await page.locator("#side .nav-group > button").first().innerText(), /scrolls-skills\s*9/);
+      assert.equal(await page.locator("#side .nav-group").first().locator("ul a").count(), 9);
       assert.ok(await page.locator("#side .side-label", { hasText: "Explainers" }).count(), "an Explainers section");
       assert.equal(await page.locator("#side a", { hasText: "See how the scrolls skills work" }).count(), 1);
       // Toggle a group open and shut.
@@ -484,7 +484,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       await page.waitForSelector("#doc iframe");
       const frame = page.frameLocator("#doc iframe");
       await frame.locator("#network-flow[data-ready=true]").waitFor();
-      assert.equal(await frame.locator(".rf-tab").count(), 9, "Overview plus 8 tabs");
+      assert.equal(await frame.locator(".rf-tab").count(), 10, "Overview plus 9 tabs");
       const box = await page.locator("#doc iframe").boundingBox();
       const doc = await page.locator("#doc").boundingBox();
       assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
@@ -513,7 +513,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
         await page.waitForSelector("#doc iframe");
         assert.equal(await page.getAttribute("#doc iframe", "src"), null, "no src on the frame");
         await page.frameLocator("#doc iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
-        assert.equal(await page.frameLocator("#doc iframe").locator(".rf-tab").count(), 9, "the embedded explainer loads with all its tabs");
+        assert.equal(await page.frameLocator("#doc iframe").locator(".rf-tab").count(), 10, "the embedded explainer loads with all its tabs");
         // "Open the explainer full-size": an overlay in this page, not a navigation.
         const before = page.url();
         await page.click('#doc a:has-text("Open the explainer full-size")');
@@ -523,7 +523,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
         const ov = await page.locator(".explainer-overlay").boundingBox();
         assert.ok(Math.abs(ov.width - viewport.width) <= 1 && Math.abs(ov.height - viewport.height) <= 1, `overlay ${ov.width}x${ov.height} fills the screen`);
         await page.frameLocator(".explainer-overlay iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
-        assert.equal(await page.frameLocator(".explainer-overlay iframe").locator(".rf-tab").count(), 9);
+        assert.equal(await page.frameLocator(".explainer-overlay iframe").locator(".rf-tab").count(), 10);
         const overflow = await page.frameLocator(".explainer-overlay iframe").locator("body").evaluate(() => document.documentElement.scrollWidth > innerWidth);
         assert.equal(overflow, false, "the explainer fits the screen width");
         await page.click(".explainer-overlay .explainer-close");

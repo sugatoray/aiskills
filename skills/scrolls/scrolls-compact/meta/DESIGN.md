@@ -1,11 +1,9 @@
 # `/scrolls-compact` — design
 
-Status: **draft for review**. Nothing here ships yet. This folder has no
-`SKILL.md`, so it isn't installable and isn't listed in `plugin.json`.
-Once the decisions in [Open questions](#11-open-questions) are settled,
-this document becomes the source for `SKILL.md`, `scripts/compact.py`,
-the tests, and the family-wide edits listed in
-[§10](#10-family-integration-checklist).
+Status: **implemented in 2.6.0.** The decisions in
+[§11](#11-decisions) are settled. `SKILL.md` is the runtime contract and
+`scripts/compact.py` the implementation; where they differ in detail
+from the sketches below (exact output lines, for example), they win.
 
 ## 1. What it is for
 
@@ -33,7 +31,7 @@ docs/.scrolls/
 ├── STARTER.md        ← gets one new entry pointing at COMPACT.md (once)
 ├── COMPACT.md        ← new: "how to reach old history" + Compaction History table
 ├── compacted/        ← new
-│   └── scrolls_compact_<githash>_<yyyymmdd>.md   ← one report per compaction
+│   └── scrolls_compact_<yyyymmdd>_<githash>.md   ← one report per compaction
 ├── SPEC.md  PLAN.md  HANDOFF.md  GAP_ANALYSIS.md  GAP_CONTEXT.md   ← compacted
 └── WISDOM.md         ← never compacted
 ```
@@ -161,7 +159,7 @@ content lives, replaced on every later compaction rather than stacked:
 
 ```markdown
 ## Compacted features
-<!-- scrolls-compact: checkpoint=904e593 base=d611b65 date=2026-11-15 report=compacted/scrolls_compact_904e593_20261115.md -->
+<!-- scrolls-compact: checkpoint=904e593 base=d611b65 date=2026-11-15 report=compacted/scrolls_compact_20261115_904e593.md -->
 > Older detail was compacted on 2026-11-15. See `COMPACT.md` to reach the full text.
 
 - **Release tags (`aiskills-vX.Y.Z`)** — every npm release is tagged … (#162, `bbacbb3`)
@@ -235,7 +233,7 @@ Notes:
 - compacted: docs/.scrolls/SPEC.md (3 sections → 3 lines, 23 → 11 lines)
 - compacted: docs/.scrolls/PLAN.md (4 done tickets removed)
 - unchanged: docs/.scrolls/GAP_ANALYSIS.md (all 3 gaps still open)
-- report: docs/.scrolls/compacted/scrolls_compact_904e593_20261115.md
+- report: docs/.scrolls/compacted/scrolls_compact_20261115_904e593.md
 
 Scrolls-Action: compact
 Scrolls-Checkpoint: <full sha>
@@ -245,7 +243,7 @@ Scrolls-Previous-Compaction: <full sha of the last compaction commit, or none>
 Scrolls-Folder: docs/.scrolls
 Scrolls-Compacted: docs/.scrolls/SPEC.md
 Scrolls-Compacted: docs/.scrolls/PLAN.md
-Scrolls-Report: docs/.scrolls/compacted/scrolls_compact_904e593_20261115.md
+Scrolls-Report: docs/.scrolls/compacted/scrolls_compact_20261115_904e593.md
 ```
 
 `Scrolls-Previous-Compaction` links each compaction to the one before
@@ -320,14 +318,14 @@ at that checkpoint; see each report):
 
 | # | Date | Checkpoint | Base (cutoff) | Rule | Files | Lines | Report |
 |---|------|------------|---------------|------|-------|-------|--------|
-| 1 | 2026-11-15 | `904e593` | `d611b65` (2026-11-08) | newer of 7d / 20 commits | SPEC, PLAN, HANDOFF | 154 → 98 | [report](compacted/scrolls_compact_904e593_20261115.md) |
+| 1 | 2026-11-15 | `904e593` | `d611b65` (2026-11-08) | newer of 7d / 20 commits | SPEC, PLAN, HANDOFF | 154 → 98 | [report](compacted/scrolls_compact_20261115_904e593.md) |
 ```
 
 The table is newest first, and numbers only ever increase. Links are
 relative to the scrolls folder, so `/scrolls-hide` and
 `/scrolls-unhide` don't break them.
 
-### `compacted/scrolls_compact_<githash>_<yyyymmdd>.md`
+### `compacted/scrolls_compact_<yyyymmdd>_<githash>.md`
 
 This file is deterministic. The script writes it from the plan and the
 diff, with nothing invented, and adds one **file marker** section per
@@ -441,19 +439,18 @@ set per commit:
 6. Refusals: dirty scrolls folder, other changes staged, exit 1 when
    nothing is old.
 
-## 11. Open questions
+## 11. Decisions
 
-1. **Newer-wins or older-wins** for the default rule? Newer-wins, as
-   you specified, keeps the *smaller* window. Older-wins guarantees at
-   least 7 days *and* 20 commits stay verbatim. This design follows
-   your spec, and changing it is a one-line change.
-2. **One commit, or a compaction commit followed by a record commit?**
-   This design recommends one ([§6](#the-commit)). Choose two only if
-   you want the compaction commit's own SHA written into the table.
-3. **Checkpoint tag on by default?** It protects against squash merges
-   ([§7](#7-keeping-checkpoints-alive)), but it adds tags the user has
-   to push. The alternative is a `refs/scrolls/…` namespace, which is
-   cleaner but isn't fetched by default.
-4. **Date in the file name:** this design uses the run date. Use the
-   cutoff date instead if you'd rather the name say "everything before
-   this day".
+Settled with the user on 2026-11-15:
+
+1. **Newer-wins** for the default rule, as originally specified. It
+   keeps the smaller window; `--keep-days`/`--keep-commits` widen it.
+2. **One commit.** The report and row need only the checkpoint, which is
+   known before the commit. The compaction commit is found later as the
+   commit that added its report.
+3. **Checkpoint tag on by default** (`scrolls-compact/<yyyymmdd>-<githash>`),
+   `--no-tag` to skip. The skill never pushes it; the report and output
+   print the push command.
+4. **Run date** in the file name, now ordered date first:
+   `compacted/scrolls_compact_<yyyymmdd>_<githash>.md`, so reports sort
+   chronologically.

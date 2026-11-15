@@ -52,5 +52,5 @@ default, changed template content) — not for pure documentation changes.
 
 This skill's version is locked in step with the other seven `scrolls-*`
 skills — see `../../meta/MAINTAINERS.md`'s Versioning entry. Any bump
-here means bumping all eight to the same new number in the same commit,
+here means bumping all nine to the same new number in the same commit,
 even the ones with nothing of their own to report that release.

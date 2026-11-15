@@ -12,23 +12,35 @@ updates. For a specific skill's own version history, see its own
 - [`scrolls-help/CHANGELOG.md`](scrolls-help/CHANGELOG.md)
 - [`scrolls-remove/CHANGELOG.md`](scrolls-remove/CHANGELOG.md)
 - [`scrolls-restore/CHANGELOG.md`](scrolls-restore/CHANGELOG.md)
+- [`scrolls-compact/CHANGELOG.md`](scrolls-compact/CHANGELOG.md)
 - [`scrolls-explainer/CHANGELOG.md`](scrolls-explainer/CHANGELOG.md)
 
 ## Current versions
 
-All eight skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
+All nine skills are versioned in lockstep (see `meta/MAINTAINERS.md`'s
 Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.5.0 |
-| `scrolls-update` | 2.5.0 |
-| `scrolls-hide` | 2.5.0 |
-| `scrolls-unhide` | 2.5.0 |
-| `scrolls-help` | 2.5.0 |
-| `scrolls-remove` | 2.5.0 |
-| `scrolls-restore` | 2.5.0 |
-| `scrolls-explainer` | 2.5.0 |
+| `scrolls-setup` | 2.6.0 |
+| `scrolls-update` | 2.6.0 |
+| `scrolls-hide` | 2.6.0 |
+| `scrolls-unhide` | 2.6.0 |
+| `scrolls-help` | 2.6.0 |
+| `scrolls-remove` | 2.6.0 |
+| `scrolls-restore` | 2.6.0 |
+| `scrolls-compact` | 2.6.0 |
+| `scrolls-explainer` | 2.6.0 |
+
+## 2026-11-15 (2.6.0)
+
+- **New skill: `/scrolls-compact`.** It condenses the history in a project's scrolls at a point in time, and keeps the full older text in git at a checkpoint.
+  - `git blame` decides what is old: content last changed before `--before=YYYYMMDD`, or in `--base=COMMIT` and its ancestors. By default the base is the newer of 7 days ago and 20 first-parent commits back on `main`/`master`.
+  - Only `SPEC.md`, `PLAN.md`, `HANDOFF.md`, `GAP_ANALYSIS.md` and `GAP_CONTEXT.md` are in scope. Open tickets, gap lines and HANDOFF's open threads are never condensed.
+  - One `maint(memory): scrolls-compacted` commit with `Scrolls-*` trailers (the first family command whose trailers chain: `Scrolls-Previous-Compaction`). It writes `compacted/scrolls_compact_<yyyymmdd>_<githash>.md`, adds a row to `COMPACT.md`, lists `COMPACT.md` in `STARTER.md`, and tags the checkpoint `scrolls-compact/<yyyymmdd>-<githash>`.
+  - `--list`, `--show` and `--extract` read old history back from git, and still work after a squash merge or `/scrolls-unhide`.
+- **`/scrolls-update`** now leaves `COMPACT.md`, `compacted/` and compaction markers alone.
+- **All nine skills bumped to `2.6.0`** together, in lockstep, along with `.claude-plugin/plugin.json` (which now lists `./scrolls-compact`). MINOR, for the new skill. `README.md` lists the command, and its shared-flags table gains `--before`/`--base`.
 
 ## 2026-11-12 (2.5.0)
 

@@ -24,6 +24,18 @@ In development: `package.json` is `1.4.0-dev` (a SemVer pre-release, so it
 sorts below `1.4.0`) while changes collect here. At release, set it to `1.4.0`
 and date this section.
 
+### Added
+
+- **New bundled skill: `scrolls-compact`**, in the `scrolls-skills` group
+  (alias `scrolls`). `/scrolls-compact` condenses the old history in a
+  project's scrolls (what `git blame` shows is older than a date, a commit,
+  or by default the newer of 7 days and 20 commits) and keeps the full text
+  in git at a recorded, tagged checkpoint; `--list`, `--show` and
+  `--extract` read it back. The scrolls skills move to `2.6.0` together. The
+  package now bundles 18 skills in 9 groups: `aiskills install -s
+  scrolls-compact`, or `aiskills install -G scrolls` for the whole group. See
+  the skill's own `CHANGELOG.md` for its history.
+
 ## [1.3.0] - 2026-11-17
 
 ### Added

@@ -19,16 +19,16 @@ aiskills install -G scrolls -a claude-code
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+[aiskills] bundled: scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-compact --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
-`npx skills` then prints its own progress and installs the <!-- count:group:scrolls -->8<!-- /count --> skills for Claude Code.
+`npx skills` then prints its own progress and installs the <!-- count:group:scrolls -->9<!-- /count --> skills for Claude Code.
 
 ## Features
 
-- **Skills in one package**: <!-- count:skills -->17<!-- /count --> skills in <!-- count:groups -->9<!-- /count --> groups, at the version you installed.
+- **Skills in one package**: <!-- count:skills -->18<!-- /count --> skills in <!-- count:groups -->9<!-- /count --> groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -54,7 +54,7 @@ aiskills install -G scrolls -a claude-code
 ### Skills
 
 <!-- skills:start -->
-- [Bundled skills](skills/README.md): all <!-- count:skills -->17<!-- /count --> skills in the package, in <!-- count:groups -->9<!-- /count --> groups, with what each does.
+- [Bundled skills](skills/README.md): all <!-- count:skills -->18<!-- /count --> skills in the package, in <!-- count:groups -->9<!-- /count --> groups, with what each does.
 - [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
 - [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
@@ -63,6 +63,7 @@ aiskills install -G scrolls -a claude-code
 - [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
 - [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
 - [run-code-review](skills/run-code-review.md): Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds…
+- [scrolls-compact](skills/scrolls-compact.md): Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses.
 - [scrolls-explainer](skills/scrolls-explainer.md): Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,…
 - [scrolls-help](skills/scrolls-help.md): Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,…
 - [scrolls-hide](skills/scrolls-hide.md): Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the…
@@ -317,7 +318,7 @@ See also: [CLI reference](../reference/cli.md)
 <!-- source: skills/README.md -->
 # Bundled skills
 
-Every skill in this version of the package (17 skills in 9 groups), with what it does and how to install it.
+Every skill in this version of the package (18 skills in 9 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -327,14 +328,15 @@ Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`scrolls-explainer`](scrolls-explainer.md) | 2.5.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
-| [`scrolls-help`](scrolls-help.md) | 2.5.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
-| [`scrolls-hide`](scrolls-hide.md) | 2.5.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
-| [`scrolls-remove`](scrolls-remove.md) | 2.5.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
-| [`scrolls-restore`](scrolls-restore.md) | 2.5.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
-| [`scrolls-setup`](scrolls-setup.md) | 2.5.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
-| [`scrolls-unhide`](scrolls-unhide.md) | 2.5.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
-| [`scrolls-update`](scrolls-update.md) | 2.5.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
+| [`scrolls-compact`](scrolls-compact.md) | 2.6.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
+| [`scrolls-explainer`](scrolls-explainer.md) | 2.6.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
+| [`scrolls-help`](scrolls-help.md) | 2.6.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
+| [`scrolls-hide`](scrolls-hide.md) | 2.6.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
+| [`scrolls-remove`](scrolls-remove.md) | 2.6.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
+| [`scrolls-restore`](scrolls-restore.md) | 2.6.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
+| [`scrolls-setup`](scrolls-setup.md) | 2.6.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
+| [`scrolls-unhide`](scrolls-unhide.md) | 2.6.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
+| [`scrolls-update`](scrolls-update.md) | 2.6.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
 
 ## stata-skills
 
@@ -975,6 +977,68 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
 
+<!-- source: skills/scrolls-compact.md -->
+# scrolls-compact
+
+Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. Condenses the parts of SPEC.md, PLAN.md, HANDOFF.md, GAP_ANALYSIS.md and GAP_CONTEXT.md that git blame shows are older than a compaction base — by default the newer of 7 days ago and the 20th-latest first-parent commit on main/master — while open tickets, open gaps and HANDOFF's open threads always stay word for word. Records ONE commit whose message names the checkpoint (the commit just before the compaction), writes compacted/scrolls_compact_<yyyymmdd>_<githash>.md with one marker section per compacted file, adds a row to COMPACT.md's Compaction History table, lists COMPACT.md in STARTER.md, and tags the checkpoint. --list, --show and --extract read old history back out of git. Use this only when the user runs /scrolls-compact, or explicitly asks to compact, condense, prune or checkpoint the scrolls / project memory history. Supports --before=YYYYMMDD, --base=COMMIT, --keep-days=N, --keep-commits=N, --trunk, --include/--exclude, -p/--path, -t/--reporoot, -l/--local, -r/--recurse, -n/--dry-run, -y/--yes, --no-commit and --no-tag. Refuses to run when the scrolls folder has uncommitted changes, since the checkpoint would not contain them. Works on macOS, Linux, and Windows (bash or PowerShell).
+
+| Property | Value |
+| --- | --- |
+| Group | `scrolls-skills` (alias `scrolls`) |
+| Version | 2.6.0 |
+| Starts | When you ask for it: you type `/scrolls-compact` (your agent doesn't start it on its own) |
+| Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
+| License | MIT |
+| Source | [skills/scrolls/scrolls-compact](https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-compact) |
+
+## Install
+
+For one agent (leave out `-a` for every agent `npx skills` finds):
+
+<!-- verify -->
+```bash
+aiskills install -s scrolls-compact -a claude-code
+```
+
+```text
+[aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
+[aiskills] bundled: scrolls-compact
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-compact --agent claude-code --yes
+[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
+```
+
+Or the whole `scrolls-skills` group:
+
+```bash
+aiskills install -G scrolls -a claude-code
+```
+
+Into the current project instead: add `-p`. To remove it:
+
+```bash
+aiskills uninstall -s scrolls-compact
+```
+
+## What's inside
+
+The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scrolls-compact/`:
+
+- `CHANGELOG.md`
+- `README.md`
+- `SKILL.md`
+- `agents/openai.yaml`
+- `assets/EXAMPLES.md`
+- `assets/templates/COMPACT.md`
+- `meta/DESIGN.md`
+- `meta/MAINTAINERS.md`
+- `scripts/compact.ps1`
+- `scripts/compact.py`
+- `scripts/compact.sh`
+- `tests/test_compact.ps1`
+- `tests/test_compact.sh`
+
+See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
+
 <!-- source: skills/scrolls-explainer.md -->
 # scrolls-explainer
 
@@ -983,7 +1047,7 @@ Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page t
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-explainer` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); any modern web browser to view the page; --build also needs the network-flow skill |
 | License | MIT |
@@ -1043,12 +1107,12 @@ See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiski
 <!-- source: skills/scrolls-help.md -->
 # scrolls-help
 
-Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore, and the /scrolls-explainer page) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the six commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell).
+Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide, /scrolls-remove, /scrolls-restore, /scrolls-compact, and the /scrolls-explainer page) — what each command does, their shared -p/-t/-l/-r/-u/-x/--onto/--before/--base flags, and common usage examples (new project, monorepo, running from a subdirectory, toggling hidden/visible, removing and restoring scrolls, compacting old history). Use this whenever the user runs /scrolls-help, or asks what the scrolls commands do, how to use them, what flags they take, which one they need, or seems unsure about docs/.scrolls setup — even if they only name one of the seven commands rather than 'scrolls' generally. Supports -e/--online to render it as a styled page served on an OS-assigned localhost port instead of chat text, with light/dark and colorize/plain toggles. Works on macOS, Linux, and Windows (bash or PowerShell).
 
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-help` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1110,7 +1174,7 @@ Converts an already-set-up docs/scrolls/ working-memory folder from visible (scr
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-hide` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1169,7 +1233,7 @@ Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git rep
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-remove` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |
@@ -1229,7 +1293,7 @@ Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git hist
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-restore` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |
@@ -1289,7 +1353,7 @@ Sets up a minimal docs/.scrolls/ working-memory system for a project — a small
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-setup` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1354,7 +1418,7 @@ Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hid
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-unhide` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1413,7 +1477,7 @@ Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, H
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-update` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1587,7 +1651,7 @@ aiskills groups
 ```text
 scrolls-skills  (alias: scrolls)
   Scrolls: a git-native markdown system for agentic memory that persists project state across sessions and ag...
-  skills: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+  skills: scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
 
 stata-skills  (alias: stata)
   Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-b...
@@ -1635,15 +1699,15 @@ aiskills install --group scrolls --agent claude-code
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+[aiskills] bundled: scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-compact --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 What happened, in order:
 
 1. `aiskills` refreshed the skill files in `~/.config/sugatoray/aiskills/skills/` from the package.
-2. It turned the group into its <!-- count:group:scrolls -->8<!-- /count --> skills (`bundled: ...`).
+2. It turned the group into its <!-- count:group:scrolls -->9<!-- /count --> skills (`bundled: ...`).
 3. It ran `npx skills add` on that folder with one `--skill` per skill and your agent. `--global` is the default scope, and `--yes` skips `npx skills`' prompts.
 
 `npx skills` prints its own progress after that line, and the skills appear in Claude Code as `/scrolls-setup`, `/scrolls-update` and so on.
@@ -1719,7 +1783,7 @@ aiskills install -s 'scroll-*'
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] no skill matches: scroll-*
-  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, run-code-review, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, run-code-review, scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
 ```
 
 ## Mix skills and groups
@@ -1881,7 +1945,7 @@ aiskills install -s pdf
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
 [aiskills] not provided by this package: pdf
-  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, run-code-review, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
+  available: artwallbg, commentdrop, create-issues-update-pr, create-lib-docs, dynamic-promo-video, network-flow, prodigy, run-code-review, scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update, stata-recipes
   add --route to look them up with 'npx skills' instead
 ```
 
@@ -2751,10 +2815,10 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `personas-skills` | `personas` | prodigy |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
 | `review-skills` | `review` | run-code-review |
-| `scrolls-skills` | `scrolls` | scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
+| `scrolls-skills` | `scrolls` | scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |
 | `stata-skills` | `stata` | stata-recipes |
 | `video-related-skills` | `video-related` | dynamic-promo-video |
-| `all` (built in) | | all <!-- count:skills -->17<!-- /count --> skills |
+| `all` (built in) | | all <!-- count:skills -->18<!-- /count --> skills |
 <!-- groups:end -->
 
 Every bundled skill is in a group. A skill in no group would be listed as ungrouped and installed with `-s <name>` or `-G all`. `aiskills groups` always shows the list for the version you have.
@@ -3191,7 +3255,7 @@ aiskills info
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
     project config : ./.aiskills.json  (not created)
-      saved skills : 17 skills in 9 groups, flat layout
+      saved skills : 18 skills in 9 groups, flat layout
 …
         skills CLI : skills@1.7.6  (pinned, tested)
              scope : global  (default)
@@ -5207,7 +5271,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-17 skills, sorted by name.
+18 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
@@ -5219,6 +5283,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 | [`network-flow`](skills/network-flow.md) | diagrams | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/SKILL.md) |
 | [`prodigy`](skills/prodigy.md) | personas | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/SKILL.md) |
 | [`run-code-review`](skills/run-code-review.md) | review | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/SKILL.md) |
+| [`scrolls-compact`](skills/scrolls-compact.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/SKILL.md) |
 | [`scrolls-explainer`](skills/scrolls-explainer.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-explainer/SKILL.md) |
 | [`scrolls-help`](skills/scrolls-help.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/SKILL.md) |
 | [`scrolls-hide`](skills/scrolls-hide.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-hide/SKILL.md) |

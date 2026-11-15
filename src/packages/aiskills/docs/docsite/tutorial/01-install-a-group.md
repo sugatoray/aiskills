@@ -14,7 +14,7 @@ aiskills groups
 ```text
 scrolls-skills  (alias: scrolls)
   Scrolls: a git-native markdown system for agentic memory that persists project state across sessions and ag...
-  skills: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+  skills: scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
 
 stata-skills  (alias: stata)
   Stata skills: turns a plain-language data/statistics task into correct, runnable Stata code, with good-vs-b...
@@ -62,15 +62,15 @@ aiskills install --group scrolls --agent claude-code
 
 ```text
 [aiskills] skills saved to ~/.config/sugatoray/aiskills/skills (flat layout)
-[aiskills] bundled: scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
-[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
+[aiskills] bundled: scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update
+[aiskills] running: npx -y skills@1.7.6 add ~/.config/sugatoray/aiskills --global --skill scrolls-compact --skill scrolls-explainer --skill scrolls-help --skill scrolls-hide --skill scrolls-remove --skill scrolls-restore --skill scrolls-setup --skill scrolls-unhide --skill scrolls-update --agent claude-code --yes
 [aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)
 ```
 
 What happened, in order:
 
 1. `aiskills` refreshed the skill files in `~/.config/sugatoray/aiskills/skills/` from the package.
-2. It turned the group into its <!-- count:group:scrolls -->8<!-- /count --> skills (`bundled: ...`).
+2. It turned the group into its <!-- count:group:scrolls -->9<!-- /count --> skills (`bundled: ...`).
 3. It ran `npx skills add` on that folder with one `--skill` per skill and your agent. `--global` is the default scope, and `--yes` skips `npx skills`' prompts.
 
 `npx skills` prints its own progress after that line, and the skills appear in Claude Code as `/scrolls-setup`, `/scrolls-update` and so on.
