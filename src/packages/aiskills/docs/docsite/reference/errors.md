@@ -345,6 +345,83 @@ Install <n> external skill(s) from the registry? [y/N] n
 
 **Cause:** [`AISKILLS_TODAY`](environment.md#aiskills_today) is set to something that isn't a real date. **Fix:** a date like `2026-11-12`, or unset it.
 
+## Config errors
+
+From [`aiskills config`](cli.md#config), and from any command that reads a config file.
+
+### Unknown config key
+
+```text
+unknown config key: <key> (keys: agents, color, copy, groups, layout, route, scope, skills, skills-version, stats)
+```
+
+**Fix:** use one of the listed keys. Keys are lowercase and use a hyphen (`skills-version`).
+
+### Value not valid for the key
+
+```text
+<key> must be <values>; got '<value>'
+<key> must be true or false (or yes/no, on/off, 1/0); got '<value>'
+<key> needs at least one name
+<key> needs a value
+skills-version must be a version (e.g. 1.7.6), "latest", "next", an npm range (e.g. ~1.7.4) or an interval (e.g. [1.7.4, 1.8.0)); got '<value>'
+```
+
+**Fix:** give a value the key takes; the [keys table](cli.md#config) lists them. Nothing is written.
+
+### Not set
+
+```text
+<key> is not set in <file>
+```
+
+**Fix:** `--unset` only removes what that file holds. Check with `aiskills config --list --show-origin`, and add `--project` for `./.aiskills.json`.
+
+### Alias not valid
+
+```text
+alias.<name>: alias names are lowercase letters, digits and dashes, starting with a letter
+alias.<name>: shell aliases (!...) are only allowed in the user file, ~/.config/sugatoray/aiskillsconfig.json (or in the file AISKILLS_USER_CONFIG names)
+alias.<name> in ./.aiskills.json is a shell alias, which a project can't define; define it in ~/.config/sugatoray/aiskillsconfig.json instead (or in the file AISKILLS_USER_CONFIG names)
+alias.<name>: '<name>' is an aiskills command; an alias can't replace it
+unclosed quote in '<value>'
+```
+
+**Fix:** name the alias something like `gi` or `dry-run`, not a command or its short name (`install`, `i`, ...), and make the value an aiskills command with its options, e.g. `aiskills config alias.gi "install -g"`. Quotes must be closed. A shell alias (`!...`) goes in your user file (leave out `--project`), or in the file [`AISKILLS_USER_CONFIG`](environment.md#aiskills_user_config) names; a project's `./.aiskills.json` can't have one, and running such an alias from that file stops before anything runs. Nothing is written.
+
+### Shell alias in a project file (warning)
+
+```text
+warning: alias.<name> in ./.aiskills.json is ignored: an alias that starts with '!' isn't allowed in a project's .aiskills.json; define it in ~/.config/sugatoray/aiskillsconfig.json instead (or in the file AISKILLS_USER_CONFIG names)
+```
+
+Printed once per run, on stderr, by any command that reads the project file. The alias is skipped; the file's other settings and aliases, and every command, keep working. **Fix:** if you trust it, move the alias to your user file (`aiskills config alias.<name> '!...'`), and remove it from `./.aiskills.json`.
+
+### Alias loop
+
+```text
+alias loop: <name> → <name> → <name>
+```
+
+**Fix:** aliases may use other aliases, but not in a circle. Change or `--unset` one of the aliases named.
+
+### Config file not valid JSON
+
+```text
+<file> is not valid JSON; fix it or delete it
+<file>: <key> must be ...
+```
+
+**Fix:** a config file is a JSON object such as `{"layout": "nested"}`. Correct the file, or delete it and set the values again. Any command that reads settings stops on it, so the broken file doesn't silently stop counting.
+
+### Config usage
+
+```text
+usage: aiskills config <key> [<value>] | --unset <key> | --list [--show-origin] [--json]  [--global | --project]
+```
+
+**Fix:** pass a key (to read), a key and a value (to set), `--unset <key>`, or `--list`.
+
 ## Upgrade
 
 ### Can't upgrade
@@ -507,7 +584,15 @@ two skills are both named '<name>': skills/<folder> and skills/<folder>
 
 ## Docs build errors (maintainers)
 
-These come from `npm run docs:html`, which builds `docs/docsite/index.html`.
+These come from `npm run docs:html`, which builds `docs/docsite/index.html`, and `npm run docs:skills`, which writes the skill pages, the counts and the group tables.
+
+### Unknown count marker
+
+```text
+<page>: unknown count marker '<key>' (known: skills, groups, group:<alias>, ...)
+```
+
+**Fix:** a page has a `<!-- count:<key> -->N<!-- /count -->` marker that `npm run docs:skills` can't fill. Use `count:skills` (skills in the package), `count:groups` (groups with skills) or `count:group:<alias>` (one group's skills, e.g. `count:group:scrolls`). Write any count of skills or groups this way, so it can't go stale; a test fails on a number typed by hand.
 
 ### Page not in the landing page
 

@@ -53,6 +53,36 @@ describe("build-docs-html", () => {
     for (const p of d.pages) assert.equal(p.md, readFileSync(join(DOCS, p.path), "utf8"), `${p.path} changed in the bundle`);
   });
 
+  test("a tab's number counts the pages in its own folder, not that folder's overview or pages from elsewhere", async () => {
+    const { build } = await load();
+    const d = data(build(DOCS).html);
+    const tab = (id) => d.tabs.find((t) => t.id === id);
+    const skillPages = readdirSync(join(DOCS, "skills")).filter((f) => f.endsWith(".md") && f !== "README.md").length;
+    assert.equal(tab("skills").count, skillPages, "Skills: one per skill, not the overview or the explainer");
+    assert.ok(tab("skills").pages.length > skillPages, "the Skills tab also holds the overview and the explainer");
+    assert.equal(tab("tutorial").count, tab("tutorial").pages.length, "a tab without an overview counts every page");
+    assert.equal(tab("reference").count, tab("reference").pages.length);
+    assert.equal(tab("home").count, 0, "the landing page alone: no number");
+  });
+
+  test("the Skills tab's page list is grouped by skill group, as on the Bundled skills page", async () => {
+    const { build } = await load();
+    const skills = data(build(DOCS).html).tabs.find((t) => t.id === "skills");
+    // The groups and their skills, read straight from the generated overview (skills/README.md).
+    const overview = readFileSync(join(DOCS, "skills", "README.md"), "utf8");
+    const want = overview.split(/^## /m).slice(1).map((sec) => ({
+      label: sec.split("\n")[0].trim(),
+      pages: [...sec.matchAll(/\]\(([a-z0-9-]+)\.md\)/g)].map((m) => `skills/${m[1]}.md`),
+    }));
+    assert.ok(want.length >= 9, "the overview has a section per group");
+    assert.deepEqual(skills.nav.groups.map((g) => ({ label: g.label, pages: g.pages })), want);
+    assert.deepEqual(skills.nav.top, ["skills/README.md"], "the overview stays on top");
+    assert.deepEqual(skills.nav.extra, [{ label: "Explainers", pages: ["explainers/scrolls.md"] }], "the explainer is not a skill");
+    const everyPage = [...skills.nav.top, ...skills.nav.groups.flatMap((g) => g.pages), ...skills.nav.extra.flatMap((x) => x.pages)];
+    assert.deepEqual(everyPage.sort(), [...skills.pages].sort(), "every page of the tab is listed once");
+    for (const tab of data(build(DOCS).html).tabs.filter((t) => t.id !== "skills")) assert.equal(tab.nav, undefined, `${tab.id}: a plain list`);
+  });
+
   test("the page is a complete HTML document with the version filled in", async () => {
     const { build } = await load();
     const { html } = build(DOCS);
@@ -317,6 +347,73 @@ const online = await fetch("https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2
 const noBrowser = !playwright ? "playwright not installed" : !online ? "cdnjs.cloudflare.com unreachable" : false;
 
 describe("index.html in a browser", { skip: noBrowser }, () => {
+  test("the Skills tab's left pane: collapsible groups, remembered, opened for the page you're on", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
+      const page = await context.newPage();
+      const open = () => page.$$eval("#side .nav-group > button", (bs) => bs.map((b) => [b.dataset.group, b.getAttribute("aria-expanded")]));
+      const isOpen = async (id) => Object.fromEntries(await open())[id];
+      await page.goto(pathToFileURL(OUT).href + "#skills");
+      await page.waitForSelector("#side .nav-group");
+      // The overview on top, then one collapsible group per skill group with its count, then the explainers.
+      assert.equal(await page.locator("#side .nav-list a[aria-current=page]").innerText(), "Bundled skills");
+      const groups = await open();
+      assert.ok(groups.length >= 9);
+      assert.deepEqual(groups.filter(([, e]) => e === "true").map(([g]) => g), [groups[0][0]], "on the overview, the first group starts open");
+      assert.match(await page.locator("#side .nav-group > button").first().innerText(), /scrolls-skills\s*8/);
+      assert.equal(await page.locator("#side .nav-group").first().locator("ul a").count(), 8);
+      assert.ok(await page.locator("#side .side-label", { hasText: "Explainers" }).count(), "an Explainers section");
+      assert.equal(await page.locator("#side a", { hasText: "See how the scrolls skills work" }).count(), 1);
+      // Toggle a group open and shut.
+      const docs = page.locator('#side .nav-group > button[data-group="docs-skills"]');
+      await docs.click();
+      assert.equal(await isOpen("docs-skills"), "true");
+      assert.equal(await page.locator('#side .nav-group:has(button[data-group="docs-skills"]) ul a').innerText(), "create-lib-docs");
+      // Remembered per browser: still open after a reload.
+      await page.reload();
+      await page.waitForSelector("#side .nav-group");
+      assert.equal(await isOpen("docs-skills"), "true", "open groups are remembered");
+      await page.locator('#side .nav-group > button[data-group="docs-skills"]').click();
+      assert.equal(await isOpen("docs-skills"), "false");
+      // A skill page opens its own group and marks the page.
+      await page.evaluate(() => (location.hash = "skills-run-code-review"));
+      await page.waitForFunction(() => document.querySelector('#side a[aria-current="page"]')?.textContent === "run-code-review");
+      assert.equal(await isOpen("review-skills"), "true");
+      // So does a search result.
+      await page.fill("#q", "network-flow");
+      await page.locator(".hit", { hasText: "network-flow" }).first().click();
+      await page.fill("#q", "");
+      await page.dispatchEvent("#q", "input");
+      await page.waitForSelector('#side .nav-group > button[data-group="diagrams-skills"][aria-expanded="true"]');
+      // Expand all / Collapse all.
+      await page.locator("#side button", { hasText: "Expand all" }).click();
+      assert.ok((await open()).every(([, e]) => e === "true"));
+      await page.locator("#side button", { hasText: "Collapse all" }).click();
+      assert.deepEqual((await open()).filter(([, e]) => e === "true").map(([g]) => g), ["diagrams-skills"], "the current page's group stays open");
+      // Other tabs keep their plain list.
+      await page.evaluate(() => (location.hash = "tutorial-01-install-a-group"));
+      await page.waitForFunction(() => location.hash === "#tutorial-01-install-a-group" && !document.querySelector("#side .nav-group"));
+      await context.close();
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the Skills tab shows the number of skills", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage();
+      await page.goto(pathToFileURL(OUT).href);
+      await page.waitForSelector("#tabs .tab");
+      const skills = readdirSync(join(DOCS, "skills")).filter((f) => f.endsWith(".md") && f !== "README.md").length;
+      const label = await page.locator("#tabs .tab", { hasText: "Skills" }).innerText();
+      assert.equal(label.replace(/\s+/g, " ").trim(), `Skills ${skills}`);
+    } finally {
+      await browser.close();
+    }
+  });
+
   test("every page renders, and every link goes to a page and heading that exist", async () => {
     const browser = await playwright.chromium.launch();
     try {

@@ -235,6 +235,7 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
   cpSync(join(PKG_SRC, "src", "scripts"), join(pkg, "src", "scripts"), { recursive: true });
   cpSync(join(PKG_SRC, "package.json"), join(pkg, "package.json"));
   cpSync(join(PKG_SRC, "CHANGELOG.md"), join(pkg, "CHANGELOG.md"));
+  cpSync(join(PKG_SRC, "examples"), join(pkg, "examples"), { recursive: true });
   const repo = realSkills ? copyRealSkills(join(dir, "repo")) : writeFixtureTree(join(dir, "repo"));
   vendor({ repoRoot: repo, pkgDir: pkg });
   const home = join(dir, "home");
@@ -415,7 +416,7 @@ export function repoCopy() {
     cpSync(join(REPO_ROOT, rel), dest);
   }
   const pkg = join(repo, "src", "packages", "aiskills");
-  for (const p of ["bin", "src", "package.json", "README.md", "CHANGELOG.md", "SECURITY.md", "LICENSE", ".npmignore", ".gitignore"]) {
+  for (const p of ["bin", "src", "examples", "package.json", "README.md", "CHANGELOG.md", "SECURITY.md", "LICENSE", ".npmignore", ".gitignore"]) {
     cpSync(join(PKG_SRC, p), join(pkg, p), { recursive: true });
   }
   return { dir, repo, pkg, skills };

@@ -10,6 +10,7 @@ The full policy, including how to report a vulnerability, is in the package's [S
 | --- | --- |
 | `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | Written by `install`, `sync`, `list` and `groups`. `skills/` is replaced each time. `--purge` deletes the folder. |
 | Agents' skill folders | Only through `npx skills add` / `remove`. |
+| Your config files | `~/.config/sugatoray/aiskillsconfig.json` and a project's `./.aiskills.json`, written only by [`aiskills config`](../reference/cli.md#config). |
 | An empty temporary folder | While reading the agent list for `-a` patterns; deleted straight after. |
 | A temporary `aiskills-stats-*` folder | The [skills.sh install count](install-count.md) after `install`: a throwaway project install from GitHub, deleted when it ends. |
 | The network | Never directly. `npx` downloads the `skills` CLI; `npx skills` talks to `skills.sh` and GitHub, including for the [skills.sh install count](install-count.md). |
@@ -25,6 +26,7 @@ Each one is covered by the test suite.
 - **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
 - **Only its own folders are replaced or deleted.** `sync`, `install` and `uninstall --purge` refuse a folder that has other files but no `aiskills.json`. This guards against an `AISKILLS_HOME` pointed at the wrong place.
 - **npm's own variables are removed** before `npx` runs (registry, proxy and certificate settings are kept).
+- **A project's config file can't run programs.** Shell aliases (`!...`) are read only from your own config file; one in a project's `./.aiskills.json`, which usually comes with someone else's repo, is skipped with a [warning](../reference/errors.md#shell-alias-in-a-project-file-warning). An alias can never replace a command. A project file can still set that folder's defaults (such as `route` or `skills-version`): see them with `aiskills config --list --show-origin`.
 - **No runtime dependencies.**
 
 ## Skills are code

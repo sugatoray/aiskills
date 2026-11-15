@@ -17,6 +17,7 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - The quoted `skills@<range>` argument for `cmd.exe` (Windows) is only unit-tested; no range has been run through `npx.cmd` on real Windows.
 - The release-age explanation doesn't say *when* the pinned version qualifies: that needs its publish time, i.e. a registry call that `aiskills` doesn't make. It points at `npm view skills time` instead.
 - The docs page needs network to render (marked and highlight.js come from cdnjs).
-- Hand-written skill/group lists (README intro and group table, `docs/docsite/README.md` count, `concepts/skill-groups.md` table) aren't checked by tests, so they can go stale when a skill or group is added.
+- Shell aliases (`aiskills config alias.x '!...'`) never ran on Windows; the `cmd` quoting of the arguments after the alias is untested.
+- A project's `./.aiskills.json` can still change what an install does in that folder (`agents`, `skills`, `route`, `skills-version`, `copy`); only `!` aliases are refused there.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.

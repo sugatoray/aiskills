@@ -18,6 +18,10 @@ documented and tested. The user guide is [`docs/docsite/`](../docsite/README.md)
 | `aiskills list` | | List the skills available in the install folder. |
 | `aiskills path` | `p` | Print the install folder. |
 | `aiskills skills <args>` | | Pass `<args>` to `npx skills`; `:root` becomes the install folder. |
+| `aiskills info` | | This setup: versions, folders, settings and where each comes from. |
+| `aiskills config` | | Get and set defaults and aliases, like `git config`. |
+| `aiskills releases` | `rel` | The latest releases on npm, with download counts. |
+| `aiskills upgrade` | | Install the latest aiskills, then refresh your agents' skills. |
 | `aiskills help` | `h`, `-h`, `--help` | Show help. |
 | `aiskills --version` | `-v` | Show the version. |
 
@@ -41,13 +45,17 @@ The whole CLI is also available as **`ais`** (identical) and **`aix`**
 | `-n`, `--dry-run` | uninstall | Print the `npx skills` command only | |
 | `--json` | groups | Machine-readable output | |
 | `-- <args>` | install, uninstall | Append `<args>` to the `npx skills` command | |
+| `--color`, `--no-color` | any | Color the output even when piped, or never | `NO_COLOR`, `FORCE_COLOR`; `aiskills config color` |
 
 `--route`, `--nested` and `--flat` may also come **before** the command
 (`aiskills --nested i`). `-s`, `-G` and `-a` can be repeated; their values
-add up. Command-line values replace the env defaults.
+add up. Command-line values replace the env defaults, which replace
+`aiskills config` values (the project's `./.aiskills.json`, then
+`~/.config/sugatoray/aiskillsconfig.json`).
 
 Other environment variables: `AISKILLS_HOME` (install folder),
-`AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI version `npx` runs; pinned by default).
+`AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI version `npx` runs; pinned by default),
+`AISKILLS_USER_CONFIG` (the user config file).
 
 ## Feature list
 
@@ -68,6 +76,9 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 | skills.sh install count | After a bundled install, a background `npx skills add sugatoray/aiskills` in a temp folder so skills.sh counts it; silent without github.com; `--no-stats` (remembered), `AISKILLS_STATS`, `DO_NOT_TRACK`/`DISABLE_TELEMETRY`/CI | [The skills.sh install count](../docsite/concepts/install-count.md), [SECURITY.md](../../SECURITY.md) | `stats.test.mjs` |
 | `skills` CLI version | Pinned by default; `AISKILLS_SKILLS_LIB_VERSION` takes a version, tag, npm range or interval (`[1.7.4, 1.8.0)`); npm's release-age variables reach `npx`, and an age-rule refusal is explained; `npm run audit:skills` for maintainers | [Choose the `skills` CLI version](../docsite/guides/choose-the-skills-cli-version.md), [MAINTAINERS](MAINTAINERS.md#updating-the-pinned-skills-cli) | `skills-version.test.mjs` |
 | Safety checks | Pinned `skills` CLI; unsafe registry results ignored; no shell characters to `cmd.exe`; only aiskills folders replaced or purged | [SECURITY.md](../../SECURITY.md), [Security model](../docsite/concepts/security.md) | `cli.test.mjs`, `unit.test.mjs` |
+| `aiskills config` | Defaults (every `AISKILLS_*` default and `color`) in a user file and a project file; `--list --show-origin`; aliases, alias chains, option-first aliases; shell aliases from the user file only (a project's are skipped with a warning); `AISKILLS_USER_CONFIG`; `examples/sample_aiskillsconfig.json` copied to the install folder | [CLI reference](../docsite/reference/cli.md#config), [Set default choices](../docsite/guides/set-defaults.md), [Files](../docsite/reference/files.md#config-files) | `config.test.mjs`, `cli.test.mjs`, `packaging.test.mjs` |
+| Colored output | On a terminal; plain when piped and for `--json`; `--color`/`--no-color`, `NO_COLOR`/`FORCE_COLOR`, `config color` | [CLI reference](../docsite/reference/cli.md#colored-output) | `colors.test.mjs`, `config.test.mjs` |
+| CLI outputs page | Every command's real, colored output on one page, rebuilt by `npm run cli-outputs` | [CLI outputs](../docsite/reference/cli-outputs.md), [docs/cli-outputs/README.md](../cli-outputs/README.md) | `cli-outputs.test.mjs` |
 | `npx skills` passthrough | `aiskills skills <args>` with `:root` | [Run any `npx skills` command](../docsite/guides/run-npx-skills-directly.md) | `cli.test.mjs` |
 | Themes | 11 themes (light and dark) for the docs page and the banner, chosen with a gear menu and remembered per browser; default Lights Out; one list in `src/scripts/docs/themes.mjs` | [FAQ](../docsite/faq.md#how-do-i-change-how-these-docs-look), [docs/banner/README.md](../banner/README.md#themes) | `themes.test.mjs`, `docs-html.test.mjs`, `banner.test.mjs` |
 | Banner | README image and docs landing-page banner from `docs/banner/config.yaml`, with an in-browser editor and PNG export; the PNG is fingerprinted so a stale one fails the tests (not published) | [docs/banner/README.md](../banner/README.md) | `banner.test.mjs`, `docs-html.test.mjs` |
@@ -82,6 +93,9 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 - Installing a skill a registry lookup found without the user's confirmation (`y` at the prompt, or `-y`).
 - Removing external skills in a full uninstall.
 - Single-letter aliases `s`, `l`, `u` (ambiguous; see MAINTAINERS).
+- Shell aliases (`!...`) from a project's `./.aiskills.json`: it usually comes
+  with someone else's repo, so it may not run programs.
+- TOML config files: JSON keeps the package free of runtime dependencies.
 
 ## Planned or under discussion
 

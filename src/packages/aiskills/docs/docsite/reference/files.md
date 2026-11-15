@@ -9,6 +9,7 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 ```text
 ~/.config/sugatoray/aiskills/
 ├── aiskills.json                     marks the folder as an aiskills folder; last sync
+├── sample_aiskillsconfig.json        an example config file (every key, each kind of alias); never read
 ├── skills/                           the skills, flat or nested; replaced on every sync
 ├── .aiskills/layout.json             each skill's original folder
 └── .claude-plugin/marketplace.json   the repo's marketplace file, used for groups
@@ -36,6 +37,21 @@ What `aiskills` writes and where, and the exact fields of every file and JSON ou
 | `stats` | boolean, optional | Written by `--stats` / `--no-stats`: whether `aiskills install` adds installs to the [skills.sh count](../concepts/install-count.md). Kept by later syncs; absent means on. |
 | `installedAt` | string (ISO 8601) | When the folder was last synced. |
 | `skills` | string (absolute path) | The `skills/` folder. |
+
+## Config files
+
+Written by [`aiskills config`](cli.md#config). Each is a JSON object of key → value, for example `{"agents": "claude-code,codex", "layout": "nested"}`; the keys and values are listed under [`config`](cli.md#config).
+
+| File | Written by | Notes |
+| --- | --- | --- |
+| `~/.config/sugatoray/aiskillsconfig.json` | `aiskills config <key> <value>` (`--global`) | Your defaults and aliases. Outside the install folder, so `uninstall --purge` keeps it, and `AISKILLS_HOME` doesn't move it; [`AISKILLS_USER_CONFIG`](environment.md#aiskills_user_config) names a different file. |
+| `./.aiskills.json` | `aiskills config --project <key> <value>` | Defaults for the current folder; win over the user file. Commit it to share them with a project. |
+
+The user file is named `aiskillsconfig.json` so it isn't mistaken for the install folder's own [`aiskills.json`](#aiskillsjson): that one is written by aiskills on every sync and records the folder; the config file holds only what you set.
+
+**An example:** every sync copies `sample_aiskillsconfig.json` (from the package's `examples/` folder) into the install folder. It sets every key and has each kind of alias, laid out as `aiskills config` writes a file. It is only an example: its name isn't a config file's, so nothing reads it. To use parts of it, set them with `aiskills config`, or copy it to `~/.config/sugatoray/aiskillsconfig.json` and remove what you don't want.
+
+Keys `aiskills` doesn't know (from a newer version) are ignored. A file that isn't valid JSON stops every command that reads settings, with [`is not valid JSON`](errors.md#config-file-not-valid-json).
 
 ## `.aiskills/layout.json`
 

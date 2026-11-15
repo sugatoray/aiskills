@@ -26,6 +26,26 @@ and date this section.
 
 ### Added
 
+- **`aiskills config`**, like `git config`: `aiskills config <key>` prints a
+  default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it,
+  and `--list` (with `--show-origin` or `--json`) shows what is set. Defaults
+  live in `~/.config/sugatoray/aiskillsconfig.json`, or with `--project` in
+  `./.aiskills.json`, which wins over it. Keys: `scope`, `agents`, `skills`,
+  `groups`, `copy`, `route`, `layout`, `stats`, `skills-version` (the same
+  defaults as the `AISKILLS_*` variables) and `color`; each value is checked
+  when it's set. Order: option > `AISKILLS_*` variable > project file > user
+  file > remembered > default. `aiskills info` lists both files and shows when
+  a setting comes from one, and has a new `color` line.
+  Aliases, like `git config alias.*`: `aiskills config alias.gi "install -g"`
+  makes `aiskills gi ...` run `aiskills install -g ...`, and an alias may
+  start with `--color`, `--route` and the like. An alias may use
+  another alias (a loop is an error) and can't replace a command. Shell
+  aliases (`!...`), as in git, are allowed in the user file only: a project's
+  `./.aiskills.json` can't run programs (a `!` alias there is skipped with a
+  warning, and everything else keeps working). `AISKILLS_USER_CONFIG` names a
+  different user file. An example file, `sample_aiskillsconfig.json` (every
+  key, each kind of alias), ships in `examples/` and is copied into the
+  install folder on every sync.
 - **Colored output.** On a terminal, `aiskills` colors its output: the
   `[aiskills]` prefix dim, errors red, warnings yellow, a finished upgrade
   green, and commands to run cyan; the headings in `--help`, the labels and

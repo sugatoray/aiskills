@@ -57,6 +57,10 @@ Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` t
 
 The install folder. Default: `~/.config/sugatoray/aiskills`. A relative path is resolved from the current folder. If the folder exists, it must be empty or an aiskills folder (it has `aiskills.json`); otherwise `aiskills` refuses to replace or delete it.
 
+### `AISKILLS_USER_CONFIG`
+
+The user config file that [`aiskills config`](cli.md#config) reads and writes. Default: `~/.config/sugatoray/aiskillsconfig.json`. A relative path is resolved from the current folder. Like the default file, it may hold shell aliases (`!...`), which a project's `./.aiskills.json` can't. [`aiskills info`](cli.md#info) shows `user config : <path>  (AISKILLS_USER_CONFIG)` when it's set.
+
 ### `AISKILLS_SKILLS_LIB_VERSION`
 
 The version of the `skills` CLI library that every `npx` call runs (not the version of the bundled skills). Default: `1.7.6` (pinned and tested). Accepts an exact version (`1.7.6`, `1.8.0-beta.1`), `latest`, `next`, an npm range (`~1.7.4`, `1.7.x`, `>=1.7.4 <1.8.0`) or interval notation, where exactly one of `...`, `?` or `*` is an open end (no combinations): `[x, ...)` (or `[x, ?)`, `[x, *)`) is `>=x`, `(x, ...)` is `>x`, `[x, y)` is `>=x <y`, `(..., x]` is `<=x`, and the other mixes of `[ ( ) ]`. With a range, npm picks the newest version its own rules (such as `min-release-age`) allow. A typographic `…` (as autocorrect makes it) is read as `...`. Only plain spaces may separate a range's parts; tabs, line breaks and Unicode spaces are refused. Anything else, or an interval no version fits, is refused. When it overrides the pinned version, every command says so once: `using skills@<spec> from AISKILLS_SKILLS_LIB_VERSION, not the tested 1.7.6`. See [Choose the `skills` CLI version](../guides/choose-the-skills-cli-version.md).

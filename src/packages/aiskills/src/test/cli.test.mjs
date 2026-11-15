@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
-import { FIXTURE_SKILLS, listTree, row, sandbox, skillsArgs, skillsPackage } from "./helpers.mjs";
+import { FIXTURE_SKILLS, PKG_SRC, listTree, row, sandbox, skillsArgs, skillsPackage } from "./helpers.mjs";
 import { SKILLS_CLI_VERSION } from "../scripts/core/installer.mjs";
 
 const posixOnly = { skip: process.platform === "win32" && "stand-in npx is a POSIX script" };
@@ -109,6 +109,15 @@ describe("aiskills sync / install (bundled)", posixOnly, () => {
     const meta = JSON.parse(readFileSync(join(sb.root, "aiskills.json"), "utf8"));
     assert.equal(meta.package, "@sugatoray-ai/aiskills");
     assert.equal(meta.layout, "flat");
+  });
+
+  test("sync puts sample_aiskillsconfig.json in the install folder, as an example only (never read as config)", () => {
+    sb.run(["sync"]);
+    const copied = join(sb.root, "sample_aiskillsconfig.json");
+    assert.equal(readFileSync(copied, "utf8"), readFileSync(join(PKG_SRC, "examples", "sample_aiskillsconfig.json"), "utf8"));
+    const list = sb.run(["config", "--list"]);
+    assert.equal(list.status, 0, list.out);
+    assert.equal(list.out, "", "its settings don't take effect");
   });
 
   test("sync replaces an older copy instead of merging into it", () => {

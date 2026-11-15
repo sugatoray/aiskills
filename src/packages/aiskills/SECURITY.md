@@ -50,6 +50,9 @@ Only the latest release gets fixes. See [`CHANGELOG.md`](CHANGELOG.md).
 | `~/.config/sugatoray/aiskills/` (or `AISKILLS_HOME`) | `install`, `sync`, `list`, `groups` | `skills/` is **replaced** on every sync; `--purge` deletes the **whole folder**. Both refuse a folder that isn't an aiskills folder (see [Protections](#protections-against-known-risks)). |
 | `~/.agents/skills/`, `~/.claude/skills/` and other agents' skill folders | `npx skills add` / `remove`, run by `install` / `uninstall` | Global scope. The `skills` CLI decides the exact folders. |
 | `./.claude/skills/`, `./skills-lock.json` etc. in the current folder | `npx skills`, with `-p`/`--project` | Project scope. |
+| `~/.config/sugatoray/aiskillsconfig.json` (or `AISKILLS_USER_CONFIG`) | `aiskills config <key> <value>` | Your defaults and aliases. Written only when you run `aiskills config`; kept by `--purge`. |
+| `./.aiskills.json` in the current folder | `aiskills config --project <key> <value>` | A project's defaults and aliases. |
+| `~/.config/sugatoray/aiskills/sample_aiskillsconfig.json` | `install`, `sync` | An example config file, replaced on every sync; never read. |
 | A temporary folder under the OS temp dir | the agent-list lookup for `-a` patterns | Empty; deleted straight after. |
 | A temporary folder under the OS temp dir (`aiskills-stats-*`) | the [skills.sh install count](#the-skillssh-install-count) after `install` | A throwaway project install from GitHub; deleted when the count ends. |
 
@@ -103,6 +106,16 @@ npx -y skills@1.7.6 add sugatoray/aiskills --skill <each installed skill> --agen
 - The only program it starts is `npx` (`npx.cmd` on Windows), always as
   `npx -y skills@<pinned version> <args>`, with an argument array (no shell on
   macOS and Linux; on Windows, see the shell-character check below).
+  The one exception is a shell alias you define yourself.
+- **Shell aliases** (`aiskills config alias.<name> '!<command>'`) run
+  `<command>` through `sh -c` (`cmd` on Windows) when you type
+  `aiskills <name>`, like git's `!` aliases. They are read **only from your
+  user file** (`~/.config/sugatoray/aiskillsconfig.json`, or the file
+  `AISKILLS_USER_CONFIG` names). A project's `./.aiskills.json` usually comes
+  with a cloned repo, so it can't define one: `aiskills config --project`
+  refuses it, and one written there by hand is skipped with a warning (and
+  never run). An alias can't use a command's name, so no alias changes what
+  `aiskills install` and the other commands do.
 - npm's own lifecycle variables (`npm_config_global`, `npm_config_prefix`,
   `npm_lifecycle_*`, …) are removed before `npx` runs; registry, proxy and
   certificate settings are kept, and so are npm's release-age settings
@@ -179,7 +192,12 @@ Each of these has tests in `src/test/` (`npm test`).
 
 ## Remaining caveats
 
-- Setting `AISKILLS_SKILLS_LIB_VERSION=latest` gives up the pinning above.
+- Setting `AISKILLS_SKILLS_LIB_VERSION=latest` gives up the pinning above, and
+  so does `aiskills config skills-version latest`.
+- A project's `./.aiskills.json` can set the defaults of commands run in that
+  folder, including `route`, `agents` and `skills-version`. It can't run
+  programs (see Shell aliases above), but check a cloned repo's file with
+  `aiskills config --list --show-origin` before installing there.
 - An `owner/repo@skill` you type yourself is passed to `npx skills add` as you
   typed it (on Windows, still subject to the shell-character check).
 - Anything already in an aiskills folder's `skills/` is replaced on every
