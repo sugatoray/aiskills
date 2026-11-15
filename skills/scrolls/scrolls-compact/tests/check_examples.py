@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-"""Check assets/EXAMPLES.md: its structure, its coverage, and that every
-documented output is what the skill really prints.
+"""Check the examples: assets/EXAMPLES.md (a small index) and one file per
+example, assets/examples/example_NNN.md. Checks the layout, the coverage, and
+that every documented output is what the skill really prints.
+
+Layout rules (so an agent can read the index, then only the example it needs):
+  - EXAMPLES.md holds no example bodies, stays under INDEX_MAX_LINES lines, and
+    has one table row per example: | Example | File | Prompt | Shows | Starts from |.
+  - The table's files and assets/examples/*.md match one to one, in order.
+  - Each example file holds exactly one example, links back to ../EXAMPLES.md,
+    says what it starts from (linking the example it depends on, if any), and
+    stays under the Read tool's 2,000-line default.
 
 Each example is replayed, in order, in a fresh demo repository:
 
@@ -40,6 +49,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
 EXAMPLE = SKILL / "assets" / "EXAMPLES.md"
+EXAMPLE_DIR = SKILL / "assets" / "examples"
+INDEX_MAX_LINES = 150
+FILE_MAX_LINES = 2000
 SCRIPT = SKILL / "scripts" / "compact.sh"
 SHOWN_ROOT = "/work/shop"
 S = "docs/.scrolls"
@@ -384,12 +396,58 @@ def replay(ex, printing: bool):
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+ROW = re.compile(r"^\| \[(\d\d)\]\((examples/example_(\d{3})\.md)\) \| `examples/example_\d{3}\.md` \|"
+                 r" (.+?) \| (.+?) \| (.+?) \|$")
+
+
 def main() -> int:
     printing = "--print" in sys.argv
     if not check(EXAMPLE.is_file(), "assets/EXAMPLES.md exists"):
         return 1
-    text = EXAMPLE.read_text(encoding="utf-8")
-    examples, problems = parse(text)
+    index = EXAMPLE.read_text(encoding="utf-8")
+
+    # ---- the index
+    check(len(index.splitlines()) <= INDEX_MAX_LINES,
+          f"EXAMPLES.md is a small index ({len(index.splitlines())} lines, at most {INDEX_MAX_LINES})")
+    check(not re.search(r"(?m)^<!--- (example|prompt-block|prompt-output|setup-block):start", index),
+          "EXAMPLES.md holds no example bodies (they live in examples/)")
+    check("| Example | File | Prompt | Shows | Starts from |" in index,
+          "EXAMPLES.md's table has the columns Example, File, Prompt, Shows, Starts from")
+    rows = [ROW.match(l) for l in index.splitlines() if l.startswith("| [")]
+    check(all(rows), "every table row has the expected shape, with the file as a link and as a path")
+    rows = [r for r in rows if r]
+    files = sorted(p.name for p in EXAMPLE_DIR.glob("*.md")) if EXAMPLE_DIR.is_dir() else []
+    check(EXAMPLE_DIR.is_dir(), "assets/examples/ exists")
+    check([f"example_{r.group(3)}.md" for r in rows] == files,
+          "the table and assets/examples/*.md match one to one, in order",
+          f"  table: {[r.group(2) for r in rows]}\n  files: {files}")
+    for r in rows:
+        check(int(r.group(1)) == int(r.group(3)), f"row {r.group(1)} points at its own file ({r.group(2)})")
+
+    # ---- each example file
+    examples, problems = [], []
+    for name in files:
+        text = (EXAMPLE_DIR / name).read_text(encoding="utf-8")
+        exs, probs = parse(text)
+        problems += [f"{name}: {p}" for p in probs]
+        n = name[len("example_"):-3]
+        check(len(exs) == 1, f"{name}: holds exactly one example")
+        check(len(text.splitlines()) < FILE_MAX_LINES, f"{name}: under {FILE_MAX_LINES} lines")
+        check("](../EXAMPLES.md)" in text, f"{name}: links back to ../EXAMPLES.md")
+        check(re.search(r"(?m)^Starts from: ", text) is not None, f"{name}: says what it starts from")
+        for e in exs:
+            check(e["num"] is not None and int(e["num"]) == int(n), f"{name}: is Example-{int(n):02d}")
+            e["file"] = name
+            dep = re.match(r"^(?:after|condensed)-(\d\d)$", e["fixture"] or "")
+            if dep:
+                check(f"(example_{int(dep.group(1)):03d}.md)" in text,
+                      f"{name}: links the example it starts from (example_{int(dep.group(1)):03d}.md)")
+            row = next((r for r in rows if int(r.group(1)) == int(n)), None)
+            if row:
+                want = (f"[Example-{dep.group(1)}](examples/example_{int(dep.group(1)):03d}.md)" if dep
+                        else f"`{e['fixture']}`")
+                check(want in row.group(6), f"row {row.group(1)}: Starts from names {want}", f"  row says: {row.group(6)}")
+        examples += exs
     check(not problems, "markers are balanced and well formed", "\n".join("  " + p for p in problems))
     check(len(examples) >= 15, f"has an exhaustive set of examples ({len(examples)} found, at least 15)")
     nums = [e["num"] for e in examples]
@@ -398,7 +456,6 @@ def main() -> int:
     for e in examples:
         check(e["fixture"] is not None, f"Example-{e['num']}: names its fixture")
         check(any(it["kind"] == "prompt-block" for it in e["items"]), f"Example-{e['num']}: has a prompt")
-        check(f"[{e['num']}](#example-{e['num']})" in text, f"Example-{e['num']}: is in the index table")
         for it in e["items"]:
             if it["kind"] == "prompt-block":
                 meta, _ = metadata(it["body"])

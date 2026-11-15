@@ -19,7 +19,9 @@ scrolls-compact/
 ├── agents/
 │   └── openai.yaml
 ├── assets/
-│   ├── EXAMPLES.md
+│   ├── EXAMPLES.md               the index: one table row per example
+│   ├── examples/
+│   │   └── example_001.md … example_023.md
 │   └── templates/
 │       └── COMPACT.md
 ├── meta/
@@ -40,7 +42,7 @@ scrolls-compact/
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
-- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md): 23 examples, each with a premise, caveats, the prompt and its real output, covering every flag, refusal and exit code; checked by `tests/test_examples.sh`
+- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md), the index, and one file per example in [`assets/examples/`](assets/examples/): 23 examples, each with a premise, caveats, the prompt and its real output, covering every flag, refusal and exit code; checked by `tests/test_examples.sh`
 - **Design**: [`meta/DESIGN.md`](meta/DESIGN.md): why it works the way it does
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)

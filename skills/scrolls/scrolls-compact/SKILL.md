@@ -210,9 +210,12 @@ An agent that can't run this skill can use the plain git commands that `COMPACT.
 
 ## Examples
 
-`assets/EXAMPLES.md` has 23 worked examples, covering every flag, refusal and exit code, all run on one small demo repository. Each has a premise, caveats, the prompt, and its **real** output: a test replays every one, so the outputs are exactly what the script prints.
+There are 23 worked examples, covering every flag, refusal and exit code, all run on one small demo repository. Each has a premise, caveats, the prompt, and its **real** output: a test replays every one, so the outputs are exactly what the script prints.
 
-Read that file only when you need it: for example, when a request does not map clearly to the flags above, or when the user asks for an example.
+- `assets/EXAMPLES.md` is the index: how to read the examples, the demo repository, and a table with one row per example and its file.
+- `assets/examples/example_NNN.md` holds one example each (`example_001.md` to `example_023.md`).
+
+Read them only when you need them: for example, when a request does not map clearly to the flags above, or when the user asks for an example. Read the index first, then only the example file you need. If that example starts from another example's state, its `Starts from:` line links to it.
 
 ## Development
 

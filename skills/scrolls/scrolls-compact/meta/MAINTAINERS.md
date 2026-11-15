@@ -9,12 +9,18 @@ For people developing this skill. It isn't read when answering a
 - `../README.md`: a short, human-facing pointer. Not read at invocation time.
 - `../CHANGELOG.md`: this skill's version history. Update it alongside
   `metadata.version` in `SKILL.md`.
-- `../assets/EXAMPLES.md`: every flag, refusal and exit code as an example
+- `../assets/EXAMPLES.md` (the index) and `../assets/examples/example_NNN.md`
+  (one example each): every flag, refusal and exit code as an example
   with a **Premise**, **Caveats**, the prompt and its real output, in the
   marker format of the image-styles skills' `EXAMPLE.md`
   (`example:start fixture=…`, `setup-block`, `prompt-block`,
   `prompt-output`). Follow the writing rule at its top (ASD-STE100, about
-  80%) for the prose. `tests/test_examples.sh` replays each example
+  80%) for the prose. The index stays small (at most 150 lines, no example
+  bodies) so an agent reads it, then only the example it needs; each file
+  stays under the Read tool's 2,000-line default. To add an example, add
+  `examples/example_NNN.md` (title, link back to `../EXAMPLES.md`,
+  `Starts from:` line) and its table row; the test fails until the table
+  and the files match one to one. `tests/test_examples.sh` replays each example
   in a demo repository with a pinned clock and fails on any difference.
   When you add or change an example, leave its output as a placeholder,
   watch the test fail, run `python3 tests/check_examples.py --print`,
@@ -30,7 +36,7 @@ For people developing this skill. It isn't read when answering a
   They find Python and pass `"$@"` / `@args` through unchanged. A flag or
   behavior change goes in `compact.py`, never in only one launcher.
 - `../tests/`: `test_compact.sh` is the full Red/Green behavior suite.
-  `test_examples.sh` (with `check_examples.py`) checks `assets/EXAMPLES.md`.
+  `test_examples.sh` (with `check_examples.py`) checks `assets/EXAMPLES.md` and `assets/examples/`.
   `test_compact.ps1` is a parity harness for the PowerShell launcher.
 - `../agents/openai.yaml`: OpenAI-agent interface metadata.
 - `DESIGN.md`: the design and the decisions behind it.
@@ -64,7 +70,7 @@ After touching anything under `scripts/` or `assets/templates/`:
 
 ```
 bash tests/test_compact.sh
-bash tests/test_examples.sh   # assets/EXAMPLES.md, replayed
+bash tests/test_examples.sh   # assets/EXAMPLES.md + examples/, replayed
 pwsh tests/test_compact.ps1   # where pwsh is available
 ```
 
