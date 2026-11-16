@@ -93,7 +93,45 @@ def main():
     check(re.search(r"\bbody\{[^}]*background:", html) is not None, "body has an explicit background")
     srcs = re.findall(r'<script[^>]*\bsrc="([^"]+)"', html)
     check(srcs == [MARKED], "the only external script is marked 12.0.2 from cdnjs, as in the docsite", str(srcs))
+    check_theme(html)
     return finish()
+
+
+THEMES = SKILL.parents[2] / "src" / "packages" / "aiskills" / "src" / "scripts" / "docs" / "themes.mjs"
+
+
+def check_theme(html):
+    """The page uses the banner's theme, Lights Out, exactly as themes.mjs defines it."""
+    if not THEMES.is_file() or subprocess.run(["node", "--version"], capture_output=True).returncode:
+        print("SKIP theme checks (needs this repository's themes.mjs and node)")
+        return
+    js = ("import(process.argv[1]).then(m => { const t = m.THEMES.find(x => x.id === 'lightsout');"
+          " const k = (c, f) => `--bg:${c.bg};--surface:${c.surface};--surface-2:${c.surface2};--fg:${c.fg};"
+          "--muted:${c.muted};--line:${c.line};--accent:${c.accent};--accent-soft:${c.accentSoft};"
+          "--accent-fg:${c.accentFg};--code-bg:${c.codeBg};--code-fg:${c.codeFg};"
+          "--font-display:${f.display};--font-body:${f.body};--font-mono:${f.mono};`;"
+          " console.log(JSON.stringify({banner: m.DEFAULT_THEME, light: k(t.light, t.fonts),"
+          " dark: k(t.dark, t.fonts), fonts: m.fontsHref(t)})); })")
+    r = subprocess.run(["node", "--input-type=module", "-e", js, THEMES.as_uri()], capture_output=True, text=True)
+    want = json.loads(r.stdout)
+    banner = (SKILL.parents[2] / "src/packages/aiskills/docs/banner/config.yaml").read_text(encoding="utf-8")
+    check('theme: "lightsout"' in banner, "the banner uses Lights Out (docs/banner/config.yaml)")
+    m = re.search(r":root\{([^}]*)\}", html)
+    check(m is not None and m.group(1) == want["light"], "light colors and fonts are Lights Out's, from themes.mjs",
+          m.group(1)[:120] if m else "no :root block")
+    dark = re.findall(r'(?::root:not\(\[data-theme="light"\]\)|:root\[data-theme="dark"\])\{([^}]*)\}', html)
+    check(len(dark) == 2 and all(d == want["dark"] + "color-scheme:dark;" for d in dark),
+          "dark colors and fonts are Lights Out's, in both dark blocks", str([d[:80] for d in dark]))
+    check(f'<link rel="stylesheet" href="{html_escape(want["fonts"])}">' in html, "it loads Lights Out's fonts (Geist)")
+    check("--surface-2" in html and "var(--panel)" not in html and "--f-body" not in html,
+          "it uses the docsite's variable names, not the old ones")
+    check(re.search(r'nav\.tabs a\[aria-selected="true"\]::after\{[^}]*background:var\(--accent\)', html) is not None,
+          "the open tab has Lights Out's accent bar")
+    check("backdrop-filter" in html, "the header is frosted, as in Lights Out")
+
+
+def html_escape(s):
+    return s.replace("&", "&amp;")
 
 
 def finish():

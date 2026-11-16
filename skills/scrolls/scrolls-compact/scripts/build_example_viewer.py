@@ -24,6 +24,29 @@ SOURCE_URL = "https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/s
 MARKED = "https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"
 H1 = re.compile(r"# /scrolls-compact — (Example-\d\d): (.+)$")
 
+# The banner's and the docsite's theme, Lights Out, copied from
+# src/packages/aiskills/src/scripts/docs/themes.mjs. tests/check_example_viewer.py
+# fails if the two differ, so change them together.
+LIGHTS_OUT = {
+    "fonts": {"display": '"Geist", system-ui, sans-serif', "body": '"Geist", system-ui, sans-serif',
+              "mono": '"Geist Mono", ui-monospace, monospace'},
+    "googleFonts": "family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600",
+    "light": {"bg": "#ffffff", "surface": "#fafafa", "surface2": "#f4f4f5", "fg": "#09090b", "muted": "#66666e",
+              "line": "#e4e4e7", "accent": "#0f6cbd", "accentSoft": "#e8f2fc", "accentFg": "#ffffff",
+              "codeBg": "#fafafa", "codeFg": "#09090b"},
+    "dark": {"bg": "#000000", "surface": "#0a0a0b", "surface2": "#16181c", "fg": "#e7e9ea", "muted": "#8b9096",
+             "line": "#2f3336", "accent": "#1d9bf0", "accentSoft": "#071d2c", "accentFg": "#031321",
+             "codeBg": "#0a0a0b", "codeFg": "#e7e9ea"},
+}
+
+
+def tokens(c, f):
+    """The CSS variables, named and ordered as themes.mjs names them for the docsite."""
+    return (f"--bg:{c['bg']};--surface:{c['surface']};--surface-2:{c['surface2']};--fg:{c['fg']};"
+            f"--muted:{c['muted']};--line:{c['line']};--accent:{c['accent']};--accent-soft:{c['accentSoft']};"
+            f"--accent-fg:{c['accentFg']};--code-bg:{c['codeBg']};--code-fg:{c['codeFg']};"
+            f"--font-display:{f['display']};--font-body:{f['body']};--font-mono:{f['mono']};")
+
 
 def load():
     index = (ASSETS / "EXAMPLES.md").read_text(encoding="utf-8")
@@ -63,6 +86,9 @@ def render(index, examples):
             .replace("@@PANELS@@", "\n".join(panels))
             .replace("@@MARKED@@", MARKED)
             .replace("@@SOURCE_URL@@", SOURCE_URL)
+            .replace("@@LIGHT@@", tokens(LIGHTS_OUT["light"], LIGHTS_OUT["fonts"]))
+            .replace("@@DARK@@", tokens(LIGHTS_OUT["dark"], LIGHTS_OUT["fonts"]))
+            .replace("@@FONTS@@", html.escape(f"https://fonts.googleapis.com/css2?{LIGHTS_OUT['googleFonts']}&display=swap"))
             .replace("@@DATA@@", data))
 
 
@@ -90,71 +116,72 @@ TEMPLATE = r"""<!doctype html>
 <title>scrolls-compact Example Viewer</title>
 <meta name="description" content="The worked examples of /scrolls-compact: the index and every example, one tab each.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<link rel="stylesheet" href="@@FONTS@@">
 <!-- Built by scripts/build_example_viewer.py from assets/EXAMPLES.md and assets/examples/. Do not edit by hand. -->
 <style>
-:root{
-  --bg:#f6f5f1; --panel:#ffffff; --ink:#1d2321; --muted:#5d6763; --line:#dcdcd4;
-  --accent:#1f6f62; --accent-soft:#e2f0ec; --code:#f1f0ea;
-  --f-display:"Fraunces", Georgia, serif;
-  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#141917; --panel:#1b2220; --ink:#e4e8e5; --muted:#9aa5a0; --line:#2e3834;
-  --accent:#6cc4b2; --accent-soft:#1d3530; --code:#202826; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#141917; --panel:#1b2220; --ink:#e4e8e5; --muted:#9aa5a0; --line:#2e3834;
-  --accent:#6cc4b2; --accent-soft:#1d3530; --code:#202826; color-scheme:dark}
+/* Theme: Lights Out, the banner's and the docsite's (src/packages/aiskills/src/scripts/docs/themes.mjs). */
+:root{@@LIGHT@@}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){@@DARK@@color-scheme:dark;}}
+:root[data-theme="dark"]{@@DARK@@color-scheme:dark;}
 *{box-sizing:border-box}
 html{overflow-x:hidden}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+body{margin:0;color:var(--fg);font:15px/1.6 var(--font-body);
+  background:radial-gradient(1100px 380px at 50% -220px,color-mix(in srgb,var(--accent) 14%,transparent),transparent 72%) no-repeat,var(--bg)}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header.top{border-bottom:1px solid var(--line);background:var(--panel)}
-header.top .wrap{padding-block:22px 0}
-.kicker{font:500 12px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere}
-h1.page{font:600 clamp(24px,3.4vw,34px)/1.15 var(--f-display);margin:8px 0 6px;text-wrap:balance}
+header.top{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:saturate(180%) blur(14px);backdrop-filter:saturate(180%) blur(14px)}
+header.top .wrap{padding-block:24px 0}
+.kicker{font:500 12px/1.3 var(--font-mono);color:var(--muted);overflow-wrap:anywhere}
+h1.page{font:700 clamp(28px,4vw,40px)/1.05 var(--font-display);letter-spacing:-.045em;margin:10px 0 8px;text-wrap:balance}
 .lede{color:var(--muted);max-width:72ch;margin:0 0 16px}
 .files{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin-bottom:18px}
-.file{border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0;background:var(--bg)}
-.file b{font:500 13px var(--f-mono);display:block}
+.file{border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:0;background:var(--surface)}
+.file b{font:500 13px var(--font-mono);display:block}
 .file span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.file.out{border-color:var(--accent);background:var(--accent-soft)}
-nav.tabs{display:flex;gap:2px;overflow-x:auto;margin-bottom:-1px;scrollbar-width:thin}
-nav.tabs a{padding:10px 12px;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;color:var(--muted);text-decoration:none;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
-nav.tabs a[aria-selected="true"]{background:var(--bg);border-color:var(--line);color:var(--ink)}
+.file.out{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:var(--accent-soft)}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.tabs a{position:relative;padding:10px 12px 12px;border-radius:8px 8px 0 0;color:var(--muted);text-decoration:none;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+nav.tabs a:hover{background:color-mix(in srgb,var(--fg) 6%,transparent);color:var(--fg)}
+nav.tabs a[aria-selected="true"]{color:var(--fg);font-weight:700}
+nav.tabs a[aria-selected="true"]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:4px;border-radius:999px;background:var(--accent)}
 nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 main .wrap{padding-block:20px 60px}
 [hidden]{display:none!important}
-code,.mono{font-family:var(--f-mono);font-size:.9em}
-:not(pre)>code{background:var(--code);padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}
+code,.mono{font-family:var(--font-mono);font-size:.9em}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 14px}
-.toolbar label{display:flex;gap:6px;align-items:center;min-width:0;flex:1 1 260px;max-width:520px;color:var(--muted);font-size:14px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-.seg button{background:var(--panel);color:var(--muted);border:0;padding:6px 12px;font:500 13px var(--f-body);cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+.toolbar label{display:flex;gap:8px;align-items:center;min-width:0;flex:1 1 260px;max-width:520px;color:var(--muted);font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{background:transparent;color:var(--muted);border:0;padding:6px 14px;font:500 13px var(--font-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
 .seg button:focus-visible,.steps button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-select{font:13px var(--f-body);padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);min-width:0;width:100%}
+select{font:13px var(--font-body);padding:6px 12px;border:1px solid transparent;border-radius:999px;background:var(--surface-2);color:var(--fg);min-width:0;width:100%}
+select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .panelhead{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:0 0 10px}
 .path{color:var(--muted);overflow-wrap:anywhere}
 .steps{display:flex;gap:6px}
-.steps button{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 10px;font:500 13px var(--f-body);cursor:pointer}
+.steps button{background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font:500 13px var(--font-body);cursor:pointer;transition:background .15s}
+.steps button:hover:not(:disabled){background:var(--surface-2)}
 .steps button:disabled{color:var(--muted);opacity:.5;cursor:default}
-.doc{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(16px,3vw,32px);min-width:0;overflow-wrap:anywhere}
-.doc h1{font:600 26px/1.2 var(--f-display);margin:0 0 12px;text-wrap:balance}
-.doc h2{font:600 21px/1.25 var(--f-display);margin-top:30px;padding-top:12px;border-top:1px solid var(--line)}
-.doc h3{margin-top:18px;font-size:15px}
+.doc{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,32px);min-width:0;overflow-wrap:anywhere}
+.doc h1{font:700 clamp(24px,3vw,30px)/1.05 var(--font-display);letter-spacing:-.045em;margin:0 0 14px;text-wrap:balance}
+.doc h2{font:650 22px/1.2 var(--font-display);letter-spacing:-.03em;margin-top:32px;padding-top:8px}
+.doc h3{margin-top:18px;font-size:15px;letter-spacing:-.02em}
 .doc p,.doc li{max-width:80ch}
-.doc a{color:var(--accent)}
-.doc pre{background:var(--code);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12.5px/1.5 var(--f-mono)}
-.doc pre code{background:none;padding:0;overflow-wrap:normal}
+.doc a{color:var(--accent);text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.doc a:hover{text-decoration-color:var(--accent)}
+.doc :not(pre)>code{background:var(--surface-2);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);padding:.05em .36em;border-radius:6px;overflow-wrap:anywhere}
+.doc pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);padding:12px 14px;border-radius:12px;overflow-x:auto;font:12.5px/1.55 var(--font-mono);transition:border-color .2s,box-shadow .2s}
+.doc pre:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 10%,transparent)}
+.doc pre code{font-size:inherit}
 .doc pre.fallback{white-space:pre-wrap;overflow-wrap:anywhere}
 .doc blockquote{margin:0;padding:4px 14px;border-left:3px solid var(--line);color:var(--muted)}
+.doc hr{border:0;border-top:1px solid var(--line)}
 .doc table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
-.doc th,.doc td{border:1px solid var(--line);padding:4px 8px;font-size:14px;vertical-align:top}
-.doc th{background:var(--bg)}
-pre.raw{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;font:12.5px/1.5 var(--f-mono);white-space:pre-wrap;word-break:break-word;margin:0}
+.doc th,.doc td{border-bottom:1px solid var(--line);padding:6px 10px;font-size:14px;vertical-align:top;text-align:left}
+.doc th{background:transparent;color:var(--muted);font-weight:500}
+.doc tr:hover td{background:color-mix(in srgb,var(--fg) 3%,transparent)}
+pre.raw{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:12px;padding:14px;font:12.5px/1.55 var(--font-mono);white-space:pre-wrap;word-break:break-word;margin:0}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>

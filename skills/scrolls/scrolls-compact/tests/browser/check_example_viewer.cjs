@@ -134,8 +134,12 @@ const NUMS = fs.readdirSync(examplesDir).filter((f) => /^example_\d{3}\.md$/.tes
   const light = await bg();
   await page.emulateMedia({colorScheme: 'dark'});
   const dark = await bg();
-  assert.notEqual(light, dark, 'dark mode changes the background');
-  ok('dark mode has its own colors');
+  assert.equal(light, 'rgb(255, 255, 255)', 'light background is Lights Out white');
+  assert.equal(dark, 'rgb(0, 0, 0)', 'dark background is Lights Out black');
+  ok('Lights Out colors: white in light mode, black in dark mode');
+  const bar = await page.evaluate(() => getComputedStyle(document.querySelector('nav.tabs a[aria-selected="true"]'), '::after').backgroundColor);
+  assert.equal(bar, 'rgb(29, 155, 240)', 'the open tab has the dark-mode accent bar (#1d9bf0)');
+  ok('the open tab has the accent bar');
 
   assert.deepEqual(errors, [], 'no page errors');
   ok('no page errors');

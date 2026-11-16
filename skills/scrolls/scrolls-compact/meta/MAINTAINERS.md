@@ -35,6 +35,10 @@ For people developing this skill. It isn't read when answering a
   `python3 scripts/build_example_viewer.py`. `tests/test_example_viewer.sh`
   fails if the page is stale, then checks it in a browser (online, and
   offline with the plain-text fallback) when Node.js and Playwright exist.
+  Its theme is Lights Out, the banner's and the docsite's: the builder holds
+  a copy of its values from `src/packages/aiskills/src/scripts/docs/themes.mjs`,
+  with the docsite's CSS variable names. In this repository the test fails
+  if the copy and `themes.mjs` differ, so change them together.
 - `../assets/templates/COMPACT.md`: the `COMPACT.md` written on the first
   compaction (`{{SCROLLS_PATH}}` is substituted). `compact.py` embeds a
   copy as `COMPACT_TEMPLATE_FALLBACK`; scenario 12 of `test_compact.sh`
