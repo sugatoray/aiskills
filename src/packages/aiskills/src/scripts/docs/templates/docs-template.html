@@ -501,11 +501,26 @@ const DATA = /*__DOCS_DATA__*/null;
     const t = root.getAttribute("data-theme");
     return t === "dark" || t === "light" ? t : (mq.matches ? "dark" : "light");
   }
+  // Embedded pages (explainers, the example viewer, the CLI outputs) follow these docs'
+  // light/dark choice through data-theme on their <html>, the convention they share;
+  // a page that doesn't use it is unaffected. Their srcdoc carries it from the start
+  // (themedHtml), and open frames are updated when the theme changes.
+  function themedHtml(html) {
+    return html.replace(/<html\b/i, '<html data-theme="' + effectiveTheme() + '"');
+  }
+  function themeFrame(f) {
+    try {
+      const d = f.contentDocument;
+      if (d && d.documentElement) d.documentElement.setAttribute("data-theme", effectiveTheme());
+    } catch (_) { /* a frame we can't reach keeps its own theme */ }
+  }
   function syncThemeUI() {
     const eff = effectiveTheme();
     root.setAttribute("data-effective", eff);
     $("#theme-btn").setAttribute("aria-label", eff === "dark" ? "Switch to light theme" : "Switch to dark theme");
+    document.querySelectorAll("iframe[srcdoc]").forEach(themeFrame);
   }
+  document.addEventListener("load", e => { if (e.target.tagName === "IFRAME") themeFrame(e.target); }, true);
   const saved = store.get("aiskills-docs-theme");
   if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved);
   syncThemeUI();
@@ -587,7 +602,7 @@ const DATA = /*__DOCS_DATA__*/null;
     close.addEventListener("click", closeOverlay);
     const frame = document.createElement("iframe");
     frame.title = title;
-    frame.srcdoc = staticHtml(path);
+    frame.srcdoc = themedHtml(staticHtml(path));
     // Esc inside the explainer closes the overlay too, unless the explainer's own shortcut panel is open.
     frame.addEventListener("load", () => {
       try {
@@ -692,7 +707,7 @@ const DATA = /*__DOCS_DATA__*/null;
       const html = r && staticHtml(r.path);
       if (html === undefined) return;
       f.dataset.page = r.path;
-      f.srcdoc = html;
+      f.srcdoc = themedHtml(html);
     });
 
     // Links: other pages become in-app routes; HTML pages served next to

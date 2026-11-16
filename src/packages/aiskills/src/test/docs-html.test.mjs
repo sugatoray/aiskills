@@ -535,6 +535,46 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
     }
   });
 
+  test("the embedded example viewer follows the docs' light/dark theme, not only the system's", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const context = await browser.newContext({ viewport: { width: 1400, height: 900 }, colorScheme: "dark" });
+      const page = await context.newPage();
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(OUT).href + "#explainers-scrolls-compact-examples");
+      await page.waitForSelector("#doc iframe");
+      const frame = page.frameLocator("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      const docs = () => page.evaluate(() => document.documentElement.getAttribute("data-effective"));
+      const bg = (f) => f.locator("body").evaluate((b) => getComputedStyle(b).backgroundColor);
+      const WHITE = "rgb(255, 255, 255)", BLACK = "rgb(0, 0, 0)";
+      assert.equal(await docs(), "dark");
+      assert.equal(await bg(frame), BLACK, "dark system, dark docs: dark viewer");
+      await page.click("#theme-btn");
+      assert.equal(await docs(), "light");
+      await page.waitForFunction(() => getComputedStyle(document.querySelector("#doc iframe").contentDocument.body).backgroundColor === "rgb(255, 255, 255)", null, { timeout: 3000 }).catch(() => {});
+      assert.equal(await bg(frame), WHITE, "the docs switched to light on a dark system: the viewer is light too");
+      // The full-size overlay opens in the docs' theme.
+      await page.click('#doc a:has-text("Open the examples full-size")');
+      const over = page.frameLocator(".explainer-overlay iframe");
+      await over.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      assert.equal(await bg(over), WHITE, "the full-size viewer is light too");
+      await page.keyboard.press("Escape");
+      // The choice is saved: after a reload the viewer opens light.
+      await page.reload();
+      await page.waitForSelector("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      assert.equal(await bg(frame), WHITE, "after a reload, the saved light theme applies to the viewer");
+      await page.click("#theme-btn");
+      assert.equal(await docs(), "dark");
+      assert.equal(await bg(frame), BLACK, "and back to dark");
+      assert.deepEqual(errors, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
   for (const [label, viewport] of [["desktop", { width: 1400, height: 900 }], ["phone", { width: 390, height: 844 }]]) {
     test(`index.html on its own (no explainers/ folder next to it) shows the explainer and opens it full-size, on a ${label}`, async () => {
       // A viewer or preview that only gets index.html: the explainer must come from the bundle itself,

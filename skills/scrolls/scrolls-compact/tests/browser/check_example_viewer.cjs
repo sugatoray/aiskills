@@ -165,6 +165,14 @@ const NUMS = fs.readdirSync(examplesDir).filter((f) => /^example_\d{3}\.md$/.tes
   const bar = await page.evaluate(() => getComputedStyle(document.querySelector('nav.tabs a[aria-selected="true"]'), '::after').backgroundColor);
   assert.equal(bar, 'rgb(29, 155, 240)', 'the open tab has the dark-mode accent bar (#1d9bf0)');
   ok('the open tab has the accent bar');
+  // A host page (the docsite) picks the mode with data-theme on <html>, over the system's.
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+  assert.equal(await bg(), 'rgb(255, 255, 255)', 'data-theme=light wins over a dark system');
+  await page.emulateMedia({colorScheme: 'light'});
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  assert.equal(await bg(), 'rgb(0, 0, 0)', 'data-theme=dark wins over a light system');
+  await page.evaluate(() => document.documentElement.removeAttribute('data-theme'));
+  ok('data-theme on <html> overrides the system mode (the docsite sets it)');
 
   assert.deepEqual(errors, [], 'no page errors');
   ok('no page errors');

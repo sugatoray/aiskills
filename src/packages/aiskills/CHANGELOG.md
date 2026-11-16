@@ -38,6 +38,10 @@ and date this section.
 - **Docs: Browse the scrolls-compact examples**, a new page in the Skills tab
   (under Explainers). It embeds the skill's `assets/example-viewer.html`: the
   index and all 23 worked examples, one tab each, with real output.
+- **Docs: embedded pages follow the docs' light/dark choice.** The theme
+  button now also switches the example viewer and the CLI outputs page (in
+  the page and full-size), through `data-theme` on their `<html>`; before,
+  they followed only the system setting.
 
 ### Changed
 
