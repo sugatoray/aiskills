@@ -63,13 +63,14 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 | `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
 | `test_layout.py` | 24 long items, 90-minute item, phone width |
 | `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
+| `test_theme.py` | The reference theme: background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
 | `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
 
-Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `#dots .dot`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 
-- **Background:** a top-left radial glow (`#3a2a6b`) over a 135° navy-to-plum linear gradient (`#0f1530` to `#2e1a47`), set on `body`. `test_gradient_theme` only checks that a gradient is present.
+- **Theme** (matched to a reference screenshot from the user, pinned by `test_theme.py`): an indigo body (`#2a2386` → `#1d1a68` → `#2b2280`, 135°) with a violet glow at the top-left and a softer one at the bottom-right. Also: a cyan `.eyebrow` label, a violet `.num`, a ring stroked with `#ring-grad` (cyan top-right to violet bottom-left; the SVG is rotated -90°, so the gradient runs from (1,1) to (0,0)), the caption `of M:SS allotted`, pill buttons with `::before` icons (the button text stays `Pause`/`Resume`/`Reset` for the tests), dash-shaped `.dot`s with a `.dot-fill` per item, the meeting bar before the meeting text with a violet-to-cyan fill, and a transparent footer and gear.
 - **Colours:** edit the `:root` tokens. The amber test checks the ring stroke is `#f59e0b`, so update it if you change that token.
 - **Warn threshold:** `WARN_FRACTION` (item ring) and the `80` in `render()` (meeting bar). Update the matching tests.
 - **New per-item field:** add it to `normalize()`, `rowFromItem`, `renderRows`, `readRows`, `collect`, and to the slide build in `build()`. Set it with `textContent`.

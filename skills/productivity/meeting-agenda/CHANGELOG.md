@@ -14,4 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `localStorage` or downloads an updated copy.
 - `scripts/build_deck.py`: validates agenda JSON and writes it into the
   template's `agenda-data` block, escaping `<`.
-- pytest + Playwright suite (67 tests), built red/green.
+- Indigo/violet theme with cyan accents: an "Agenda item N of M · X min"
+  label, a violet-to-cyan ring captioned "of M:SS allotted", pill
+  Pause/Reset buttons, progress dashes that fill per item, and the
+  meeting bar ahead of the meeting text.
+- pytest + Playwright suite (77 tests), built red/green.

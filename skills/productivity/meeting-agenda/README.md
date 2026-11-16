@@ -48,7 +48,7 @@ python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly
 | Reset timer | `R` |
 | Close editor without saving | `Esc` |
 
-The Pause/Resume and Reset buttons under the ring, and the progress dots in the footer, do the same with the mouse.
+The Pause/Resume and Reset buttons under the ring, and the progress dashes in the footer, do the same with the mouse.
 
 ### Timers
 
@@ -97,7 +97,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 67 tests (55 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 77 tests (65 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 

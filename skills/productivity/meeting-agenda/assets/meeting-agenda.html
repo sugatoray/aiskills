@@ -6,18 +6,20 @@
 <title>Meeting Agenda</title>
 <style>
   :root {
-    --bg-1: #0f1530; --bg-2: #2e1a47; --glow: #3a2a6b;
-    --ink: #f4f1ff; --muted: #b9b0d8; --faint: rgba(255,255,255,.12);
-    --teal: #2dd4bf; --violet: #a78bfa; --amber: #f59e0b; --red: #ef4444;
-    --panel: rgba(18, 8, 40, .92);
+    --bg-1: #2a2386; --bg-2: #1d1a68; --bg-3: #2b2280;
+    --ink: #f5f3ff; --muted: #c4c0f0; --faint: rgba(255,255,255,.12);
+    --teal: #2dd4bf; --cyan: #22d3ee; --indigo: #6d4cff; --violet: #8b5cf6;
+    --amber: #f59e0b; --red: #ef4444;
+    --panel: rgba(24, 20, 78, .95);
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background-color: #0f1530;
+    background-color: #2a2386;
     background:
-      radial-gradient(ellipse at top left, #3a2a6b 0%, transparent 55%),  /* top layer */
-      linear-gradient(135deg, #0f1530, #2e1a47);                          /* base layer */
+      radial-gradient(ellipse at top left, rgba(124, 92, 255, .55) 0%, transparent 55%),   /* violet glow */
+      radial-gradient(ellipse at bottom right, rgba(110, 80, 230, .35) 0%, transparent 60%),
+      linear-gradient(135deg, #2a2386 0%, #1d1a68 55%, #2b2280 100%);                     /* indigo base */
     color: var(--ink);
     font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
@@ -30,9 +32,9 @@
   /* header */
   header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 3vw, 40px) 0; }
   #meeting-title { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); overflow-wrap: anywhere; }
-  #btn-edit { background: var(--faint); border: 1px solid rgba(255,255,255,.18); border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; flex: none; }
-  #btn-edit:hover { background: rgba(255,255,255,.2); }
-  #btn-edit svg { width: 22px; height: 22px; }
+  #btn-edit { background: transparent; border: 0; border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; flex: none; opacity: .85; }
+  #btn-edit:hover { opacity: 1; background-color: rgba(255,255,255,.08); }
+  #btn-edit svg { width: 24px; height: 24px; }
 
   /* stage */
   main { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(16px, 4vw, 56px); padding: clamp(12px, 3vh, 32px) clamp(16px, 5vw, 72px); overflow: hidden; }
@@ -40,11 +42,13 @@
   .slide { display: none; height: 100%; overflow-y: auto; flex-direction: column; justify-content: center; min-width: 0; }
   .slide.active { display: flex; animation: enter .35s ease-out; }
   @keyframes enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .eyebrow { margin-bottom: .6em; font-size: clamp(12px, 1.9vh, 17px); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--teal); }
   .num {
-    font-size: clamp(64px, 16vh, 168px); font-weight: 800; line-height: .9; letter-spacing: -.04em;
-    background: linear-gradient(120deg, var(--teal), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-size: clamp(56px, 13vh, 140px); font-weight: 900; line-height: .9; letter-spacing: -.02em;
+    background: linear-gradient(160deg, var(--violet), var(--indigo) 70%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px rgba(109, 76, 255, .35));
   }
-  .title { margin: .25em 0 .4em; font-size: clamp(26px, 5.2vh, 56px); line-height: 1.12; font-weight: 700; overflow-wrap: anywhere; }
+  .title { margin: .35em 0 .4em; font-size: clamp(28px, 6vh, 64px); line-height: 1.1; font-weight: 800; overflow-wrap: anywhere; text-shadow: 0 2px 14px rgba(10, 6, 40, .35); }
   .points { margin: 0; padding-left: 1.2em; font-size: clamp(17px, 2.8vh, 28px); color: #ddd6fe; overflow-wrap: anywhere; }
   .points li { margin: .3em 0; }
   .points li::marker { color: var(--teal); }
@@ -53,8 +57,8 @@
   #timer-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
   #timer { position: relative; width: clamp(150px, 34vh, 280px); aspect-ratio: 1; }
   #timer svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  #ring-track { fill: none; stroke: var(--faint); stroke-width: 12; }
-  #ring-progress { fill: none; stroke: var(--teal); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+  #ring-track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 14; }
+  #ring-progress { fill: none; stroke: url(#ring-grad); stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .25s linear; filter: drop-shadow(0 0 10px rgba(34, 211, 238, .25)); }
   #timer.warn #ring-progress { stroke: var(--amber); }
   #timer.over #ring-progress { stroke: var(--red); }
   #timer.over { animation: pulse 1s ease-in-out infinite; }
@@ -63,32 +67,40 @@
   #timer-text { font-size: clamp(30px, 7vh, 60px); font-weight: 700; font-variant-numeric: tabular-nums; }
   #timer.warn #timer-text { color: #fcd34d; }
   #timer.over #timer-text { color: #fca5a5; }
-  #timer-sub { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  #timer-sub { font-size: clamp(12px, 1.9vh, 16px); font-weight: 600; color: var(--muted); }
   #timer.paused #timer-text { opacity: .55; }
   .controls { display: flex; gap: 8px; }
-  .controls button, .ed-actions button, .row button {
+  .controls button { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 7px 16px; font-weight: 600; }
+  .controls button::before { display: inline-block; margin-right: .45em; text-align: center; }
+  #btn-pause::before { content: "\275A\275A"; letter-spacing: -.12em; font-size: .7em; }
+  #btn-pause[data-state="paused"]::before { content: "\25B6\FE0E"; }
+  #btn-reset::before { content: "\21BA"; }
+  .ed-actions button, .row button {
     background: var(--faint); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 6px 14px;
   }
   .controls button:hover, .ed-actions button:hover:not(:disabled), .row button:hover:not(:disabled) { background: rgba(255,255,255,.22); }
 
   /* footer */
-  footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 10px clamp(16px, 3vw, 40px) 14px; border-top: 1px solid rgba(255,255,255,.08); background: rgba(0,0,0,.18); font-size: 13px; }
-  #hints { color: var(--muted); }
-  #hints kbd { font: 12px/1 ui-monospace, monospace; border: 1px solid rgba(255,255,255,.25); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; color: var(--ink); }
-  #dots { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; flex: 1 1 160px; }
-  .dot { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: transparent; }
-  .dot.done { background: rgba(167,139,250,.55); }
-  .dot[aria-current="step"] { background: var(--teal); border-color: var(--teal); transform: scale(1.25); }
+  footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 10px clamp(16px, 3vw, 40px) 16px; background: transparent; font-size: 13px; }
+  #hints { color: var(--ink); font-weight: 600; }
+  #hints kbd { font: 600 12px/1 system-ui, sans-serif; border: 0; border-radius: 4px; padding: 3px 6px; background: rgba(255,255,255,.08); color: var(--ink); }
+  #hints .sep { color: var(--muted); margin: 0 .3em; }
+  #dots { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; flex: 1 1 160px; }
+  /* one dash per item; it fills with the time spent on that item */
+  .dot { width: 24px; height: 6px; padding: 0; border: 0; border-radius: 3px; background: rgba(255,255,255,.14); overflow: hidden; display: block; }
+  .dot-fill { display: block; height: 100%; width: 0; background: var(--cyan); }
+  .dot.over .dot-fill { background: var(--red); }
+  .dot[aria-current="step"] { width: 34px; background: rgba(109, 76, 255, .55); box-shadow: 0 0 10px rgba(109, 76, 255, .6); }
   #meeting { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   #meeting-text { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  #meeting-bar { position: relative; width: clamp(120px, 18vw, 240px); height: 8px; border-radius: 4px; background: var(--faint); overflow: hidden; }
+  #meeting-bar { position: relative; width: clamp(140px, 20vw, 280px); height: 8px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
   /* one segment per item, sized by its planned minutes; each fills with the time spent on that item */
   #meeting-bar .seg { position: absolute; top: 0; bottom: 0; overflow: hidden; }
   #meeting-bar .seg.current { background: rgba(255,255,255,.14); }
-  #meeting-bar .seg-fill { height: 100%; width: 0; background: var(--teal); transition: width .25s linear, background .3s; }
+  #meeting-bar .seg-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--indigo), var(--cyan)); transition: width .25s linear; }
   #meeting-bar.warn .seg-fill { background: var(--amber); }
   #meeting-bar.over .seg-fill, #meeting-bar .seg.over .seg-fill { background: var(--red); }
-  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(10,4,25,.85); }
+  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(20,16,70,.9); }
 
   /* editor */
   #editor { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(5,2,15,.6); backdrop-filter: blur(4px); }
@@ -135,6 +147,13 @@
   <div id="timer-wrap">
     <div id="timer" role="timer" aria-label="Item timer">
       <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <!-- the svg is rotated -90deg, so (1,1) is the top-right: cyan there, violet bottom-left -->
+          <linearGradient id="ring-grad" x1="1" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#22d3ee"/>
+            <stop offset="1" stop-color="#6d4cff"/>
+          </linearGradient>
+        </defs>
         <circle id="ring-track" cx="100" cy="100" r="90"/>
         <circle id="ring-progress" cx="100" cy="100" r="90" stroke-dasharray="565.487" stroke-dashoffset="0"/>
       </svg>
@@ -148,11 +167,11 @@
 </main>
 
 <footer>
-  <div id="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>Space</kbd> <kbd>PgUp</kbd><kbd>PgDn</kbd> <kbd>Home</kbd><kbd>End</kbd> navigate · <kbd>P</kbd> pause · <kbd>R</kbd> reset</div>
+  <div id="hints" title="Also: PgUp/PgDn, Shift+Space back, Home/End"><kbd>←</kbd> <kbd>→</kbd> <kbd>Space</kbd> navigate<span class="sep">·</span><kbd>P</kbd> pause/resume<span class="sep">·</span><kbd>R</kbd> reset timer</div>
   <nav id="dots" aria-label="Agenda items"></nav>
   <div id="meeting">
-    <span id="meeting-text"></span>
     <div id="meeting-bar" role="progressbar" aria-label="Meeting time used"></div>
+    <span id="meeting-text"></span>
   </div>
 </footer>
 
@@ -272,6 +291,7 @@
     agenda.items.forEach(function (it, i) {
       var s = el("section", "slide");
       s.setAttribute("aria-label", "Item " + (i + 1));
+      s.appendChild(el("div", "eyebrow", "Agenda item " + (i + 1) + " of " + agenda.items.length + " · " + it.minutes + " min"));
       s.appendChild(el("div", "num", String(i + 1).padStart(2, "0")));
       s.appendChild(el("h2", "title", it.title));
       if (it.points.length) {
@@ -283,6 +303,7 @@
 
       var d = el("button", "dot");
       d.type = "button";
+      d.appendChild(el("span", "dot-fill"));
       d.setAttribute("aria-label", "Go to item " + (i + 1) + ": " + it.title);
       d.title = (i + 1) + ". " + it.title;
       d.addEventListener("click", function () { go(i); d.blur(); });
@@ -322,6 +343,9 @@
       slides[i].classList.toggle("active", i === current);
       if (i === current) dots[i].setAttribute("aria-current", "step"); else dots[i].removeAttribute("aria-current");
       dots[i].classList.toggle("done", i < current);
+      var du = usedMs(i), dp = plannedMs(i);
+      dots[i].classList.toggle("over", du > dp);
+      dots[i].firstChild.style.width = +Math.min(100, du * 100 / dp).toFixed(2) + "%";
     }
 
     var planned = plannedMs(current), used = usedMs(current);
@@ -332,9 +356,11 @@
     timer.classList.toggle("warn", !over && remaining <= planned * WARN_FRACTION);
     timer.classList.toggle("paused", runningSince == null);
     $("#timer-text").textContent = over ? "+" + fmt(Math.floor((used - planned) / 1000)) : fmt(Math.ceil(remaining / 1000));
-    $("#timer-sub").textContent = over ? "over" : (runningSince == null ? "paused" : "remaining");
+    var allotted = fmt(Math.round(planned / 1000)) + " allotted";
+    $("#timer-sub").textContent = over ? "over " + allotted : (runningSince == null ? "paused · of " : "of ") + allotted;
     $("#ring-progress").setAttribute("stroke-dashoffset", String(over ? 0 : RING_C * Math.min(1, used / planned)));
     $("#btn-pause").textContent = runningSince == null ? "Resume" : "Pause";
+    $("#btn-pause").setAttribute("data-state", runningSince == null ? "paused" : "running");
 
     var tp = totalPlannedMs(), tu = totalUsedMs();
     $("#meeting-text").textContent = "Meeting: " + fmt(Math.floor(tu / 1000)) + " used / " + fmt(Math.round(tp / 1000)) + " planned";

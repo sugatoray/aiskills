@@ -78,8 +78,8 @@ Give the user:
 
 ## What the deck does (for answering questions)
 
-- **Slides:** one per item, with a large two-digit number, the title, and the sub-points. The background is a dark navy-to-plum gradient with a violet glow in the top-left corner. Adapts to any number of items and any lengths.
-- **Timers:** each slide has a ring countdown that starts when the slide is shown and pauses when you leave it. It turns amber in the last 20% of the item's time, then red, pulsing and counting up (`+M:SS`) past zero. `P` and `R` (or the buttons) pause/resume and reset.
-- **Footer:** keyboard hints, clickable progress dots, `Meeting: M:SS used / M:SS planned`, and a progress bar with one section per item, each filling with the time spent on that item. The bar turns amber at 80% of the planned total and red past it, and its tooltip shows the percentage used.
+- **Slides:** one per item, with a large two-digit number, the title, and the sub-points. Above the number, a cyan label reads "Agenda item 3 of 5 · 5 min". The theme is indigo/violet with a lighter violet glow at the top-left, a violet number, and cyan accents. Adapts to any number of items and any lengths.
+- **Timers:** each slide has a violet-to-cyan ring countdown, captioned "of M:SS allotted",, that starts when the slide is shown and pauses when you leave it. It turns amber in the last 20% of the item's time, then red, pulsing and counting up (`+M:SS`) past zero. `P` and `R` (or the buttons) pause/resume and reset.
+- **Footer:** keyboard hints, clickable progress dashes (one per item, each filling with that item's time), a progress bar, then `Meeting: M:SS used / M:SS planned`. The bar has one section per item, each filling with the time spent on that item. The bar turns amber at 80% of the planned total and red past it, and its tooltip shows the percentage used.
 - **Editor (gear):** a row per item (minutes, title, sub-points), with ↑/↓ to reorder and ✕ to remove (the last row can't be removed). Buttons: Add item, Reset to file defaults (asks first), Cancel/Esc, Save HTML, Apply. Rows without a title or with minutes ≤ 0 are highlighted and block Apply and Save. While the editor is open the timer pauses and keys don't change slides.
 - **Offline and private:** no network requests, and agenda text is never parsed as HTML. See `meta/SECURITY.md`.
