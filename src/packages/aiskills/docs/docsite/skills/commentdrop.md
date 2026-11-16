@@ -5,7 +5,7 @@ Add simulated social-media comment overlays to a still image in the floating com
 | Property | Value |
 | --- | --- |
 | Group | `image-styles-skills` (alias `image-styles`) |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Starts | When you ask for it: you type `/commentdrop` (your agent doesn't start it on its own) |
 | Needs | An image-generation or image-editing tool capable of returning rendered images |
 | License | MIT |
@@ -47,7 +47,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/comm
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

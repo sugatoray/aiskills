@@ -135,6 +135,18 @@ describe("docs/docsite/skills/", () => {
       assert.deepEqual(listed, shipped, `${name}: files`);
     }
   });
+
+  test("every skill's worked examples are named assets/EXAMPLES.md, never assets/EXAMPLE.md", () => {
+    for (const name of box.names) {
+      const dir = join(box.current.root, "skills", name);
+      const shipped = listTree(dir);
+      assert.ok(!shipped.includes("assets/EXAMPLE.md"), `${name}: rename assets/EXAMPLE.md to assets/EXAMPLES.md`);
+      for (const f of ["SKILL.md", "README.md"]) {
+        if (!existsSync(join(dir, f))) continue;
+        assert.doesNotMatch(readFileSync(join(dir, f), "utf8"), /\bEXAMPLE\.md\b/, `${name}/${f}: links to EXAMPLE.md`);
+      }
+    }
+  });
 });
 
 describe("docs/docsite/license.md", () => {

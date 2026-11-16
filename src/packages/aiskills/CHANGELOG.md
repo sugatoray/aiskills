@@ -36,6 +36,14 @@ and date this section.
   scrolls-compact`, or `aiskills install -G scrolls` for the whole group. See
   the skill's own `CHANGELOG.md` for its history.
 
+### Changed
+
+- **Bundled skills `run-code-review` 1.3.1, `artwallbg` 1.0.1 and
+  `commentdrop` 1.0.1:** each skill's worked examples are now in
+  `assets/EXAMPLES.md` (was `assets/EXAMPLE.md`), the name every bundled
+  skill uses. The content is unchanged. A test now fails if a bundled skill
+  ships `assets/EXAMPLE.md` again.
+
 ## [1.3.0] - 2026-11-17
 
 ### Added

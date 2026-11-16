@@ -5,7 +5,7 @@ Create a vivid illustrated image of a subject in front of a huge spray-painted w
 | Property | Value |
 | --- | --- |
 | Group | `image-styles-skills` (alias `image-styles`) |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Starts | When you ask for it: you type `/artwallbg` (your agent doesn't start it on its own) |
 | Needs | An image-generation or image-editing tool capable of returning rendered images |
 | License | MIT |
@@ -47,7 +47,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/artw
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

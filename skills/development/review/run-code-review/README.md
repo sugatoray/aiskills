@@ -31,7 +31,7 @@ run-code-review/
 │   ├── claude-code.yaml          display name and invocation policy
 │   └── openai.yaml
 ├── assets/
-│   ├── EXAMPLE.md                example prompts and their outputs, one per option
+│   ├── EXAMPLES.md               example prompts and their outputs, one per option
 │   ├── report-example.json       a complete report as JSON (Example-01's)
 │   └── report-template.html      the page render_report.py fills in for -o report.html
 ├── meta/
@@ -90,7 +90,7 @@ the default branch plus uncommitted work.
 /run-code-review -t -l json,yaml,toml,xml     every tracked configuration file, tools first
 ```
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/run-code-review` prompts and their outputs:
+See [assets/EXAMPLES.md](assets/EXAMPLES.md) for example `/run-code-review` prompts and their outputs:
 each option, the options combined, and a complete report.
 
 | Option | Meaning |

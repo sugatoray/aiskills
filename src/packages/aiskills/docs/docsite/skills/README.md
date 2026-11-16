@@ -42,7 +42,7 @@ Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`run-code-review`](run-code-review.md) | 1.3.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
+| [`run-code-review`](run-code-review.md) | 1.3.1 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 
@@ -82,8 +82,8 @@ Alias `image-styles`. Install the group with `aiskills install -G image-styles`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`artwallbg`](artwallbg.md) | 1.0.0 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
-| [`commentdrop`](commentdrop.md) | 1.0.0 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
+| [`artwallbg`](artwallbg.md) | 1.0.1 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
+| [`commentdrop`](commentdrop.md) | 1.0.1 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 

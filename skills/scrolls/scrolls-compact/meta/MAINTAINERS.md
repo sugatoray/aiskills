@@ -12,7 +12,7 @@ For people developing this skill. It isn't read when answering a
 - `../assets/EXAMPLES.md` (the index) and `../assets/examples/example_NNN.md`
   (one example each): every flag, refusal and exit code as an example
   with a **Premise**, **Caveats**, the prompt and its real output, in the
-  marker format of the image-styles skills' `EXAMPLE.md`
+  marker format of the image-styles skills' `EXAMPLES.md`
   (`example:start fixture=…`, `setup-block`, `prompt-block`,
   `prompt-output`). Follow the writing rule at its top (ASD-STE100, about
   80%) for the prose. The index stays small (at most 150 lines, no example

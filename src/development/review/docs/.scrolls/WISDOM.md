@@ -43,7 +43,7 @@ Bad patterns or decisions to never take, and why they were rejected.
 
 - Having the model read XML, JSON, YAML or TOML line by line for syntax, formatting or schema validity. A parser decides those exactly and for almost nothing; the user chose tool-first for that reason.
 - Letting a missing parser or tool count as a pass. Report `unchecked` and name what would check it.
-- Passing off a hand-written sample as a captured run. `assets/EXAMPLE.md` states which output was pasted from real runs and which was written by hand; keep that line true when the file changes.
+- Passing off a hand-written sample as a captured run. `assets/EXAMPLES.md` states which output was pasted from real runs and which was written by hand; keep that line true when the file changes.
 - Dropping files from a review silently. Vendored, generated, lock, `filtered` and `unsupported` files are all listed, so the report never looks more complete than it was.
 - Repeating a checklist in two places. `REVIEW.md` points to `SECURITY.md`, and TypeScript loads JavaScript's files instead of copying them.
 

@@ -9,7 +9,7 @@ that's `../SKILL.md`.
   eight-step workflow, and which reference to read at which step. Keep it under about 250 lines;
   detail belongs in `../references/`.
 - `../references/SEVERITY.md`, `REPORT_TEMPLATE.md` and `CROSS_LANGUAGE.md` apply to every review.
-- `../assets/EXAMPLE.md` shows each option on one small demo repository. Its command output was
+- `../assets/EXAMPLES.md` shows each option on one small demo repository. Its command output was
   pasted from real runs, with `read:` lines shortened to file names. When a script's output or
   an option changes, rebuild the demo repository described at the top of that file, re-run the
   commands and paste the new output. Its sample report was written by the skill's author on

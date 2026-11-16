@@ -360,7 +360,7 @@ Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`run-code-review`](run-code-review.md) | 1.3.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
+| [`run-code-review`](run-code-review.md) | 1.3.1 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 
@@ -400,8 +400,8 @@ Alias `image-styles`. Install the group with `aiskills install -G image-styles`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`artwallbg`](artwallbg.md) | 1.0.0 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
-| [`commentdrop`](commentdrop.md) | 1.0.0 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
+| [`artwallbg`](artwallbg.md) | 1.0.1 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
+| [`commentdrop`](commentdrop.md) | 1.0.1 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 
@@ -415,7 +415,7 @@ Create a vivid illustrated image of a subject in front of a huge spray-painted w
 | Property | Value |
 | --- | --- |
 | Group | `image-styles-skills` (alias `image-styles`) |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Starts | When you ask for it: you type `/artwallbg` (your agent doesn't start it on its own) |
 | Needs | An image-generation or image-editing tool capable of returning rendered images |
 | License | MIT |
@@ -457,7 +457,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/artw
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
@@ -470,7 +470,7 @@ Add simulated social-media comment overlays to a still image in the floating com
 | Property | Value |
 | --- | --- |
 | Group | `image-styles-skills` (alias `image-styles`) |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Starts | When you ask for it: you type `/commentdrop` (your agent doesn't start it on its own) |
 | Needs | An image-generation or image-editing tool capable of returning rendered images |
 | License | MIT |
@@ -512,7 +512,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/comm
 - `README.md`
 - `SKILL.md`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)
@@ -843,7 +843,7 @@ Runs a thorough, evidence-based code review of a pull request, branch, diff, set
 | Property | Value |
 | --- | --- |
 | Group | `review-skills` (alias `review`) |
-| Version | 1.3.0 |
+| Version | 1.3.1 |
 | Starts | When you ask for it: you type `/run-code-review` (your agent doesn't start it on its own) |
 | Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
@@ -886,7 +886,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `SKILL.md`
 - `agents/claude-code.yaml`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `assets/report-example.json`
 - `assets/report-template.html`
 - `meta/MAINTAINERS.md`

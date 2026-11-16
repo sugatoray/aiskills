@@ -8,7 +8,7 @@ metadata:
   name: run-code-review
   type: skill
   author: sugatoray
-  version: "1.3.0"
+  version: "1.3.1"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/development/review/run-code-review"
 ---
 
@@ -21,7 +21,7 @@ structured report, not a stream of remarks.
 
 Paths below (`references/…`, `scripts/…`) are relative to this skill's folder.
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/run-code-review` prompts and their outputs.
+See [assets/EXAMPLES.md](assets/EXAMPLES.md) for example `/run-code-review` prompts and their outputs.
 
 ## The bar you hold
 

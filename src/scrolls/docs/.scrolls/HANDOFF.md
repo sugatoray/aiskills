@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 
 - **`master` (`904e593`):** eight `scrolls-*` skills at `2.5.0`. `/scrolls-explainer` merged as #206 (`67b771c`). The npm package bundles the family (1.2.0 published; `1.3.0-dev` on `master`).
-- **Branch `claude/clever-mendel-k9n73h`** (from `904e593`; pushed; **no PR yet**): adds **`/scrolls-compact`** and bumps all **nine** skills to **`2.6.0`** in lockstep, with `plugin.json`, the marketplace description, the root `README.md` skills table, `/scrolls-help`, a new `/scrolls-explainer` tab, and the npm package docs (18 skills) updated to match. `/scrolls-update` now leaves `COMPACT.md` and `compacted/` alone.
+- **Branch `claude/clever-mendel-k9n73h`** (from `904e593`; pushed; open as **[#265](https://github.com/sugatoray/aiskills/pull/265)**): adds **`/scrolls-compact`** and bumps all **nine** skills to **`2.6.0`** in lockstep, with `plugin.json`, the marketplace description, the root `README.md` skills table, `/scrolls-help`, a new `/scrolls-explainer` tab, and the npm package docs (18 skills) updated to match. `/scrolls-update` now leaves `COMPACT.md` and `compacted/` alone.
 - **`/scrolls-compact` in one paragraph:** `git blame` dates every scroll line against a base (`--before`, `--base`, or by default the newer of 7 days and 20 first-parent commits on `main`/`master`). A read-only plan marks units `old`/`live`/`new`. The agent condenses only `old` units. `--finalize` checks the edits against the plan and makes one `maint(memory): scrolls-compacted` commit. That commit writes `compacted/scrolls_compact_<yyyymmdd>_<githash>.md`, adds a `COMPACT.md` row and the `STARTER.md` entry, and tags the checkpoint. `--list`/`--show`/`--extract` read old text back. Design and decisions: `skills/scrolls/scrolls-compact/meta/DESIGN.md`.
 - **Tests on the branch:** `test_compact.sh` 126, `test_examples.sh` 420 (replays every example), `test_explain.sh` 110, the other scrolls suites, and the package `npm test` 516: all pass.
 - The old branches `claude/confident-maxwell-d6ws37` and `claude/brave-mccarthy-m6aut0` are gone from the remote.
@@ -21,6 +21,6 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## Known issues / open threads
 
-- **No PR for `claude/clever-mendel-k9n73h` yet**, and no issues filed. It regenerates the package docs, so if another docs PR merges first, rebase and re-run `npm run docs`.
+- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged**, and no issues are filed. It regenerates the package docs, so if another docs PR merges first, rebase and re-run `npm run docs`.
 - `tests/test_compact.ps1` has never run (no `pwsh` here), like every other `.ps1` suite.
 - After any change to a scrolls skill's `SKILL.md`, run `skills/scrolls/scrolls-explainer/scripts/explain.sh --build`, review the named tabs, then `--build --reviewed`. Then run `npm run docs` in `src/packages/aiskills/`.
