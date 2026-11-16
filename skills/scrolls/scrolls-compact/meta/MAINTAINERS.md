@@ -27,6 +27,14 @@ For people developing this skill. It isn't read when answering a
   **read** the actual output, and paste it only if it shows what the
   example claims. A behavior change in `compact.py` shows up here as
   failures to review, never as outputs to regenerate blindly.
+- `../assets/example-viewer.html`: the index and every example on one page,
+  one tab each, rendered or as Markdown; links between the files open the
+  matching tab. Built by `../scripts/build_example_viewer.py` (maintenance
+  only; the skill never runs it). Never edit the page by hand: after any
+  change to `EXAMPLES.md` or an example, run
+  `python3 scripts/build_example_viewer.py`. `tests/test_example_viewer.sh`
+  fails if the page is stale, then checks it in a browser (online, and
+  offline with the plain-text fallback) when Node.js and Playwright exist.
 - `../assets/templates/COMPACT.md`: the `COMPACT.md` written on the first
   compaction (`{{SCROLLS_PATH}}` is substituted). `compact.py` embeds a
   copy as `COMPACT_TEMPLATE_FALLBACK`; scenario 12 of `test_compact.sh`
@@ -71,6 +79,7 @@ After touching anything under `scripts/` or `assets/templates/`:
 ```
 bash tests/test_compact.sh
 bash tests/test_examples.sh   # assets/EXAMPLES.md + examples/, replayed
+bash tests/test_example_viewer.sh   # assets/example-viewer.html, fresh and working
 pwsh tests/test_compact.ps1   # where pwsh is available
 ```
 

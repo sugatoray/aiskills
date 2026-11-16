@@ -214,6 +214,7 @@ There are 23 worked examples, covering every flag, refusal and exit code, all ru
 
 - `assets/EXAMPLES.md` is the index: how to read the examples, the demo repository, and a table with one row per example and its file.
 - `assets/examples/example_NNN.md` holds one example each (`example_001.md` to `example_023.md`).
+- `assets/example-viewer.html` shows the same files on one page for people. Don't read it; read the Markdown files. To show the examples to the user, point them to it.
 
 Read them only when you need them: for example, when a request does not map clearly to the flags above, or when the user asks for an example. Read the index first, then only the example file you need. If that example starts from another example's state, its `Starts from:` line links to it.
 

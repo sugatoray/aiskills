@@ -20,6 +20,7 @@ scrolls-compact/
 │   └── openai.yaml
 ├── assets/
 │   ├── EXAMPLES.md               the index: one table row per example
+│   ├── example-viewer.html       the index and every example, one tab each (built)
 │   ├── examples/
 │   │   └── example_001.md … example_023.md
 │   └── templates/
@@ -28,13 +29,18 @@ scrolls-compact/
 │   ├── DESIGN.md
 │   └── MAINTAINERS.md
 ├── scripts/
+│   ├── build_example_viewer.py   builds assets/example-viewer.html (maintenance only)
 │   ├── compact.ps1
 │   ├── compact.py
 │   └── compact.sh
 ├── tests/
+│   ├── browser/
+│   │   └── check_example_viewer.cjs
+│   ├── check_example_viewer.py
 │   ├── check_examples.py
 │   ├── test_compact.ps1
 │   ├── test_compact.sh
+│   ├── test_example_viewer.sh
 │   └── test_examples.sh
 ├── CHANGELOG.md
 ├── README.md
@@ -42,7 +48,7 @@ scrolls-compact/
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)
-- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md), the index, and one file per example in [`assets/examples/`](assets/examples/): 23 examples, each with a premise, caveats, the prompt and its real output, covering every flag, refusal and exit code; checked by `tests/test_examples.sh`
+- **Examples**: [`assets/EXAMPLES.md`](assets/EXAMPLES.md), the index, and one file per example in [`assets/examples/`](assets/examples/): 23 examples, each with a premise, caveats, the prompt and its real output, covering every flag, refusal and exit code; checked by `tests/test_examples.sh`. [`assets/example-viewer.html`](assets/example-viewer.html) shows the index and every example on one page, one tab each, rendered or as Markdown
 - **Design**: [`meta/DESIGN.md`](meta/DESIGN.md): why it works the way it does
 - **Development notes**: [`meta/MAINTAINERS.md`](meta/MAINTAINERS.md)
 - **Version history**: [`CHANGELOG.md`](CHANGELOG.md)
