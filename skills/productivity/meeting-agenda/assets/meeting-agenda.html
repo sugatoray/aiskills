@@ -191,7 +191,7 @@
 </main>
 
 <footer>
-  <div id="hints"><span class="hint-keys" title="Also: PgUp/PgDn, Shift+Space back, Home/End"><kbd>←</kbd> <kbd>→</kbd> <kbd>Space</kbd> navigate<span class="sep">·</span><kbd>P</kbd> pause/resume<span class="sep">·</span><kbd>R</kbd> reset timer</span><span class="hint-touch">Swipe or tap to navigate<span class="sep">·</span>Hold to pause</span></div>
+  <div id="hints"><span class="hint-keys" title="Also: PgUp/PgDn to navigate, Home/End for first/last"><kbd>←</kbd> <kbd>→</kbd> navigate<span class="sep">·</span><kbd>Space</kbd> <kbd>P</kbd> pause/resume<span class="sep">·</span><kbd>R</kbd> reset timer</span><span class="hint-touch">Swipe or tap to navigate<span class="sep">·</span>Hold to pause</span></div>
   <div id="nav">
     <button id="btn-prev" class="nav-btn" type="button" aria-label="Previous item">‹</button>
     <nav id="dots" aria-label="Agenda items"></nav>
@@ -422,10 +422,11 @@
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var k = e.key, handled = true;
-    if (k === "ArrowRight" || k === "PageDown" || (k === " " && !e.shiftKey)) go(current + 1);
-    else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) go(current - 1);
+    if (k === "ArrowRight" || k === "PageDown") go(current + 1);
+    else if (k === "ArrowLeft" || k === "PageUp") go(current - 1);
     else if (k === "Home") go(0);
     else if (k === "End") go(agenda.items.length - 1);
+    else if (k === " ") { if (!e.shiftKey && !e.repeat) togglePause(); }   // Space pauses/resumes, like a video player
     else if (k === "p" || k === "P") togglePause();
     else if (k === "r" || k === "R") resetTimer();
     else handled = false;

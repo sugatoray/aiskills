@@ -56,6 +56,25 @@ def test_p_pauses_and_resumes(deck):
     expect(text(deck)).to_have_text("9:50")
 
 
+def test_space_pauses_and_resumes_like_a_video_player(deck):
+    tick(deck, 5)
+    deck.keyboard.press("Space")
+    expect(deck.locator("#timer.paused")).to_have_count(1)
+    tick(deck, 30)
+    expect(text(deck)).to_have_text("9:55")
+    deck.keyboard.press("Space")
+    expect(deck.locator("#timer.paused")).to_have_count(0)
+    tick(deck, 5)
+    expect(text(deck)).to_have_text("9:50")
+
+
+def test_hints_show_space_for_pause(deck):
+    hint = deck.locator(".hint-keys").inner_text()
+    assert "Space navigate" not in hint, hint
+    assert hint.index("Space") < hint.index("pause/resume"), hint
+    assert "navigate" in hint
+
+
 def test_r_resets(deck):
     tick(deck, 40)
     deck.keyboard.press("r")

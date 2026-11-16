@@ -74,12 +74,12 @@ Give the user:
 
 1. The HTML file (send it or link it; don't paste its source).
 2. A short table of the items (number, minutes, title) and the planned total. Point out any times you chose for them.
-3. The controls in one or two lines. Keyboard: `→`/`Space`/`PgDn` next, `←`/`Shift+Space`/`PgUp` back, `Home`/`End`, `P` pause, `R` reset. Phone: swipe or tap (right side forward, left side back), hold to pause, `‹ ›` buttons. The gear edits the agenda: Apply remembers it in that browser, and Save HTML downloads an updated copy.
+3. The controls in one or two lines. Keyboard: `→`/`PgDn` next, `←`/`PgUp` back, `Home`/`End`, `Space` or `P` pause/resume, `R` reset. Phone: swipe or tap (right side forward, left side back), hold to pause, `‹ ›` buttons. The gear edits the agenda: Apply remembers it in that browser, and Save HTML downloads an updated copy.
 
 ## What the deck does (for answering questions)
 
 - **Slides:** one per item, with a large two-digit number, the title, and the sub-points. Above the number, a cyan label reads "Agenda item 3 of 5 · 5 min". The theme is indigo/violet with a lighter violet glow at the top-left, a violet number, and cyan accents. Adapts to any number of items and any lengths.
-- **Timers:** each slide has a violet-to-cyan ring countdown, captioned "of M:SS allotted",, that starts when the slide is shown and pauses when you leave it. It turns amber in the last 20% of the item's time, then red, pulsing and counting up (`+M:SS`) past zero. `P` and `R` (or the buttons) pause/resume and reset.
+- **Timers:** each slide has a violet-to-cyan ring countdown, captioned "of M:SS allotted",, that starts when the slide is shown and pauses when you leave it. It turns amber in the last 20% of the item's time, then red, pulsing and counting up (`+M:SS`) past zero. `Space` or `P` pauses/resumes (like a video player), and `R` resets; the buttons do the same.
 - **Footer:** keyboard hints, clickable progress dashes (one per item, each filling with that item's time), a progress bar, then `Meeting: M:SS used / M:SS planned`. The bar has one section per item, each filling with the time spent on that item. The bar turns amber at 80% of the planned total and red past it, and its tooltip shows the percentage used.
 - **Phones and tablets:** swipe left/right for next/previous, tap the right 70% / left 30% of the slide, long-press (½ s) to pause or resume, and `‹ ›` buttons beside the progress dashes. Touch targets are at least 44 px, and the layout scales down to fit a phone. Mouse clicks on the slide don't navigate.
 - **Editor (gear):** a row per item (minutes, title, sub-points), with ↑/↓ to reorder and ✕ to remove (the last row can't be removed). Buttons: Add item, Reset to file defaults (asks first), Cancel/Esc, Save HTML, Apply. Rows without a title or with minutes ≤ 0 are highlighted and block Apply and Save. While the editor is open the timer pauses and keys don't change slides.

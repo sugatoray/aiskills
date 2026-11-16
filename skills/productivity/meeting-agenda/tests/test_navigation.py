@@ -7,7 +7,7 @@ def active_num(page):
 
 
 def test_next_keys(deck):
-    for key, want in [("ArrowRight", "02"), ("Space", "03"), ("PageDown", "04")]:
+    for key, want in [("ArrowRight", "02"), ("PageDown", "03")]:
         deck.keyboard.press(key)
         expect(active_num(deck)).to_have_text(want)
 
@@ -15,7 +15,7 @@ def test_next_keys(deck):
 def test_previous_keys(deck):
     deck.keyboard.press("End")
     expect(active_num(deck)).to_have_text("05")
-    for key, want in [("ArrowLeft", "04"), ("Shift+Space", "03"), ("PageUp", "02")]:
+    for key, want in [("ArrowLeft", "04"), ("PageUp", "03")]:
         deck.keyboard.press(key)
         expect(active_num(deck)).to_have_text(want)
 
@@ -43,10 +43,21 @@ def test_progress_dots_are_clickable(deck):
     expect(dots.nth(3)).to_have_attribute("aria-current", "step")
 
 
-def test_space_after_clicking_a_button_navigates_once(deck):
-    deck.locator("#btn-pause").click()
+def test_space_and_shift_space_do_not_change_slides(deck):
     deck.keyboard.press("Space")
+    expect(active_num(deck)).to_have_text("01")
+    deck.keyboard.press("ArrowRight")
+    deck.keyboard.press("Shift+Space")
     expect(active_num(deck)).to_have_text("02")
+
+
+def test_space_after_clicking_a_button_acts_once(deck):
+    """The clicked button is blurred, so Space toggles pause once and
+    doesn't also re-press the button."""
+    deck.locator("#btn-reset").click()
+    deck.keyboard.press("Space")
+    expect(deck.locator("#timer.paused")).to_have_count(1)
+    expect(active_num(deck)).to_have_text("01")
 
 
 def test_keyboard_hints_in_footer(deck):

@@ -41,10 +41,10 @@ python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly
 
 | Action | Keyboard | Phone or tablet |
 |---|---|---|
-| Next slide | `→`, `Space`, `Page Down` | Swipe left, tap the right 70% of the slide, or tap `›` |
-| Previous slide | `←`, `Shift+Space`, `Page Up` | Swipe right, tap the left 30% of the slide, or tap `‹` |
+| Next slide | `→`, `Page Down` | Swipe left, tap the right 70% of the slide, or tap `›` |
+| Previous slide | `←`, `Page Up` | Swipe right, tap the left 30% of the slide, or tap `‹` |
 | First / last slide | `Home` / `End` | Tap the first / last progress dash |
-| Pause / resume timer | `P` | Long-press the slide (½ s), or tap Pause |
+| Pause / resume timer | `Space` or `P` (like a video player) | Long-press the slide (½ s), or tap Pause |
 | Reset timer | `R` | Tap Reset |
 | Close editor without saving | `Esc` | Tap Cancel |
 
@@ -106,7 +106,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 91 tests (79 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 94 tests (82 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 

@@ -71,7 +71,7 @@ Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is i
 | File | Covers |
 |---|---|
 | `test_slides.py` | Self-containment, embedded demo, slide structure, XSS-as-text, corrupt storage |
-| `test_navigation.py` | All keys, clamping, dots, Space after a button click |
+| `test_navigation.py` | All navigation keys, clamping, dots, Space/Shift+Space never navigating, Space after a button click acting once |
 | `test_timers.py` | Countdown, per-slide pause, P/R and buttons, amber, red/pulse/count-up |
 | `test_footer.py` | Meeting text, ticks, per-section segments (sizing, fill per item, revisits, overtime cap, current marker), tooltip, amber/red |
 | `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
