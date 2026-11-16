@@ -275,16 +275,28 @@ pre.raw{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--li
     const a = document.querySelector(`nav.tabs a[data-tab="${tab}"]`);
     a.scrollIntoView({block: "nearest", inline: "nearest"});
   }
+  // History is optional: in an <iframe srcdoc> (as the docsite embeds this
+  // page) history calls throw, and a bare "#tab" link would resolve against
+  // the host page. So tab links never navigate; go() switches the tab and,
+  // where it can, records it in the address so Back works.
+  function remember(tab, replace){
+    try {
+      if (location.hash !== "#" + tab) history[replace ? "replaceState" : "pushState"](null, "", "#" + tab);
+    } catch (e) { /* no address of our own: the tab still switches */ }
+  }
   function go(tab){
     show(tab);
-    if (location.hash !== "#" + tab) location.hash = tab;
+    remember(tab, false);
     scrollTo(0, 0);
   }
+  addEventListener("popstate", () => show(location.hash.slice(1)));
   addEventListener("hashchange", () => { show(location.hash.slice(1)); scrollTo(0, 0); });
-  // Switch at once on a click; the link still sets the hash, so Back works.
   document.addEventListener("click", e => {
     const a = e.target.closest('a[href^="#"]');
-    if (a && TABS.includes(a.getAttribute("href").slice(1))) show(a.getAttribute("href").slice(1));
+    const tab = a && a.getAttribute("href").slice(1);
+    if (!a || !TABS.includes(tab)) return;
+    e.preventDefault();
+    go(tab);
   });
   jump.addEventListener("change", () => go(jump.value));
   document.querySelectorAll("[data-step]").forEach(b => b.addEventListener("click", () => { if (b.dataset.to) go(b.dataset.to); }));
@@ -299,8 +311,8 @@ pre.raw{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--li
   document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
 
   const start = location.hash.slice(1);
-  if (!TABS.includes(start)) history.replaceState(null, "", "#index");
-  show(location.hash.slice(1));
+  show(start);
+  if (!TABS.includes(start)) remember("index", true);
   document.body.dataset.ready = "true";
 })();
 </script>

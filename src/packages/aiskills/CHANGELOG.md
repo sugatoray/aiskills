@@ -35,6 +35,9 @@ and date this section.
   package now bundles 18 skills in 9 groups: `aiskills install -s
   scrolls-compact`, or `aiskills install -G scrolls` for the whole group. See
   the skill's own `CHANGELOG.md` for its history.
+- **Docs: Browse the scrolls-compact examples**, a new page in the Skills tab
+  (under Explainers). It embeds the skill's `assets/example-viewer.html`: the
+  index and all 23 worked examples, one tab each, with real output.
 
 ### Changed
 

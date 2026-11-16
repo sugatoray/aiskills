@@ -38,6 +38,7 @@ const BLOB = "https://github.com/sugatoray/aiskills/blob/master/skills/";
  */
 export const EXPLAINERS = {
   "explainers/scrolls-explainer.html": "skills/scrolls/scrolls-explainer/assets/scrolls-explainer.html",
+  "explainers/scrolls-compact-examples.html": "skills/scrolls/scrolls-compact/assets/example-viewer.html",
 };
 const START = "<!-- skills:start -->";
 const END = "<!-- skills:end -->";

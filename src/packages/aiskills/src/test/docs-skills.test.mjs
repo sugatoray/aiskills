@@ -226,6 +226,7 @@ describe("explainer pages in the docs (docs/docsite/explainers/)", () => {
     const { EXPLAINERS } = await load();
     assert.ok(EXPLAINERS && Object.keys(EXPLAINERS).length > 0, "build-skills-docs.mjs exports EXPLAINERS");
     assert.equal(EXPLAINERS["explainers/scrolls-explainer.html"], "skills/scrolls/scrolls-explainer/assets/scrolls-explainer.html");
+    assert.equal(EXPLAINERS["explainers/scrolls-compact-examples.html"], "skills/scrolls/scrolls-compact/assets/example-viewer.html");
     for (const [rel, src] of Object.entries(EXPLAINERS)) {
       const copy = join(DOCS, rel);
       assert.ok(existsSync(copy), `${rel} is missing: run npm run docs:skills`);

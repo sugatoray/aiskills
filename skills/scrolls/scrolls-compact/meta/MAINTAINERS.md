@@ -35,6 +35,11 @@ For people developing this skill. It isn't read when answering a
   `python3 scripts/build_example_viewer.py`. `tests/test_example_viewer.sh`
   fails if the page is stale, then checks it in a browser (online, and
   offline with the plain-text fallback) when Node.js and Playwright exist.
+  The docsite serves a copy as `explainers/scrolls-compact-examples.html`
+  (`EXPLAINERS` in the package's `build-skills-docs.mjs`) and embeds it in an
+  `<iframe srcdoc>`, where history calls throw: keep tab links from
+  navigating, and keep the browser test's frame check passing. After
+  rebuilding the page, run `npm run docs` in `src/packages/aiskills/`.
   Each example's **Premise** and **Caveats** are grouped in one tinted
   box labelled "Note" when the page renders; the Markdown files are not
   changed. Its theme is Lights Out, the banner's and the docsite's: the builder holds

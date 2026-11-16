@@ -168,5 +168,37 @@ const NUMS = fs.readdirSync(examplesDir).filter((f) => /^example_\d{3}\.md$/.tes
 
   assert.deepEqual(errors, [], 'no page errors');
   ok('no page errors');
+
+  // Embedded as the docsite embeds it: an <iframe srcdoc> with no address of its own.
+  // History calls throw there, and a bare "#tab" link would resolve against the host page.
+  const host = await ctx.newPage();
+  const hostErrors = [];
+  host.on('pageerror', (e) => hostErrors.push(e.message));
+  const hostFile = path.join(fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'viewer-host-')), 'host.html');
+  fs.writeFileSync(hostFile, '<!doctype html><title>host</title><body></body>');
+  await host.goto('file://' + hostFile + '#host');
+  await host.evaluate((html) => {
+    document.body.innerHTML = '';
+    const f = document.createElement('iframe');
+    f.style.cssText = 'width:1200px;height:800px';
+    f.srcdoc = html;
+    document.body.append(f);
+  }, fs.readFileSync(path.resolve(file), 'utf8'));
+  const fr = host.frameLocator('iframe');
+  await fr.locator('body[data-ready=true]').waitFor({timeout: 10000});
+  const shown = () => fr.locator('section.tab:not([hidden])').getAttribute('id');
+  await fr.locator('nav.tabs a[data-tab="example-021"]').click();
+  assert.equal(await shown(), 'tab-example-021', 'in a frame: a tab opens');
+  await fr.locator('#tab-example-021 .doc a:text("← All examples")').click();
+  assert.equal(await shown(), 'tab-index', 'in a frame: the back-link opens the Index');
+  await fr.locator('#tab-index .doc table a[data-src="examples/example_007.md"] >> nth=0').click();
+  assert.equal(await shown(), 'tab-example-007', 'in a frame: an index link opens its example');
+  await fr.locator('#tab-example-007 [data-step="next"]').click();
+  await fr.locator('#jump').selectOption('example-015');
+  assert.equal(await shown(), 'tab-example-015', 'in a frame: Next and Jump to work');
+  assert.equal(await fr.locator('body[data-ready=true]').count(), 1, 'in a frame: the viewer never navigated away');
+  assert.equal(new URL(host.url()).hash, '#host', 'in a frame: the host page keeps its address');
+  assert.deepEqual(hostErrors, [], 'in a frame: no page errors');
+  ok('embedded in an <iframe srcdoc> (as in the docsite): tabs, links, Next and Jump to work');
   await browser.close();
 })().catch((e) => { console.error('FAIL ' + e.message); process.exit(1); });

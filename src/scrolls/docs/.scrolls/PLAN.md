@@ -17,7 +17,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] File #265's issues: epic #266 with sub-issues #267–#270, and #271 for the `EXAMPLES.md` rename (2026-11-16); the PR body lists them with `Closes`.
 - [ ] Add `/scrolls-compact` to `SPEC.md` once #265 merges.
 - [ ] Later, to revisit (the user's choice, 2026-11-16: one box for now): in `assets/example-viewer.html`, split the "Note" box into two, Premise in the accent tint and Caveats in a warning-style amber.
-- [ ] Show `/scrolls-compact`'s examples in the docsite's Skills tab, using `assets/example-viewer.html` (the user's next step; the page uses the same `marked` 12.0.2 from cdnjs as `docs/docsite/index.html`).
+- [x] Show `/scrolls-compact`'s examples in the docsite's Skills tab: the page "Browse the scrolls-compact examples" (`explainers/scrolls-compact-examples.md`, under Explainers) embeds `assets/example-viewer.html` (2026-11-16).
 - [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1`, `tests/test_compact.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
 - [x] The stale remote branch `claude/confident-maxwell-d6ws37` is gone (checked with `git ls-remote`).
 

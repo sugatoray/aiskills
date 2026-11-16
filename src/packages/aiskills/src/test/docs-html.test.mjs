@@ -10,7 +10,7 @@ import { describe, test } from "node:test";
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 
-import { PKG_SRC, tempDir } from "./helpers.mjs";
+import { PKG_SRC, REPO_ROOT, tempDir } from "./helpers.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const OUT = join(DOCS, "index.html");
@@ -77,7 +77,7 @@ describe("build-docs-html", () => {
     assert.ok(want.length >= 9, "the overview has a section per group");
     assert.deepEqual(skills.nav.groups.map((g) => ({ label: g.label, pages: g.pages })), want);
     assert.deepEqual(skills.nav.top, ["skills/README.md"], "the overview stays on top");
-    assert.deepEqual(skills.nav.extra, [{ label: "Explainers", pages: ["explainers/scrolls.md"] }], "the explainer is not a skill");
+    assert.deepEqual(skills.nav.extra, [{ label: "Explainers", pages: ["explainers/scrolls-compact-examples.md", "explainers/scrolls.md"] }], "the explainers are not skills");
     const everyPage = [...skills.nav.top, ...skills.nav.groups.flatMap((g) => g.pages), ...skills.nav.extra.flatMap((x) => x.pages)];
     assert.deepEqual(everyPage.sort(), [...skills.pages].sort(), "every page of the tab is listed once");
     for (const tab of data(build(DOCS).html).tabs.filter((t) => t.id !== "skills")) assert.equal(tab.nav, undefined, `${tab.id}: a plain list`);
@@ -112,6 +112,7 @@ describe("build-docs-html", () => {
     const d = data(build(DOCS).html);
     // [the HTML page, the docs page that embeds it, the tab that lists that docs page]
     const served = [
+      ["explainers/scrolls-compact-examples.html", "explainers/scrolls-compact-examples.md", "Skills"],
       ["explainers/scrolls-explainer.html", "explainers/scrolls.md", "Skills"],
       ["reference/cli-outputs.html", "reference/cli-outputs.md", "Reference"],
     ];
@@ -488,6 +489,46 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       const box = await page.locator("#doc iframe").boundingBox();
       const doc = await page.locator("#doc").boundingBox();
       assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
+      assert.deepEqual(errors, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the scrolls-compact examples page embeds the example viewer: its tabs, links and Note boxes work in the frame", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(OUT).href + "#explainers-scrolls-compact-examples");
+      await page.waitForSelector("#doc iframe");
+      assert.equal(await page.locator("#side a", { hasText: "Browse the scrolls-compact examples" }).count(), 1, "listed under Explainers");
+      const frame = page.frameLocator("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      const examples = readdirSync(join(REPO_ROOT, "skills/scrolls/scrolls-compact/assets/examples")).filter((f) => /^example_\d{3}\.md$/.test(f)).length;
+      assert.equal(await frame.locator("nav.tabs a[role=tab]").count(), examples + 1, "Index plus one tab per example");
+      assert.equal(await frame.locator(".doc .pc").count(), examples, "one Note box per example");
+      const outer = page.url();
+      await frame.locator('nav.tabs a[data-tab="example-021"]').click();
+      assert.equal(await frame.locator("#tab-example-021").isVisible(), true, "a tab opens inside the frame");
+      assert.match(await frame.locator("#tab-example-021 .doc h1").innerText(), /Example-21/);
+      await frame.locator('#tab-example-021 .doc a:text("← All examples")').click();
+      assert.equal(await frame.locator("#tab-index").isVisible(), true, "the back-link opens the Index tab");
+      await frame.locator('#tab-index .doc table a[data-src="examples/example_007.md"] >> nth=0').click();
+      assert.equal(await frame.locator("#tab-example-007").isVisible(), true, "an index link opens its example");
+      await frame.locator('#tab-example-007 [data-step="next"]').click();
+      assert.equal(await frame.locator("#tab-example-008").isVisible(), true, "Next works");
+      assert.equal(page.url(), outer, "the frame's tabs don't change the docs page's address");
+      const box = await page.locator("#doc iframe").boundingBox();
+      const doc = await page.locator("#doc").boundingBox();
+      assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
+      // Full-size: an overlay in this page, as for the scrolls explainer.
+      await page.click('#doc a:has-text("Open the examples full-size")');
+      await page.waitForSelector(".explainer-overlay iframe");
+      await page.frameLocator(".explainer-overlay iframe").locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator(".explainer-overlay").count(), 0, "Esc closes it");
       assert.deepEqual(errors, []);
     } finally {
       await browser.close();
