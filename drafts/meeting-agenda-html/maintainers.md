@@ -35,7 +35,7 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 
 - `go(i)`: stop the current segment, switch slides, start the new one.
 - Timer thresholds: `warn` when not over and remaining ≤ 20% of planned; `over` when used > planned. The text shows `ceil(remaining)` normally and `+floor(overage)` when over.
-- Meeting bar: `pct = used*100/planned`. `warn` at ≥ 80% and ≤ 100%, `over` above 100%. The fill is capped at 100%, and the tooltip `title` shows the uncapped rounded percentage.
+- Meeting bar: one `.seg` per item (`left`/`width` = the item's planned share of the total), each holding a `.seg-fill` whose width is that item's `used*100/planned`, capped at 100%. `.seg.current` marks the visible item, and `.seg.over` marks an item past its own time. On the whole bar, `pct = totalUsed*100/totalPlanned` gives `warn` (≥ 80% and ≤ 100%), `over` (above 100%), and the uncapped rounded tooltip. *History:* the first version had one fill growing from the left by the total, so time on a later item appeared inside item 1's section. Fixed red/green (`logs/red-section-progress.log`).
 
 ## Editor flow
 
@@ -52,12 +52,12 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 | `test_slides.py` | Self-containment, embedded demo, slide structure, XSS-as-text, corrupt storage |
 | `test_navigation.py` | All keys, clamping, dots, Space after a button click |
 | `test_timers.py` | Countdown, per-slide pause, P/R and buttons, amber, red/pulse/count-up |
-| `test_footer.py` | Meeting text, ticks, fill/tooltip, amber/red |
+| `test_footer.py` | Meeting text, ticks, per-section segments (sizing, fill per item, revisits, overtime cap, current marker), tooltip, amber/red |
 | `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
 | `test_layout.py` | 24 long items, 90-minute item, phone width |
 | `test_screenshots.py` | Regenerates `screenshots/`. Finishes finite animations before capturing, so images aren't caught mid-fade. |
 
-Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `#dots .dot`, `#meeting-text`, `#meeting-bar(.warn|.over) .fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `#dots .dot`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 

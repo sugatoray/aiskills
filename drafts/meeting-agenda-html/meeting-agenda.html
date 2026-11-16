@@ -80,10 +80,13 @@
   #meeting { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   #meeting-text { font-variant-numeric: tabular-nums; white-space: nowrap; }
   #meeting-bar { position: relative; width: clamp(120px, 18vw, 240px); height: 8px; border-radius: 4px; background: var(--faint); overflow: hidden; }
-  #meeting-bar .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--teal); border-radius: 4px; transition: width .25s linear, background .3s; }
-  #meeting-bar.warn .fill { background: var(--amber); }
-  #meeting-bar.over .fill { background: var(--red); }
-  #meeting-bar .tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(10,4,25,.85); }
+  /* one segment per item, sized by its planned minutes; each fills with the time spent on that item */
+  #meeting-bar .seg { position: absolute; top: 0; bottom: 0; overflow: hidden; }
+  #meeting-bar .seg.current { background: rgba(255,255,255,.14); }
+  #meeting-bar .seg-fill { height: 100%; width: 0; background: var(--teal); transition: width .25s linear, background .3s; }
+  #meeting-bar.warn .seg-fill { background: var(--amber); }
+  #meeting-bar.over .seg-fill, #meeting-bar .seg.over .seg-fill { background: var(--red); }
+  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(10,4,25,.85); }
 
   /* editor */
   #editor { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(5,2,15,.6); backdrop-filter: blur(4px); }
@@ -147,7 +150,7 @@
   <nav id="dots" aria-label="Agenda items"></nav>
   <div id="meeting">
     <span id="meeting-text"></span>
-    <div id="meeting-bar" role="progressbar" aria-label="Meeting time used"><div class="fill"></div></div>
+    <div id="meeting-bar" role="progressbar" aria-label="Meeting time used"></div>
   </div>
 </footer>
 
@@ -259,7 +262,7 @@
   function build() {
     var deck = $("#deck"), dots = $("#dots"), bar = $("#meeting-bar");
     deck.textContent = ""; dots.textContent = "";
-    bar.querySelectorAll(".tick").forEach(function (t) { t.remove(); });
+    bar.textContent = "";
     $("#meeting-title").textContent = agenda.title || "";
     document.title = agenda.title || "Meeting Agenda";
 
@@ -282,6 +285,13 @@
       d.title = (i + 1) + ". " + it.title;
       d.addEventListener("click", function () { go(i); d.blur(); });
       dots.appendChild(d);
+
+      var seg = el("div", "seg");
+      seg.style.left = (acc * 100 / total) + "%";
+      seg.style.width = (it.minutes * 60000 * 100 / total) + "%";
+      seg.title = (i + 1) + ". " + it.title;
+      seg.appendChild(el("div", "seg-fill"));
+      bar.appendChild(seg);
 
       acc += it.minutes * 60000;
       if (i < agenda.items.length - 1) {
@@ -331,7 +341,12 @@
     bar.classList.toggle("warn", tu <= tp && pct >= 80);
     bar.title = Math.round(pct) + "% used";
     bar.setAttribute("aria-valuenow", String(Math.round(pct)));
-    $(".fill", bar).style.width = +Math.min(100, pct).toFixed(2) + "%";
+    bar.querySelectorAll(".seg").forEach(function (seg, i) {
+      var u = usedMs(i), p = plannedMs(i);
+      seg.classList.toggle("current", i === current);
+      seg.classList.toggle("over", u > p);
+      seg.firstChild.style.width = +Math.min(100, u * 100 / p).toFixed(2) + "%";
+    });
   }
 
   // ---------- timer controls ----------

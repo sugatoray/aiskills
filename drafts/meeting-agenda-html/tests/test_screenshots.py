@@ -72,3 +72,14 @@ def test_shot_meeting_over(hd):
     tick(hd, 2 * 60)
     expect(hd.locator("#meeting-bar.over")).to_have_count(1)
     snap(hd, "06-meeting-over.png")
+
+
+def test_shot_progress_by_section(hd):
+    tick(hd, 4 * 60)
+    hd.keyboard.press("ArrowRight")
+    hd.keyboard.press("ArrowRight")
+    tick(hd, 3 * 60)
+    hd.keyboard.press("End")
+    tick(hd, 60)
+    expect(hd.locator("#meeting-text")).to_have_text("Meeting: 8:00 used / 30:00 planned")
+    snap(hd, "07-progress-by-section.png")

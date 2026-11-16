@@ -25,7 +25,7 @@ The Pause/Resume and Reset buttons under the ring, and the progress dots in the 
 
 - The ring counts down from the item's minutes. It pauses when you leave the slide and continues from the same point when you come back.
 - The ring turns **amber** in the last 20% of the item's time. Past zero it turns **red**, pulses, and counts up (`+1:05`).
-- The footer shows `Meeting: M:SS used / M:SS planned` and a progress bar with a tick mark at each item boundary. The bar turns amber at 80% of the planned total and red once past it. Hover over it to see the percentage used.
+- The footer shows `Meeting: M:SS used / M:SS planned` and a progress bar split into one section per item, sized by that item's planned minutes and separated by tick marks. Each section fills with the time spent on its own item, so moving between items (or skipping one) shows exactly where the time went. The current item's section is highlighted, and a section that runs over its item's time turns red without spilling into the next section. The whole bar turns amber at 80% of the planned total and red once past it. Hover over it to see the percentage used.
 
 ### Editing the agenda
 
@@ -68,7 +68,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 49 tests and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 55 tests and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `screenshots/`.
 
 ## Contents
 
@@ -77,6 +77,7 @@ If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the
 | `meeting-agenda.html` | The deck |
 | `tests/` | pytest + Playwright suite |
 | `logs/red.log`, `logs/green.log` | Test runs before (stub) and after the implementation |
-| `screenshots/` | Normal, amber, overtime, editor, validation, meeting-over |
+| `logs/red-section-progress.log` | Red run for the per-section progress bar fix |
+| `screenshots/` | Normal, amber, overtime, editor, validation, meeting-over, progress-by-section |
 | `maintainers.md` | How it's built and how to change it |
 | `security.md` | Security model |
