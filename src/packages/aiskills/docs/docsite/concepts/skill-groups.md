@@ -24,6 +24,7 @@ Entries whose `source` isn't a local folder (a git URL, say) are skipped, becaus
 | `docs-skills` | `docs` | create-lib-docs |
 | `image-styles-skills` | `image-styles` | artwallbg, commentdrop |
 | `personas-skills` | `personas` | prodigy |
+| `productivity-skills` | `productivity` | meeting-agenda |
 | `repo-related-skills` | `repo-related` | create-issues-update-pr |
 | `review-skills` | `review` | run-code-review |
 | `scrolls-skills` | `scrolls` | scrolls-compact, scrolls-explainer, scrolls-help, scrolls-hide, scrolls-remove, scrolls-restore, scrolls-setup, scrolls-unhide, scrolls-update |

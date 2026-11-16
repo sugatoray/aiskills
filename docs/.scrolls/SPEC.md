@@ -16,6 +16,9 @@ Every page's header has a version menu with a **Find a version** box (partial or
 ## Release tags (`aiskills-vX.Y.Z`)
 Every published npm release has an annotated git tag on the commit npm recorded as its `gitHead`, with the publish time in the message: `aiskills-v0.4.0`–`aiskills-v1.4.0` so far. New releases are tagged the same way (`src/packages/aiskills/docs/meta/MAINTAINERS.md` → Releasing, step 6).
 
+## `meeting-agenda` skill (productivity group)
+`/meeting-agenda` turns an agenda (pasted text, notes, a document or JSON) into one offline HTML slide deck. Each item gets a slide with a large number, its title and sub-points, plus a ring countdown that turns amber in the last 20% and red with a `+M:SS` count-up past zero. The footer has progress dots and a meeting bar that fills per item. A gear-button editor applies to `localStorage` or downloads an updated copy. `scripts/build_deck.py` validates the agenda and writes it into the template with `<` escaped. 67 pytest + Playwright tests. Code: `skills/productivity/meeting-agenda/`.
+
 <!--
 ## <Feature name>
 What it does, from a user's perspective. A pointer to where it lives in the code

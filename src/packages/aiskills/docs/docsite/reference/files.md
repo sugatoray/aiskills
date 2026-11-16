@@ -66,7 +66,7 @@ Written when the package is built, and copied to the install folder.
     "scrolls-setup": "scrolls/scrolls-setup"
   },
   "extras": ["scrolls/README.md", "scrolls/.claude-plugin/plugin.json"],
-  "ignored": ["newsletters/newsletter-ai/"]
+  "ignored": ["newsletters/newsletter-ai/", "productivity/meeting-agenda/meta/screenshots/", "productivity/meeting-agenda/meta/tdd-logs/"]
 }
 ```
 
@@ -76,7 +76,7 @@ Written when the package is built, and copied to the install folder.
 | `description` | string | A note for people reading the file. |
 | `skills` | object: skill name → string | Each skill's original folder, relative to the repo's `skills/`. Used for `--nested` and for groups. |
 | `extras` | string[] | Files outside any skill folder (READMEs, `plugin.json`, `meta/`), stored in the package under `.aiskills/nested/` at these paths. |
-| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`. |
+| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`, and `meeting-agenda`'s `meta/screenshots/` and `meta/tdd-logs/`, from `skills/productivity/meeting-agenda/.skillsignore`. |
 
 ## The package
 

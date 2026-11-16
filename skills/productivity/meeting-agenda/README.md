@@ -1,10 +1,39 @@
-# Meeting Agenda Deck
+# meeting-agenda
 
-One self-contained HTML file (`meeting-agenda.html`) that turns a meeting agenda into a full-screen slide deck, with a countdown timer for every item. It has no dependencies and makes no network calls. Open it in any modern browser, including offline.
+Turns a meeting agenda into one self-contained HTML slide deck with a countdown timer for every item. The deck has no dependencies and makes no network calls; open it in any modern browser, including offline.
 
-## Use it
+![A slide with its ring timer and the per-item meeting progress bar](meta/screenshots/07-progress-by-section.png)
 
-1. Open `meeting-agenda.html` in a browser (double-click it; no server needed).
+## Install
+
+```bash
+npx skills add sugatoray/aiskills --skill meeting-agenda
+```
+
+Or, in Claude Code, run `/plugin marketplace add sugatoray/aiskills`, then `/plugin install productivity-skills@sugatoray`.
+
+## Ask for a deck
+
+```text
+/meeting-agenda --title "Team Planning Meeting" --total 30
+10 min  Priorities for 2026 & 2027 (what are the priorities for 2026? for 2027?)
+8 min   Identify trainings for 2027
+5 min   Resourcing & budget
+3 min   Risks & blockers
+4 min   Decisions, owners & next steps
+```
+
+The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), and `--output` (path).
+
+To build a deck yourself without an agent:
+
+```bash
+python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly sync"
+```
+
+## Present it
+
+1. Open the HTML file in a browser (double-click it; no server needed).
 2. Present with the keyboard. Each slide's timer starts when the slide is shown.
 3. Click the gear in the top right to change the agenda.
 
@@ -68,16 +97,17 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 55 tests and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 67 tests (55 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 
 | Path | What |
 |---|---|
-| `meeting-agenda.html` | The deck |
+| `SKILL.md` | Instructions the agent follows |
+| `assets/meeting-agenda.html` | The deck template (it's also a working deck: the 30-minute demo agenda) |
+| `scripts/build_deck.py` | Validates agenda JSON and writes it into a copy of the template |
 | `tests/` | pytest + Playwright suite |
-| `logs/red.log`, `logs/green.log` | Test runs before (stub) and after the implementation |
-| `logs/red-section-progress.log` | Red run for the per-section progress bar fix |
-| `screenshots/` | Normal, amber, overtime, editor, validation, meeting-over, progress-by-section |
-| `maintainers.md` | How it's built and how to change it |
-| `security.md` | Security model |
+| `meta/MAINTAINERS.md` | How the deck is built and how to change it |
+| `meta/SECURITY.md` | Security model |
+| `meta/tdd-logs/` | Red and green test runs from development |
+| `meta/screenshots/` | Normal slide, overtime, editor, progress by section |

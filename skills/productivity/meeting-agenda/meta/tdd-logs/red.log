@@ -1,0 +1,1211 @@
+# RED phase — tests written first, run against an empty stub meeting-agenda.html
+# 2026-11-16T15:17:16Z
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.2.0, pluggy-1.7.0 -- /usr/local/bin/python3
+rootdir: /home/user/aiskills/drafts/meeting-agenda-html
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.15.1
+collecting ... collected 49 items
+
+tests/test_editor.py::test_gear_opens_editor_with_one_row_per_item FAILED [  2%]
+tests/test_editor.py::test_editor_pauses_timer_and_blocks_slide_keys FAILED [  4%]
+tests/test_editor.py::test_add_item_and_apply_rebuilds_deck_and_saves FAILED [  6%]
+tests/test_editor.py::test_reorder_and_remove FAILED                     [  8%]
+tests/test_editor.py::test_last_row_can_never_be_removed FAILED          [ 10%]
+tests/test_editor.py::test_validation_highlights_invalid_rows_and_blocks_apply FAILED [ 12%]
+tests/test_editor.py::test_negative_and_blank_minutes_are_invalid FAILED [ 14%]
+tests/test_editor.py::test_cancel_and_escape_discard_changes FAILED      [ 16%]
+tests/test_editor.py::test_reset_to_file_defaults_asks_first FAILED      [ 18%]
+tests/test_editor.py::test_save_html_downloads_copy_with_escaped_agenda FAILED [ 20%]
+tests/test_editor.py::test_save_html_blocked_when_invalid FAILED         [ 22%]
+tests/test_footer.py::test_meeting_text_sums_across_slides FAILED        [ 24%]
+tests/test_footer.py::test_progress_bar_has_tick_at_each_item_boundary FAILED [ 26%]
+tests/test_footer.py::test_progress_bar_fill_and_tooltip FAILED          [ 28%]
+tests/test_footer.py::test_progress_bar_amber_then_red FAILED            [ 30%]
+tests/test_layout.py::test_many_items_long_text FAILED                   [ 32%]
+tests/test_layout.py::test_long_meeting_formats_minutes_past_an_hour FAILED [ 34%]
+tests/test_layout.py::test_phone_width FAILED                            [ 36%]
+tests/test_navigation.py::test_next_keys FAILED                          [ 38%]
+tests/test_navigation.py::test_previous_keys FAILED                      [ 40%]
+tests/test_navigation.py::test_home_and_end FAILED                       [ 42%]
+tests/test_navigation.py::test_navigation_clamps_at_ends FAILED          [ 44%]
+tests/test_navigation.py::test_progress_dots_are_clickable FAILED        [ 46%]
+tests/test_navigation.py::test_space_after_clicking_a_button_navigates_once FAILED [ 48%]
+tests/test_navigation.py::test_keyboard_hints_in_footer FAILED           [ 51%]
+tests/test_screenshots.py::test_shot_normal FAILED                       [ 53%]
+tests/test_screenshots.py::test_shot_amber FAILED                        [ 55%]
+tests/test_screenshots.py::test_shot_overtime FAILED                     [ 57%]
+tests/test_screenshots.py::test_shot_editor FAILED                       [ 59%]
+tests/test_screenshots.py::test_shot_editor_invalid FAILED               [ 61%]
+tests/test_screenshots.py::test_shot_meeting_over FAILED                 [ 63%]
+tests/test_slides.py::test_file_has_no_external_dependencies PASSED      [ 65%]
+tests/test_slides.py::test_no_network_requests_on_load PASSED            [ 67%]
+tests/test_slides.py::test_embedded_agenda_block_is_the_30_minute_demo FAILED [ 69%]
+tests/test_slides.py::test_one_slide_per_item_with_numbers_titles_points FAILED [ 71%]
+tests/test_slides.py::test_item_without_points_renders_no_list FAILED    [ 73%]
+tests/test_slides.py::test_first_slide_active_on_load FAILED             [ 75%]
+tests/test_slides.py::test_gradient_theme FAILED                         [ 77%]
+tests/test_slides.py::test_user_text_is_not_parsed_as_html FAILED        [ 79%]
+tests/test_slides.py::test_corrupt_storage_falls_back_to_file_defaults FAILED [ 81%]
+tests/test_timers.py::test_starts_at_item_minutes_and_counts_down FAILED [ 83%]
+tests/test_timers.py::test_each_slide_uses_its_own_minutes FAILED        [ 85%]
+tests/test_timers.py::test_half_minute_items FAILED                      [ 87%]
+tests/test_timers.py::test_leaving_a_slide_pauses_it_and_returning_resumes FAILED [ 89%]
+tests/test_timers.py::test_p_pauses_and_resumes FAILED                   [ 91%]
+tests/test_timers.py::test_r_resets FAILED                               [ 93%]
+tests/test_timers.py::test_on_screen_buttons FAILED                      [ 95%]
+tests/test_timers.py::test_amber_in_last_20_percent FAILED               [ 97%]
+tests/test_timers.py::test_past_zero_turns_red_pulses_and_counts_up FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________ test_gear_opens_editor_with_one_row_per_item _________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_gear_opens_editor_with_one_row_per_item(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b9baad0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b834680>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+________________ test_editor_pauses_timer_and_blocks_slide_keys ________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_editor_pauses_timer_and_blocks_slide_keys(deck):
+        tick(deck, 10)
+>       open_editor(deck)
+
+tests/test_editor.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b6aa780>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6f1260>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+_______________ test_add_item_and_apply_rebuilds_deck_and_saves ________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_add_item_and_apply_rebuilds_deck_and_saves(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b487e30>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6f14e0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+___________________________ test_reorder_and_remove ____________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_reorder_and_remove(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b4919a0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6e0900>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+______________________ test_last_row_can_never_be_removed ______________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_last_row_can_never_be_removed(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b491720>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6e3c40>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+___________ test_validation_highlights_invalid_rows_and_blocks_apply ___________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_validation_highlights_invalid_rows_and_blocks_apply(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b4918b0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b827c40>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+_________________ test_negative_and_blank_minutes_are_invalid __________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_negative_and_blank_minutes_are_invalid(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b5d07d0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8cc2c0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+____________________ test_cancel_and_escape_discard_changes ____________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_cancel_and_escape_discard_changes(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b5d2a80>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8cc5e0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+____________________ test_reset_to_file_defaults_asks_first ____________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_reset_to_file_defaults_asks_first(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b5d2cb0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8cfa60>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+______________ test_save_html_downloads_copy_with_escaped_agenda _______________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+browser = <Browser type=<BrowserType name=chromium executable_path=/opt/pw-browsers/chromium-1255/chrome-linux64/chrome> version=153.0.8010.12>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_save_html_downloads_copy_0')
+
+    def test_save_html_downloads_copy_with_escaped_agenda(deck, browser, tmp_path):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b5d14f0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8dc9a0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+_____________________ test_save_html_blocked_when_invalid ______________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_save_html_blocked_when_invalid(deck):
+>       rows = open_editor(deck)
+               ^^^^^^^^^^^^^^^^^
+
+tests/test_editor.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_editor.py:11: in open_editor
+    page.locator("#btn-edit").click()
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b5d0e10>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8c80e0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+_____________________ test_meeting_text_sums_across_slides _____________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_meeting_text_sums_across_slides(deck):
+        mt = deck.locator("#meeting-text")
+>       expect(mt).to_have_text("Meeting: 0:00 used / 30:00 planned")
+E       AssertionError: Locator expected to have text 'Meeting: 0:00 used / 30:00 planned'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#meeting-text") with timeout 2000ms
+E         - waiting for locator("#meeting-text")
+
+tests/test_footer.py:11: AssertionError
+_______________ test_progress_bar_has_tick_at_each_item_boundary _______________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_progress_bar_has_tick_at_each_item_boundary(deck):
+        ticks = deck.locator("#meeting-bar .tick")
+>       expect(ticks).to_have_count(4)
+E       AssertionError: Locator expected to have count '4'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#meeting-bar .tick") with timeout 2000ms
+E         - waiting for locator("#meeting-bar .tick")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_footer.py:20: AssertionError
+______________________ test_progress_bar_fill_and_tooltip ______________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_progress_bar_fill_and_tooltip(deck):
+        tick(deck, 9 * 60)  # 9 of 30 minutes = 30%
+        bar = deck.locator("#meeting-bar")
+>       expect(bar).to_have_attribute("title", "30% used")
+E       AssertionError: Locator expected to have attribute '30% used'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_attribute" locator("#meeting-bar") with timeout 2000ms
+E         - waiting for locator("#meeting-bar")
+
+tests/test_footer.py:30: AssertionError
+_______________________ test_progress_bar_amber_then_red _______________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_progress_bar_amber_then_red(deck):
+        store_agenda(deck, [{"minutes": 5, "title": "A", "points": []},
+                            {"minutes": 5, "title": "B", "points": []}])
+        bar = deck.locator("#meeting-bar")
+        tick(deck, 7 * 60 + 59)                     # 7:59 of 10:00 is below 80%
+        expect(deck.locator("#meeting-bar.warn")).to_have_count(0)
+        tick(deck, 2)                               # 8:01 of 10:00 is past 80%
+>       expect(deck.locator("#meeting-bar.warn")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#meeting-bar.warn") with timeout 2000ms
+E         - waiting for locator("#meeting-bar.warn")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_footer.py:42: AssertionError
+__________________________ test_many_items_long_text ___________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_many_items_long_text(deck):
+        items = [{"minutes": 0.5 + i, "title": f"Item {i + 1}: " + "a fairly long agenda title " * 3,
+                  "points": [f"Point {j} " + "with some extra words " * 4 for j in range(8)]}
+                 for i in range(24)]
+        store_agenda(deck, items)
+>       expect(deck.locator(".slide")).to_have_count(24)
+E       AssertionError: Locator expected to have count '24'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator(".slide") with timeout 2000ms
+E         - waiting for locator(".slide")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_layout.py:16: AssertionError
+________________ test_long_meeting_formats_minutes_past_an_hour ________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_long_meeting_formats_minutes_past_an_hour(deck):
+        store_agenda(deck, [{"minutes": 90, "title": "Offsite", "points": []}])
+>       expect(deck.locator("#timer-text")).to_have_text("90:00")
+E       AssertionError: Locator expected to have text '90:00'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_layout.py:30: AssertionError
+_______________________________ test_phone_width _______________________________
+
+browser = <Browser type=<BrowserType name=chromium executable_path=/opt/pw-browsers/chromium-1255/chrome-linux64/chrome> version=153.0.8010.12>
+
+    def test_phone_width(browser):
+        from conftest import URL
+        ctx = browser.new_context(viewport={"width": 390, "height": 844})
+        try:
+            p = ctx.new_page()
+            p.goto(URL)
+>           expect(p.locator(".slide.active")).to_be_visible()
+E           AssertionError: Locator expected to be visible
+E           Actual value: None
+E           Error: element(s) not found 
+E           Call log:
+E             - Expect "to_be_visible" locator(".slide.active") with timeout 2000ms
+E             - waiting for locator(".slide.active")
+
+tests/test_layout.py:40: AssertionError
+________________________________ test_next_keys ________________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_next_keys(deck):
+        for key, want in [("ArrowRight", "02"), ("Space", "03"), ("PageDown", "04")]:
+            deck.keyboard.press(key)
+>           expect(active_num(deck)).to_have_text(want)
+E           AssertionError: Locator expected to have text '02'
+E           Actual value: None
+E           Error: element(s) not found 
+E           Call log:
+E             - Expect "to_have_text" locator(".slide.active .num") with timeout 2000ms
+E             - waiting for locator(".slide.active .num")
+
+tests/test_navigation.py:12: AssertionError
+______________________________ test_previous_keys ______________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_previous_keys(deck):
+        deck.keyboard.press("End")
+>       expect(active_num(deck)).to_have_text("05")
+E       AssertionError: Locator expected to have text '05'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator(".slide.active .num") with timeout 2000ms
+E         - waiting for locator(".slide.active .num")
+
+tests/test_navigation.py:17: AssertionError
+______________________________ test_home_and_end _______________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_home_and_end(deck):
+        deck.keyboard.press("End")
+>       expect(active_num(deck)).to_have_text("05")
+E       AssertionError: Locator expected to have text '05'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator(".slide.active .num") with timeout 2000ms
+E         - waiting for locator(".slide.active .num")
+
+tests/test_navigation.py:25: AssertionError
+________________________ test_navigation_clamps_at_ends ________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_navigation_clamps_at_ends(deck):
+        deck.keyboard.press("ArrowLeft")
+>       expect(active_num(deck)).to_have_text("01")
+E       AssertionError: Locator expected to have text '01'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator(".slide.active .num") with timeout 2000ms
+E         - waiting for locator(".slide.active .num")
+
+tests/test_navigation.py:32: AssertionError
+_______________________ test_progress_dots_are_clickable _______________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_progress_dots_are_clickable(deck):
+        dots = deck.locator("#dots .dot")
+>       expect(dots).to_have_count(5)
+E       AssertionError: Locator expected to have count '5'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#dots .dot") with timeout 2000ms
+E         - waiting for locator("#dots .dot")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_navigation.py:40: AssertionError
+______________ test_space_after_clicking_a_button_navigates_once _______________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_space_after_clicking_a_button_navigates_once(deck):
+>       deck.locator("#btn-pause").click()
+
+tests/test_navigation.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b4623f0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b8c8f40>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-pause")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+________________________ test_keyboard_hints_in_footer _________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_keyboard_hints_in_footer(deck):
+        hints = deck.locator("#hints")
+>       expect(hints).to_be_visible()
+E       AssertionError: Locator expected to be visible
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_be_visible" locator("#hints") with timeout 2000ms
+E         - waiting for locator("#hints")
+
+tests/test_navigation.py:54: AssertionError
+_______________________________ test_shot_normal _______________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_normal(hd):
+        tick(hd, 95)
+>       expect(hd.locator("#timer-text")).to_have_text("8:25")
+E       AssertionError: Locator expected to have text '8:25'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_screenshots.py:25: AssertionError
+_______________________________ test_shot_amber ________________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_amber(hd):
+        hd.keyboard.press("ArrowRight")
+        tick(hd, 7 * 60)
+>       expect(hd.locator("#timer.warn")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#timer.warn") with timeout 2000ms
+E         - waiting for locator("#timer.warn")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_screenshots.py:32: AssertionError
+______________________________ test_shot_overtime ______________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_overtime(hd):
+        hd.keyboard.press("End")
+        tick(hd, 4 * 60 + 42)
+>       expect(hd.locator("#timer.over")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#timer.over") with timeout 2000ms
+E         - waiting for locator("#timer.over")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_screenshots.py:39: AssertionError
+_______________________________ test_shot_editor _______________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_editor(hd):
+>       hd.locator("#btn-edit").click()
+
+tests/test_screenshots.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032b462d00>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b4163e0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+___________________________ test_shot_editor_invalid ___________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_editor_invalid(hd):
+>       hd.locator("#btn-edit").click()
+
+tests/test_screenshots.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032acdbd90>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6e3100>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-edit")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+____________________________ test_shot_meeting_over ____________________________
+
+hd = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_shot_meeting_over(hd):
+        for _ in range(4):
+            tick(hd, 8 * 60)
+            hd.keyboard.press("ArrowRight")
+        tick(hd, 2 * 60)
+>       expect(hd.locator("#meeting-bar.over")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#meeting-bar.over") with timeout 2000ms
+E         - waiting for locator("#meeting-bar.over")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_screenshots.py:65: AssertionError
+_______________ test_embedded_agenda_block_is_the_30_minute_demo _______________
+
+    def test_embedded_agenda_block_is_the_30_minute_demo():
+        src = HTML.read_text(encoding="utf-8")
+        m = re.search(r'<script type="application/json" id="agenda-data">(.*?)</script>', src, re.S)
+>       assert m, "agenda-data block present"
+E       AssertionError: agenda-data block present
+E       assert None
+
+tests/test_slides.py:36: AssertionError
+______________ test_one_slide_per_item_with_numbers_titles_points ______________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_one_slide_per_item_with_numbers_titles_points(deck):
+        slides = deck.locator(".slide")
+>       expect(slides).to_have_count(5)
+E       AssertionError: Locator expected to have count '5'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator(".slide") with timeout 2000ms
+E         - waiting for locator(".slide")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_slides.py:46: AssertionError
+___________________ test_item_without_points_renders_no_list ___________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_item_without_points_renders_no_list(deck):
+        from conftest import store_agenda
+        store_agenda(deck, [{"minutes": 2, "title": "Solo", "points": []}])
+>       expect(deck.locator(".slide")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator(".slide") with timeout 2000ms
+E         - waiting for locator(".slide")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_slides.py:57: AssertionError
+_______________________ test_first_slide_active_on_load ________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_first_slide_active_on_load(deck):
+>       expect(deck.locator(".slide.active")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator(".slide.active") with timeout 2000ms
+E         - waiting for locator(".slide.active")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_slides.py:62: AssertionError
+_____________________________ test_gradient_theme ______________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_gradient_theme(deck):
+        bg = deck.evaluate("getComputedStyle(document.body).backgroundImage")
+>       assert "gradient" in bg
+E       AssertionError: assert 'gradient' in 'none'
+
+tests/test_slides.py:68: AssertionError
+_____________________ test_user_text_is_not_parsed_as_html _____________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_user_text_is_not_parsed_as_html(deck):
+        from conftest import store_agenda
+        store_agenda(deck, [{"minutes": 1, "title": "<img src=x onerror=\"window.pwned=1\">",
+                             "points": ["<b>bold?</b>"]}])
+>       expect(deck.locator(".slide .title")).to_have_text("<img src=x onerror=\"window.pwned=1\">")
+E       AssertionError: Locator expected to have text '<img src=x onerror="window.pwned=1">'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator(".slide .title") with timeout 2000ms
+E         - waiting for locator(".slide .title")
+
+tests/test_slides.py:75: AssertionError
+_______________ test_corrupt_storage_falls_back_to_file_defaults _______________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_corrupt_storage_falls_back_to_file_defaults(deck):
+        deck.evaluate("localStorage.setItem('meetingAgenda', '{not json')")
+        deck.reload()
+>       expect(deck.locator(".slide")).to_have_count(5)
+E       AssertionError: Locator expected to have count '5'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator(".slide") with timeout 2000ms
+E         - waiting for locator(".slide")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_slides.py:84: AssertionError
+_________________ test_starts_at_item_minutes_and_counts_down __________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_starts_at_item_minutes_and_counts_down(deck):
+>       expect(text(deck)).to_have_text("10:00")
+E       AssertionError: Locator expected to have text '10:00'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_timers.py:16: AssertionError
+_____________________ test_each_slide_uses_its_own_minutes _____________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_each_slide_uses_its_own_minutes(deck):
+        deck.keyboard.press("ArrowRight")
+>       expect(text(deck)).to_have_text("8:00")
+E       AssertionError: Locator expected to have text '8:00'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_timers.py:25: AssertionError
+____________________________ test_half_minute_items ____________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_half_minute_items(deck):
+        store_agenda(deck, [{"minutes": 1.5, "title": "Short", "points": []}])
+>       expect(text(deck)).to_have_text("1:30")
+E       AssertionError: Locator expected to have text '1:30'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_timers.py:32: AssertionError
+_____________ test_leaving_a_slide_pauses_it_and_returning_resumes _____________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_leaving_a_slide_pauses_it_and_returning_resumes(deck):
+        tick(deck, 30)
+>       expect(text(deck)).to_have_text("9:30")
+E       AssertionError: Locator expected to have text '9:30'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_timers.py:37: AssertionError
+__________________________ test_p_pauses_and_resumes ___________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_p_pauses_and_resumes(deck):
+        tick(deck, 5)
+        deck.keyboard.press("p")
+>       expect(deck.locator("#timer.paused")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#timer.paused") with timeout 2000ms
+E         - waiting for locator("#timer.paused")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_timers.py:50: AssertionError
+________________________________ test_r_resets _________________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_r_resets(deck):
+        tick(deck, 40)
+        deck.keyboard.press("r")
+>       expect(text(deck)).to_have_text("10:00")
+E       AssertionError: Locator expected to have text '10:00'
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_have_text" locator("#timer-text") with timeout 2000ms
+E         - waiting for locator("#timer-text")
+
+tests/test_timers.py:62: AssertionError
+____________________________ test_on_screen_buttons ____________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_on_screen_buttons(deck):
+        tick(deck, 5)
+>       deck.locator("#btn-pause").click()
+
+tests/test_timers.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:11045: in click
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/locator.py:222: in click
+    return await self._frame.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:587: in click
+    return await self._channel.click(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f032acdbcf0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f032b6e34c0>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("#btn-pause")
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: TimeoutError
+________________________ test_amber_in_last_20_percent _________________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_amber_in_last_20_percent(deck):
+        timer = deck.locator("#timer")
+        tick(deck, 7 * 60 + 59)          # 2:01 left of 10:00 -> still normal
+        expect(deck.locator("#timer.warn")).to_have_count(0)
+        tick(deck, 2)                    # 1:59 left -> amber
+>       expect(deck.locator("#timer.warn")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#timer.warn") with timeout 2000ms
+E         - waiting for locator("#timer.warn")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_timers.py:85: AssertionError
+________________ test_past_zero_turns_red_pulses_and_counts_up _________________
+
+deck = <Page url='file:///home/user/aiskills/drafts/meeting-agenda-html/meeting-agenda.html'>
+
+    def test_past_zero_turns_red_pulses_and_counts_up(deck):
+        tick(deck, 10 * 60 + 5)
+>       expect(deck.locator("#timer.over")).to_have_count(1)
+E       AssertionError: Locator expected to have count '1'
+E       Actual value: 0 
+E       Call log:
+E         - Expect "to_have_count" locator("#timer.over") with timeout 2000ms
+E         - waiting for locator("#timer.over")
+E           21 × locator resolved to 0 elements
+E              - unexpected value "0"
+
+tests/test_timers.py:93: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_editor.py::test_gear_opens_editor_with_one_row_per_item - p...
+FAILED tests/test_editor.py::test_editor_pauses_timer_and_blocks_slide_keys
+FAILED tests/test_editor.py::test_add_item_and_apply_rebuilds_deck_and_saves
+FAILED tests/test_editor.py::test_reorder_and_remove - playwright._impl._erro...
+FAILED tests/test_editor.py::test_last_row_can_never_be_removed - playwright....
+FAILED tests/test_editor.py::test_validation_highlights_invalid_rows_and_blocks_apply
+FAILED tests/test_editor.py::test_negative_and_blank_minutes_are_invalid - pl...
+FAILED tests/test_editor.py::test_cancel_and_escape_discard_changes - playwri...
+FAILED tests/test_editor.py::test_reset_to_file_defaults_asks_first - playwri...
+FAILED tests/test_editor.py::test_save_html_downloads_copy_with_escaped_agenda
+FAILED tests/test_editor.py::test_save_html_blocked_when_invalid - playwright...
+FAILED tests/test_footer.py::test_meeting_text_sums_across_slides - Assertion...
+FAILED tests/test_footer.py::test_progress_bar_has_tick_at_each_item_boundary
+FAILED tests/test_footer.py::test_progress_bar_fill_and_tooltip - AssertionEr...
+FAILED tests/test_footer.py::test_progress_bar_amber_then_red - AssertionErro...
+FAILED tests/test_layout.py::test_many_items_long_text - AssertionError: Loca...
+FAILED tests/test_layout.py::test_long_meeting_formats_minutes_past_an_hour
+FAILED tests/test_layout.py::test_phone_width - AssertionError: Locator expec...
+FAILED tests/test_navigation.py::test_next_keys - AssertionError: Locator exp...
+FAILED tests/test_navigation.py::test_previous_keys - AssertionError: Locator...
+FAILED tests/test_navigation.py::test_home_and_end - AssertionError: Locator ...
+FAILED tests/test_navigation.py::test_navigation_clamps_at_ends - AssertionEr...
+FAILED tests/test_navigation.py::test_progress_dots_are_clickable - Assertion...
+FAILED tests/test_navigation.py::test_space_after_clicking_a_button_navigates_once
+FAILED tests/test_navigation.py::test_keyboard_hints_in_footer - AssertionErr...
+FAILED tests/test_screenshots.py::test_shot_normal - AssertionError: Locator ...
+FAILED tests/test_screenshots.py::test_shot_amber - AssertionError: Locator e...
+FAILED tests/test_screenshots.py::test_shot_overtime - AssertionError: Locato...
+FAILED tests/test_screenshots.py::test_shot_editor - playwright._impl._errors...
+FAILED tests/test_screenshots.py::test_shot_editor_invalid - playwright._impl...
+FAILED tests/test_screenshots.py::test_shot_meeting_over - AssertionError: Lo...
+FAILED tests/test_slides.py::test_embedded_agenda_block_is_the_30_minute_demo
+FAILED tests/test_slides.py::test_one_slide_per_item_with_numbers_titles_points
+FAILED tests/test_slides.py::test_item_without_points_renders_no_list - Asser...
+FAILED tests/test_slides.py::test_first_slide_active_on_load - AssertionError...
+FAILED tests/test_slides.py::test_gradient_theme - AssertionError: assert 'gr...
+FAILED tests/test_slides.py::test_user_text_is_not_parsed_as_html - Assertion...
+FAILED tests/test_slides.py::test_corrupt_storage_falls_back_to_file_defaults
+FAILED tests/test_timers.py::test_starts_at_item_minutes_and_counts_down - As...
+FAILED tests/test_timers.py::test_each_slide_uses_its_own_minutes - Assertion...
+FAILED tests/test_timers.py::test_half_minute_items - AssertionError: Locator...
+FAILED tests/test_timers.py::test_leaving_a_slide_pauses_it_and_returning_resumes
+FAILED tests/test_timers.py::test_p_pauses_and_resumes - AssertionError: Loca...
+FAILED tests/test_timers.py::test_r_resets - AssertionError: Locator expected...
+FAILED tests/test_timers.py::test_on_screen_buttons - playwright._impl._error...
+FAILED tests/test_timers.py::test_amber_in_last_20_percent - AssertionError: ...
+FAILED tests/test_timers.py::test_past_zero_turns_red_pulses_and_counts_up - ...
+=================== 47 failed, 2 passed in 524.17s (0:08:44) ===================

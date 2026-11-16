@@ -293,6 +293,41 @@ with every skill twice — pick one.
 
 ---
 
+### ⏱️ Productivity
+
+Skills that help run day-to-day work: meetings, planning and follow-through.
+
+**Installation**:
+
+Run one of the following, choose the skill by name: `meeting-agenda` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install productivity-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Productivity README.md**](skills/productivity/README.md).
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Productivity](skills/productivity/README.md) | `meeting-agenda` | Turns an agenda into one offline HTML slide deck: a slide per item with a ring countdown (amber in the last 20%, red with a `+M:SS` count-up past zero), keyboard and dot navigation, a meeting progress bar that fills per item, and a built-in editor that applies to the browser or downloads an updated copy. See [usage](skills/productivity/meeting-agenda/README.md). |
+
+---
+
 ### 🎬 Video Related
 
 Skills that produce videos from code, real screenshots, narration and music.

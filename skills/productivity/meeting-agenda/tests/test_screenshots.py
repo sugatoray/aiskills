@@ -7,7 +7,7 @@ from conftest import SHOTS, URL, tick
 
 @pytest.fixture
 def hd(browser):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=2)
+    ctx = browser.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1)
     p = ctx.new_page()
     p.clock.install()
     p.goto(URL)
@@ -21,10 +21,17 @@ SETTLE = """document.getAnimations().forEach(a => {
 })"""
 
 
+# Only these are kept in the repo (the skill is copied on install, so stay small).
+# The other states are still asserted by their tests, just not saved.
+KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png"}
+
+
 def snap(page, name):
     """Finish transitions/fade-ins (and freeze the infinite pulse) so the
     picture shows the settled state rather than a frame mid-animation."""
     page.evaluate(SETTLE)
+    if name not in KEEP:
+        return
     SHOTS.mkdir(exist_ok=True)
     page.screenshot(path=str(SHOTS / name))
 

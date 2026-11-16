@@ -1,0 +1,5 @@
+# Keep the npm package small: screenshots and TDD logs are for maintainers
+# reading the repo, not needed to run the skill.
+# Syntax: src/packages/aiskills/docs/docsite/reference/skillsignore.md
+meta/screenshots/
+meta/tdd-logs/

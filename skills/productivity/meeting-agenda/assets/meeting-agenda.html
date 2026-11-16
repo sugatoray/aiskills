@@ -6,7 +6,7 @@
 <title>Meeting Agenda</title>
 <style>
   :root {
-    --bg-1: #1a0936; --bg-2: #2b1058; --bg-3: #0a4650;
+    --bg-1: #0f1530; --bg-2: #2e1a47; --glow: #3a2a6b;
     --ink: #f4f1ff; --muted: #b9b0d8; --faint: rgba(255,255,255,.12);
     --teal: #2dd4bf; --violet: #a78bfa; --amber: #f59e0b; --red: #ef4444;
     --panel: rgba(18, 8, 40, .92);
@@ -14,8 +14,10 @@
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background-color: var(--bg-1);
-    background-image: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+    background-color: #0f1530;
+    background:
+      radial-gradient(ellipse at top left, #3a2a6b 0%, transparent 55%),  /* top layer */
+      linear-gradient(135deg, #0f1530, #2e1a47);                          /* base layer */
     color: var(--ink);
     font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto;

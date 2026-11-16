@@ -17,11 +17,12 @@ The file itself is code. Opening an HTML file from someone runs whatever script 
 ## Protections
 
 1. **No HTML injection.** All agenda text (titles, sub-points, meeting title, tooltips, aria labels) is set with `textContent` or attributes, never `innerHTML`, `insertAdjacentHTML`, `document.write` or `eval`. A title like `<img src=x onerror=…>` renders as literal text. Tested in `test_user_text_is_not_parsed_as_html`.
-2. **Safe "Save HTML".** The agenda is written into `<script type="application/json">`, which browsers never execute. Every `<` in the JSON is escaped as `<`, so a title containing a closing script tag can't end the block early and inject markup. `JSON.parse` turns `<` back into `<`. Tested by round-tripping a title containing `</script><script>…`.
-3. **The saved copy is built from a pristine clone** of the page taken before rendering. Runtime DOM (rendered slides, editor rows, user text in attributes) is never serialized into the downloaded file.
-4. **Validated input.** `normalize()` rejects non-arrays, empty agendas, non-positive or non-finite minutes, and empty titles. Corrupt `localStorage` JSON is caught, and the file defaults load instead.
-5. **No network.** The page has no external `src`/`href`, no `@import`, and no `fetch`/XHR/WebSocket/EventSource. Tests assert both the source and the actual requests made during load. Nothing is sent anywhere, so agenda contents stay on the device.
-6. **Storage access is wrapped in try/catch**, so blocked storage (private mode, policy) degrades to "not remembered" rather than breaking the page.
+2. **Safe deck building.** `scripts/build_deck.py` uses the same rule as Save HTML. It validates the agenda, escapes every `<`, and changes nothing outside the data block (tested).
+3. **Safe "Save HTML".** The agenda is written into `<script type="application/json">`, which browsers never execute. Every `<` in the JSON is escaped as `\u003c`, so a title containing a closing script tag can't end the block early and inject markup. `JSON.parse` turns `\u003c` back into `<`. Tested by round-tripping a title containing `</script><script>…`.
+4. **The saved copy is built from a pristine clone** of the page taken before rendering. Runtime DOM (rendered slides, editor rows, user text in attributes) is never serialized into the downloaded file.
+5. **Validated input.** `normalize()` rejects non-arrays, empty agendas, non-positive or non-finite minutes, and empty titles. Corrupt `localStorage` JSON is caught, and the file defaults load instead.
+6. **No network.** The page has no external `src`/`href`, no `@import`, and no `fetch`/XHR/WebSocket/EventSource. Tests assert both the source and the actual requests made during load. Nothing is sent anywhere, so agenda contents stay on the device.
+7. **Storage access is wrapped in try/catch**, so blocked storage (private mode, policy) degrades to "not remembered" rather than breaking the page.
 
 ## Data at rest
 

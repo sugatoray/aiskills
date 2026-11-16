@@ -9,9 +9,9 @@ import pytest
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-HTML = ROOT / "meeting-agenda.html"
+HTML = ROOT / "assets" / "meeting-agenda.html"
 URL = HTML.as_uri()
-SHOTS = ROOT / "screenshots"
+SHOTS = ROOT / "meta" / "screenshots"
 STORAGE_KEY = "meetingAgenda"
 
 expect.set_options(timeout=2000)

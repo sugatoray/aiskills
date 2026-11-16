@@ -1,0 +1,314 @@
+# RED phase (build_deck.py) — tests written before the script exists
+# 2026-11-16T16:12:26Z
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.2.0, pluggy-1.7.0 -- /usr/local/bin/python3
+rootdir: /home/user/aiskills/skills/productivity/meeting-agenda
+configfile: pytest.ini
+plugins: anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_build_deck.py::test_builds_deck_from_json_file FAILED         [  8%]
+tests/test_build_deck.py::test_reads_stdin_and_title_override FAILED     [ 16%]
+tests/test_build_deck.py::test_only_the_data_block_changes FAILED        [ 25%]
+tests/test_build_deck.py::test_escapes_less_than_so_titles_cannot_break_out FAILED [ 33%]
+tests/test_build_deck.py::test_rejects_invalid_agendas[bad0-at least one item] FAILED [ 41%]
+tests/test_build_deck.py::test_rejects_invalid_agendas[bad1-item 1: minutes must be greater than 0] FAILED [ 50%]
+tests/test_build_deck.py::test_rejects_invalid_agendas[bad2-item 1: title is required] FAILED [ 58%]
+tests/test_build_deck.py::test_rejects_invalid_agendas[bad3-item 2: minutes must be a number] FAILED [ 66%]
+tests/test_build_deck.py::test_rejects_invalid_agendas[bad4-item 1: points must be a list of strings] FAILED [ 75%]
+tests/test_build_deck.py::test_rejects_malformed_json FAILED             [ 83%]
+tests/test_build_deck.py::test_check_mode_validates_without_writing FAILED [ 91%]
+tests/test_build_deck.py::test_built_deck_renders_the_agenda FAILED      [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_builds_deck_from_json_file ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_builds_deck_from_json_fil0')
+
+    def test_builds_deck_from_json_file(tmp_path):
+        src = tmp_path / "agenda.json"
+        src.write_text(json.dumps(AGENDA))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+>       assert r.returncode == 0, r.stderr
+E       AssertionError: /usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_builds_deck_from_json_fil0/agenda.json', '-o', '/tmp/pytest-of-root/pytest-8/test_builds_deck_from_json_fil0/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").returncode
+
+tests/test_build_deck.py:40: AssertionError
+_____________________ test_reads_stdin_and_title_override ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_reads_stdin_and_title_ove0')
+
+    def test_reads_stdin_and_title_override(tmp_path):
+        out = tmp_path / "deck.html"
+        r = run("-", "-o", out, "--title", "Weekly sync", stdin=json.dumps(AGENDA["items"]))
+>       assert r.returncode == 0, r.stderr
+E       AssertionError: /usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '-', '-o', '/tmp/pytest-of-root/pytest-8/test_reads_stdin_and_title_ove0/deck.html', '--title', 'Weekly sync'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").returncode
+
+tests/test_build_deck.py:51: AssertionError
+_______________________ test_only_the_data_block_changes _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_only_the_data_block_chang0')
+
+    def test_only_the_data_block_changes(tmp_path):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(AGENDA))
+        out = tmp_path / "deck.html"
+        run(src, "-o", out)
+        template = HTML.read_text()
+>       built = out.read_text()
+                ^^^^^^^^^^^^^^^
+
+tests/test_build_deck.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/pathlib/_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-8/test_only_the_data_block_chang0/deck.html')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-8/test_only_the_data_block_chang0/deck.html'
+
+/usr/local/lib/python3.13/pathlib/_local.py:537: FileNotFoundError
+______________ test_escapes_less_than_so_titles_cannot_break_out _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0')
+
+    def test_escapes_less_than_so_titles_cannot_break_out(tmp_path):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps({"items": [{"minutes": 1, "title": "x </script><script>alert(1)</script>"}]}))
+        out = tmp_path / "deck.html"
+>       assert run(src, "-o", out).returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").returncode
+E        +    where CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n") = run(PosixPath('/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/a.json'), '-o', PosixPath('/tmp/pytest-of-root/pytest-8/test_escapes_less_than_so_titl0/deck.html'))
+
+tests/test_build_deck.py:69: AssertionError
+_____________ test_rejects_invalid_agendas[bad0-at least one item] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b0')
+bad = {'items': []}, msg = 'at least one item'
+
+    @pytest.mark.parametrize("bad, msg", [
+        ({"items": []}, "at least one item"),
+        ({"items": [{"minutes": 0, "title": "A"}]}, "item 1: minutes must be greater than 0"),
+        ({"items": [{"minutes": 5, "title": "  "}]}, "item 1: title is required"),
+        ({"items": [{"minutes": 5, "title": "A"}, {"minutes": "ten", "title": "B"}]}, "item 2: minutes must be a number"),
+        ({"items": [{"minutes": 5, "title": "A", "points": "not a list"}]}, "item 1: points must be a list of strings"),
+    ])
+    def test_rejects_invalid_agendas(tmp_path, bad, msg):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(bad))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+        assert r.returncode == 2
+>       assert msg in r.stderr
+E       assert 'at least one item' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n"
+E        +  where "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b0/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b0/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:88: AssertionError
+__ test_rejects_invalid_agendas[bad1-item 1: minutes must be greater than 0] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b1')
+bad = {'items': [{'minutes': 0, 'title': 'A'}]}
+msg = 'item 1: minutes must be greater than 0'
+
+    @pytest.mark.parametrize("bad, msg", [
+        ({"items": []}, "at least one item"),
+        ({"items": [{"minutes": 0, "title": "A"}]}, "item 1: minutes must be greater than 0"),
+        ({"items": [{"minutes": 5, "title": "  "}]}, "item 1: title is required"),
+        ({"items": [{"minutes": 5, "title": "A"}, {"minutes": "ten", "title": "B"}]}, "item 2: minutes must be a number"),
+        ({"items": [{"minutes": 5, "title": "A", "points": "not a list"}]}, "item 1: points must be a list of strings"),
+    ])
+    def test_rejects_invalid_agendas(tmp_path, bad, msg):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(bad))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+        assert r.returncode == 2
+>       assert msg in r.stderr
+E       assert 'item 1: minutes must be greater than 0' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n"
+E        +  where "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b1/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b1/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:88: AssertionError
+_________ test_rejects_invalid_agendas[bad2-item 1: title is required] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b2')
+bad = {'items': [{'minutes': 5, 'title': '  '}]}
+msg = 'item 1: title is required'
+
+    @pytest.mark.parametrize("bad, msg", [
+        ({"items": []}, "at least one item"),
+        ({"items": [{"minutes": 0, "title": "A"}]}, "item 1: minutes must be greater than 0"),
+        ({"items": [{"minutes": 5, "title": "  "}]}, "item 1: title is required"),
+        ({"items": [{"minutes": 5, "title": "A"}, {"minutes": "ten", "title": "B"}]}, "item 2: minutes must be a number"),
+        ({"items": [{"minutes": 5, "title": "A", "points": "not a list"}]}, "item 1: points must be a list of strings"),
+    ])
+    def test_rejects_invalid_agendas(tmp_path, bad, msg):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(bad))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+        assert r.returncode == 2
+>       assert msg in r.stderr
+E       assert 'item 1: title is required' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n"
+E        +  where "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b2/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b2/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:88: AssertionError
+_____ test_rejects_invalid_agendas[bad3-item 2: minutes must be a number] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b3')
+bad = {'items': [{'minutes': 5, 'title': 'A'}, {'minutes': 'ten', 'title': 'B'}]}
+msg = 'item 2: minutes must be a number'
+
+    @pytest.mark.parametrize("bad, msg", [
+        ({"items": []}, "at least one item"),
+        ({"items": [{"minutes": 0, "title": "A"}]}, "item 1: minutes must be greater than 0"),
+        ({"items": [{"minutes": 5, "title": "  "}]}, "item 1: title is required"),
+        ({"items": [{"minutes": 5, "title": "A"}, {"minutes": "ten", "title": "B"}]}, "item 2: minutes must be a number"),
+        ({"items": [{"minutes": 5, "title": "A", "points": "not a list"}]}, "item 1: points must be a list of strings"),
+    ])
+    def test_rejects_invalid_agendas(tmp_path, bad, msg):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(bad))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+        assert r.returncode == 2
+>       assert msg in r.stderr
+E       assert 'item 2: minutes must be a number' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n"
+E        +  where "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b3/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b3/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:88: AssertionError
+_ test_rejects_invalid_agendas[bad4-item 1: points must be a list of strings] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b4')
+bad = {'items': [{'minutes': 5, 'title': 'A', 'points': 'not a list'}]}
+msg = 'item 1: points must be a list of strings'
+
+    @pytest.mark.parametrize("bad, msg", [
+        ({"items": []}, "at least one item"),
+        ({"items": [{"minutes": 0, "title": "A"}]}, "item 1: minutes must be greater than 0"),
+        ({"items": [{"minutes": 5, "title": "  "}]}, "item 1: title is required"),
+        ({"items": [{"minutes": 5, "title": "A"}, {"minutes": "ten", "title": "B"}]}, "item 2: minutes must be a number"),
+        ({"items": [{"minutes": 5, "title": "A", "points": "not a list"}]}, "item 1: points must be a list of strings"),
+    ])
+    def test_rejects_invalid_agendas(tmp_path, bad, msg):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(bad))
+        out = tmp_path / "deck.html"
+        r = run(src, "-o", out)
+        assert r.returncode == 2
+>       assert msg in r.stderr
+E       assert 'item 1: points must be a list of strings' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n"
+E        +  where "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b4/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_invalid_agendas_b4/deck.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:88: AssertionError
+_________________________ test_rejects_malformed_json __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rejects_malformed_json0')
+
+    def test_rejects_malformed_json(tmp_path):
+        src = tmp_path / "a.json"
+        src.write_text("{nope")
+        r = run(src, "-o", tmp_path / "d.html")
+>       assert r.returncode == 2 and "not valid JSON" in r.stderr
+E       assert (2 == 2 and 'not valid JSON' in "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n")
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_malformed_json0/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_malformed_json0/d.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").returncode
+E        +  and   "/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_rejects_malformed_json0/a.json', '-o', '/tmp/pytest-of-root/pytest-8/test_rejects_malformed_json0/d.html'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").stderr
+
+tests/test_build_deck.py:96: AssertionError
+__________________ test_check_mode_validates_without_writing ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_check_mode_validates_with0')
+
+    def test_check_mode_validates_without_writing(tmp_path):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(AGENDA))
+        r = run(src, "--check")
+>       assert r.returncode == 0 and "2 items, 22:30 planned" in r.stdout
+E       assert (2 == 0)
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py', '/tmp/pytest-of-root/pytest-8/test_check_mode_validates_with0/a.json', '--check'], returncode=2, stdout='', stderr="/usr/local/bin/python3: can't open file '/home/user/aiskills/skills/productivity/meeting-agenda/scripts/build_deck.py': [Errno 2] No such file or directory\n").returncode
+
+tests/test_build_deck.py:103: AssertionError
+______________________ test_built_deck_renders_the_agenda ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_built_deck_renders_the_ag0')
+browser = <Browser type=<BrowserType name=chromium executable_path=/opt/pw-browsers/chromium-1255/chrome-linux64/chrome> version=153.0.8010.12>
+
+    def test_built_deck_renders_the_agenda(tmp_path, browser):
+        src = tmp_path / "a.json"
+        src.write_text(json.dumps(AGENDA))
+        out = tmp_path / "deck.html"
+        run(src, "-o", out)
+        ctx = browser.new_context()
+        try:
+            p = ctx.new_page()
+>           p.goto(out.as_uri())
+
+tests/test_build_deck.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py:18561: in goto
+    self._sync(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/page.py:600: in goto
+    return await self._main_frame.goto(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/frame.py:217: in goto
+    await self._channel.goto(
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:398: in _mapped
+    return mapper(await awaitable)
+                  ^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:387: in finish
+    raise e from None
+/usr/local/lib/python3.13/site-packages/playwright/_impl/channel_owner.py:352: in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <playwright._impl.utils.zones.Zone object at 0x7f5996649eb0>
+func = <function ChannelOwner._wrap_api_call.<locals>.finish.<locals>.<lambda> at 0x7f5996477240>
+
+    async def run_async(self, func: Callable[[], Awaitable[R]]) -> R:
+        # Python: run() of an async function. The coroutine runs when it is awaited,
+        # so the zone must be current while it is awaited, not while it is created.
+        token = _async_local_storage.set(self)
+        try:
+>           return await func()
+                   ^^^^^^^^^^^^
+E           playwright._impl._errors.Error: Page.goto: net::ERR_FILE_NOT_FOUND at file:///tmp/pytest-of-root/pytest-8/test_built_deck_renders_the_ag0/deck.html
+E           Call log:
+E             - navigating to "file:///tmp/pytest-of-root/pytest-8/test_built_deck_renders_the_ag0/deck.html", waiting until "load"
+
+/usr/local/lib/python3.13/site-packages/playwright/_impl/utils/zones.py:58: Error
+=========================== short test summary info ============================
+FAILED tests/test_build_deck.py::test_builds_deck_from_json_file - AssertionE...
+FAILED tests/test_build_deck.py::test_reads_stdin_and_title_override - Assert...
+FAILED tests/test_build_deck.py::test_only_the_data_block_changes - FileNotFo...
+FAILED tests/test_build_deck.py::test_escapes_less_than_so_titles_cannot_break_out
+FAILED tests/test_build_deck.py::test_rejects_invalid_agendas[bad0-at least one item]
+FAILED tests/test_build_deck.py::test_rejects_invalid_agendas[bad1-item 1: minutes must be greater than 0]
+FAILED tests/test_build_deck.py::test_rejects_invalid_agendas[bad2-item 1: title is required]
+FAILED tests/test_build_deck.py::test_rejects_invalid_agendas[bad3-item 2: minutes must be a number]
+FAILED tests/test_build_deck.py::test_rejects_invalid_agendas[bad4-item 1: points must be a list of strings]
+FAILED tests/test_build_deck.py::test_rejects_malformed_json - assert (2 == 2...
+FAILED tests/test_build_deck.py::test_check_mode_validates_without_writing - ...
+FAILED tests/test_build_deck.py::test_built_deck_renders_the_agenda - playwri...
+============================== 12 failed in 1.50s ==============================

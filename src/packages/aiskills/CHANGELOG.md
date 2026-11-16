@@ -57,6 +57,11 @@ and date this section.
 
 ### Added
 
+- **New skill group `productivity`** (`productivity-skills`) with the
+  **`meeting-agenda`** skill: turns an agenda into an offline HTML slide deck
+  with a countdown timer per item and an in-page editor. The bundle now has
+  18 skills in 10 groups. The skill's screenshots and test logs are left out
+  of the package by its `.skillsignore`.
 - **`aiskills config`**, like `git config`: `aiskills config <key>` prints a
   default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it,
   and `--list` (with `--show-origin` or `--json`) shows what is set. Defaults

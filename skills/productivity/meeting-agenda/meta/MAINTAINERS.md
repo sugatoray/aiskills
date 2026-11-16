@@ -6,7 +6,14 @@
 - **Red/green TDD.** Add or change a test first, watch it fail, then change the HTML.
 - **Never write a literal closing script tag inside the main `<script>`.** That includes comments: the HTML parser ends the block there. This happened once during development and broke the whole page. Write "closing script tag" in prose instead.
 
-## Layout of `meeting-agenda.html`
+## Skill layout
+
+- `SKILL.md`: the agent workflow (input → agenda JSON → `build_deck.py` → verify → deliver).
+- `assets/meeting-agenda.html`: the template, which is also a working deck with the demo agenda.
+- `scripts/build_deck.py`: stdlib-only. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
+- `tests/`: run `python3 -m pytest` from the skill directory.
+
+## Layout of `assets/meeting-agenda.html`
 
 1. `<style>`: colour tokens on `:root`, then the header, stage, timer, footer and editor sections.
 2. Static markup: header (`#meeting-title`, `#btn-edit`), `main` (`#deck`, `#timer`, controls), footer (`#hints`, `#dots`, `#meeting-text`, `#meeting-bar`), and the hidden `#editor` dialog. **Static markup must stay free of rendered slides.** "Save HTML" serializes a copy of the page as it was before rendering.
@@ -55,12 +62,14 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 | `test_footer.py` | Meeting text, ticks, per-section segments (sizing, fill per item, revisits, overtime cap, current marker), tooltip, amber/red |
 | `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
 | `test_layout.py` | 24 long items, 90-minute item, phone width |
-| `test_screenshots.py` | Regenerates `screenshots/`. Finishes finite animations before capturing, so images aren't caught mid-fade. |
+| `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
+| `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
 
 Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `#dots .dot`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 
+- **Background:** a top-left radial glow (`#3a2a6b`) over a 135° navy-to-plum linear gradient (`#0f1530` to `#2e1a47`), set on `body`. `test_gradient_theme` only checks that a gradient is present.
 - **Colours:** edit the `:root` tokens. The amber test checks the ring stroke is `#f59e0b`, so update it if you change that token.
 - **Warn threshold:** `WARN_FRACTION` (item ring) and the `80` in `render()` (meeting bar). Update the matching tests.
 - **New per-item field:** add it to `normalize()`, `rowFromItem`, `renderRows`, `readRows`, `collect`, and to the slide build in `build()`. Set it with `textContent`.
