@@ -79,6 +79,7 @@ def main():
     # Controls taken from the review page's "Combined file" tab.
     check('data-view="rendered"' in html and 'data-view="raw"' in html, "a Rendered / Markdown switch")
     check('id="jump"' in html, "a Jump to list")
+    check(".doc .pc{" in html and ".doc .pc-label{" in html, "styles for the Note box around Premise and Caveats")
     check('data-step="prev"' in html and 'data-step="next"' in html, "Previous and Next buttons")
 
     # Page contract.

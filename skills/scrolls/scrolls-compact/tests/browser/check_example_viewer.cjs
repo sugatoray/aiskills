@@ -62,6 +62,31 @@ const NUMS = fs.readdirSync(examplesDir).filter((f) => /^example_\d{3}\.md$/.tes
   assert.equal(rows, NUMS.length, 'the index table has one row per example');
   ok(`the index table renders with ${rows} rows`);
 
+  // Premise and Caveats: one "Note" box per example, holding both headings and their lists.
+  const notes = await page.evaluate(() => [...document.querySelectorAll('section.tab')].map((s) => {
+    const boxes = [...s.querySelectorAll('.doc .pc')];
+    const outside = [...s.querySelectorAll('.doc h3')].filter((h) => /^(Premise|Caveats)$/.test(h.textContent.trim()) && !h.closest('.pc')).length;
+    const b = boxes[0];
+    return {id: s.id, boxes: boxes.length, outside,
+      label: b ? b.querySelector('.pc-label')?.textContent : null,
+      kids: b ? [...b.children].map((c) => c.tagName + (c.tagName === 'H3' ? ':' + c.textContent.trim() : '')) : []};
+  }));
+  const idx = notes.find((n) => n.id === 'tab-index');
+  assert.equal(idx.boxes, 0, 'the index has no Note box');
+  for (const n of notes.filter((x) => x.id !== 'tab-index')) {
+    assert.equal(n.boxes, 1, `${n.id}: one Note box`);
+    assert.equal(n.outside, 0, `${n.id}: no Premise/Caveats heading outside the box`);
+    assert.equal(n.label, 'Note', `${n.id}: the box is labelled Note`);
+    assert.deepEqual(n.kids, ['SPAN', 'H3:Premise', 'UL', 'H3:Caveats', 'UL'], `${n.id}: box contents`);
+  }
+  ok(`every example (${NUMS.length}) has one Note box with its Premise and Caveats`);
+  const tint = await page.evaluate(() => {
+    const b = document.querySelector('#tab-example-001 .pc');
+    return [getComputedStyle(b).backgroundColor, getComputedStyle(b.closest('.doc')).backgroundColor];
+  });
+  assert.notEqual(tint[0], tint[1], 'the Note box is tinted');
+  ok('the Note box is tinted against the page');
+
   // Tabs switch, and a hash opens a tab directly.
   await page.click('nav.tabs a[data-tab="example-021"]');
   await expectTab('example-021', 'clicking a tab shows that example');

@@ -69,6 +69,10 @@ select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-
 .doc th,.doc td{border-bottom:1px solid var(--line);padding:6px 10px;font-size:14px;vertical-align:top;text-align:left}
 .doc th{background:transparent;color:var(--muted);font-weight:500}
 .doc tr:hover td{background:color-mix(in srgb,var(--fg) 3%,transparent)}
+.doc .pc{background:color-mix(in srgb,var(--accent) 7%,var(--bg));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:12px;padding:4px 18px 6px;margin:14px 0 20px}
+.doc .pc-label{display:block;font:600 11px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);padding:12px 0 2px}
+.doc .pc h3{margin-top:12px}
+.doc .pc ul{margin:6px 0 10px}
 pre.raw{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:12px;padding:14px;font:12.5px/1.55 var(--font-mono);white-space:pre-wrap;word-break:break-word;margin:0}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -274,6 +278,18 @@ pre.raw{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--li
         a.dataset.src = target;
         if (files[target]) a.setAttribute("href", "#" + files[target].tab);
         else a.setAttribute("href", SOURCE + target + (frag ? "#" + frag : ""));
+      });
+      // Premise and Caveats: one tinted "Note" box per example.
+      doc.querySelectorAll("h3").forEach(h => {
+        if (h.textContent.trim() !== "Premise" || h.closest(".pc")) return;
+        const box = document.createElement("div");
+        box.className = "pc";
+        box.innerHTML = '<span class="pc-label">Note</span>';
+        h.before(box);
+        let el = h;
+        while (el && ((el.tagName === "H3" && /^(Premise|Caveats)$/.test(el.textContent.trim())) || el.tagName === "UL")) {
+          const next = el.nextElementSibling; box.append(el); el = next;
+        }
       });
     } else {
       doc.innerHTML = '<pre class="fallback">' + esc(f.text) + "</pre>";
