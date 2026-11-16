@@ -21,6 +21,6 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - At the user's request, renamed `assets/EXAMPLE.md` to `assets/EXAMPLES.md` in `run-code-review` (1.3.1), `artwallbg` and `commentdrop` (1.0.1), so every skill uses one name. A new package test fails if a bundled skill ships `assets/EXAMPLE.md` again; `npm test` passes 517.
 
 ## Known issues / open threads
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10: issues not filed; `SPEC.md` waits for the merge). Pushing to `claude/clever-mendel-k9n73h` updates it. It regenerates the package docs, so rebase onto `master` and re-run `npm run docs` if another docs PR lands first.
+- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10: issues filed, epic #266 with #267–#270, plus #271; `SPEC.md` waits for the merge). Pushing to `claude/clever-mendel-k9n73h` updates it. It regenerates the package docs, so rebase onto `master` and re-run `npm run docs` if another docs PR lands first.
 - **`tests/test_compact.ps1` has never run.** This session had no `pwsh`; the same scenario passed through the bash launcher.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).

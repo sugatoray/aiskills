@@ -21,6 +21,6 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## Known issues / open threads
 
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged**, and no issues are filed. It regenerates the package docs, so if another docs PR merges first, rebase and re-run `npm run docs`.
+- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged**. Its issues are filed: epic #266 (#267–#270) and #271. It regenerates the package docs, so if another docs PR merges first, rebase and re-run `npm run docs`.
 - `tests/test_compact.ps1` has never run (no `pwsh` here), like every other `.ps1` suite.
 - After any change to a scrolls skill's `SKILL.md`, run `skills/scrolls/scrolls-explainer/scripts/explain.sh --build`, review the named tabs, then `--build --reviewed`. Then run `npm run docs` in `src/packages/aiskills/`.
