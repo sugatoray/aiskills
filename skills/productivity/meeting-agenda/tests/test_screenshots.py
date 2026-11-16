@@ -23,7 +23,7 @@ SETTLE = """document.getAnimations().forEach(a => {
 
 # Only these are kept in the repo (the skill is copied on install, so stay small).
 # The other states are still asserted by their tests, just not saved.
-KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png"}
+KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png", "08-phone.png"}
 
 
 def snap(page, name):
@@ -90,3 +90,17 @@ def test_shot_progress_by_section(hd):
     tick(hd, 60)
     expect(hd.locator("#meeting-text")).to_have_text("Meeting: 8:00 used / 30:00 planned")
     snap(hd, "07-progress-by-section.png")
+
+
+def test_shot_phone(browser):
+    ctx = browser.new_context(viewport={"width": 390, "height": 844}, has_touch=True, is_mobile=True,
+                              device_scale_factor=2)
+    try:
+        p = ctx.new_page()
+        p.clock.install()
+        p.goto(URL)
+        tick(p, 95)
+        expect(p.locator("#btn-next")).to_be_visible()
+        snap(p, "08-phone.png")
+    finally:
+        ctx.close()

@@ -44,6 +44,20 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 - Timer thresholds: `warn` when not over and remaining ≤ 20% of planned; `over` when used > planned. The text shows `ceil(remaining)` normally and `+floor(overage)` when over.
 - Meeting bar: one `.seg` per item (`left`/`width` = the item's planned share of the total), each holding a `.seg-fill` whose width is that item's `used*100/planned`, capped at 100%. `.seg.current` marks the visible item, and `.seg.over` marks an item past its own time. On the whole bar, `pct = totalUsed*100/totalPlanned` gives `warn` (≥ 80% and ≤ 100%), `over` (above 100%), and the uncapped rounded tooltip. *History:* the first version had one fill growing from the left by the total, so time on a later item appeared inside item 1's section. Fixed red/green: 5 new tests in `test_footer.py` failed first.
 
+## Touch
+
+Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is ignored), and never while the editor is open or when the press starts on a button or field. The thresholds live in `GESTURE`:
+
+| Constant | Default | Meaning |
+|---|---|---|
+| `SWIPE_MIN_PX` | 50 | Horizontal travel that counts as a swipe (left = next, right = back) |
+| `SWIPE_RATIO` | 1.5 | `|dx|` must be at least this × `|dy|`; otherwise it's a scroll |
+| `TAP_SLOP_PX` | 10 | Movement still counted as a tap or long-press |
+| `LONG_PRESS_MS` | 500 | Hold time for pause/resume (with a toast and `navigator.vibrate(15)`) |
+| `BACK_ZONE` | 0.3 | A tap in the left 30% of the viewport goes back; elsewhere forward. Taps on the timer area don't navigate. |
+
+`main` has `touch-action: pan-y`, so vertical scrolling stays native and sideways moves reach the handler. `#btn-prev`/`#btn-next` and the touch hint (`.hint-touch`) show only under `@media (pointer: coarse)`. The phone sizes are in the `max-width: 720px` block, and `.slide` uses `justify-content: safe center`, so tall content scrolls instead of clipping at the top.
+
 ## Editor flow
 
 `openEditor` stops the timer and copies `agenda` into rows. Rows are re-rendered from `readRows()` on add, move and remove, so typed values survive. Validation runs on Apply and Save. After the first failed attempt it re-runs live on every input. `applyAgenda(data, persist)` either writes to `localStorage` (Apply) or clears it (Reset), rebuilds the deck, and resets all timers.
@@ -64,9 +78,10 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 | `test_layout.py` | 24 long items, 90-minute item, phone width |
 | `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
 | `test_theme.py` | The reference theme: background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
+| `test_touch.py` | Phone context (`has_touch`, `is_mobile`): swipes, thresholds, tap zones, long-press, buttons not navigating, prev/next (≥ 44 px), device-specific hints, editor gating, mouse ignored, timer unaffected, phone layout fits, caption inside the ring |
 | `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
 
-Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 

@@ -62,5 +62,6 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/meet
 - `tests/test_slides.py`
 - `tests/test_theme.py`
 - `tests/test_timers.py`
+- `tests/test_touch.py`
 
 See also: [All skills](README.md) · [README](https://github.com/sugatoray/aiskills/blob/master/skills/productivity/meeting-agenda/README.md) · [CHANGELOG](https://github.com/sugatoray/aiskills/blob/master/skills/productivity/meeting-agenda/CHANGELOG.md) · [Skill groups](../concepts/skill-groups.md)

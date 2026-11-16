@@ -37,18 +37,27 @@ python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly
 2. Present with the keyboard. Each slide's timer starts when the slide is shown.
 3. Click the gear in the top right to change the agenda.
 
-### Keyboard
+### Controls
 
-| Action | Keys |
-|---|---|
-| Next slide | `→`, `Space`, `Page Down` |
-| Previous slide | `←`, `Shift+Space`, `Page Up` |
-| First / last slide | `Home` / `End` |
-| Pause / resume timer | `P` |
-| Reset timer | `R` |
-| Close editor without saving | `Esc` |
+| Action | Keyboard | Phone or tablet |
+|---|---|---|
+| Next slide | `→`, `Space`, `Page Down` | Swipe left, tap the right 70% of the slide, or tap `›` |
+| Previous slide | `←`, `Shift+Space`, `Page Up` | Swipe right, tap the left 30% of the slide, or tap `‹` |
+| First / last slide | `Home` / `End` | Tap the first / last progress dash |
+| Pause / resume timer | `P` | Long-press the slide (½ s), or tap Pause |
+| Reset timer | `R` | Tap Reset |
+| Close editor without saving | `Esc` | Tap Cancel |
 
-The Pause/Resume and Reset buttons under the ring, and the progress dashes in the footer, do the same with the mouse.
+The Pause/Resume and Reset buttons under the ring, and the progress dashes in the footer, also work with a mouse. A mouse click on the slide itself never changes slides; only touch and pen do.
+
+The touch defaults follow common presentation apps (Keynote, Google Slides, reveal.js) and story viewers:
+- A swipe must travel at least 50 px and be mostly sideways, so scrolling a long slide never changes it.
+- Forward gets the larger tap area because it's the common action.
+- Long-press uses the standard ½-second hold, with a short vibration where the phone supports it and a "Paused"/"Resumed" message.
+- Reset has no gesture, so it can't happen by accident.
+- Touch targets are at least 44 px, Apple's minimum.
+
+On a touch screen, the footer hints change to "Swipe or tap to navigate · Hold to pause".
 
 ### Timers
 
@@ -97,7 +106,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 77 tests (65 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 91 tests (79 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 
@@ -109,4 +118,4 @@ If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the
 | `tests/` | pytest + Playwright suite |
 | `meta/MAINTAINERS.md` | How the deck is built and how to change it |
 | `meta/SECURITY.md` | Security model |
-| `meta/screenshots/` | Normal slide, overtime, editor, progress by section |
+| `meta/screenshots/` | Normal slide, overtime, editor, progress by section, phone |

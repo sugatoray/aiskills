@@ -18,4 +18,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   label, a violet-to-cyan ring captioned "of M:SS allotted", pill
   Pause/Reset buttons, progress dashes that fill per item, and the
   meeting bar ahead of the meeting text.
-- pytest + Playwright suite (77 tests), built red/green.
+- Touch support: swipe, tap zones (right 70% forward, left 30% back),
+  long-press to pause/resume, `‹ ›` buttons and touch hints on touch
+  screens, and a layout that fits a phone.
+- pytest + Playwright suite (91 tests), built red/green.
