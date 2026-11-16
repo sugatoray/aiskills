@@ -109,5 +109,4 @@ If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the
 | `tests/` | pytest + Playwright suite |
 | `meta/MAINTAINERS.md` | How the deck is built and how to change it |
 | `meta/SECURITY.md` | Security model |
-| `meta/tdd-logs/` | Red and green test runs from development |
 | `meta/screenshots/` | Normal slide, overtime, editor, progress by section |

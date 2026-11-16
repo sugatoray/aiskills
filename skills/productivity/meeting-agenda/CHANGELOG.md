@@ -14,5 +14,4 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `localStorage` or downloads an updated copy.
 - `scripts/build_deck.py`: validates agenda JSON and writes it into the
   template's `agenda-data` block, escaping `<`.
-- pytest + Playwright suite (67 tests), built red/green; logs in
-  `meta/tdd-logs/`.
+- pytest + Playwright suite (67 tests), built red/green.

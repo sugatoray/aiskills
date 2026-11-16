@@ -42,7 +42,7 @@ Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is 
 
 - `go(i)`: stop the current segment, switch slides, start the new one.
 - Timer thresholds: `warn` when not over and remaining ≤ 20% of planned; `over` when used > planned. The text shows `ceil(remaining)` normally and `+floor(overage)` when over.
-- Meeting bar: one `.seg` per item (`left`/`width` = the item's planned share of the total), each holding a `.seg-fill` whose width is that item's `used*100/planned`, capped at 100%. `.seg.current` marks the visible item, and `.seg.over` marks an item past its own time. On the whole bar, `pct = totalUsed*100/totalPlanned` gives `warn` (≥ 80% and ≤ 100%), `over` (above 100%), and the uncapped rounded tooltip. *History:* the first version had one fill growing from the left by the total, so time on a later item appeared inside item 1's section. Fixed red/green (`logs/red-section-progress.log`).
+- Meeting bar: one `.seg` per item (`left`/`width` = the item's planned share of the total), each holding a `.seg-fill` whose width is that item's `used*100/planned`, capped at 100%. `.seg.current` marks the visible item, and `.seg.over` marks an item past its own time. On the whole bar, `pct = totalUsed*100/totalPlanned` gives `warn` (≥ 80% and ≤ 100%), `over` (above 100%), and the uncapped rounded tooltip. *History:* the first version had one fill growing from the left by the total, so time on a later item appeared inside item 1's section. Fixed red/green: 5 new tests in `test_footer.py` failed first.
 
 ## Editor flow
 
