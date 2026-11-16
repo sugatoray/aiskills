@@ -10,7 +10,7 @@
 
 - `SKILL.md`: the agent workflow (input → agenda JSON → `build_deck.py` → verify → deliver).
 - `assets/meeting-agenda.html`: the template, which is also a working deck with the demo agenda.
-- `scripts/build_deck.py`: stdlib-only. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
+- `scripts/build_deck.py`: stdlib-only. `THEMES` must match the page's list. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
 - `tests/`: run `python3 -m pytest` from the skill directory.
 
 ## Layout of `assets/meeting-agenda.html`
@@ -58,6 +58,19 @@ Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is i
 
 `main` has `touch-action: pan-y`, so vertical scrolling stays native and sideways moves reach the handler. `#btn-prev`/`#btn-next` and the touch hint (`.hint-touch`) show only under `@media (pointer: coarse)`. The phone sizes are in the `max-width: 720px` block, and `.slide` uses `justify-content: safe center`, so tall content scrolls instead of clipping at the top.
 
+## Themes
+
+Every colour in the stylesheet is a CSS variable. Each theme sets the full list on `[data-theme="<id>"]`, and `html[data-theme]` picks the active one. `--amber` and `--red` are shared on `:root` and never themed, so time warnings look the same everywhere. The ring's gradient stops take `--ring-1` and `--ring-2` through CSS `stop-color`, which overrides the SVG attributes.
+
+The agenda JSON has an optional `"theme"`. `normalize()` maps an unknown or missing value to `indigo`. Apply saves it with the agenda, Save HTML writes it into the copy, and Reset restores the file's value.
+
+The theme cards carry `data-theme` themselves, so each one picks up its own theme's variables and is a true mini preview. Card text is tested for contrast against the card's own background.
+
+**To add a theme:**
+1. Add a `[data-theme="<id>"]` block with every variable; copy an existing block.
+2. Add an entry to `THEMES` in the page script (id, name, description, swatch colours) and to `THEMES` in `scripts/build_deck.py`. A test checks that the two lists match.
+3. Add the id to `THEMES`/`NAMES` in `tests/test_settings.py`. The contrast and warning-colour tests then cover it automatically.
+
 ## Editor flow
 
 `openEditor` stops the timer and copies `agenda` into rows. Rows are re-rendered from `readRows()` on add, move and remove, so typed values survive. Validation runs on Apply and Save. After the first failed attempt it re-runs live on every input. `applyAgenda(data, persist)` either writes to `localStorage` (Apply) or clears it (Reset), rebuilds the deck, and resets all timers.
@@ -79,9 +92,10 @@ Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is i
 | `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
 | `test_theme.py` | The reference theme: background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
 | `test_touch.py` | Phone context (`has_touch`, `is_mobile`): swipes, thresholds, tap zones, long-press, buttons not navigating, prev/next (≥ 44 px), device-specific hints, editor gating, mouse ignored, timer unaffected, phone layout fits, caption inside the ring |
+| `test_settings.py` | Settings tabs (order, ARIA, arrow keys), theme list, live preview, Cancel/Esc revert, Apply persists, Apply from the Theme tab with invalid rows, Save HTML carries the theme, Reset restores the default, unknown-theme fallback, per-theme contrast (AAA title, AA small text), shared warning colours, readable cards, ✓ on the selected card |
 | `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
 
-Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#tab-contents`, `#tab-theme`, `#panel-contents`, `#panel-theme`, `.theme-card[data-theme]` (`aria-checked`), `.theme-name`, `.theme-desc`, `html[data-theme]`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 

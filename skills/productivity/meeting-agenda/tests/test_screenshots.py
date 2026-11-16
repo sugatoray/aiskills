@@ -23,7 +23,7 @@ SETTLE = """document.getAnimations().forEach(a => {
 
 # Only these are kept in the repo (the skill is copied on install, so stay small).
 # The other states are still asserted by their tests, just not saved.
-KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png", "08-phone.png"}
+KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png", "08-phone.png", "09-settings-theme.png"}
 
 
 def snap(page, name):
@@ -104,3 +104,11 @@ def test_shot_phone(browser):
         snap(p, "08-phone.png")
     finally:
         ctx.close()
+
+
+def test_shot_settings_theme(hd):
+    hd.locator("#btn-edit").click()
+    hd.locator("#tab-theme").click()
+    hd.locator('.theme-card[data-theme="ocean"]').click()
+    expect(hd.locator('.theme-card[data-theme="ocean"]')).to_have_attribute("aria-checked", "true")
+    snap(hd, "09-settings-theme.png")

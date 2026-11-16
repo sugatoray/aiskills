@@ -23,12 +23,12 @@ Or, in Claude Code, run `/plugin marketplace add sugatoray/aiskills`, then `/plu
 4 min   Decisions, owners & next steps
 ```
 
-The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), and `--output` (path).
+The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), `--theme` (`indigo`, `midnight`, `ocean`, `daylight` or `contrast`), and `--output` (path).
 
 To build a deck yourself without an agent:
 
 ```bash
-python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly sync"
+python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly sync" --theme daylight
 ```
 
 ## Present it
@@ -65,24 +65,39 @@ On a touch screen, the footer hints change to "Swipe or tap to navigate · Hold 
 - The ring turns **amber** in the last 20% of the item's time. Past zero it turns **red**, pulses, and counts up (`+1:05`).
 - The footer shows `Meeting: M:SS used / M:SS planned` and a progress bar split into one section per item, sized by that item's planned minutes and separated by tick marks. Each section fills with the time spent on its own item, so moving between items (or skipping one) shows exactly where the time went. The current item's section is highlighted, and a section that runs over its item's time turns red without spilling into the next section. The whole bar turns amber at 80% of the planned total and red once past it. Hover over it to see the percentage used.
 
-### Editing the agenda
+### Settings (the gear)
 
-The gear opens the editor, with one row per item: minutes (0.5 steps), title, and sub-points (one per line). Use ↑/↓ to reorder and ✕ to remove a row. The last row can't be removed.
+The gear opens **Settings**, which has two tabs. Switch between them by clicking, or with `←`/`→` when a tab has focus.
+
+**Contents** edits the agenda, with one row per item: minutes (0.5 steps), title, and sub-points (one per line). Use ↑/↓ to reorder, ✕ to remove a row (the last row can't be removed), and **+ Add item** for a new row.
+
+**Theme** shows the five themes as cards, each a small preview of that theme. Clicking a card previews the theme on the deck behind the dialog. The chosen card has a ✓.
+
+| Theme | Look | Best for |
+|---|---|---|
+| **Indigo** (default) | Violet and cyan on indigo | General use |
+| **Midnight** | Teal on navy and plum | Dark rooms, a calmer look |
+| **Ocean** | Aqua and coral on deep teal-blue | A cooler alternative |
+| **Daylight** | Light background, dark text | Bright rooms and washed-out projectors |
+| **High contrast** | Black and white, cyan accents, no gradients | Accessibility and very poor projectors |
+
+Every theme keeps the main text at WCAG AAA contrast (7:1) and the small text at AA (4.5:1). The amber and red time warnings look the same in every theme.
+
+The buttons at the bottom apply to both tabs:
 
 | Button | What it does |
 |---|---|
-| **+ Add item** | Adds a blank row |
-| **Reset to file defaults** | Asks first, then restores the agenda built into the file and forgets the browser copy |
-| **Cancel** / `Esc` | Closes the editor and discards changes |
-| **Save HTML** | Downloads a copy of `meeting-agenda.html` with this agenda built in. Share it, and it opens with your agenda. |
-| **Apply** | Rebuilds the deck and remembers the agenda in this browser (`localStorage`) |
+| **Reset to file defaults** | Asks first, then restores the agenda and theme built into the file and forgets the browser copy |
+| **Cancel** / `Esc` | Closes Settings and discards changes, including a previewed theme |
+| **Save HTML** | Downloads a copy of `meeting-agenda.html` with this agenda and theme built in. Share it, and it opens that way. |
+| **Apply** | Rebuilds the deck and remembers the agenda and theme in this browser (`localStorage`) |
 
-Every item needs a title and minutes greater than 0. Invalid rows are highlighted, and Apply/Save are blocked until they're fixed. While the editor is open the timer is paused and the keys don't change slides.
+Every item needs a title and minutes greater than 0. Invalid rows are highlighted, and Apply/Save are blocked until they're fixed. If you press Apply from the Theme tab, Settings switches to Contents to show the problem. While Settings is open the timer is paused and the keys don't change slides.
 
 You can also edit the agenda directly in the file's `<script type="application/json" id="agenda-data">` block:
 
 ```json
-{ "title": "Team Planning Meeting",
+{ "title": "Team Planning Meeting", "theme": "daylight",
   "items": [ { "minutes": 10, "title": "Priorities", "points": ["2026", "2027"] } ] }
 ```
 
@@ -106,7 +121,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 94 tests (82 for the deck, 12 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 121 tests (106 for the deck, 15 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 
@@ -118,4 +133,4 @@ If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the
 | `tests/` | pytest + Playwright suite |
 | `meta/MAINTAINERS.md` | How the deck is built and how to change it |
 | `meta/SECURITY.md` | Security model |
-| `meta/screenshots/` | Normal slide, overtime, editor, progress by section, phone |
+| `meta/screenshots/` | Normal slide, overtime, editor, progress by section, phone, theme picker |

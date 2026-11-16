@@ -18,9 +18,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   label, a violet-to-cyan ring captioned "of M:SS allotted", pill
   Pause/Reset buttons, progress dashes that fill per item, and the
   meeting bar ahead of the meeting text.
+- Settings (gear) with two tabs: **Contents** (the agenda editor) and
+  **Theme**. There are five themes: Indigo (default), Midnight, Ocean,
+  Daylight (light) and High contrast. Clicking a theme previews it live;
+  Apply keeps it, and Save HTML carries it. `build_deck.py --theme` and
+  the agenda's `"theme"` field set it.
 - `Space` pauses and resumes the timer (like `P`, and like a video
   player); it no longer changes slides, and `Shift+Space` does nothing.
 - Touch support: swipe, tap zones (right 70% forward, left 30% back),
   long-press to pause/resume, `‹ ›` buttons and touch hints on touch
   screens, and a layout that fits a phone.
-- pytest + Playwright suite (94 tests), built red/green.
+- pytest + Playwright suite (121 tests), built red/green.

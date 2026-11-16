@@ -28,6 +28,7 @@ Leave `README.md`, `CHANGELOG.md` and `meta/` for maintainers. Read
 | --- | --- | --- |
 | `--title` | Inferred from the request, else none | Meeting name shown top-left and as the page title. |
 | `--total` | Sum of item minutes | Target length in minutes. Use it to allocate missing item times (below). If items already carry minutes that don't add up to it, say so; don't silently rescale. |
+| `--theme` | `indigo` | One of `indigo`, `midnight`, `ocean`, `daylight` (light; for bright rooms and projectors) or `contrast` (high contrast). If the user mentions a bright room, a projector or accessibility, suggest `daylight` or `contrast`. |
 | `--output` | `meeting-agenda.html` in the working directory | Path of the HTML file to write. |
 
 With no agenda at all, ask for one. Build the bundled 30-minute demo only if the user asks for a demo or example.
@@ -35,7 +36,7 @@ With no agenda at all, ask for one. Build the bundled 30-minute demo only if the
 ## 1. Turn the input into agenda JSON
 
 ```json
-{ "title": "Team Planning Meeting",
+{ "title": "Team Planning Meeting", "theme": "indigo",
   "items": [
     { "minutes": 10, "title": "Priorities for 2026 & 2027",
       "points": ["What are the priorities for 2026?", "What are the priorities for 2027?"] }
@@ -55,7 +56,7 @@ With no agenda at all, ask for one. Build the bundled 30-minute demo only if the
 Write the JSON to a temporary file, then run the script from this skill's directory:
 
 ```bash
-python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Team Planning Meeting"
+python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Team Planning Meeting" --theme indigo
 ```
 
 - `-` reads the JSON from stdin, and `--check` validates without writing.
@@ -82,5 +83,9 @@ Give the user:
 - **Timers:** each slide has a violet-to-cyan ring countdown, captioned "of M:SS allotted",, that starts when the slide is shown and pauses when you leave it. It turns amber in the last 20% of the item's time, then red, pulsing and counting up (`+M:SS`) past zero. `Space` or `P` pauses/resumes (like a video player), and `R` resets; the buttons do the same.
 - **Footer:** keyboard hints, clickable progress dashes (one per item, each filling with that item's time), a progress bar, then `Meeting: M:SS used / M:SS planned`. The bar has one section per item, each filling with the time spent on that item. The bar turns amber at 80% of the planned total and red past it, and its tooltip shows the percentage used.
 - **Phones and tablets:** swipe left/right for next/previous, tap the right 70% / left 30% of the slide, long-press (½ s) to pause or resume, and `‹ ›` buttons beside the progress dashes. Touch targets are at least 44 px, and the layout scales down to fit a phone. Mouse clicks on the slide don't navigate.
-- **Editor (gear):** a row per item (minutes, title, sub-points), with ↑/↓ to reorder and ✕ to remove (the last row can't be removed). Buttons: Add item, Reset to file defaults (asks first), Cancel/Esc, Save HTML, Apply. Rows without a title or with minutes ≤ 0 are highlighted and block Apply and Save. While the editor is open the timer pauses and keys don't change slides.
+- **Settings (gear):** two tabs.
+  - **Contents:** a row per item (minutes, title, sub-points), with ↑/↓ to reorder, ✕ to remove (the last row can't be removed), and Add item.
+  - **Theme:** five themes (Indigo, Midnight, Ocean, Daylight, High contrast) as preview cards. Clicking one previews it live.
+  - **Shared buttons:** Reset to file defaults (asks first), Cancel/Esc (discards changes, including a previewed theme), Save HTML (the agenda and theme go into the copy), and Apply (saved in the browser).
+  - Rows without a title or with minutes ≤ 0 are highlighted and block Apply and Save. While Settings is open the timer pauses and keys don't change slides.
 - **Offline and private:** no network requests, and agenda text is never parsed as HTML. See `meta/SECURITY.md`.

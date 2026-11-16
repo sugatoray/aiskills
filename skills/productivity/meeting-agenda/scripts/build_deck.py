@@ -7,11 +7,11 @@ Nothing else in the template changes. Stdlib only.
 
 Agenda JSON (a bare list of items is also accepted):
 
-    {"title": "Team sync",
+    {"title": "Team sync", "theme": "ocean",
      "items": [{"minutes": 10, "title": "Updates", "points": ["Wins", "Blockers"]}]}
 
 Usage:
-    build_deck.py agenda.json -o meeting-agenda.html [--title "..."]
+    build_deck.py agenda.json -o meeting-agenda.html [--title "..."] [--theme daylight]
     build_deck.py - -o deck.html < agenda.json      # read stdin
     build_deck.py agenda.json --check               # validate only
 
@@ -25,6 +25,8 @@ import re
 import sys
 
 TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / "assets" / "meeting-agenda.html"
+# Must match the THEMES list in assets/meeting-agenda.html (a test checks this).
+THEMES = ("indigo", "midnight", "ocean", "daylight", "contrast")
 BLOCK = re.compile(r'(<script type="application/json" id="agenda-data">)(.*?)(</script>)', re.S)
 
 
@@ -42,6 +44,9 @@ def normalize(raw):
     title = data.get("title", "")
     if not isinstance(title, str):
         raise AgendaError("title must be a string")
+    theme = data.get("theme")
+    if theme is not None and theme not in THEMES:
+        raise AgendaError("theme must be one of: " + ", ".join(THEMES))
     items = []
     for n, it in enumerate(data["items"], 1):
         if not isinstance(it, dict):
@@ -58,7 +63,10 @@ def normalize(raw):
         if not isinstance(pts, list) or not all(isinstance(p, str) for p in pts):
             raise AgendaError(f"item {n}: points must be a list of strings")
         items.append({"minutes": m, "title": t.strip(), "points": [p.strip() for p in pts if p.strip()]})
-    return {"title": title.strip(), "items": items}
+    out = {"title": title.strip(), "items": items}
+    if theme is not None:
+        out = {"title": out["title"], "theme": theme, "items": items}
+    return out
 
 
 def embed(template_html, agenda):
@@ -80,6 +88,7 @@ def main(argv=None):
     ap.add_argument("agenda", help="agenda JSON file, or - for stdin")
     ap.add_argument("-o", "--output", help="where to write the deck HTML")
     ap.add_argument("--title", help="meeting title (overrides the one in the JSON)")
+    ap.add_argument("--theme", help="deck theme: " + ", ".join(THEMES) + " (default: indigo)")
     ap.add_argument("--check", action="store_true", help="validate only; write nothing")
     args = ap.parse_args(argv)
     if not args.check and not args.output:
@@ -91,6 +100,11 @@ def main(argv=None):
     except json.JSONDecodeError as e:
         print(f"error: agenda is not valid JSON ({e})", file=sys.stderr)
         return 2
+    if args.theme is not None:
+        if isinstance(raw, list):
+            raw = {"items": raw}
+        if isinstance(raw, dict):
+            raw = {**raw, "theme": args.theme}
     try:
         agenda = normalize(raw)
     except AgendaError as e:

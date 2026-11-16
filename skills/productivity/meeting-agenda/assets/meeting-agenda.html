@@ -1,25 +1,98 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="indigo">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meeting Agenda</title>
 <style>
+  /* ---------- themes ----------
+     Every colour comes from these variables. Each theme sets the same list on
+     html[data-theme=...]. Warning colours (--amber, --red) are shared by all
+     themes, so "almost out of time" and "over" always look the same. */
   :root {
-    --bg-1: #2a2386; --bg-2: #1d1a68; --bg-3: #2b2280;
-    --ink: #f5f3ff; --muted: #c4c0f0; --faint: rgba(255,255,255,.12);
-    --teal: #2dd4bf; --cyan: #22d3ee; --indigo: #6d4cff; --violet: #8b5cf6;
     --amber: #f59e0b; --red: #ef4444;
-    --panel: rgba(24, 20, 78, .95);
   }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
-  body {
-    background-color: #2a2386;
-    background:
+  :root, [data-theme="indigo"] {
+    --bg-solid: #241f7a;
+    --bg-image:
       radial-gradient(ellipse at top left, rgba(124, 92, 255, .55) 0%, transparent 55%),   /* violet glow */
       radial-gradient(ellipse at bottom right, rgba(110, 80, 230, .35) 0%, transparent 60%),
       linear-gradient(135deg, #2a2386 0%, #1d1a68 55%, #2b2280 100%);                     /* indigo base */
+    --ink: #f5f3ff; --muted: #c4c0f0; --accent: #2dd4bf; --accent-ink: #052e2b;
+    --num-1: #8b5cf6; --num-2: #6d4cff; --num-glow: rgba(109, 76, 255, .35);
+    --ring-1: #22d3ee; --ring-2: #6d4cff; --ring-glow: rgba(34, 211, 238, .25);
+    --bar-1: #6d4cff; --bar-2: #22d3ee; --dot-fill: #22d3ee;
+    --dot-current: rgba(109, 76, 255, .55); --dot-glow: rgba(109, 76, 255, .6);
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.12); --line: rgba(255,255,255,.12);
+    --track: rgba(255,255,255,.1); --tick: rgba(20,16,70,.9); --input: rgba(0,0,0,.3);
+    --panel: rgba(24, 20, 78, .97); --overlay: rgba(5,2,15,.6); --title-shadow: rgba(10, 6, 40, .35);
+    --toast: rgba(15, 12, 60, .92);
+  }
+  [data-theme="midnight"] {
+    --bg-solid: #141a3a;
+    --bg-image:
+      radial-gradient(ellipse at top left, #3a2a6b 0%, transparent 55%),
+      linear-gradient(135deg, #0f1530, #2e1a47);
+    --ink: #f4f1ff; --muted: #b9b0d8; --accent: #2dd4bf; --accent-ink: #052e2b;
+    --num-1: #2dd4bf; --num-2: #a78bfa; --num-glow: rgba(45, 212, 191, .2);
+    --ring-1: #2dd4bf; --ring-2: #a78bfa; --ring-glow: rgba(45, 212, 191, .2);
+    --bar-1: #a78bfa; --bar-2: #2dd4bf; --dot-fill: #2dd4bf;
+    --dot-current: rgba(167, 139, 250, .5); --dot-glow: rgba(167, 139, 250, .5);
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.12); --line: rgba(255,255,255,.12);
+    --track: rgba(255,255,255,.1); --tick: rgba(10,8,30,.9); --input: rgba(0,0,0,.3);
+    --panel: rgba(20, 16, 44, .97); --overlay: rgba(5,2,15,.6); --title-shadow: rgba(0, 0, 0, .35);
+    --toast: rgba(15, 12, 40, .92);
+  }
+  [data-theme="ocean"] {
+    --bg-solid: #0b3142;
+    --bg-image:
+      radial-gradient(ellipse at top left, rgba(56, 189, 248, .30) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(251, 113, 133, .16) 0%, transparent 60%),
+      linear-gradient(135deg, #0c3a4f 0%, #082636 55%, #0b3346 100%);
+    --ink: #f0fbff; --muted: #a9d3e0; --accent: #5eead4; --accent-ink: #042f2e;
+    --num-1: #5eead4; --num-2: #38bdf8; --num-glow: rgba(56, 189, 248, .3);
+    --ring-1: #5eead4; --ring-2: #fb7185; --ring-glow: rgba(94, 234, 212, .25);
+    --bar-1: #38bdf8; --bar-2: #5eead4; --dot-fill: #5eead4;
+    --dot-current: rgba(251, 113, 133, .6); --dot-glow: rgba(251, 113, 133, .5);
+    --surface: rgba(255,255,255,.07); --surface-2: rgba(255,255,255,.13); --line: rgba(255,255,255,.14);
+    --track: rgba(255,255,255,.11); --tick: rgba(4,24,34,.9); --input: rgba(0,0,0,.28);
+    --panel: rgba(8, 38, 54, .97); --overlay: rgba(0,10,15,.6); --title-shadow: rgba(0, 20, 30, .4);
+    --toast: rgba(6, 30, 44, .92);
+  }
+  [data-theme="daylight"] {
+    --bg-solid: #f6f7fb;
+    --bg-image:
+      radial-gradient(ellipse at top left, rgba(109, 76, 255, .10) 0%, transparent 55%),
+      linear-gradient(135deg, #ffffff 0%, #f2f3fa 60%, #eceffa 100%);
+    --ink: #15132b; --muted: #4b4868; --accent: #0f766e; --accent-ink: #ffffff;
+    --num-1: #6d4cff; --num-2: #4f2fd9; --num-glow: rgba(109, 76, 255, .15);
+    --ring-1: #0891b2; --ring-2: #6d4cff; --ring-glow: rgba(8, 145, 178, .15);
+    --bar-1: #6d4cff; --bar-2: #0891b2; --dot-fill: #0891b2;
+    --dot-current: rgba(109, 76, 255, .45); --dot-glow: rgba(109, 76, 255, .3);
+    --surface: rgba(20,19,43,.05); --surface-2: rgba(20,19,43,.10); --line: rgba(20,19,43,.14);
+    --track: rgba(20,19,43,.10); --tick: rgba(255,255,255,.95); --input: #ffffff;
+    --panel: rgba(255, 255, 255, .98); --overlay: rgba(20,19,43,.35); --title-shadow: transparent;
+    --toast: rgba(255, 255, 255, .96);
+  }
+  [data-theme="contrast"] {
+    --bg-solid: #000000;
+    --bg-image: none;
+    --ink: #ffffff; --muted: #e5e5e5; --accent: #00e5ff; --accent-ink: #000000;
+    --num-1: #ffffff; --num-2: #ffffff; --num-glow: transparent;
+    --ring-1: #00e5ff; --ring-2: #00e5ff; --ring-glow: transparent;
+    --bar-1: #00e5ff; --bar-2: #00e5ff; --dot-fill: #00e5ff;
+    --dot-current: #ffffff; --dot-glow: transparent;
+    --surface: #000000; --surface-2: #1a1a1a; --line: #ffffff;
+    --track: #4d4d4d; --tick: #000000; --input: #000000;
+    --panel: #000000; --overlay: rgba(0,0,0,.75); --title-shadow: transparent;
+    --toast: #000000;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background-color: var(--bg-solid);
+    background-image: var(--bg-image);
     color: var(--ink);
     font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
@@ -27,13 +100,13 @@
   }
   button { font: inherit; color: inherit; cursor: pointer; }
   button:disabled { cursor: not-allowed; opacity: .35; }
-  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* header */
   header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 3vw, 40px) 0; }
   #meeting-title { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); overflow-wrap: anywhere; }
   #btn-edit { background: transparent; border: 0; border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; flex: none; opacity: .85; }
-  #btn-edit:hover { opacity: 1; background-color: rgba(255,255,255,.08); }
+  #btn-edit:hover { opacity: 1; background-color: var(--surface); }
   #btn-edit svg { width: 24px; height: 24px; }
 
   /* stage */
@@ -42,96 +115,117 @@
   .slide { display: none; height: 100%; overflow-y: auto; flex-direction: column; justify-content: center; min-width: 0; }
   .slide.active { display: flex; animation: enter .35s ease-out; }
   @keyframes enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-  .eyebrow { margin-bottom: .6em; font-size: clamp(12px, 1.9vh, 17px); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--teal); }
+  .eyebrow { margin-bottom: .6em; font-size: clamp(12px, 1.9vh, 17px); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
   .num {
     font-size: clamp(56px, 13vh, 140px); font-weight: 900; line-height: .9; letter-spacing: -.02em;
-    background: linear-gradient(160deg, var(--violet), var(--indigo) 70%); -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 18px rgba(109, 76, 255, .35));
+    background: linear-gradient(160deg, var(--num-1), var(--num-2) 70%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px var(--num-glow));
   }
-  .title { margin: .35em 0 .4em; font-size: clamp(28px, 6vh, 64px); line-height: 1.1; font-weight: 800; overflow-wrap: anywhere; text-shadow: 0 2px 14px rgba(10, 6, 40, .35); }
-  .points { margin: 0; padding-left: 1.2em; font-size: clamp(17px, 2.8vh, 28px); color: #ddd6fe; overflow-wrap: anywhere; }
+  .title { margin: .35em 0 .4em; font-size: clamp(28px, 6vh, 64px); line-height: 1.1; font-weight: 800; overflow-wrap: anywhere; text-shadow: 0 2px 14px var(--title-shadow); }
+  .points { margin: 0; padding-left: 1.2em; font-size: clamp(17px, 2.8vh, 28px); color: var(--ink); opacity: .9; overflow-wrap: anywhere; }
   .points li { margin: .3em 0; }
-  .points li::marker { color: var(--teal); }
+  .points li::marker { color: var(--accent); }
 
   /* timer */
   #timer-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
   #timer { position: relative; width: clamp(150px, 34vh, 280px); aspect-ratio: 1; }
   #timer svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  #ring-track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 14; }
-  #ring-progress { fill: none; stroke: url(#ring-grad); stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .25s linear; filter: drop-shadow(0 0 10px rgba(34, 211, 238, .25)); }
+  #ring-grad stop:first-child { stop-color: var(--ring-1); }
+  #ring-grad stop:last-child { stop-color: var(--ring-2); }
+  #ring-track { fill: none; stroke: var(--track); stroke-width: 14; }
+  #ring-progress { fill: none; stroke: url(#ring-grad); stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .25s linear; filter: drop-shadow(0 0 10px var(--ring-glow)); }
   #timer.warn #ring-progress { stroke: var(--amber); }
   #timer.over #ring-progress { stroke: var(--red); }
   #timer.over { animation: pulse 1s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0)); } 50% { transform: scale(1.04); filter: drop-shadow(0 0 18px rgba(239,68,68,.7)); } }
   #timer-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
   #timer-text { font-size: clamp(30px, 7vh, 60px); font-weight: 700; font-variant-numeric: tabular-nums; }
-  #timer.warn #timer-text { color: #fcd34d; }
-  #timer.over #timer-text { color: #fca5a5; }
+  #timer.warn #timer-text { color: var(--amber); }
+  #timer.over #timer-text { color: var(--red); }
   #timer-sub { font-size: clamp(12px, 1.9vh, 16px); font-weight: 600; color: var(--muted); }
   #timer.paused #timer-text { opacity: .55; }
   .controls { display: flex; gap: 8px; }
-  .controls button { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 7px 16px; font-weight: 600; }
+  .controls button { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px; font-weight: 600; }
   .controls button::before { display: inline-block; margin-right: .45em; text-align: center; }
   #btn-pause::before { content: "\275A\275A"; letter-spacing: -.12em; font-size: .7em; }
   #btn-pause[data-state="paused"]::before { content: "\25B6\FE0E"; }
   #btn-reset::before { content: "\21BA"; }
-  .ed-actions button, .row button {
-    background: var(--faint); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 6px 14px;
+  .ed-actions button, .row button, .ed-tabs button {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px;
   }
-  .controls button:hover, .ed-actions button:hover:not(:disabled), .row button:hover:not(:disabled) { background: rgba(255,255,255,.22); }
+  .controls button:hover, .ed-actions button:hover:not(:disabled), .row button:hover:not(:disabled) { background: var(--surface-2); filter: brightness(1.15); }
 
   /* footer */
   footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 10px clamp(16px, 3vw, 40px) 16px; background: transparent; font-size: 13px; }
   #hints { color: var(--ink); font-weight: 600; }
-  #hints kbd { font: 600 12px/1 system-ui, sans-serif; border: 0; border-radius: 4px; padding: 3px 6px; background: rgba(255,255,255,.08); color: var(--ink); }
+  #hints kbd { font: 600 12px/1 system-ui, sans-serif; border: 0; border-radius: 4px; padding: 3px 6px; background: var(--surface-2); color: var(--ink); }
   #hints .sep { color: var(--muted); margin: 0 .3em; }
   #dots { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; flex: 1 1 160px; }
   /* one dash per item; it fills with the time spent on that item */
-  .dot { width: 24px; height: 6px; padding: 0; border: 0; border-radius: 3px; background: rgba(255,255,255,.14); overflow: hidden; display: block; }
-  .dot-fill { display: block; height: 100%; width: 0; background: var(--cyan); }
+  .dot { width: 24px; height: 6px; padding: 0; border: 0; border-radius: 3px; background: var(--track); overflow: hidden; display: block; }
+  .dot-fill { display: block; height: 100%; width: 0; background: var(--dot-fill); }
   .dot.over .dot-fill { background: var(--red); }
-  .dot[aria-current="step"] { width: 34px; background: rgba(109, 76, 255, .55); box-shadow: 0 0 10px rgba(109, 76, 255, .6); }
+  .dot[aria-current="step"] { width: 34px; background: var(--dot-current); box-shadow: 0 0 10px var(--dot-glow); }
   #meeting { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   #meeting-text { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  #meeting-bar { position: relative; width: clamp(140px, 20vw, 280px); height: 8px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
+  #meeting-bar { position: relative; width: clamp(140px, 20vw, 280px); height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
   /* one segment per item, sized by its planned minutes; each fills with the time spent on that item */
   #meeting-bar .seg { position: absolute; top: 0; bottom: 0; overflow: hidden; }
-  #meeting-bar .seg.current { background: rgba(255,255,255,.14); }
-  #meeting-bar .seg-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--indigo), var(--cyan)); transition: width .25s linear; }
+  #meeting-bar .seg.current { background: var(--surface-2); }
+  #meeting-bar .seg-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--bar-1), var(--bar-2)); transition: width .25s linear; }
   #meeting-bar.warn .seg-fill { background: var(--amber); }
   #meeting-bar.over .seg-fill, #meeting-bar .seg.over .seg-fill { background: var(--red); }
-  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: rgba(20,16,70,.9); }
+  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--tick); }
 
-  /* editor */
-  #editor { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(5,2,15,.6); backdrop-filter: blur(4px); }
+  /* settings (gear): tabs for Contents and Theme */
+  #editor { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: var(--overlay); backdrop-filter: blur(4px); }
   #editor[hidden] { display: none; }
-  .ed-panel { width: min(920px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; background: var(--panel); border: 1px solid rgba(255,255,255,.14); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
-  .ed-head { padding: 16px 20px 6px; }
+  .ed-panel { width: min(920px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .ed-head { padding: 16px 20px 6px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
   .ed-head h2 { margin: 0; font-size: 20px; }
-  .ed-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .ed-tabs { display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+  .ed-tabs button { border-color: transparent; background: transparent; padding: 6px 16px; font-weight: 600; color: var(--muted); }
+  .ed-tabs button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
+  .ed-tabpanel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .ed-tabpanel[hidden] { display: none; }
+  .ed-note { margin: 4px 20px 0; color: var(--muted); font-size: 13px; }
   #ed-rows { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 20px; display: flex; flex-direction: column; gap: 10px; }
-  .row { display: grid; grid-template-columns: 34px 92px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); }
+  .ed-add-row { padding: 0 20px 8px; }
+  .ed-add-row button { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; }
+  .row { display: grid; grid-template-columns: 34px 92px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
   .row.invalid { border-color: var(--red); background: rgba(239,68,68,.12); }
-  .row-num { font-weight: 800; color: var(--teal); padding-top: 8px; }
+  .row-num { font-weight: 800; color: var(--accent); padding-top: 8px; }
   .row label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-  .row input, .row textarea { width: 100%; font: inherit; color: var(--ink); background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 6px 8px; }
+  .row input, .row textarea { width: 100%; font: inherit; color: var(--ink); background: var(--input); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
   .row textarea { resize: vertical; min-height: 58px; margin-top: 8px; }
   .row-btns { display: flex; gap: 4px; padding-top: 18px; }
   .row-btns button { padding: 4px 9px; }
   .btn-remove:hover:not(:disabled) { background: rgba(239,68,68,.35) !important; }
-  #ed-error { margin: 0 20px; color: #fca5a5; font-size: 13px; }
-  .ed-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid rgba(255,255,255,.1); }
+  #ed-error { margin: 0 20px; color: var(--red); font-size: 13px; font-weight: 600; }
+  #theme-grid { overflow-y: auto; padding: 10px 20px 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  /* Each card carries data-theme, so it picks up that theme's variables:
+     it's a true mini preview, with its own background, text and accent. */
+  .theme-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 12px; border: 2px solid var(--line); background-color: var(--bg-solid); background-image: var(--bg-image); color: var(--ink); text-align: left; }
+  .theme-card[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+  .theme-card[aria-checked="true"]::after { content: "✓"; position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--accent); color: var(--accent-ink); }
+  .theme-swatch { height: 70px; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid var(--line); }
+  .theme-swatch i { position: absolute; left: 10px; bottom: 10px; width: 46%; height: 6px; border-radius: 3px; }
+  .theme-swatch b { position: absolute; right: 10px; top: 12px; width: 34px; height: 34px; border-radius: 50%; border: 5px solid; }
+  .theme-swatch s { position: absolute; left: 10px; top: 12px; font: 800 20px/1 system-ui, sans-serif; text-decoration: none; }
+  .theme-name { font-weight: 700; }
+  .theme-desc { font-size: 12px; color: var(--muted); }
+  .ed-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--line); }
   .ed-actions .spacer { flex: 1; }
-  #ed-apply { background: var(--teal); color: #052e2b; border-color: var(--teal); font-weight: 700; }
+  #ed-apply { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
 
   /* touch: gestures on the stage, prev/next buttons, touch hints, a toast for long-press */
   main { touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   button { touch-action: manipulation; }
   #nav { display: flex; align-items: center; justify-content: center; gap: 12px; flex: 1 1 160px; }
   #nav #dots { flex: 0 1 auto; }
-  .nav-btn { display: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.08); font-size: 26px; line-height: 1; padding: 0 0 3px; place-items: center; flex: none; }
+  .nav-btn { display: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-size: 26px; line-height: 1; padding: 0 0 3px; place-items: center; flex: none; }
   .hint-touch { display: none; }
-  #toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 8px); padding: 8px 16px; border-radius: 999px; background: rgba(15, 12, 60, .9); border: 1px solid rgba(255,255,255,.14); font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
+  #toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 8px); padding: 8px 16px; border-radius: 999px; background: var(--toast); color: var(--ink); border: 1px solid var(--line); font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
   @media (pointer: coarse) {
     .nav-btn { display: grid; }
@@ -208,13 +302,23 @@
 <div id="editor" role="dialog" aria-modal="true" aria-labelledby="ed-heading" hidden>
   <div class="ed-panel">
     <div class="ed-head">
-      <h2 id="ed-heading">Edit agenda</h2>
-      <p>One row per item. Minutes in 0.5 steps; sub-points one per line.</p>
+      <h2 id="ed-heading">Settings</h2>
+      <div class="ed-tabs" role="tablist" aria-label="Settings sections">
+        <button id="tab-contents" type="button" role="tab" aria-selected="true" aria-controls="panel-contents">Contents</button>
+        <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme</button>
+      </div>
     </div>
-    <div id="ed-rows"></div>
-    <p id="ed-error" hidden>Every item needs a title and minutes greater than 0. Fix the highlighted rows.</p>
+    <div id="panel-contents" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-contents">
+      <p class="ed-note">One row per item. Minutes in 0.5 steps; sub-points one per line.</p>
+      <div id="ed-rows"></div>
+      <p id="ed-error" hidden>Every item needs a title and minutes greater than 0. Fix the highlighted rows.</p>
+      <div class="ed-add-row"><button id="ed-add" type="button">+ Add item</button></div>
+    </div>
+    <div id="panel-theme" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-theme" hidden>
+      <p class="ed-note">Pick a theme to preview it. Apply keeps it; Cancel goes back.</p>
+      <div id="theme-grid" role="radiogroup" aria-label="Theme"></div>
+    </div>
     <div class="ed-actions">
-      <button id="ed-add" type="button">+ Add item</button>
       <button id="ed-reset" type="button">Reset to file defaults</button>
       <span class="spacer"></span>
       <button id="ed-cancel" type="button">Cancel</button>
@@ -247,6 +351,18 @@
   "use strict";
 
   var STORAGE_KEY = "meetingAgenda";
+  // Theme ids must match scripts/build_deck.py THEMES (a test checks this).
+  // Swatch colours only draw the preview cards; the real colours are in the CSS.
+  var THEMES = [
+    { id: "indigo",   name: "Indigo",        desc: "Violet and cyan on indigo. The default.",   sw: ["#2a2386", "#22d3ee", "#8b5cf6", "#f5f3ff"] },
+    { id: "midnight", name: "Midnight",      desc: "Teal on navy and plum. Calm, dark rooms.",  sw: ["#141a3a", "#2dd4bf", "#a78bfa", "#f4f1ff"] },
+    { id: "ocean",    name: "Ocean",         desc: "Aqua and coral on deep teal-blue.",         sw: ["#0b3142", "#5eead4", "#fb7185", "#f0fbff"] },
+    { id: "daylight", name: "Daylight",      desc: "Light. For bright rooms and projectors.",   sw: ["#f6f7fb", "#0891b2", "#6d4cff", "#15132b"] },
+    { id: "contrast", name: "High contrast", desc: "Black and white, cyan accents, no blur.",  sw: ["#000000", "#00e5ff", "#ffffff", "#ffffff"] }
+  ];
+  var DEFAULT_THEME = THEMES[0].id;
+  function knownTheme(t) { return THEMES.some(function (x) { return x.id === t; }) ? t : DEFAULT_THEME; }
+  function setTheme(t) { document.documentElement.setAttribute("data-theme", knownTheme(t)); }
   var RING_C = 2 * Math.PI * 90;
   var WARN_FRACTION = 0.2;
 
@@ -274,7 +390,7 @@
       var points = Array.isArray(it.points) ? it.points.filter(function (p) { return typeof p === "string" && p.trim(); }).map(function (p) { return p.trim(); }) : [];
       items.push({ minutes: minutes, title: title, points: points });
     }
-    return { title: typeof data.title === "string" ? data.title : "", items: items };
+    return { title: typeof data.title === "string" ? data.title : "", theme: knownTheme(data.theme), items: items };
   }
 
   var FILE_DEFAULTS = normalize(JSON.parse($("#agenda-data").textContent)) || { title: "", items: [{ minutes: 5, title: "Agenda item", points: [] }] };
@@ -315,6 +431,7 @@
     deck.textContent = ""; dots.textContent = "";
     bar.textContent = "";
     $("#meeting-title").textContent = agenda.title || "";
+    setTheme(agenda.theme);
     document.title = agenda.title || "Meeting Agenda";
 
     var total = totalPlannedMs(), acc = 0;
@@ -590,6 +707,7 @@
   function collect() {
     return {
       title: agenda.title,
+      theme: draftTheme,
       items: readRows().map(function (r) {
         return {
           minutes: Number(r.minutesRaw),
@@ -608,6 +726,9 @@
     showErrors = false;
     $("#ed-error").hidden = true;
     renderRows(agenda.items.map(rowFromItem));
+    draftTheme = agenda.theme;
+    renderThemes();
+    selectTab("contents", false);
     $("#editor").hidden = false;
     var first = $("#ed-rows .f-title");
     if (first) first.focus();
@@ -615,6 +736,7 @@
 
   function closeEditor() {
     editorOpen = false;
+    setTheme(agenda.theme);            // drop any un-applied preview
     $("#editor").hidden = true;
     if (resumeAfterEditor) start();
     render();
@@ -633,6 +755,60 @@
     render();
   }
 
+  // ---------- settings tabs and theme picker ----------
+  var draftTheme = DEFAULT_THEME;
+  var TABS = ["contents", "theme"];
+
+  function selectTab(name, focus) {
+    TABS.forEach(function (t) {
+      var tab = $("#tab-" + t), on = t === name;
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+      $("#panel-" + t).hidden = !on;
+    });
+    if (focus) $("#tab-" + name).focus();
+  }
+  TABS.forEach(function (t, i) {
+    var tab = $("#tab-" + t);
+    tab.addEventListener("click", function () { selectTab(t, false); });
+    tab.addEventListener("keydown", function (e) {
+      var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (e.key === "Home") d = -i; else if (e.key === "End") d = TABS.length - 1 - i;
+      if (!d) return;
+      e.preventDefault();
+      selectTab(TABS[(i + d + TABS.length) % TABS.length], true);
+    });
+  });
+
+  function renderThemes() {
+    var grid = $("#theme-grid");
+    grid.textContent = "";
+    THEMES.forEach(function (th) {
+      var card = el("button", "theme-card");
+      card.type = "button";
+      card.setAttribute("role", "radio");
+      card.setAttribute("data-theme", th.id);
+      card.setAttribute("aria-checked", th.id === draftTheme ? "true" : "false");
+      var sw = el("span", "theme-swatch");
+      sw.style.background = th.sw[0];
+      var num = el("s", null, "01"); num.style.color = th.sw[2];
+      var ring = el("b"); ring.style.borderColor = th.sw[1];
+      var bar = el("i"); bar.style.background = "linear-gradient(90deg," + th.sw[2] + "," + th.sw[1] + ")";
+      sw.appendChild(num); sw.appendChild(ring); sw.appendChild(bar);
+      card.appendChild(sw);
+      card.appendChild(el("span", "theme-name", th.name));
+      card.appendChild(el("span", "theme-desc", th.desc));
+      card.addEventListener("click", function () {
+        draftTheme = th.id;
+        setTheme(th.id);               // live preview behind the dialog
+        renderThemes();
+        var again = document.querySelector('.theme-card[data-theme="' + th.id + '"]');
+        if (again) again.focus();
+      });
+      grid.appendChild(card);
+    });
+  }
+
   $("#btn-edit").addEventListener("click", openEditor);
   $("#ed-cancel").addEventListener("click", closeEditor);
   $("#ed-add").addEventListener("click", function () {
@@ -644,7 +820,7 @@
   });
   $("#ed-apply").addEventListener("click", function () {
     showErrors = true;
-    if (!validate()) return;
+    if (!validate()) { selectTab("contents", false); return; }
     applyAgenda(collect(), true);
   });
   $("#ed-reset").addEventListener("click", function () {
@@ -653,7 +829,7 @@
   });
   $("#ed-save").addEventListener("click", function () {
     showErrors = true;
-    if (!validate()) return;
+    if (!validate()) { selectTab("contents", false); return; }
     var copy = PRISTINE.cloneNode(true);
     // Escape every "<" so a title containing a closing script tag cannot end the data block early.
     copy.querySelector("#agenda-data").textContent =

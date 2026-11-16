@@ -117,3 +117,31 @@ def test_built_deck_renders_the_agenda(tmp_path, browser):
         expect(p.locator("#meeting-title")).to_have_text("Q3 Review")
     finally:
         ctx.close()
+
+
+def test_theme_option_and_json_field(tmp_path):
+    src = tmp_path / "a.json"
+    src.write_text(json.dumps({**AGENDA, "theme": "ocean"}))
+    out = tmp_path / "d.html"
+    assert run(src, "-o", out).returncode == 0
+    assert json.loads(block(out.read_text()))["theme"] == "ocean"
+    assert run(src, "-o", out, "--theme", "daylight").returncode == 0
+    assert json.loads(block(out.read_text()))["theme"] == "daylight"
+
+
+def test_rejects_unknown_theme(tmp_path):
+    src = tmp_path / "a.json"
+    src.write_text(json.dumps(AGENDA))
+    r = run(src, "-o", tmp_path / "d.html", "--theme", "neon")
+    assert r.returncode == 2 and "theme must be one of: indigo, midnight, ocean, daylight, contrast" in r.stderr
+
+
+def test_script_themes_match_the_page(deck):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("build_deck", SCRIPT)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    deck.locator("#btn-edit").click()
+    deck.locator("#tab-theme").click()
+    page_themes = [c.get_attribute("data-theme") for c in deck.locator(".theme-card").all()]
+    assert list(mod.THEMES) == page_themes
