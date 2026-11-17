@@ -17,7 +17,7 @@ Every page's header has a version menu with a **Find a version** box (partial or
 Every published npm release has an annotated git tag on the commit npm recorded as its `gitHead`, with the publish time in the message: `aiskills-v0.4.0`–`aiskills-v1.4.0` so far. New releases are tagged the same way (`src/packages/aiskills/docs/meta/MAINTAINERS.md` → Releasing, step 6).
 
 ## `meeting-agenda` skill (productivity group)
-`/meeting-agenda` turns an agenda (pasted text, notes, a document or JSON) into one offline HTML slide deck. Each item gets a slide with a large number, its title and sub-points, plus a ring countdown that turns amber in the last 20% and red with a `+M:SS` count-up past zero. The footer has progress dots and a meeting bar that fills per item. A gear-button editor applies to `localStorage` or downloads an updated copy. `scripts/build_deck.py` validates the agenda and writes it into the template with `<` escaped. Indigo/violet theme with cyan accents. On phones: swipe or tap to move, hold to pause, and `‹ ›` buttons. The gear opens Settings with Contents and Theme tabs: five themes, previewed live and saved with the agenda, plus an editable deck title. `/meeting-agenda --demo` returns the bundled demo deck unchanged. Settings → Contents has a Quick View (inline list) and a Detailed View (list plus detail). The agenda-item line stays at the same height across slides. 168 pytest + Playwright tests. Code: `skills/productivity/meeting-agenda/`.
+`/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
 
 <!--
 ## <Feature name>

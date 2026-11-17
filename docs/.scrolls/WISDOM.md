@@ -23,7 +23,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **Adding a control to the docs header breaks the phone layout.** The search input can't render narrower than its padding (about 68px), so it overlaps the next button rather than shrinking. Check the header at iPhone width for sideways scroll and overlap; the docs browser tests do this for the version menu.
 
 - **A new skill or group changes hard-coded numbers in the package tests and docs.** After `npm run docs` and `npm run banner:png`, expect to update `banner.test.mjs` (skill and group counts, the `#pills` counts), the `<!-- verify -->` outputs that list groups or skills (`guides/use-from-an-agent.md`, `reference/cli.md`, `tutorial/01`, `02`, `04`), and, for a new `.skillsignore`, the one-line `"ignored"` sample in `reference/files.md`. The package suite only counts git-tracked skills, so `git add` the skill first.
-- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. This broke the meeting-agenda deck once during development.
+- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/productivity/docs/.scrolls/WISDOM.md`.
 
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.

@@ -21,7 +21,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
   9. Explicit-only invocation.
   10. A Settings redesign (Quick View and Detailed View, from mockups the user approved).
   11. The "Agenda item" line held at one height across slides.
-- The red/green summary for the PR description is in the repo-root `docs/.scrolls/PLAN.md` (ROOT-10). It isn't in the PR description yet; add it only if the user asks.
+- The red/green summary for the PR description is in `PLAN.md` (PROD-1). It isn't in the PR description yet; add it only if the user asks.
 
 ## Known issues / open threads
 - **Screenshots churn:** running the tests rewrites the four to six tracked screenshots in `meta/screenshots/` with tiny pixel differences. Restore them (`git checkout -- skills/productivity/meeting-agenda/meta/screenshots`) unless the UI really changed. The user was offered a fix (save screenshots only when asked) and hasn't answered.
