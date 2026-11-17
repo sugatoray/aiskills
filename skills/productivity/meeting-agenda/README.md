@@ -136,7 +136,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 161 tests (143 for the deck, 18 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 168 tests (150 for the deck, 18 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 

@@ -53,6 +53,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/meet
 - `pytest.ini`
 - `scripts/build_deck.py`
 - `tests/conftest.py`
+- `tests/test_alignment.py`
 - `tests/test_build_deck.py`
 - `tests/test_deck_title.py`
 - `tests/test_editor.py`
