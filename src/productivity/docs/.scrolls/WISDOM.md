@@ -33,6 +33,7 @@ Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code. Write the failing tests first, run them, and say how many failed, before implementing.
 - **Use Playwright's fake clock for timers:** `page.clock.install()` before `goto`, then `page.clock.run_for(ms)`. A 10-minute countdown is tested in milliseconds.
+- **Name themes after the idea, not a company.** "Use Apple's design principles" became **Clarity**, so the deck never uses Apple's name or branding. Do the same for any "in the style of <brand>" request.
 - **Mock up art direction, not palettes.** A first theme mockup that only re-tuned colours was rejected outright; the approved one gave each theme its own type, texture, numeral and dial. For a "make it beautiful" ask, show a working HTML mockup with every state (normal, amber, over).
 - **A CSS `filter: drop-shadow` on an SVG `<circle>` is clipped to a box.** Put the glow on the whole `<svg>` instead.
 - **Every theme block must set every token.** A theme card's `data-theme` otherwise inherits tokens from the page's theme.

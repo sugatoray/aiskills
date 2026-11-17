@@ -22,7 +22,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
   10. A Settings redesign (Quick View and Detailed View, from mockups the user approved).
   11. The "Agenda item" line held at one height across slides.
   12. Five studio themes (Aurora, Observatory, Abyss, Editorial, Signal) added in front of the five classics, with Aurora as the new default. The user rejected a first, colour-only mockup ("impress me"), then approved an art-directed one (own type, texture, numeral and dial per theme) as a working HTML mockup. Cards are now drawn from theme tokens (no `sw` swatch colours). Filed as #285 under #273.
-  13. Clarity and Clarity Dark, after Apple's design principles, from an approved mockup. Named "Clarity" so the deck doesn't use Apple's name or brand. Not yet filed as an issue on the PR.
+  13. Clarity and Clarity Dark, after Apple's design principles, from an approved mockup. Named "Clarity" so the deck doesn't use Apple's name or brand. Filed as #286 under #273, and the PR description now covers twelve themes and 226 tests.
 - Filed issues for the PR with `/create-issues-update-pr`: parent #273 (Feature) with sub-issues #274–#284, one per step of the work (Feature/Task/Bug). The PR description was corrected (it said the ring turns amber at 80% remaining; it's the last 20%) and now lists them with `Closes`, plus the red/green summary. A later run added #285 (studio themes) and refreshed the PR's theme, test-count and red/green lines.
 
 ## Known issues / open threads
