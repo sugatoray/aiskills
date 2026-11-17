@@ -189,6 +189,9 @@
   .ed-tabpanel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
   .ed-tabpanel[hidden] { display: none; }
   .ed-note { margin: 4px 20px 0; color: var(--muted); font-size: 13px; }
+  .ed-field { padding: 8px 20px 4px; }
+  .ed-field label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .ed-field input { width: 100%; font: inherit; font-weight: 600; color: var(--ink); background: var(--input); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; }
   #ed-rows { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 20px; display: flex; flex-direction: column; gap: 10px; }
   .ed-add-row { padding: 0 20px 8px; }
   .ed-add-row button { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; }
@@ -309,6 +312,10 @@
       </div>
     </div>
     <div id="panel-contents" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-contents">
+      <div class="ed-field">
+        <label for="f-deck-title">Deck title</label>
+        <input id="f-deck-title" type="text" autocomplete="off" spellcheck="true" placeholder="Shown top-left and as the page title (optional)">
+      </div>
       <p class="ed-note">One row per item. Minutes in 0.5 steps; sub-points one per line.</p>
       <div id="ed-rows"></div>
       <p id="ed-error" hidden>Every item needs a title and minutes greater than 0. Fix the highlighted rows.</p>
@@ -706,7 +713,7 @@
 
   function collect() {
     return {
-      title: agenda.title,
+      title: $("#f-deck-title").value.trim(),
       theme: draftTheme,
       items: readRows().map(function (r) {
         return {
@@ -725,6 +732,7 @@
     stop(); render();
     showErrors = false;
     $("#ed-error").hidden = true;
+    $("#f-deck-title").value = agenda.title;
     renderRows(agenda.items.map(rowFromItem));
     draftTheme = agenda.theme;
     renderThemes();

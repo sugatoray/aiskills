@@ -18,6 +18,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   label, a violet-to-cyan ring captioned "of M:SS allotted", pill
   Pause/Reset buttons, progress dashes that fill per item, and the
   meeting bar ahead of the meeting text.
+- Deck title field in Settings → Contents (default "Team Planning Meeting"),
+  kept in the agenda's `"title"`.
+- `/meeting-agenda --demo` (`build_deck.py --demo`) returns the bundled
+  demo deck byte for byte.
 - Settings (gear) with two tabs: **Contents** (the agenda editor) and
   **Theme**. There are five themes: Indigo (default), Midnight, Ocean,
   Daylight (light) and High contrast. Clicking a theme previews it live;
@@ -28,4 +32,4 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Touch support: swipe, tap zones (right 70% forward, left 30% back),
   long-press to pause/resume, `‹ ›` buttons and touch hints on touch
   screens, and a layout that fits a phone.
-- pytest + Playwright suite (121 tests), built red/green.
+- pytest + Playwright suite (133 tests), built red/green.

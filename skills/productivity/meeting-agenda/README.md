@@ -25,10 +25,18 @@ Or, in Claude Code, run `/plugin marketplace add sugatoray/aiskills`, then `/plu
 
 The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), `--theme` (`indigo`, `midnight`, `ocean`, `daylight` or `contrast`), and `--output` (path).
 
+`/meeting-agenda --demo` returns the bundled 30-minute demo deck exactly as it ships.
+
 To build a deck yourself without an agent:
 
 ```bash
 python3 scripts/build_deck.py agenda.json -o meeting-agenda.html --title "Weekly sync" --theme daylight
+```
+
+Or copy the demo deck unchanged:
+
+```bash
+python3 scripts/build_deck.py --demo -o meeting-agenda.html
 ```
 
 ## Present it
@@ -69,7 +77,7 @@ On a touch screen, the footer hints change to "Swipe or tap to navigate · Hold 
 
 The gear opens **Settings**, which has two tabs. Switch between them by clicking, or with `←`/`→` when a tab has focus.
 
-**Contents** edits the agenda, with one row per item: minutes (0.5 steps), title, and sub-points (one per line). Use ↑/↓ to reorder, ✕ to remove a row (the last row can't be removed), and **+ Add item** for a new row.
+**Contents** edits the **deck title** (shown top-left and as the browser tab's title; leave it blank to hide it) and the agenda, with one row per item: minutes (0.5 steps), title, and sub-points (one per line). Use ↑/↓ to reorder, ✕ to remove a row (the last row can't be removed), and **+ Add item** for a new row.
 
 **Theme** shows the five themes as cards, each a small preview of that theme. Clicking a card previews the theme on the deck behind the dialog. The chosen card has a ✓.
 
@@ -87,7 +95,7 @@ The buttons at the bottom apply to both tabs:
 
 | Button | What it does |
 |---|---|
-| **Reset to file defaults** | Asks first, then restores the agenda and theme built into the file and forgets the browser copy |
+| **Reset to file defaults** | Asks first, then restores the title, agenda and theme built into the file and forgets the browser copy |
 | **Cancel** / `Esc` | Closes Settings and discards changes, including a previewed theme |
 | **Save HTML** | Downloads a copy of `meeting-agenda.html` with this agenda and theme built in. Share it, and it opens that way. |
 | **Apply** | Rebuilds the deck and remembers the agenda and theme in this browser (`localStorage`) |
@@ -121,7 +129,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 121 tests (106 for the deck, 15 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 133 tests (115 for the deck, 18 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 

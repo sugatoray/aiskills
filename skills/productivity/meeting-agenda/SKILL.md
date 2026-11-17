@@ -30,8 +30,19 @@ Leave `README.md`, `CHANGELOG.md` and `meta/` for maintainers. Read
 | `--total` | Sum of item minutes | Target length in minutes. Use it to allocate missing item times (below). If items already carry minutes that don't add up to it, say so; don't silently rescale. |
 | `--theme` | `indigo` | One of `indigo`, `midnight`, `ocean`, `daylight` (light; for bright rooms and projectors) or `contrast` (high contrast). If the user mentions a bright room, a projector or accessibility, suggest `daylight` or `contrast`. |
 | `--output` | `meeting-agenda.html` in the working directory | Path of the HTML file to write. |
+| `--demo` | Off | Return the bundled 30-minute demo deck exactly as it ships. See **Demo** below. |
 
-With no agenda at all, ask for one. Build the bundled 30-minute demo only if the user asks for a demo or example.
+With no agenda at all, ask for one. If the user asks for a demo or an example, treat it as `--demo`.
+
+## Demo (`--demo`)
+
+Copy the bundled deck byte for byte. Don't build, edit or re-theme it:
+
+```bash
+python3 scripts/build_deck.py --demo -o meeting-agenda.html
+```
+
+The script refuses an agenda, `--title` or `--theme` alongside `--demo` (exit 2). If the user passed any, say they were ignored, and offer a custom build instead. Then skip to **4. Deliver**: send the file, show the demo's five items (10 + 8 + 5 + 3 + 4 = 30 minutes), and give the controls line.
 
 ## 1. Turn the input into agenda JSON
 
@@ -84,7 +95,7 @@ Give the user:
 - **Footer:** keyboard hints, clickable progress dashes (one per item, each filling with that item's time), a progress bar, then `Meeting: M:SS used / M:SS planned`. The bar has one section per item, each filling with the time spent on that item. The bar turns amber at 80% of the planned total and red past it, and its tooltip shows the percentage used.
 - **Phones and tablets:** swipe left/right for next/previous, tap the right 70% / left 30% of the slide, long-press (½ s) to pause or resume, and `‹ ›` buttons beside the progress dashes. Touch targets are at least 44 px, and the layout scales down to fit a phone. Mouse clicks on the slide don't navigate.
 - **Settings (gear):** two tabs.
-  - **Contents:** a row per item (minutes, title, sub-points), with ↑/↓ to reorder, ✕ to remove (the last row can't be removed), and Add item.
+  - **Contents:** the deck title (shown top-left and as the page title; may be blank), then a row per item (minutes, title, sub-points), with ↑/↓ to reorder, ✕ to remove (the last row can't be removed), and Add item.
   - **Theme:** five themes (Indigo, Midnight, Ocean, Daylight, High contrast) as preview cards. Clicking one previews it live.
   - **Shared buttons:** Reset to file defaults (asks first), Cancel/Esc (discards changes, including a previewed theme), Save HTML (the agenda and theme go into the copy), and Apply (saved in the browser).
   - Rows without a title or with minutes ≤ 0 are highlighted and block Apply and Save. While Settings is open the timer pauses and keys don't change slides.

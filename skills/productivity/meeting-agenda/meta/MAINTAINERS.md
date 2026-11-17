@@ -10,7 +10,7 @@
 
 - `SKILL.md`: the agent workflow (input → agenda JSON → `build_deck.py` → verify → deliver).
 - `assets/meeting-agenda.html`: the template, which is also a working deck with the demo agenda.
-- `scripts/build_deck.py`: stdlib-only. `THEMES` must match the page's list. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
+- `scripts/build_deck.py`: stdlib-only. `THEMES` must match the page's list. `--demo` copies the template byte for byte (for `/meeting-agenda --demo`) and refuses an agenda, `--title`, `--theme` or `--check` alongside it. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
 - `tests/`: run `python3 -m pytest` from the skill directory.
 
 ## Layout of `assets/meeting-agenda.html`
@@ -73,7 +73,7 @@ The theme cards carry `data-theme` themselves, so each one picks up its own them
 
 ## Editor flow
 
-`openEditor` stops the timer and copies `agenda` into rows. Rows are re-rendered from `readRows()` on add, move and remove, so typed values survive. Validation runs on Apply and Save. After the first failed attempt it re-runs live on every input. `applyAgenda(data, persist)` either writes to `localStorage` (Apply) or clears it (Reset), rebuilds the deck, and resets all timers.
+`openEditor` stops the timer and copies `agenda` into the deck-title field and the rows. Rows are re-rendered from `readRows()` on add, move and remove, so typed values survive. Validation runs on Apply and Save. After the first failed attempt it re-runs live on every input. `applyAgenda(data, persist)` either writes to `localStorage` (Apply) or clears it (Reset), rebuilds the deck, and resets all timers.
 
 **Save HTML** clones the `PRISTINE` copy of the document (taken at script start, before anything is rendered) and writes `JSON.stringify(...).replace(/</g, "\\u003c")` into `#agenda-data`. It then downloads `"<!doctype html>\n" + outerHTML` as a Blob.
 
@@ -93,9 +93,10 @@ The theme cards carry `data-theme` themselves, so each one picks up its own them
 | `test_theme.py` | The reference theme: background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
 | `test_touch.py` | Phone context (`has_touch`, `is_mobile`): swipes, thresholds, tap zones, long-press, buttons not navigating, prev/next (≥ 44 px), device-specific hints, editor gating, mouse ignored, timer unaffected, phone layout fits, caption inside the ring |
 | `test_settings.py` | Settings tabs (order, ARIA, arrow keys), theme list, live preview, Cancel/Esc revert, Apply persists, Apply from the Theme tab with invalid rows, Save HTML carries the theme, Reset restores the default, unknown-theme fallback, per-theme contrast (AAA title, AA small text), shared warning colours, readable cards, ✓ on the selected card |
+| `test_deck_title.py` | Deck title field (label, above the rows), Apply updates the header, the page title and storage, Cancel/Esc discard, blank allowed, Reset restores, Save HTML escaping, shown as text, typing doesn't drive the deck |
 | `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
 
-Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#tab-contents`, `#tab-theme`, `#panel-contents`, `#panel-theme`, `.theme-card[data-theme]` (`aria-checked`), `.theme-name`, `.theme-desc`, `html[data-theme]`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#f-deck-title`, `#tab-contents`, `#tab-theme`, `#panel-contents`, `#panel-theme`, `.theme-card[data-theme]` (`aria-checked`), `.theme-name`, `.theme-desc`, `html[data-theme]`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
 
 ## Common changes
 

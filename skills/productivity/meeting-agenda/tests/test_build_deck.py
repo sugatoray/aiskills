@@ -145,3 +145,26 @@ def test_script_themes_match_the_page(deck):
     deck.locator("#tab-theme").click()
     page_themes = [c.get_attribute("data-theme") for c in deck.locator(".theme-card").all()]
     assert list(mod.THEMES) == page_themes
+
+
+def test_demo_copies_the_bundled_deck_byte_for_byte(tmp_path):
+    out = tmp_path / "demo.html"
+    r = run("--demo", "-o", out)
+    assert r.returncode == 0, r.stderr
+    assert out.read_bytes() == HTML.read_bytes()
+    assert "demo" in r.stdout and "5 items, 30:00 planned" in r.stdout
+
+
+def test_demo_takes_no_agenda_or_overrides(tmp_path):
+    src = tmp_path / "a.json"
+    src.write_text(json.dumps(AGENDA))
+    for extra in ([str(src)], ["--title", "X"], ["--theme", "ocean"]):
+        r = run("--demo", "-o", tmp_path / "d.html", *extra)
+        assert r.returncode == 2, extra
+        assert "--demo copies the bundled deck as is" in r.stderr
+    assert not (tmp_path / "d.html").exists()
+
+
+def test_demo_needs_an_output_path(tmp_path):
+    r = run("--demo")
+    assert r.returncode == 2 and "--output" in r.stderr

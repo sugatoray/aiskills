@@ -14,6 +14,7 @@ Usage:
     build_deck.py agenda.json -o meeting-agenda.html [--title "..."] [--theme daylight]
     build_deck.py - -o deck.html < agenda.json      # read stdin
     build_deck.py agenda.json --check               # validate only
+    build_deck.py --demo -o meeting-agenda.html     # the bundled 30-minute demo, as is
 
 Exit codes: 0 ok, 2 invalid input.
 """
@@ -85,12 +86,29 @@ def summary(agenda):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Build a meeting-agenda slide deck from agenda JSON.")
-    ap.add_argument("agenda", help="agenda JSON file, or - for stdin")
+    ap.add_argument("agenda", nargs="?", help="agenda JSON file, or - for stdin")
+    ap.add_argument("--demo", action="store_true",
+                    help="copy the bundled demo deck (assets/meeting-agenda.html) byte for byte; takes no agenda")
     ap.add_argument("-o", "--output", help="where to write the deck HTML")
     ap.add_argument("--title", help="meeting title (overrides the one in the JSON)")
     ap.add_argument("--theme", help="deck theme: " + ", ".join(THEMES) + " (default: indigo)")
     ap.add_argument("--check", action="store_true", help="validate only; write nothing")
     args = ap.parse_args(argv)
+    if args.demo:
+        if args.agenda is not None or args.title is not None or args.theme is not None or args.check:
+            print("error: --demo copies the bundled deck as is; drop the agenda, --title, --theme and --check",
+                  file=sys.stderr)
+            return 2
+        if not args.output:
+            ap.error("--output is required with --demo")
+        out = pathlib.Path(args.output)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(TEMPLATE.read_bytes())
+        demo = normalize(json.loads(BLOCK.search(TEMPLATE.read_text(encoding="utf-8")).group(2)))
+        print(f"wrote {out} (demo, unchanged): {summary(demo)}")
+        return 0
+    if args.agenda is None:
+        ap.error("an agenda file (or - for stdin) is required unless --demo is given")
     if not args.check and not args.output:
         ap.error("--output is required unless --check is given")
 
