@@ -7,8 +7,8 @@ from playwright.sync_api import expect
 
 from conftest import STORAGE_KEY, store_agenda
 
-THEMES = ["indigo", "midnight", "ocean", "daylight", "contrast"]
-NAMES = ["Indigo", "Midnight", "Ocean", "Daylight", "High contrast"]
+THEMES = ["aurora", "observatory", "abyss", "editorial", "signal", "indigo", "midnight", "ocean", "daylight", "contrast"]
+NAMES = ["Aurora", "Observatory", "Abyss", "Editorial", "Signal", "Indigo", "Midnight", "Ocean", "Daylight", "High contrast"]
 
 
 def open_settings(page):
@@ -48,10 +48,10 @@ def test_tabs_switch_by_click_and_arrow_keys(deck):
 
 
 def test_theme_tab_lists_the_themes_and_marks_the_current_one(deck):
-    assert current_theme(deck) == "indigo"
+    assert current_theme(deck) == "aurora"
     theme_tab(deck)
     cards = deck.locator("#panel-theme .theme-card")
-    expect(cards).to_have_count(5)
+    expect(cards).to_have_count(len(THEMES))
     expect(cards.locator(".theme-name")).to_have_text(NAMES)
     assert [c.get_attribute("data-theme") for c in cards.all()] == THEMES
     expect(cards.nth(0)).to_have_attribute("aria-checked", "true")
@@ -72,12 +72,12 @@ def test_cancel_and_escape_revert_the_preview(deck):
     theme_tab(deck)
     deck.locator('.theme-card[data-theme="daylight"]').click()
     deck.locator("#ed-cancel").click()
-    assert current_theme(deck) == "indigo"
+    assert current_theme(deck) == "aurora"
     theme_tab(deck)
     deck.locator('.theme-card[data-theme="midnight"]').click()
     deck.keyboard.press("Escape")
     expect(deck.locator("#editor")).to_be_hidden()
-    assert current_theme(deck) == "indigo"
+    assert current_theme(deck) == "aurora"
 
 
 def test_apply_keeps_the_theme_across_reloads(deck):
@@ -126,7 +126,7 @@ def test_reset_to_file_defaults_restores_the_default_theme(deck):
     open_settings(deck)
     deck.once("dialog", lambda d: d.accept())
     deck.locator("#ed-reset").click()
-    assert current_theme(deck) == "indigo"
+    assert current_theme(deck) == "aurora"
 
 
 def test_unknown_theme_falls_back_to_default(deck):
@@ -134,7 +134,7 @@ def test_unknown_theme_falls_back_to_default(deck):
         {{title: 'x', theme: 'neon-nope', items: [{{minutes: 1, title: 'A', points: []}}]}}))""")
     deck.reload()
     expect(deck.locator(".slide")).to_have_count(1)
-    assert current_theme(deck) == "indigo"
+    assert current_theme(deck) == "aurora"
 
 
 def _lum(rgb):
@@ -161,9 +161,11 @@ def test_every_theme_keeps_text_readable(deck, theme):
     title = _rgb(deck.evaluate("getComputedStyle(document.querySelector('.slide.active .title')).color"))
     muted = _rgb(deck.evaluate("getComputedStyle(document.getElementById('timer-sub')).color"))
     eyebrow = _rgb(deck.evaluate("getComputedStyle(document.querySelector('.slide.active .eyebrow')).color"))
+    eb_bg = deck.evaluate("getComputedStyle(document.querySelector('.slide.active .eyebrow')).backgroundColor")
+    eb_bg = _rgb(eb_bg) if eb_bg not in ("rgba(0, 0, 0, 0)", "transparent") and not eb_bg.startswith("rgba") else bg
     assert _ratio(title, bg) >= 7, (theme, title, bg)      # WCAG AAA for the main text
     assert _ratio(muted, bg) >= 4.5, (theme, muted, bg)    # AA for small text
-    assert _ratio(eyebrow, bg) >= 4.5, (theme, eyebrow, bg)
+    assert _ratio(eyebrow, eb_bg) >= 4.5, (theme, eyebrow, eb_bg)   # a solid label is read against itself
 
 
 @pytest.mark.parametrize("theme", THEMES)
@@ -175,7 +177,7 @@ def test_warning_colours_stay_the_same_in_every_theme(deck, theme):
     assert stroke.replace(" ", "") == "rgb(239,68,68)", (theme, stroke)
 
 
-@pytest.mark.parametrize("preview", ["indigo", "daylight", "contrast"])
+@pytest.mark.parametrize("preview", ["aurora", "editorial", "signal", "indigo", "daylight", "contrast"])
 def test_theme_cards_are_readable_whatever_theme_is_previewed(deck, preview):
     """Each card is a mini preview in its own theme, so its text must read
     against its own background, not the dialog's."""

@@ -66,13 +66,22 @@ Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is i
 
 Every colour in the stylesheet is a CSS variable. Each theme sets the full list on `[data-theme="<id>"]`, and `html[data-theme]` picks the active one. `--amber` and `--red` are shared on `:root` and never themed, so time warnings look the same everywhere. The ring's gradient stops take `--ring-1` and `--ring-2` through CSS `stop-color`, which overrides the SVG attributes.
 
-The agenda JSON has an optional `"theme"`. `normalize()` maps an unknown or missing value to `indigo`. Apply saves it with the agenda, Save HTML writes it into the copy, and Reset restores the file's value.
+The agenda JSON has an optional `"theme"`. `normalize()` maps an unknown or missing value to `aurora` (the first entry in `THEMES`). Apply saves it with the agenda, Save HTML writes it into the copy, and Reset restores the file's value.
 
-The theme cards carry `data-theme` themselves, so each one picks up its own theme's variables and is a true mini preview. Card text is tested for contrast against the card's own background.
+There are two kinds of theme:
+
+- **Studio** (`aurora`, `observatory`, `abyss`, `editorial`, `signal`): besides colours, each sets type and dial tokens (`--f-title`, `--f-num`, `--f-time`, `--f-meta`, `--num-style`, `--num-weight`, `--title-weight`, `--ring-w`, `--bezel`, `--glass`, `--glass-line`). Their art direction lives in the "studio themes" block at the end of the stylesheet, under `:root:is([data-theme="aurora"], …)` (CSS nesting), with one block per theme for texture (`body::before`), grain (`body::after`) and touches such as the dial ticks (`#timer::before`, a masked `repeating-conic-gradient`). The ring glow sits on the whole `#timer svg`: on the circle it would be clipped to a box.
+- **Classic** (`indigo`, `midnight`, `ocean`, `daylight`, `contrast`): colours only, plus one shared block that sets the type and dial tokens to the original values. The studio selectors never match them, so they look exactly as before; `test_studio_themes.py::test_classic_themes_keep_their_look` pins that.
+
+`:root` carries Aurora's tokens as the fallback. Every theme block sets every token, because a card's `data-theme` must not inherit tokens from the page's theme.
+
+Fonts are stacks of locally installed fonts (`--sans`, `--display`, `--serif`, `--mono`): nothing is downloaded, so the deck works offline. The grain is an inline SVG `feTurbulence` data URI. Motion (`aurora`, `shafts`) is decoration only and is switched off under `prefers-reduced-motion`.
+
+The theme cards carry `data-theme` themselves, so each one picks up its own theme's tokens and is a true mini preview; nothing in a card is coloured inline. Card text is tested for contrast against the card's own background.
 
 **To add a theme:**
-1. Add a `[data-theme="<id>"]` block with every variable; copy an existing block.
-2. Add an entry to `THEMES` in the page script (id, name, description, swatch colours) and to `THEMES` in `scripts/build_deck.py`. A test checks that the two lists match.
+1. Add a `[data-theme="<id>"]` block with every variable; copy an existing block of the same kind (studio or classic). For a classic-style theme, add the id to the shared classic block too.
+2. Add an entry to `THEMES` in the page script (id, name, description) and to `THEMES` in `scripts/build_deck.py`. A test checks that the two lists match.
 3. Add the id to `THEMES`/`NAMES` in `tests/test_settings.py`. The contrast and warning-colour tests then cover it automatically.
 
 ## Editor flow
@@ -96,7 +105,8 @@ The theme cards carry `data-theme` themselves, so each one picks up its own them
 | `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
 | `test_layout.py` | 24 long items, 90-minute item, phone width |
 | `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
-| `test_theme.py` | The reference theme: background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
+| `test_studio_themes.py` | Aurora is the default; studio themes first, then classics; cards drawn from their own tokens (no inline colours); per-theme type (serif Editorial, mono Observatory, outlined and italic numerals); dial ticks only on Observatory and Editorial; Aurora/Abyss motion and reduced motion; Signal has no texture, glow or blur; classic themes keep their look; studio themes fit on a phone |
+| `test_theme.py` | The classic Indigo theme (switched to first, since Aurora is the default): background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
 | `test_touch.py` | Phone context (`has_touch`, `is_mobile`): swipes, thresholds, tap zones, long-press, buttons not navigating, prev/next (≥ 44 px), device-specific hints, editor gating, mouse ignored, timer unaffected, phone layout fits, caption inside the ring |
 | `test_settings.py` | Settings tabs (order, ARIA, arrow keys), theme list, live preview, Cancel/Esc revert, Apply persists, Apply from the Theme tab with invalid rows, Save HTML carries the theme, Reset restores the default, unknown-theme fallback, per-theme contrast (AAA title, AA small text), shared warning colours, readable cards, ✓ on the selected card |
 | `test_alignment.py` | The eyebrow line stays at the same height across slides (demo, mixed content, phone), spacing below it is unchanged, the tallest slide is still centred, the entrance has no vertical motion, and only the active slide is visible |

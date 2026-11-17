@@ -7,7 +7,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 
 - **The deck is one self-contained HTML file:** no CDNs, fonts, images or network calls. `test_file_has_no_external_dependencies` and `test_no_network_requests_on_load` enforce it.
 - **Agenda text is only ever set with `textContent`**, never `innerHTML`. Saved agendas escape every `<` as `\u003c` (Save HTML and `build_deck.py` alike).
-- **Two copies of the theme list:** `THEMES` exists in the page script and in `scripts/build_deck.py`, and a test checks that they match. Add a theme in both places, plus `tests/test_settings.py`.
+- **Two copies of the theme list:** `THEMES` exists in the page script and in `scripts/build_deck.py`, and a test checks that they match. Add a theme in both places, plus `tests/test_settings.py` (which also hard-codes the theme names).
 - **Explicit invocation only:** `disable-model-invocation: true` in `SKILL.md`, and `allow_implicit_invocation: false` in `agents/openai.yaml`. The user asked for this.
 - **Keep the user's names:** the button is "Save HTML" (from their spec), even though a mockup said "Download HTML".
 
@@ -33,6 +33,9 @@ Best practices worth reusing.
 
 - Always use Red/Green TDD while developing or fixing code. Write the failing tests first, run them, and say how many failed, before implementing.
 - **Use Playwright's fake clock for timers:** `page.clock.install()` before `goto`, then `page.clock.run_for(ms)`. A 10-minute countdown is tested in milliseconds.
+- **Mock up art direction, not palettes.** A first theme mockup that only re-tuned colours was rejected outright; the approved one gave each theme its own type, texture, numeral and dial. For a "make it beautiful" ask, show a working HTML mockup with every state (normal, amber, over).
+- **A CSS `filter: drop-shadow` on an SVG `<circle>` is clipped to a box.** Put the glow on the whole `<svg>` instead.
+- **Every theme block must set every token.** A theme card's `data-theme` otherwise inherits tokens from the page's theme.
 - **Look at the screenshots after the tests go green.** That's how the off-screen editor buttons, the reversed ring gradient, unreadable theme cards and a clipped phone layout were caught. Then turn each finding into a failing test.
 - **Mock up before redesigning.** For visual changes, render static mockups to PNG (scratchpad HTML plus Playwright) and get the user's pick before writing code.
 - **In cloud sessions:** `pip install pytest playwright`, then launch Chromium with `executable_path="/opt/pw-browsers/chromium"`. `conftest.py` does this.

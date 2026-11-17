@@ -1,7 +1,15 @@
-"""Theme matching the reference screenshot (indigo/violet with cyan accents)."""
+"""The classic Indigo theme, matching the reference screenshot (indigo/violet with cyan
+accents). Aurora is now the default, so these tests switch to Indigo first."""
+import pytest
 from playwright.sync_api import expect
 
 from conftest import tick, store_agenda
+
+
+@pytest.fixture
+def deck(deck):
+    deck.evaluate("document.documentElement.dataset.theme = 'indigo'")
+    return deck
 
 
 def test_indigo_violet_background(deck):
