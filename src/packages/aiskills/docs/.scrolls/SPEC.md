@@ -89,3 +89,9 @@ On a terminal, `aiskills` colors its output: the `[aiskills]` prefix dim, errors
 
 ## CLI outputs page in the docs
 Reference → CLI outputs shows every command's real, colored output in one page. `npm run cli-outputs` regenerates it from `docs/cli-outputs/commands.json` in the docs examples' sandbox; `npm run docs` includes it. In 1.3.0 (unreleased; #245).
+
+## `aiskills config`: saved defaults and aliases
+`aiskills config <key>` prints a default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it, and `-l`/`--list` (with `--show-origin` or `--json`) shows what's set, like `git config`. Defaults live in `~/.config/sugatoray/aiskillsconfig.json` (or the file `AISKILLS_USER_CONFIG` names), or with `--project` in `./.aiskills.json`, which wins. Keys: `scope`, `agents`, `skills`, `groups`, `copy`, `route`, `layout`, `stats`, `skills-version` and `color`; values are checked when set. Precedence: option > `AISKILLS_*` > project file > user file > remembered > default. `alias.<name>` defines a command alias; `!` shell aliases are allowed in the user file only, and one in a project file is skipped with a warning. `info` shows both files and where each setting comes from. A sample, `examples/sample_aiskillsconfig.json`, ships and is copied into the install folder. In 1.3.0 (unreleased; #250). (`src/scripts/core/config.mjs`)
+
+## Docs site: the Skills tab grouped by skill group
+The Skills tab's left pane shows the overview, then one collapsible group per skill group with its count, then Explainers. Expand all / Collapse all; the current page's group opens; open groups are remembered in the browser. Tab numbers count skills, not pages, and every skill or group count in the README and docs is generated (`npm run docs:skills`). In 1.3.0 (unreleased; #250).
