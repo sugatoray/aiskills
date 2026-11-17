@@ -3,6 +3,7 @@ name: meeting-agenda
 description: "Turn a meeting agenda into a self-contained HTML slide deck with a countdown timer per item: one slide per item (large 01, 02… number, title, optional sub-points), a ring timer that turns amber in the last 20% and red with a +M:SS count-up past zero, a footer with clickable progress dots and a per-item meeting progress bar, and a built-in editor (gear button) that saves to localStorage or downloads an updated copy. Use when the user invokes /meeting-agenda, or asks for agenda slides, a timed agenda, a meeting timer deck, or to present an agenda with timeboxes. Accepts pasted agenda text, notes, a document, or agenda JSON. Delivers one offline HTML file that needs no dependencies."
 license: MIT
 compatibility: "Python 3.9+ (stdlib only) to build the deck; any modern browser to present it; optional pytest + Playwright to run the bundled test suite"
+disable-model-invocation: true
 metadata:
   name: meeting-agenda
   type: skill

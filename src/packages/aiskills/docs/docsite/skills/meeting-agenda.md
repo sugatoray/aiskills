@@ -6,7 +6,7 @@ Turn a meeting agenda into a self-contained HTML slide deck with a countdown tim
 | --- | --- |
 | Group | `productivity-skills` (alias `productivity`) |
 | Version | 1.0.0 |
-| Starts | When you type `/meeting-agenda`, or your agent uses it when a task fits its description |
+| Starts | When you ask for it: you type `/meeting-agenda` (your agent doesn't start it on its own) |
 | Needs | Python 3.9+ (stdlib only) to build the deck; any modern browser to present it; optional pytest + Playwright to run the bundled test suite |
 | License | MIT |
 | Source | [skills/productivity/meeting-agenda](https://github.com/sugatoray/aiskills/tree/master/skills/productivity/meeting-agenda) |

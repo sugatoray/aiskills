@@ -12,6 +12,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `+M:SS` count-up past zero), keyboard and dot navigation, a footer with a
   per-item meeting progress bar, and an in-page editor that applies to
   `localStorage` or downloads an updated copy.
+- Runs only when invoked explicitly (`/meeting-agenda`, or `$meeting-agenda`
+  in Codex): `disable-model-invocation: true` in `SKILL.md`, and
+  `allow_implicit_invocation: false` in `agents/openai.yaml`.
 - `scripts/build_deck.py`: validates agenda JSON and writes it into the
   template's `agenda-data` block, escaping `<`.
 - Indigo/violet theme with cyan accents: an "Agenda item N of M · X min"
