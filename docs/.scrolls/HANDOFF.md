@@ -3,18 +3,17 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`master` is at `904e593`.** Since the last snapshot:
-  - #245 (colored CLI output, the CLI outputs page) was squash-merged as `73af49b`.
-  - #250 (`aiskills config`, the grouped Skills tab) was squash-merged as `904e593`.
-- **npm:** `@sugatoray-ai/aiskills` 1.2.0 is still the latest.
-- **Release 1.3.0 prepared in [#287](https://github.com/sugatoray/aiskills/pull/287)** (branch `claude/awesome-knuth-8n4u00`, `0122db5`): `package.json` `1.3.0`, CHANGELOG dated 2026-11-17, SECURITY `1.3.x`, docs examples, banner and docs regenerated. 515 package tests pass. Not merged, published or tagged.
+- **`master` is at `a92ab00`:** #287 (release 1.3.0) squash-merged; issues #288–#290 closed by it.
+- **npm:** `@sugatoray-ai/aiskills` **1.3.0 is published** (`latest`, 2026-11-17T23:07Z; npm `gitHead` `a92ab00`). The user pushed the tag `aiskills-v1.3.0`, which rebuilds the docs site with 1.3.0 at the root.
+- **`claude/aiskills-1.4.0-dev`** (from `a92ab00`; pushed; **no PR yet**): the package's next version, `1.4.0-dev`, with an empty `## [1.4.0] - Unreleased` section and the docs regenerated (`0576950`), plus this scrolls update. 515 package tests pass.
 
 ## What just happened
-- The user asked to bump the package from `1.3.0-dev` to `1.3.0`; done per the package's MAINTAINERS → Releasing steps 2–3. The PR was opened from the Claude Code UI.
-- Package detail is in `src/packages/aiskills/docs/.scrolls/` (HANDOFF, AIS-20).
+- Prepared 1.3.0 in #287; the user merged, published and tagged it. ROOT-6 ticked; the tag range in `SPEC.md` now runs to `aiskills-v1.3.0`.
+- Set the package to `1.4.0-dev` at the user's request. Package detail is in `src/packages/aiskills/docs/.scrolls/`.
 
 ## Known issues / open threads
-- **Finish 1.3.0 (ROOT-6 / AIS-20):** `npm run test:e2e` (not run), merge #287, then publish from an up-to-date `master` and tag `aiskills-v1.3.0` on its `gitHead`. Change the CHANGELOG date if the release day isn't 2026-11-17.
-- **Watching #287:** offered to the user; no answer yet.
+- **No PR for `claude/aiskills-1.4.0-dev` yet.** Open one when the user asks.
+- **`claude/awesome-knuth-8n4u00`** (#287's branch) holds only merged history and can be deleted.
+- Nobody has looked at the rebuilt docs site since the tag push (this session can't reach `sugatoray.github.io`): `/` should be 1.3.0 and `/v/` the releases before it; `/dev/` shows 1.4.0-dev once the branch merges.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered.
 - `claude/keen-babbage-2khhu9` still holds merged #215-era history. Reusing it needs a reset from `master` and a force push, which the user must approve.
