@@ -3,24 +3,24 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`master` is at `904e593`:** #245 (colored CLI output and the CLI outputs page, `73af49b`) and #250 (`aiskills config` and a grouped Skills tab in the docs, `904e593`) are merged.
-- **npm:** `@sugatoray-ai/aiskills` 1.2.0 is still the latest; `package.json` on `master` is `1.3.0-dev`.
-- **`claude/clever-mendel-k9n73h`** (from `904e593`; pushed; open as **[#265](https://github.com/sugatoray/aiskills/pull/265)**, created from the Claude Code UI): the new **`/scrolls-compact`** skill and the scrolls family at **2.6.0**.
-  - `/scrolls-compact` condenses old scroll history and keeps the full text in git at a tagged checkpoint, with `COMPACT.md` and `compacted/scrolls_compact_<yyyymmdd>_<githash>.md` as the index. Design: `skills/scrolls/scrolls-compact/meta/DESIGN.md`.
-  - The skill's examples are an index, `assets/EXAMPLES.md`, plus one file per example, `assets/examples/example_001.md`–`example_023.md`. A replay test checks every documented output against the real script.
-  - Repo-wide effects on the branch: all nine scrolls skills are bumped to 2.6.0; the package docs and banner are regenerated (18 bundled skills, 9 in `scrolls-skills`); and the package tests' hardcoded skill and tab counts are updated to match. The package CHANGELOG `[1.3.0]` lists the new skill.
-  - All tests pass: the scrolls suites, `test_compact.sh` 126, `test_examples.sh` 420, and the package `npm test` 516.
+- **`master` is at `715aca5`:** #287 released 1.3.0 (`a92ab00`), and #291 started `1.4.0-dev` with an empty `## [1.4.0] - Unreleased` section.
+- **npm:** `@sugatoray-ai/aiskills` **1.3.0** is the latest (published 2026-11-17, tagged `aiskills-v1.3.0`). `/scrolls-compact` is **not** in it: it ships in 1.4.0.
+- **`claude/clever-mendel-k9n73h`**, open as **[#265](https://github.com/sugatoray/aiskills/pull/265)**, is **rebased onto `715aca5`** (2026-11-17, at the user's request) and force-pushed. It is part of **1.4.0-dev**:
+  - The new **`/scrolls-compact`** skill and the scrolls family at **2.6.0**. Design: `skills/scrolls/scrolls-compact/meta/DESIGN.md`. Family detail: `src/scrolls/docs/.scrolls/`.
+  - Its 23 replay-tested examples (`assets/EXAMPLES.md` plus `assets/examples/`), and `assets/example-viewer.html`, which shows them one tab each. The docsite shows the viewer in its Skills tab under Explainers, and embedded pages now follow the docs' light/dark button.
+  - `assets/EXAMPLE.md` renamed `assets/EXAMPLES.md` in `run-code-review` (1.3.1), `artwallbg` and `commentdrop` (1.0.1).
+  - The package CHANGELOG lists all of it under `[1.4.0] - Unreleased`. The rebase moved these entries there from `[1.3.0]`, which is released and now matches `master`.
+  - Tests on the rebased branch: package `npm test` 519; `test_compact.sh` 126; `test_examples.sh` 420; `test_example_viewer.sh`; `test_explain.sh` 110; the other scrolls suites; `make test-scripts` 59. All pass.
 
 ## What just happened
-- Designed `/scrolls-compact` with the user (four decisions, recorded in `DESIGN.md` §11), then built it Red/Green.
-- Added the replay-tested examples. Reading their real outputs found three bugs, each fixed test-first.
-- At the user's request, merged the two example files into one `EXAMPLES.md`, then split it into the index plus per-example files, so an agent reads about 2k tokens instead of 25k.
-- Linked `scrolls-compact` (`make link-skills`) and recorded the work in the family scrolls (`src/scrolls/docs/.scrolls`). Found three places the first pass missed and fixed them: the root marketplace description, the root `README.md` skills table, and the install commands in `src/scrolls/CLAUDE.md`. The family `WISDOM.md` now lists every place a new scrolls skill must be added.
-- Published a private review page comparing the merge with both source files ([scrolls-compact Examples Merge](https://claude.ai/artifact/5kSccRSDNDVG9t1vGxZEcp)). The merge is adopted, so the page is now only a record.
-
-- At the user's request, renamed `assets/EXAMPLE.md` to `assets/EXAMPLES.md` in `run-code-review` (1.3.1), `artwallbg` and `commentdrop` (1.0.1), so every skill uses one name. A new package test fails if a bundled skill ships `assets/EXAMPLE.md` again; `npm test` passes 517.
+- Rebased the branch's 14 commits onto `master` (`715aca5`, 1.4.0-dev). Conflicts:
+  - generated docs and the banner: took `master`'s side, then regenerated with `npm run docs` and `npm run banner:png` at each commit;
+  - the package CHANGELOG: moved this branch's entries into `[1.4.0]`;
+  - the root scrolls: `PLAN.md` keeps `master`'s ROOT-6 and ROOT-9, and this snapshot was rewritten.
+- Earlier on the branch: the example viewer (theme, Note box, docsite page, light/dark sync). Issues for [#265](https://github.com/sugatoray/aiskills/pull/265): epic #266 (#267–#270) and #271.
 
 ## Known issues / open threads
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10: issues filed, epic #266 with #267–#270, plus #271; `SPEC.md` waits for the merge). Pushing to `claude/clever-mendel-k9n73h` updates it. It regenerates the package docs, so rebase onto `master` and re-run `npm run docs` if another docs PR lands first.
+- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10). Add `/scrolls-compact` to `SPEC.md` once it merges. The PR's issue list doesn't yet cover the example viewer, its docsite page or the theme sync.
 - **`tests/test_compact.ps1` has never run.** This session had no `pwsh`; the same scenario passed through the bash launcher.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).
+- `claude/keen-babbage-2khhu9` still holds merged #215-era history. Reusing it needs a reset from `master` and a force push, which the user must approve.
