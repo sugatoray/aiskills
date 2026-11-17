@@ -23,7 +23,7 @@ SETTLE = """document.getAnimations().forEach(a => {
 
 # Only these are kept in the repo (the skill is copied on install, so stay small).
 # The other states are still asserted by their tests, just not saved.
-KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png", "08-phone.png", "09-settings-theme.png"}
+KEEP = {"01-slide-normal.png", "03-timer-overtime.png", "04-editor.png", "07-progress-by-section.png", "08-phone.png", "09-settings-theme.png", "10-detailed-view.png"}
 
 
 def snap(page, name):
@@ -112,3 +112,12 @@ def test_shot_settings_theme(hd):
     hd.locator('.theme-card[data-theme="ocean"]').click()
     expect(hd.locator('.theme-card[data-theme="ocean"]')).to_have_attribute("aria-checked", "true")
     snap(hd, "09-settings-theme.png")
+
+
+def test_shot_detailed_view(hd):
+    hd.locator("#btn-edit").click()
+    hd.locator("#vtab-detailed").click()
+    hd.mouse.move(5, 5)
+    expect(hd.locator("#view-detailed")).to_be_visible()
+    snap(hd, "10-detailed-view.png")
+    hd.locator("#vtab-quick").click()     # leave the remembered view as Quick View

@@ -61,6 +61,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/meet
 - `tests/test_navigation.py`
 - `tests/test_screenshots.py`
 - `tests/test_settings.py`
+- `tests/test_settings_views.py`
 - `tests/test_slides.py`
 - `tests/test_theme.py`
 - `tests/test_timers.py`

@@ -77,7 +77,14 @@ On a touch screen, the footer hints change to "Swipe or tap to navigate · Hold 
 
 The gear opens **Settings**, which has two tabs. Switch between them by clicking, or with `←`/`→` when a tab has focus.
 
-**Contents** edits the **deck title** (shown top-left and as the browser tab's title; leave it blank to hide it) and the agenda, with one row per item: minutes (0.5 steps), title, and sub-points (one per line). Use ↑/↓ to reorder, ✕ to remove a row (the last row can't be removed), and **+ Add item** for a new row.
+**Contents** starts with the **deck title**: large text you click into to edit, shown top-left and as the browser tab's title. Leave it blank to hide it. Next to the view switch, a running total ("5 items · 30 min planned") updates as you type. The agenda itself has two views of the same unsaved edits, so you can switch between them mid-edit; the view you used last opens next time.
+
+| View | Layout | Best for |
+|---|---|---|
+| **Quick View** (default) | One list. Each row has the title, its sub-points (one per line, growing as you type) and a compact "10 min" field. ↑ ↓ ✕ appear when you hover over or focus a row. **+ Add item** is at the end. | Scanning and tweaking the whole meeting at once |
+| **Detailed View** | The item list on the left (number, title, minutes) and the selected item on the right: title, a −/+ minutes control with 5 / 10 / 15 / 30 quick picks, and sub-points as separate lines. Enter adds a sub-point, Backspace on an empty one removes it, and ✕ deletes one. ↑ ↓ ✕ at the top move or delete the item. | Long or detailed agendas |
+
+In both views the last item can't be removed. A problem item gets a red edge and a short message ("Add a title", "Minutes must be more than 0"), and the footer shows how many items need attention.
 
 **Theme** shows the five themes as cards, each a small preview of that theme. Clicking a card previews the theme on the deck behind the dialog. The chosen card has a ✓.
 
@@ -91,13 +98,13 @@ The gear opens **Settings**, which has two tabs. Switch between them by clicking
 
 Every theme keeps the main text at WCAG AAA contrast (7:1) and the small text at AA (4.5:1). The amber and red time warnings look the same in every theme.
 
-The buttons at the bottom apply to both tabs:
+The buttons at the bottom apply to both tabs. The × at the top right closes like Cancel, and **Ctrl+Enter** (**⌘+Enter** on a Mac) applies:
 
 | Button | What it does |
 |---|---|
-| **Reset to file defaults** | Asks first, then restores the title, agenda and theme built into the file and forgets the browser copy |
+| **Reset to defaults** | Asks first, then restores the title, agenda and theme built into the file and forgets the browser copy |
 | **Cancel** / `Esc` | Closes Settings and discards changes, including a previewed theme |
-| **Save HTML** | Downloads a copy of `meeting-agenda.html` with this agenda and theme built in. Share it, and it opens that way. |
+| **↓ Save HTML** | Downloads a copy of `meeting-agenda.html` with this agenda and theme built in. Share it, and it opens that way. |
 | **Apply** | Rebuilds the deck and remembers the agenda and theme in this browser (`localStorage`) |
 
 Every item needs a title and minutes greater than 0. Invalid rows are highlighted, and Apply/Save are blocked until they're fixed. If you press Apply from the Theme tab, Settings switches to Contents to show the problem. While Settings is open the timer is paused and the keys don't change slides.
@@ -129,7 +136,7 @@ python -m playwright install chromium
 python -m pytest
 ```
 
-If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 133 tests (115 for the deck, 18 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
+If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the `playwright install` step. The suite has 161 tests (143 for the deck, 18 for `build_deck.py`) and runs in about 25 seconds, because the timers use Playwright's fake clock. It also regenerates `meta/screenshots/`.
 
 ## Contents
 
@@ -141,4 +148,4 @@ If you already have Chromium installed, point `CHROMIUM_PATH` at it and skip the
 | `tests/` | pytest + Playwright suite |
 | `meta/MAINTAINERS.md` | How the deck is built and how to change it |
 | `meta/SECURITY.md` | Security model |
-| `meta/screenshots/` | Normal slide, overtime, editor, progress by section, phone, theme picker |
+| `meta/screenshots/` | Normal slide, overtime, Settings (Quick View, Detailed View, Theme), progress by section, phone |

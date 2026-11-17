@@ -21,6 +21,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   label, a violet-to-cyan ring captioned "of M:SS allotted", pill
   Pause/Reset buttons, progress dashes that fill per item, and the
   meeting bar ahead of the meeting text.
+- Redesigned Settings: an underlined Contents/Theme tab bar, a × to close, the deck
+  title as an editable heading, a running total, inline per-item errors with a
+  footer count, Ctrl/⌘+Enter to apply, a quieter footer, and a bottom sheet on
+  phones. Contents has two views of one draft: **Quick View** (an inline list)
+  and **Detailed View** (list plus detail, with a −/+ minutes control, quick
+  picks and one line per sub-point).
 - Deck title field in Settings → Contents (default "Team Planning Meeting"),
   kept in the agenda's `"title"`.
 - `/meeting-agenda --demo` (`build_deck.py --demo`) returns the bundled
@@ -35,4 +41,4 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Touch support: swipe, tap zones (right 70% forward, left 30% back),
   long-press to pause/resume, `‹ ›` buttons and touch hints on touch
   screens, and a layout that fits a phone.
-- pytest + Playwright suite (133 tests), built red/green.
+- pytest + Playwright suite (161 tests), built red/green.

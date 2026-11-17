@@ -28,7 +28,7 @@ def current_theme(page):
 
 def test_settings_has_contents_then_theme_tabs(deck):
     open_settings(deck)
-    expect(deck.locator("#editor [role=tab]")).to_have_text(["Contents", "Theme"])
+    expect(deck.locator("#settings-tabs [role=tab]")).to_have_text(["Contents", "Theme"])
     expect(deck.locator("#tab-contents")).to_have_attribute("aria-selected", "true")
     expect(deck.locator("#panel-contents")).to_be_visible()
     expect(deck.locator("#panel-theme")).to_be_hidden()

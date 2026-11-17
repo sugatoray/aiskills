@@ -98,7 +98,7 @@
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
     overflow: hidden;
   }
-  button { font: inherit; color: inherit; cursor: pointer; }
+  button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   button:disabled { cursor: not-allowed; opacity: .35; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -150,10 +150,7 @@
   #btn-pause::before { content: "\275A\275A"; letter-spacing: -.12em; font-size: .7em; }
   #btn-pause[data-state="paused"]::before { content: "\25B6\FE0E"; }
   #btn-reset::before { content: "\21BA"; }
-  .ed-actions button, .row button, .ed-tabs button {
-    background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px;
-  }
-  .controls button:hover, .ed-actions button:hover:not(:disabled), .row button:hover:not(:disabled) { background: var(--surface-2); filter: brightness(1.15); }
+  .controls button:hover { background: var(--surface-2); filter: brightness(1.15); }
 
   /* footer */
   footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 10px clamp(16px, 3vw, 40px) 16px; background: transparent; font-size: 13px; }
@@ -177,49 +174,139 @@
   #meeting-bar.over .seg-fill, #meeting-bar .seg.over .seg-fill { background: var(--red); }
   #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--tick); }
 
-  /* settings (gear): tabs for Contents and Theme */
-  #editor { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: var(--overlay); backdrop-filter: blur(4px); }
+  /* ---------- settings (gear) ----------
+     One sheet: header with close, underline tabs (Contents | Theme), a scrolling body,
+     and a footer with one primary action. Contents offers two views of one draft:
+     Quick View (an inline list) and Detailed View (list + detail). */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  #editor { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--overlay); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
   #editor[hidden] { display: none; }
-  .ed-panel { width: min(920px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
-  .ed-head { padding: 16px 20px 6px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-  .ed-head h2 { margin: 0; font-size: 20px; }
-  .ed-tabs { display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
-  .ed-tabs button { border-color: transparent; background: transparent; padding: 6px 16px; font-weight: 600; color: var(--muted); }
-  .ed-tabs button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
-  .ed-tabpanel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .ed-panel { width: min(800px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 40px 80px -20px rgba(0,0,0,.55); overflow: hidden; }
+  .ed-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 0 20px; }
+  .ed-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  #ed-close { width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; display: grid; place-items: center; }
+  #ed-close:hover { background: var(--surface-2); color: var(--ink); }
+  .ed-tabs { display: flex; gap: 20px; padding: 0 20px; margin-top: 6px; border-bottom: 1px solid var(--line); }
+  .ed-tabs button { position: relative; border: 0; background: transparent; padding: 10px 0 11px; font-weight: 500; color: var(--muted); border-radius: 0; }
+  .ed-tabs button:hover { color: var(--ink); }
+  .ed-tabs button[aria-selected="true"] { color: var(--ink); }
+  .ed-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--ink); }
+  .ed-tabpanel { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 18px 20px 12px; }
   .ed-tabpanel[hidden] { display: none; }
-  .ed-note { margin: 4px 20px 0; color: var(--muted); font-size: 13px; }
-  .ed-field { padding: 8px 20px 4px; }
-  .ed-field label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-  .ed-field input { width: 100%; font: inherit; font-weight: 600; color: var(--ink); background: var(--input); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; }
-  #ed-rows { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 20px; display: flex; flex-direction: column; gap: 10px; }
-  .ed-add-row { padding: 0 20px 8px; }
-  .ed-add-row button { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; }
-  .row { display: grid; grid-template-columns: 34px 92px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
-  .row.invalid { border-color: var(--red); background: rgba(239,68,68,.12); }
-  .row-num { font-weight: 800; color: var(--accent); padding-top: 8px; }
-  .row label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-  .row input, .row textarea { width: 100%; font: inherit; color: var(--ink); background: var(--input); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
-  .row textarea { resize: vertical; min-height: 58px; margin-top: 8px; }
-  .row-btns { display: flex; gap: 4px; padding-top: 18px; }
-  .row-btns button { padding: 4px 9px; }
-  .btn-remove:hover:not(:disabled) { background: rgba(239,68,68,.35) !important; }
-  #ed-error { margin: 0 20px; color: var(--red); font-size: 13px; font-weight: 600; }
-  #theme-grid { overflow-y: auto; padding: 10px 20px 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .ed-note { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+
+  /* deck title: a heading you can type into */
+  #f-deck-title { width: 100%; font: 650 22px/1.25 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.02em; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid transparent; padding: 2px 0 4px; border-radius: 0; }
+  #f-deck-title:hover { border-bottom-color: var(--line); }
+  #f-deck-title:focus { outline: none; border-bottom-color: var(--accent); }
+  #f-deck-title::placeholder { color: var(--muted); opacity: .6; }
+  .dt-help { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+  .dt-help label { color: inherit; }
+
+  /* view switch + running total */
+  .ed-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 0 8px; }
+  .seg { display: inline-flex; padding: 2px; border-radius: 9px; background: var(--surface); border: 1px solid var(--line); }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 5px 12px; border-radius: 7px; font-size: 13px; font-weight: 550; }
+  .seg button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  #ed-total { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ed-view[hidden] { display: none; }
+
+  /* Quick View: hairline rows, inline fields, actions on hover/focus */
+  #ed-rows { border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto; gap: 12px; align-items: start; padding: 12px 8px 12px 6px; border-bottom: 1px solid var(--line); }
+  .row:hover { background: var(--surface); }
+  .row:focus-within { background: var(--surface); box-shadow: inset 2px 0 0 var(--accent); }
+  .row.invalid { background: rgba(239,68,68,.07); box-shadow: inset 2px 0 0 var(--red); }
+  .row-num { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 3px; }
+  .row .f-title, .row .f-points { display: block; width: 100%; color: var(--ink); background: transparent; border: 0; border-radius: 0; padding: 1px 0; font: inherit; }
+  .row .f-title { font-size: 15px; font-weight: 600; border-bottom: 1px solid transparent; }
+  .row .f-title:focus { outline: none; border-bottom-color: var(--accent); }
+  .row .f-points { margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--line); font-size: 13.5px; line-height: 1.5; color: var(--muted); resize: none; overflow: hidden; min-height: 1.5em; }
+  .row .f-points:focus { outline: none; color: var(--ink); }
+  .row .f-title::placeholder, .row .f-points::placeholder { color: var(--muted); opacity: .6; }
+  .row-err { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--red); }
+  .min-wrap { display: inline-flex; align-items: baseline; gap: 3px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--surface-2); cursor: text; }
+  .min-wrap:focus-within { box-shadow: 0 0 0 1px var(--accent); }
+  .f-min { width: 2.1em; padding: 0; border: 0; background: transparent; color: var(--ink); font: 600 14px/1.4 system-ui, sans-serif; text-align: right; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield; }
+  .f-min:focus { outline: none; }
+  .f-min::-webkit-inner-spin-button, .f-min::-webkit-outer-spin-button, #dv-min::-webkit-inner-spin-button, #dv-min::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .min-unit { font-size: 12px; color: var(--muted); }
+  .row-btns { display: flex; gap: 2px; opacity: 0; }
+  .row:hover .row-btns, .row:focus-within .row-btns { opacity: 1; }
+  .icon-btn { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); display: grid; place-items: center; font-size: 14px; }
+  .icon-btn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+  .btn-remove:hover:not(:disabled), #dv-delete:hover:not(:disabled) { color: var(--red); }
+  .add-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 6px; border: 0; background: transparent; color: var(--muted); font-weight: 550; text-align: left; border-radius: 8px; }
+  .add-btn::before { content: "+"; color: var(--accent); font-size: 17px; font-weight: 600; line-height: 1; width: 22px; text-align: center; }
+  .add-btn:hover { color: var(--ink); background: var(--surface); }
+
+  /* Detailed View: list on the left, the selected item on the right */
+  #view-detailed { display: grid; grid-template-columns: 250px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; min-height: 340px; }
+  #view-detailed[hidden] { display: none; }
+  #dv-list { border-right: 1px solid var(--line); padding: 6px; display: flex; flex-direction: column; gap: 1px; }
+  .dv-item { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); text-align: left; }
+  .dv-item:hover { background: var(--surface); }
+  .dv-item[aria-current="true"] { background: var(--surface-2); }
+  .dv-item.invalid { box-shadow: inset 2px 0 0 var(--red); }
+  .dv-no, .dv-m { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .dv-ti { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dv-detail { padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .dv-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+  #dv-no-label { font-size: 12.5px; color: var(--muted); }
+  .dv-acts { display: flex; gap: 2px; }
+  .dv-label { font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  #dv-title { width: 100%; font: 650 20px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.01em; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 2px 0 8px; border-radius: 0; }
+  #dv-title:focus { outline: none; border-bottom-color: var(--accent); }
+  .dv-dur { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .stepper button { width: 36px; border: 0; background: transparent; color: var(--muted); font-size: 16px; }
+  .stepper button:hover { background: var(--surface-2); color: var(--ink); }
+  .stepper label { display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 10px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+  #dv-min { width: 3em; border: 0; background: transparent; color: var(--ink); font: 600 15px/1.3 system-ui, sans-serif; text-align: right; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
+  #dv-min:focus { outline: none; }
+  .stepper:focus-within { box-shadow: 0 0 0 1px var(--accent); }
+  .dv-picks { display: flex; gap: 6px; }
+  .dv-pick { min-width: 36px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .dv-pick:hover { color: var(--ink); background: var(--surface); }
+  .dv-pick[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+  #dv-points { display: flex; flex-direction: column; }
+  .dv-point-row { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
+  .dv-point-row::before { content: "–"; color: var(--muted); }
+  .dv-point { flex: 1; min-width: 0; padding: 8px 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; }
+  .dv-point:focus { outline: none; }
+  .dv-point-row:focus-within { border-bottom-color: var(--accent); }
+  .dv-point-remove { opacity: 0; }
+  .dv-point-row:hover .dv-point-remove, .dv-point-row:focus-within .dv-point-remove { opacity: 1; }
+  #dv-add-point { padding: 9px 0; }
+  #dv-err { font-size: 12px; font-weight: 600; color: var(--red); margin: 6px 0 0; }
+
+  /* Theme panel */
+  #theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   /* Each card carries data-theme, so it picks up that theme's variables:
      it's a true mini preview, with its own background, text and accent. */
-  .theme-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 12px; border: 2px solid var(--line); background-color: var(--bg-solid); background-image: var(--bg-image); color: var(--ink); text-align: left; }
-  .theme-card[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
-  .theme-card[aria-checked="true"]::after { content: "✓"; position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--accent); color: var(--accent-ink); }
-  .theme-swatch { height: 70px; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid var(--line); }
-  .theme-swatch i { position: absolute; left: 10px; bottom: 10px; width: 46%; height: 6px; border-radius: 3px; }
-  .theme-swatch b { position: absolute; right: 10px; top: 12px; width: 34px; height: 34px; border-radius: 50%; border: 5px solid; }
-  .theme-swatch s { position: absolute; left: 10px; top: 12px; font: 800 20px/1 system-ui, sans-serif; text-decoration: none; }
-  .theme-name { font-weight: 700; }
-  .theme-desc { font-size: 12px; color: var(--muted); }
-  .ed-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--line); }
+  .theme-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 6px 6px 12px; border-radius: 12px; border: 1px solid var(--line); background-color: var(--bg-solid); background-image: var(--bg-image); color: var(--ink); text-align: left; }
+  .theme-card[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .theme-card[aria-checked="true"]::after { content: "✓"; position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; background: var(--accent); color: var(--accent-ink); }
+  .theme-swatch { height: 86px; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid var(--line); }
+  .theme-swatch i { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 4px; border-radius: 2px; }
+  .theme-swatch b { position: absolute; right: 14px; top: 16px; width: 38px; height: 38px; border-radius: 50%; border: 5px solid; }
+  .theme-swatch s { position: absolute; left: 12px; top: 14px; font: 900 24px/1 system-ui, sans-serif; text-decoration: none; }
+  .theme-name { font-weight: 650; padding: 0 6px; }
+  .theme-desc { font-size: 12.5px; color: var(--muted); padding: 0 6px; margin-top: -4px; }
+
+  /* footer: quiet secondary actions on the left, one primary on the right */
+  .ed-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); }
   .ed-actions .spacer { flex: 1; }
-  #ed-apply { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  .ed-actions button { height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 550; font-size: 13.5px; }
+  .btn-quiet { border: 0; background: transparent; color: var(--muted); }
+  .btn-quiet:hover { color: var(--ink); background: var(--surface); }
+  #ed-save::before { content: "\2193"; margin-right: 6px; }
+  .btn-secondary { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  .btn-secondary:hover { background: var(--surface-2); }
+  #ed-apply { border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 650; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset; display: inline-flex; align-items: center; gap: 8px; }
+  #ed-apply.dim { opacity: .55; }
+  #ed-apply kbd { font: 500 11px/1 system-ui, sans-serif; opacity: .65; }
+  #ed-error { margin: 0; color: var(--red); font-size: 13px; font-weight: 600; }
 
   /* touch: gestures on the stage, prev/next buttons, touch hints, a toast for long-press */
   main { touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -230,7 +317,11 @@
   .hint-touch { display: none; }
   #toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 8px); padding: 8px 16px; border-radius: 999px; background: var(--toast); color: var(--ink); border: 1px solid var(--line); font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (hover: none) {
+    .row-btns, .dv-point-remove { opacity: 1; }
+  }
   @media (pointer: coarse) {
+    #apply-kbd { display: none; }
     .nav-btn { display: grid; }
     .hint-keys { display: none; }
     .hint-touch { display: inline; }
@@ -250,8 +341,18 @@
     .points { font-size: clamp(15px, 2.1vh, 18px); }
     #timer-wrap { flex-direction: row; }
     .controls { flex-direction: column; }
-    .row { grid-template-columns: 26px 70px minmax(0, 1fr); }
-    .row-btns { grid-column: 1 / -1; padding-top: 0; justify-content: flex-end; }
+    #editor { padding: 0; align-items: flex-end; }
+    .ed-panel { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .ed-tabpanel { padding: 16px; }
+    .row { grid-template-columns: 22px minmax(0, 1fr) auto; }
+    .row-btns { grid-column: 2 / -1; justify-content: flex-end; }
+    #view-detailed { grid-template-columns: minmax(0, 1fr); }
+    #dv-list { border-right: 0; border-bottom: 1px solid var(--line); }
+    .ed-actions { padding: 12px 16px 20px; }
+    .ed-actions button { height: 44px; }
+    .ed-actions .spacer { flex-basis: 100%; height: 0; }
+    #ed-cancel { flex: 1; }
+    #ed-apply { flex: 2; justify-content: center; }
   }
 </style>
 </head>
@@ -306,31 +407,80 @@
   <div class="ed-panel">
     <div class="ed-head">
       <h2 id="ed-heading">Settings</h2>
-      <div class="ed-tabs" role="tablist" aria-label="Settings sections">
-        <button id="tab-contents" type="button" role="tab" aria-selected="true" aria-controls="panel-contents">Contents</button>
-        <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme</button>
-      </div>
+      <button id="ed-close" type="button" aria-label="Close settings" title="Close (Esc)">×</button>
     </div>
+    <div id="settings-tabs" class="ed-tabs" role="tablist" aria-label="Settings sections">
+      <button id="tab-contents" type="button" role="tab" aria-selected="true" aria-controls="panel-contents">Contents</button>
+      <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme</button>
+    </div>
+
     <div id="panel-contents" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-contents">
-      <div class="ed-field">
-        <label for="f-deck-title">Deck title</label>
-        <input id="f-deck-title" type="text" autocomplete="off" spellcheck="true" placeholder="Shown top-left and as the page title (optional)">
+      <input id="f-deck-title" type="text" autocomplete="off" spellcheck="true" placeholder="Untitled meeting">
+      <p class="dt-help"><label for="f-deck-title">Deck title</label> · shown top-left and in the browser tab</p>
+
+      <div class="ed-toolbar">
+        <div class="seg" role="tablist" aria-label="Contents view">
+          <button id="vtab-quick" type="button" role="tab" aria-selected="true" aria-controls="view-quick">Quick View</button>
+          <button id="vtab-detailed" type="button" role="tab" aria-selected="false" aria-controls="view-detailed" tabindex="-1">Detailed View</button>
+        </div>
+        <span id="ed-total" aria-live="polite"></span>
       </div>
-      <p class="ed-note">One row per item. Minutes in 0.5 steps; sub-points one per line.</p>
-      <div id="ed-rows"></div>
-      <p id="ed-error" hidden>Every item needs a title and minutes greater than 0. Fix the highlighted rows.</p>
-      <div class="ed-add-row"><button id="ed-add" type="button">+ Add item</button></div>
+
+      <div id="view-quick" class="ed-view" role="tabpanel" aria-labelledby="vtab-quick">
+        <div id="ed-rows"></div>
+        <button id="ed-add" class="add-btn" type="button">Add item</button>
+      </div>
+
+      <div id="view-detailed" class="ed-view" role="tabpanel" aria-labelledby="vtab-detailed" hidden>
+        <div id="dv-list">
+          <div id="dv-items" aria-label="Agenda items"></div>
+          <button id="dv-add" class="add-btn" type="button">Add item</button>
+        </div>
+        <div id="dv-detail">
+          <div class="dv-top">
+            <span id="dv-no-label"></span>
+            <div class="dv-acts">
+              <button id="dv-up" class="icon-btn" type="button" aria-label="Move item up" title="Move up">↑</button>
+              <button id="dv-down" class="icon-btn" type="button" aria-label="Move item down" title="Move down">↓</button>
+              <button id="dv-delete" class="icon-btn" type="button" aria-label="Delete item" title="Delete item">✕</button>
+            </div>
+          </div>
+          <label class="dv-label" for="dv-title">Title</label>
+          <input id="dv-title" type="text" autocomplete="off" placeholder="Untitled item">
+          <span class="dv-label" id="dv-dur-label">Duration</span>
+          <div class="dv-dur" role="group" aria-labelledby="dv-dur-label">
+            <div class="stepper">
+              <button id="dv-minus" type="button" aria-label="One minute less">−</button>
+              <label><input id="dv-min" type="number" step="0.5" min="0.5" aria-label="Minutes"><span class="min-unit">min</span></label>
+              <button id="dv-plus" type="button" aria-label="One minute more">+</button>
+            </div>
+            <div class="dv-picks">
+              <button class="dv-pick" type="button" data-min="5">5</button>
+              <button class="dv-pick" type="button" data-min="10">10</button>
+              <button class="dv-pick" type="button" data-min="15">15</button>
+              <button class="dv-pick" type="button" data-min="30">30</button>
+            </div>
+          </div>
+          <span class="dv-label">Sub-points</span>
+          <div id="dv-points"></div>
+          <button id="dv-add-point" class="add-btn" type="button">Add a sub-point</button>
+          <p id="dv-err" hidden></p>
+        </div>
+      </div>
     </div>
+
     <div id="panel-theme" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-theme" hidden>
-      <p class="ed-note">Pick a theme to preview it. Apply keeps it; Cancel goes back.</p>
+      <p class="ed-note">Click a theme to preview it behind this window. Apply keeps it; Cancel goes back.</p>
       <div id="theme-grid" role="radiogroup" aria-label="Theme"></div>
     </div>
+
     <div class="ed-actions">
-      <button id="ed-reset" type="button">Reset to file defaults</button>
+      <button id="ed-reset" class="btn-quiet" type="button">Reset to defaults</button>
+      <p id="ed-error" role="status" hidden></p>
       <span class="spacer"></span>
-      <button id="ed-cancel" type="button">Cancel</button>
-      <button id="ed-save" type="button">Save HTML</button>
-      <button id="ed-apply" type="button">Apply</button>
+      <button id="ed-save" class="btn-quiet" type="button">Save HTML</button>
+      <button id="ed-cancel" class="btn-secondary" type="button">Cancel</button>
+      <button id="ed-apply" type="button">Apply <kbd id="apply-kbd" aria-hidden="true">Ctrl ↵</kbd></button>
     </div>
   </div>
 </div>
@@ -542,6 +692,7 @@
   document.addEventListener("keydown", function (e) {
     if (editorOpen) {
       if (e.key === "Escape") { e.preventDefault(); closeEditor(); }
+      else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $("#ed-apply").click(); }
       return;   // never change slides or timers while editing
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -618,111 +769,313 @@
   $("#btn-prev").addEventListener("click", function (e) { go(current - 1); e.currentTarget.blur(); });
   $("#btn-next").addEventListener("click", function (e) { go(current + 1); e.currentTarget.blur(); });
 
-  // ---------- editor ----------
+  // ---------- editor (Settings) ----------
+  // One draft, two views. Quick View and Detailed View both read and write `draft`;
+  // switching views re-renders from it, so unsaved edits carry across.
   var showErrors = false;
+  var draft = [];            // [{ minutesRaw, title, pointsRaw }] — strings, as typed
+  var sel = 0;               // selected item in Detailed View
+  var VIEW_KEY = "meetingAgendaView";
+  var view = (function () {
+    try { return localStorage.getItem(VIEW_KEY) === "detailed" ? "detailed" : "quick"; } catch (e) { return "quick"; }
+  })();
+  var draftTheme = DEFAULT_THEME;
 
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function num(v) { var m = Number(String(v).trim()); return String(v).trim() === "" || !isFinite(m) ? NaN : m; }
+  function fmtMin(n) { return String(Math.round(n * 10) / 10); }
+  function rowFromItem(it) { return { minutesRaw: String(it.minutes), title: it.title, pointsRaw: it.points.join("\n") }; }
+  function readRows() { return draft.map(function (r) { return { minutesRaw: r.minutesRaw, title: r.title, pointsRaw: r.pointsRaw }; }); }
   function rowEls() { return Array.prototype.slice.call(document.querySelectorAll("#ed-rows .row")); }
+  function pointsOf(r) { return r.pointsRaw === "" ? [] : r.pointsRaw.split("\n"); }
 
-  function readRows() {
-    return rowEls().map(function (r) {
-      return {
-        minutesRaw: $(".f-min", r).value,
-        title: $(".f-title", r).value,
-        pointsRaw: $(".f-points", r).value
-      };
+  function problems(r) {
+    var out = [], m = num(r.minutesRaw);
+    if (!r.title.trim()) out.push("Add a title");
+    if (!(m > 0)) out.push("Minutes must be more than 0");
+    return out;
+  }
+
+  function updateTotal() {
+    var n = draft.length, sum = 0;
+    draft.forEach(function (r) { var m = num(r.minutesRaw); if (m > 0) sum += m; });
+    $("#ed-total").textContent = n + " item" + (n === 1 ? "" : "s") + " · " + fmtMin(sum) + " min planned";
+  }
+
+  // Marks invalid items in whichever view is showing, and the footer status. Returns validity.
+  function validate() {
+    var bad = 0, items = document.querySelectorAll(".dv-item"), rows = rowEls();
+    draft.forEach(function (r, i) {
+      var p = problems(r), show = showErrors && p.length > 0, msg = p.join(" · ");
+      if (p.length) bad++;
+      if (rows[i]) {
+        rows[i].classList.toggle("invalid", show);
+        var e = $(".row-err", rows[i]); e.textContent = show ? msg : ""; e.hidden = !show;
+      }
+      if (items[i]) items[i].classList.toggle("invalid", show);
+      if (i === sel && view === "detailed") { var de = $("#dv-err"); de.textContent = show ? msg : ""; de.hidden = !show; }
     });
+    var st = $("#ed-error");
+    st.hidden = !(showErrors && bad);
+    st.textContent = bad === 1 ? "1 item needs attention" : bad + " items need attention";
+    $("#ed-apply").classList.toggle("dim", showErrors && bad > 0);
+    return bad === 0;
+  }
+  function changed() { updateTotal(); validate(); }
+
+  function autosize(ta) {
+    ta.style.height = "auto";
+    if (ta.scrollHeight) ta.style.height = ta.scrollHeight + "px";
   }
 
-  function rowFromItem(it) {
-    return { minutesRaw: String(it.minutes), title: it.title, pointsRaw: it.points.join("\n") };
-  }
-
-  function renderRows(rows) {
+  // ----- Quick View -----
+  function renderQuick() {
     var host = $("#ed-rows");
     host.textContent = "";
-    rows.forEach(function (r, i) {
+    draft.forEach(function (r, i) {
       var row = el("div", "row");
-      row.appendChild(el("div", "row-num", String(i + 1).padStart(2, "0")));
+      row.appendChild(el("div", "row-num", pad(i + 1)));
 
-      var mWrap = el("div");
-      var mLab = el("label", null, "Minutes");
-      var m = el("input", "f-min");
-      m.type = "number"; m.step = "0.5"; m.min = "0.5"; m.value = r.minutesRaw; m.id = "f-min-" + i;
-      mLab.htmlFor = m.id;
-      mWrap.appendChild(mLab); mWrap.appendChild(m);
-      row.appendChild(mWrap);
-
-      var tWrap = el("div");
-      var tLab = el("label", null, "Title");
+      var body = el("div", "row-body");
       var t = el("input", "f-title");
-      t.type = "text"; t.value = r.title; t.id = "f-title-" + i;
-      tLab.htmlFor = t.id;
+      t.type = "text"; t.value = r.title; t.placeholder = "Untitled item"; t.autocomplete = "off";
+      t.setAttribute("aria-label", "Title of item " + (i + 1));
+      t.addEventListener("input", function () { r.title = t.value; changed(); });
       var p = el("textarea", "f-points");
-      p.value = r.pointsRaw; p.placeholder = "Sub-points, one per line (optional)";
-      p.setAttribute("aria-label", "Sub-points for item " + (i + 1));
-      tWrap.appendChild(tLab); tWrap.appendChild(t); tWrap.appendChild(p);
-      row.appendChild(tWrap);
+      p.rows = 1; p.value = r.pointsRaw; p.placeholder = "Add sub-points…";
+      p.setAttribute("aria-label", "Sub-points for item " + (i + 1) + ", one per line");
+      p.addEventListener("input", function () { r.pointsRaw = p.value; autosize(p); });
+      var err = el("div", "row-err"); err.hidden = true;
+      body.appendChild(t); body.appendChild(p); body.appendChild(err);
+      row.appendChild(body);
+
+      var mw = el("label", "min-wrap");
+      var m = el("input", "f-min");
+      m.type = "number"; m.step = "0.5"; m.min = "0.5"; m.value = r.minutesRaw;
+      m.setAttribute("aria-label", "Minutes for item " + (i + 1));
+      m.addEventListener("input", function () { r.minutesRaw = m.value; changed(); });
+      mw.appendChild(m); mw.appendChild(el("span", "min-unit", "min"));
+      row.appendChild(mw);
 
       var b = el("div", "row-btns");
-      [["btn-up", "↑", "Move up", i === 0, -1], ["btn-down", "↓", "Move down", i === rows.length - 1, 1]].forEach(function (cfg) {
-        var btn = el("button", cfg[0], cfg[1]);
+      [["btn-up", "↑", "Move up", i === 0, -1], ["btn-down", "↓", "Move down", i === draft.length - 1, 1]].forEach(function (cfg) {
+        var btn = el("button", cfg[0] + " icon-btn", cfg[1]);
         btn.type = "button"; btn.title = cfg[2]; btn.setAttribute("aria-label", cfg[2] + " item " + (i + 1)); btn.disabled = cfg[3];
         btn.addEventListener("click", function () { move(i, cfg[4]); });
         b.appendChild(btn);
       });
-      var rm = el("button", "btn-remove", "✕");
+      var rm = el("button", "btn-remove icon-btn", "✕");
       rm.type = "button"; rm.title = "Remove item"; rm.setAttribute("aria-label", "Remove item " + (i + 1));
-      rm.disabled = rows.length === 1;
+      rm.disabled = draft.length === 1;
       rm.addEventListener("click", function () { remove(i); });
       b.appendChild(rm);
       row.appendChild(b);
 
-      row.addEventListener("input", function () { if (showErrors) validate(); });
       host.appendChild(row);
+      autosize(p);
     });
-    if (showErrors) validate();
+    changed();
   }
 
+  // ----- Detailed View -----
+  function minLabel(r) { var m = num(r.minutesRaw); return m > 0 ? fmtMin(m) + "m" : "–"; }
+
+  function renderDetailedList() {
+    var list = $("#dv-items");
+    list.textContent = "";
+    draft.forEach(function (r, i) {
+      var b = el("button", "dv-item");
+      b.type = "button";
+      if (i === sel) b.setAttribute("aria-current", "true");
+      b.appendChild(el("span", "dv-no", pad(i + 1)));
+      b.appendChild(el("span", "dv-ti", r.title.trim() || "Untitled item"));
+      b.appendChild(el("span", "dv-m", minLabel(r)));
+      b.addEventListener("click", function () { sel = i; renderDetailed(); });
+      list.appendChild(b);
+    });
+  }
+  function refreshListItem() {
+    var it = document.querySelectorAll(".dv-item")[sel], r = draft[sel];
+    if (!it) return;
+    $(".dv-ti", it).textContent = r.title.trim() || "Untitled item";
+    $(".dv-m", it).textContent = minLabel(r);
+  }
+  function refreshPicks() {
+    var m = num(draft[sel].minutesRaw);
+    document.querySelectorAll(".dv-pick").forEach(function (b) {
+      b.setAttribute("aria-pressed", Number(b.getAttribute("data-min")) === m ? "true" : "false");
+    });
+  }
+  function setMinutes(v) {
+    draft[sel].minutesRaw = String(v);
+    $("#dv-min").value = draft[sel].minutesRaw;
+    refreshListItem(); refreshPicks(); changed();
+  }
+  function renderPoints(focusIndex) {
+    var r = draft[sel], pts = pointsOf(r), host = $("#dv-points");
+    host.textContent = "";
+    pts.forEach(function (text, k) {
+      var line = el("div", "dv-point-row");
+      var inp = el("input", "dv-point");
+      inp.type = "text"; inp.value = text; inp.placeholder = "Sub-point";
+      inp.setAttribute("aria-label", "Sub-point " + (k + 1));
+      inp.addEventListener("input", function () { var a = pointsOf(r); a[k] = inp.value; r.pointsRaw = a.join("\n"); });
+      inp.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          var a = pointsOf(r); a.splice(k + 1, 0, ""); r.pointsRaw = a.join("\n"); renderPoints(k + 1);
+        } else if (e.key === "Backspace" && inp.value === "") {
+          e.preventDefault();
+          var b = pointsOf(r); b.splice(k, 1); r.pointsRaw = b.join("\n"); renderPoints(Math.max(0, k - 1));
+        }
+      });
+      var x = el("button", "dv-point-remove icon-btn", "✕");
+      x.type = "button"; x.setAttribute("aria-label", "Remove sub-point " + (k + 1));
+      x.addEventListener("click", function () { var a = pointsOf(r); a.splice(k, 1); r.pointsRaw = a.join("\n"); renderPoints(); });
+      line.appendChild(inp); line.appendChild(x);
+      host.appendChild(line);
+    });
+    if (focusIndex != null) { var all = document.querySelectorAll(".dv-point"); if (all[focusIndex]) all[focusIndex].focus(); }
+  }
+  function renderDetailed() {
+    sel = Math.max(0, Math.min(sel, draft.length - 1));
+    renderDetailedList();
+    var r = draft[sel];
+    $("#dv-no-label").textContent = "Item " + (sel + 1) + " of " + draft.length;
+    $("#dv-title").value = r.title;
+    $("#dv-min").value = r.minutesRaw;
+    $("#dv-up").disabled = sel === 0;
+    $("#dv-down").disabled = sel === draft.length - 1;
+    $("#dv-delete").disabled = draft.length === 1;
+    refreshPicks();
+    renderPoints();
+    changed();
+  }
+  function moveSel(dir) {
+    var j = sel + dir;
+    if (j < 0 || j >= draft.length) return;
+    var tmp = draft[sel]; draft[sel] = draft[j]; draft[j] = tmp; sel = j;
+    renderDetailed();
+  }
+
+  $("#dv-title").addEventListener("input", function () { draft[sel].title = $("#dv-title").value; refreshListItem(); changed(); });
+  $("#dv-min").addEventListener("input", function () { draft[sel].minutesRaw = $("#dv-min").value; refreshListItem(); refreshPicks(); changed(); });
+  $("#dv-plus").addEventListener("click", function () { var m = num(draft[sel].minutesRaw); setMinutes((m > 0 ? m : 0) + 1); });
+  $("#dv-minus").addEventListener("click", function () { var m = num(draft[sel].minutesRaw); setMinutes(Math.max(0.5, (m > 0 ? m : 1) - 1)); });
+  document.querySelectorAll(".dv-pick").forEach(function (b) {
+    b.addEventListener("click", function () { setMinutes(Number(b.getAttribute("data-min"))); });
+  });
+  $("#dv-add-point").addEventListener("click", function () {
+    var r = draft[sel], a = pointsOf(r); a.push(""); r.pointsRaw = a.join("\n"); renderPoints(a.length - 1);
+  });
+  $("#dv-add").addEventListener("click", function () {
+    draft.push({ minutesRaw: "5", title: "", pointsRaw: "" });
+    sel = draft.length - 1; renderDetailed(); $("#dv-title").focus();
+  });
+  $("#dv-up").addEventListener("click", function () { moveSel(-1); });
+  $("#dv-down").addEventListener("click", function () { moveSel(1); });
+  $("#dv-delete").addEventListener("click", function () {
+    if (draft.length <= 1) return;           // never remove the last item
+    draft.splice(sel, 1); renderDetailed();
+  });
+
+  // ----- shared editor actions -----
   function move(i, dir) {
-    var rows = readRows(), j = i + dir;
-    if (j < 0 || j >= rows.length) return;
-    var tmp = rows[i]; rows[i] = rows[j]; rows[j] = tmp;
-    renderRows(rows);
+    var j = i + dir;
+    if (j < 0 || j >= draft.length) return;
+    var tmp = draft[i]; draft[i] = draft[j]; draft[j] = tmp;
+    renderQuick();
     var btn = $(dir < 0 ? ".btn-up" : ".btn-down", rowEls()[j]);
     if (btn && !btn.disabled) btn.focus();
   }
   function remove(i) {
-    var rows = readRows();
-    if (rows.length <= 1) return;           // never remove the last row
-    rows.splice(i, 1);
-    renderRows(rows);
-  }
-
-  function validate() {
-    var ok = true;
-    rowEls().forEach(function (r) {
-      var mv = $(".f-min", r).value.trim();
-      var m = Number(mv);
-      var bad = mv === "" || !isFinite(m) || !(m > 0) || !$(".f-title", r).value.trim();
-      r.classList.toggle("invalid", bad);
-      if (bad) ok = false;
-    });
-    $("#ed-error").hidden = ok;
-    return ok;
+    if (draft.length <= 1) return;           // never remove the last row
+    draft.splice(i, 1);
+    renderQuick();
   }
 
   function collect() {
     return {
       title: $("#f-deck-title").value.trim(),
       theme: draftTheme,
-      items: readRows().map(function (r) {
+      items: draft.map(function (r) {
         return {
-          minutes: Number(r.minutesRaw),
+          minutes: num(r.minutesRaw),
           title: r.title.trim(),
           points: r.pointsRaw.split("\n").map(function (s) { return s.trim(); }).filter(Boolean)
         };
       })
     };
+  }
+
+  // Tabs (ARIA tablist): click or arrow keys / Home / End.
+  function wireTabs(names, tabId, select) {
+    names.forEach(function (t, i) {
+      var tab = $("#" + tabId(t));
+      tab.addEventListener("click", function () { select(t, false); });
+      tab.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (e.key === "Home") d = -i; else if (e.key === "End") d = names.length - 1 - i;
+        if (!d) return;
+        e.preventDefault();
+        select(names[(i + d + names.length) % names.length], true);
+      });
+    });
+  }
+  function setTabs(names, tabId, panelId, name) {
+    names.forEach(function (t) {
+      var tab = $("#" + tabId(t)), on = t === name;
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+      $("#" + panelId(t)).hidden = !on;
+    });
+  }
+
+  var TABS = ["contents", "theme"];
+  function selectTab(name, focus) {
+    setTabs(TABS, function (t) { return "tab-" + t; }, function (t) { return "panel-" + t; }, name);
+    if (focus) $("#tab-" + name).focus();
+  }
+  wireTabs(TABS, function (t) { return "tab-" + t; }, selectTab);
+
+  var VIEWS = ["quick", "detailed"];
+  function selectView(name, focus) {
+    view = name;
+    try { localStorage.setItem(VIEW_KEY, name); } catch (e) {}
+    setTabs(VIEWS, function (v) { return "vtab-" + v; }, function (v) { return "view-" + v; }, name);
+    if (name === "quick") { $("#dv-items").textContent = ""; renderQuick(); }
+    else { $("#ed-rows").textContent = ""; renderDetailed(); }
+    if (focus) $("#vtab-" + name).focus();
+  }
+  wireTabs(VIEWS, function (v) { return "vtab-" + v; }, selectView);
+
+  function renderThemes() {
+    var grid = $("#theme-grid");
+    grid.textContent = "";
+    THEMES.forEach(function (th) {
+      var card = el("button", "theme-card");
+      card.type = "button";
+      card.setAttribute("role", "radio");
+      card.setAttribute("data-theme", th.id);
+      card.setAttribute("aria-checked", th.id === draftTheme ? "true" : "false");
+      var sw = el("span", "theme-swatch");
+      sw.style.background = th.sw[0];
+      var numEl = el("s", null, "01"); numEl.style.color = th.sw[2];
+      var ring = el("b"); ring.style.borderColor = th.sw[1];
+      var bar = el("i"); bar.style.background = "linear-gradient(90deg," + th.sw[2] + "," + th.sw[1] + ")";
+      sw.appendChild(numEl); sw.appendChild(ring); sw.appendChild(bar);
+      card.appendChild(sw);
+      card.appendChild(el("span", "theme-name", th.name));
+      card.appendChild(el("span", "theme-desc", th.desc));
+      card.addEventListener("click", function () {
+        draftTheme = th.id;
+        setTheme(th.id);               // live preview behind the dialog
+        renderThemes();
+        var again = document.querySelector('.theme-card[data-theme="' + th.id + '"]');
+        if (again) again.focus();
+      });
+      grid.appendChild(card);
+    });
   }
 
   function openEditor() {
@@ -731,14 +1084,15 @@
     resumeAfterEditor = runningSince != null;
     stop(); render();
     showErrors = false;
-    $("#ed-error").hidden = true;
+    $("#editor").hidden = false;     // visible first, so text areas can measure themselves
     $("#f-deck-title").value = agenda.title;
-    renderRows(agenda.items.map(rowFromItem));
+    draft = agenda.items.map(rowFromItem);
+    sel = 0;
     draftTheme = agenda.theme;
     renderThemes();
     selectTab("contents", false);
-    $("#editor").hidden = false;
-    var first = $("#ed-rows .f-title");
+    selectView(view, false);
+    var first = view === "quick" ? $("#ed-rows .f-title") : $("#dv-title");
     if (first) first.focus();
   }
 
@@ -763,72 +1117,29 @@
     render();
   }
 
-  // ---------- settings tabs and theme picker ----------
-  var draftTheme = DEFAULT_THEME;
-  var TABS = ["contents", "theme"];
-
-  function selectTab(name, focus) {
-    TABS.forEach(function (t) {
-      var tab = $("#tab-" + t), on = t === name;
-      tab.setAttribute("aria-selected", on ? "true" : "false");
-      tab.tabIndex = on ? 0 : -1;
-      $("#panel-" + t).hidden = !on;
-    });
-    if (focus) $("#tab-" + name).focus();
+  function checkOrShow() {
+    showErrors = true;
+    if (validate()) return true;
+    selectTab("contents", false);
+    validate();
+    return false;
   }
-  TABS.forEach(function (t, i) {
-    var tab = $("#tab-" + t);
-    tab.addEventListener("click", function () { selectTab(t, false); });
-    tab.addEventListener("keydown", function (e) {
-      var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (e.key === "Home") d = -i; else if (e.key === "End") d = TABS.length - 1 - i;
-      if (!d) return;
-      e.preventDefault();
-      selectTab(TABS[(i + d + TABS.length) % TABS.length], true);
-    });
-  });
 
-  function renderThemes() {
-    var grid = $("#theme-grid");
-    grid.textContent = "";
-    THEMES.forEach(function (th) {
-      var card = el("button", "theme-card");
-      card.type = "button";
-      card.setAttribute("role", "radio");
-      card.setAttribute("data-theme", th.id);
-      card.setAttribute("aria-checked", th.id === draftTheme ? "true" : "false");
-      var sw = el("span", "theme-swatch");
-      sw.style.background = th.sw[0];
-      var num = el("s", null, "01"); num.style.color = th.sw[2];
-      var ring = el("b"); ring.style.borderColor = th.sw[1];
-      var bar = el("i"); bar.style.background = "linear-gradient(90deg," + th.sw[2] + "," + th.sw[1] + ")";
-      sw.appendChild(num); sw.appendChild(ring); sw.appendChild(bar);
-      card.appendChild(sw);
-      card.appendChild(el("span", "theme-name", th.name));
-      card.appendChild(el("span", "theme-desc", th.desc));
-      card.addEventListener("click", function () {
-        draftTheme = th.id;
-        setTheme(th.id);               // live preview behind the dialog
-        renderThemes();
-        var again = document.querySelector('.theme-card[data-theme="' + th.id + '"]');
-        if (again) again.focus();
-      });
-      grid.appendChild(card);
-    });
-  }
+  try {   // show the platform's shortcut on the Apply button
+    if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $("#apply-kbd").textContent = "⌘↵";
+  } catch (e) {}
 
   $("#btn-edit").addEventListener("click", openEditor);
   $("#ed-cancel").addEventListener("click", closeEditor);
+  $("#ed-close").addEventListener("click", closeEditor);
   $("#ed-add").addEventListener("click", function () {
-    var rows = readRows();
-    rows.push({ minutesRaw: "5", title: "", pointsRaw: "" });
-    renderRows(rows);
+    draft.push({ minutesRaw: "5", title: "", pointsRaw: "" });
+    renderQuick();
     var titles = document.querySelectorAll("#ed-rows .f-title");
     titles[titles.length - 1].focus();
   });
   $("#ed-apply").addEventListener("click", function () {
-    showErrors = true;
-    if (!validate()) { selectTab("contents", false); return; }
+    if (!checkOrShow()) return;
     applyAgenda(collect(), true);
   });
   $("#ed-reset").addEventListener("click", function () {
@@ -836,8 +1147,7 @@
     applyAgenda(clone(FILE_DEFAULTS), false);
   });
   $("#ed-save").addEventListener("click", function () {
-    showErrors = true;
-    if (!validate()) { selectTab("contents", false); return; }
+    if (!checkOrShow()) return;
     var copy = PRISTINE.cloneNode(true);
     // Escape every "<" so a title containing a closing script tag cannot end the data block early.
     copy.querySelector("#agenda-data").textContent =
