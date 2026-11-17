@@ -21,8 +21,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
   9. Explicit-only invocation.
   10. A Settings redesign (Quick View and Detailed View, from mockups the user approved).
   11. The "Agenda item" line held at one height across slides.
-- The red/green summary for the PR description is in `PLAN.md` (PROD-1). It isn't in the PR description yet; add it only if the user asks.
+- Filed issues for the PR with `/create-issues-update-pr`: parent #273 (Feature) with sub-issues #274–#284, one per step of the work (Feature/Task/Bug). The PR description was corrected (it said the ring turns amber at 80% remaining; it's the last 20%) and now lists them with `Closes`, plus the red/green summary.
 
 ## Known issues / open threads
 - **Screenshots churn:** running the tests rewrites the four to six tracked screenshots in `meta/screenshots/` with tiny pixel differences. Restore them (`git checkout -- skills/productivity/meeting-agenda/meta/screenshots`) unless the UI really changed. The user was offered a fix (save screenshots only when asked) and hasn't answered.
-- **PR description:** the red/green summary and the usual `- Closes #N -- title` issue list are not in the PR yet. Do it only if asked.
