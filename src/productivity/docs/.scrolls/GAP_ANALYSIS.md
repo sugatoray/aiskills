@@ -7,5 +7,6 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - Detailed View has no drag-and-drop for items or sub-points (↑ ↓ buttons and Enter/Backspace only).
 - Minutes accept any value above 0. The 0.5 step is a UI hint, not a validation rule.
 - The tests regenerate tracked screenshots on every run (see HANDOFF).
+- The studio themes' art direction needs a 2023+ browser (CSS nesting); older browsers get their colours only.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.
