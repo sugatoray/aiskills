@@ -35,8 +35,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `/meeting-agenda --demo` (`build_deck.py --demo`) returns the bundled
   demo deck byte for byte.
 - Settings (gear) with two tabs: **Contents** (the agenda editor) and
-  **Theme**. There are ten themes: five studio themes (Aurora, the default;
-  Observatory; Abyss; Editorial; Signal) and the five classics (Indigo,
+  **Theme**. There are twelve themes: seven studio themes (Aurora, the default;
+  Observatory; Abyss; Editorial; Signal; Clarity; Clarity Dark) and the five classics (Indigo,
   Midnight, Ocean, Daylight and High contrast). Clicking a theme previews it live;
   Apply keeps it, and Save HTML carries it. `build_deck.py --theme` and
   the agenda's `"theme"` field set it.
@@ -46,6 +46,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (ivory paper, serif italics, terracotta) and Signal (black, white, yellow;
   no texture, glow or blur). The motion respects `prefers-reduced-motion`.
   Theme cards now draw their preview from the theme's own tokens.
+- Clarity and Clarity Dark, after Apple's design principles (clarity,
+  deference, depth): quiet backgrounds, sentence-case labels, the timer on a
+  raised card, a filled blue Pause button, SF Pro Rounded timer digits where
+  installed, and no texture or glow.
 - `Space` pauses and resumes the timer (like `P`, and like a video
   player); it no longer changes slides, and `Shift+Space` does nothing.
 - Touch support: swipe, tap zones (right 70% forward, left 30% back),

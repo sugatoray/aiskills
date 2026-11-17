@@ -105,6 +105,47 @@
     --glass: #000000; --glass-line: #ffffff;
   }
 
+  /* Clarity and Clarity Dark: Apple's design principles (clarity, deference,
+     depth). Text uses San Francisco where installed, the timer SF Pro Rounded. */
+  [data-theme="clarity"] {
+    --bg-solid: #f5f5f7;
+    --bg-image: linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 60%, #efeff4 100%);
+    --ink: #1d1d1f; --muted: #6e6e73; --accent: #0066cc; --accent-ink: #ffffff;
+    --num-1: #86868b; --num-2: #86868b; --num-glow: transparent;
+    --ring-1: #0a84ff; --ring-2: #5e5ce6; --ring-glow: transparent;
+    --bar-1: #0a84ff; --bar-2: #5e5ce6; --dot-fill: #0071e3;
+    --dot-current: rgba(0,0,0,.18); --dot-glow: transparent;
+    --surface: rgba(0,0,0,.04); --surface-2: rgba(0,0,0,.07); --line: rgba(0,0,0,.1);
+    --track: #e8e8ed; --tick: #ffffff; --input: #ffffff;
+    --panel: rgba(255,255,255,.9); --overlay: rgba(0,0,0,.18); --title-shadow: transparent; --toast: rgba(255,255,255,.92);
+    --f-title: -apple-system, "SF Pro Display", "Inter Display", "Inter", system-ui, sans-serif; --f-num: var(--f-title);
+    --f-time: ui-rounded, "SF Pro Rounded", -apple-system, "Inter Display", system-ui, sans-serif;
+    --f-meta: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    --num-style: normal; --num-weight: 600; --title-weight: 700; --ring-w: 12; --bezel: transparent;
+    --glass: rgba(255,255,255,.72); --glass-line: rgba(0,0,0,.06);
+    --card: #ffffff; --card-shadow: 0 1px 1px rgba(0,0,0,.03), 0 12px 40px -12px rgba(0,0,0,.14);
+    --btn-primary: #0071e3; --btn-secondary: rgba(0,0,0,.05); --kbd: #ffffff; --bullet: #c7c7cc;
+  }
+  [data-theme="clarity-dark"] {
+    --bg-solid: #000000;
+    --bg-image: radial-gradient(80% 60% at 50% -20%, #1c1c1e 0%, transparent 70%);
+    --ink: #f5f5f7; --muted: #98989d; --accent: #0a84ff; --accent-ink: #ffffff;
+    --num-1: #8e8e93; --num-2: #8e8e93; --num-glow: transparent;
+    --ring-1: #0a84ff; --ring-2: #5e5ce6; --ring-glow: transparent;
+    --bar-1: #0a84ff; --bar-2: #5e5ce6; --dot-fill: #0a84ff;
+    --dot-current: rgba(255,255,255,.22); --dot-glow: transparent;
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.1); --line: rgba(255,255,255,.12);
+    --track: #2c2c2e; --tick: #1c1c1e; --input: #1c1c1e;
+    --panel: rgba(28,28,30,.92); --overlay: rgba(0,0,0,.5); --title-shadow: transparent; --toast: rgba(44,44,46,.94);
+    --f-title: -apple-system, "SF Pro Display", "Inter Display", "Inter", system-ui, sans-serif; --f-num: var(--f-title);
+    --f-time: ui-rounded, "SF Pro Rounded", -apple-system, "Inter Display", system-ui, sans-serif;
+    --f-meta: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    --num-style: normal; --num-weight: 600; --title-weight: 700; --ring-w: 12; --bezel: transparent;
+    --glass: rgba(28,28,30,.72); --glass-line: rgba(255,255,255,.08);
+    --card: #1c1c1e; --card-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 12px 40px -12px rgba(0,0,0,.8);
+    --btn-primary: #0a84ff; --btn-secondary: rgba(255,255,255,.1); --kbd: #2c2c2e; --bullet: #48484a;
+  }
+
   /* Classic themes: the original five, unchanged. They share the system font and
      the original numeral and ring. */
   [data-theme="indigo"], [data-theme="midnight"], [data-theme="ocean"], [data-theme="daylight"], [data-theme="contrast"] {
@@ -462,7 +503,7 @@
   /* ---------- studio themes: art direction ----------
      Only the five studio themes get these rules; the classic five never match
      this selector, so they look exactly as before. */
-  :root:is([data-theme="aurora"], [data-theme="observatory"], [data-theme="abyss"], [data-theme="editorial"], [data-theme="signal"]) {
+  :root:is([data-theme="aurora"], [data-theme="observatory"], [data-theme="abyss"], [data-theme="editorial"], [data-theme="signal"], [data-theme="clarity"], [data-theme="clarity-dark"]) {
     body { font-family: var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
     header, main, footer { position: relative; z-index: 2; }
     body::before, body::after { content: ""; position: fixed; pointer-events: none; z-index: 0; }
@@ -612,6 +653,37 @@
     #hints, #meeting-text { color: #ffffff; }
     .dot { height: 6px; border-radius: 0; }
     #meeting-bar { height: 8px; border-radius: 0; }
+  }
+
+  /* Clarity and Clarity Dark: content first on a quiet background, sentence-case
+     labels, no texture or glow, and the timer on a raised card like a widget. */
+  :root:is([data-theme="clarity"], [data-theme="clarity-dark"]) {
+    body::after { display: none; }
+    #meeting-title { font: 600 15px/1.2 var(--f-meta); letter-spacing: -.01em; text-transform: none; color: var(--ink); }
+    .eyebrow { color: var(--accent); text-transform: none; letter-spacing: -.005em; font-weight: 600; font-size: clamp(14px, 2.1vh, 19px); }
+    .num { background: none; -webkit-text-fill-color: var(--num-1); font-size: clamp(64px, 15vh, 160px); letter-spacing: -.04em; line-height: .9; }
+    .title { letter-spacing: -.03em; line-height: 1.05; max-width: 18ch; }
+    .points { font-weight: 400; }
+    .points li::before { width: 6px; height: 6px; border-radius: 50%; background: var(--bullet); transform: translateY(-.25em); }
+    #timer-wrap { align-self: center; gap: 18px; padding: clamp(20px, 3.4vh, 36px) clamp(20px, 3vw, 40px) clamp(18px, 3vh, 30px); border-radius: 32px; background: var(--card); box-shadow: var(--card-shadow); }
+    #timer-text { font-weight: 600; letter-spacing: -.02em; }
+    #timer-sub { color: var(--muted); letter-spacing: 0; font-size: clamp(12px, 1.7vh, 15px); }
+    #timer svg { filter: none; }
+    .controls { gap: 8px; padding: 0; border: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .controls button { border-radius: 980px; padding: 9px 18px; font: 500 14px/1 var(--f-meta); }
+    #btn-pause { background: var(--btn-primary); color: #ffffff; }
+    #btn-reset { background: var(--btn-secondary); color: var(--ink); }
+    .controls button:hover { filter: brightness(1.08); }
+    footer { background: var(--glass); border: 1px solid var(--glass-line); border-radius: 18px; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 8px 30px -12px rgba(0,0,0,.12); }
+    #hints kbd { background: var(--kbd); border: 0; box-shadow: 0 0 0 .5px var(--line), 0 1px 1px rgba(0,0,0,.08); color: var(--ink); }
+    .dot { width: 6px; height: 6px; border-radius: 3px; }
+    .dot[aria-current="step"] { width: 28px; }
+    #meeting-bar { height: 6px; border-radius: 3px; }
+    @media (max-width: 720px) {
+      #timer-wrap { padding: 14px 16px; border-radius: 24px; }
+      .num { font-size: clamp(44px, 8vh, 72px); }
+      footer { margin: 0; border-radius: 0; border-width: 1px 0 0; }
+    }
   }
 </style>
 </head>
@@ -775,6 +847,8 @@
     { id: "abyss",       name: "Abyss",         desc: "Light shafts through deep water, a bioluminescent ring." },
     { id: "editorial",   name: "Editorial",     desc: "Ivory paper, serif italics, terracotta ink. For bright rooms." },
     { id: "signal",      name: "Signal",        desc: "Black, white, signal yellow. No glow, no blur." },
+    { id: "clarity",     name: "Clarity",       desc: "Light and calm. Content first, the timer on a raised card." },
+    { id: "clarity-dark", name: "Clarity Dark", desc: "The same, in true black with charcoal cards." },
     { id: "indigo",      name: "Indigo",        desc: "Classic. Violet and cyan on indigo." },
     { id: "midnight",    name: "Midnight",      desc: "Classic. Teal on navy and plum." },
     { id: "ocean",       name: "Ocean",         desc: "Classic. Aqua and coral on deep teal-blue." },

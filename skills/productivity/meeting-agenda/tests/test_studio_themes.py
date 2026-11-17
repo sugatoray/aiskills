@@ -6,7 +6,7 @@ from playwright.sync_api import expect
 
 from conftest import URL, tick
 
-NEW = ["aurora", "observatory", "abyss", "editorial", "signal"]
+NEW = ["aurora", "observatory", "abyss", "editorial", "signal", "clarity", "clarity-dark"]
 CLASSIC = ["indigo", "midnight", "ocean", "daylight", "contrast"]
 
 
@@ -29,7 +29,7 @@ def test_new_themes_come_first_then_the_classics(deck):
     ids = [c.get_attribute("data-theme") for c in deck.locator(".theme-card").all()]
     assert ids == NEW + CLASSIC
     expect(deck.locator(".theme-card .theme-name")).to_have_text(
-        ["Aurora", "Observatory", "Abyss", "Editorial", "Signal",
+        ["Aurora", "Observatory", "Abyss", "Editorial", "Signal", "Clarity", "Clarity Dark",
          "Indigo", "Midnight", "Ocean", "Daylight", "High contrast"])
     expect(deck.locator('.theme-card[data-theme="aurora"] .theme-desc')).to_contain_text("The default")
     expect(deck.locator('.theme-card[data-theme="indigo"] .theme-desc')).not_to_contain_text("The default")

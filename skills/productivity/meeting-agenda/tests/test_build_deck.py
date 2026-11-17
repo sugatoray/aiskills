@@ -133,7 +133,7 @@ def test_rejects_unknown_theme(tmp_path):
     src = tmp_path / "a.json"
     src.write_text(json.dumps(AGENDA))
     r = run(src, "-o", tmp_path / "d.html", "--theme", "neon")
-    assert r.returncode == 2 and "theme must be one of: aurora, observatory, abyss, editorial, signal, indigo, midnight, ocean, daylight, contrast" in r.stderr
+    assert r.returncode == 2 and "theme must be one of: aurora, observatory, abyss, editorial, signal, clarity, clarity-dark, indigo, midnight, ocean, daylight, contrast" in r.stderr
 
 
 def test_script_themes_match_the_page(deck):

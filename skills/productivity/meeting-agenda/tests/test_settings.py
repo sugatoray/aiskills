@@ -7,8 +7,8 @@ from playwright.sync_api import expect
 
 from conftest import STORAGE_KEY, store_agenda
 
-THEMES = ["aurora", "observatory", "abyss", "editorial", "signal", "indigo", "midnight", "ocean", "daylight", "contrast"]
-NAMES = ["Aurora", "Observatory", "Abyss", "Editorial", "Signal", "Indigo", "Midnight", "Ocean", "Daylight", "High contrast"]
+THEMES = ["aurora", "observatory", "abyss", "editorial", "signal", "clarity", "clarity-dark", "indigo", "midnight", "ocean", "daylight", "contrast"]
+NAMES = ["Aurora", "Observatory", "Abyss", "Editorial", "Signal", "Clarity", "Clarity Dark", "Indigo", "Midnight", "Ocean", "Daylight", "High contrast"]
 
 
 def open_settings(page):
@@ -177,7 +177,7 @@ def test_warning_colours_stay_the_same_in_every_theme(deck, theme):
     assert stroke.replace(" ", "") == "rgb(239,68,68)", (theme, stroke)
 
 
-@pytest.mark.parametrize("preview", ["aurora", "editorial", "signal", "indigo", "daylight", "contrast"])
+@pytest.mark.parametrize("preview", ["aurora", "editorial", "signal", "clarity", "clarity-dark", "indigo", "daylight", "contrast"])
 def test_theme_cards_are_readable_whatever_theme_is_previewed(deck, preview):
     """Each card is a mini preview in its own theme, so its text must read
     against its own background, not the dialog's."""

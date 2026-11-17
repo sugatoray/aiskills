@@ -11,7 +11,7 @@ You give it an agenda (pasted text, notes, a document, or JSON) and get back one
 - **Controls:** `←`/`→` and `PgUp`/`PgDn` change slides, `Home`/`End` go to the first/last, `Space` or `P` pauses (like a video player), and `R` resets. On phones: swipe, tap the right or left side, hold to pause, and `‹ ›` buttons.
 - **Settings (gear):**
   - **Contents:** the deck title, a running total, and two views of one draft: **Quick View** (an inline list) and **Detailed View** (a list plus a detail pane with a −/+ minutes control and quick picks).
-  - **Theme:** ten themes, previewed live: five studio themes (Aurora, the default; Observatory; Abyss; Editorial; Signal), then the five classics (Indigo, Midnight, Ocean, Daylight, High contrast).
+  - **Theme:** twelve themes, previewed live: seven studio themes (Aurora, the default; Observatory; Abyss; Editorial; Signal; Clarity; Clarity Dark), then the five classics (Indigo, Midnight, Ocean, Daylight, High contrast).
   - **Buttons:** Apply (or Ctrl/⌘+Enter) remembers the agenda in the browser, Save HTML downloads a copy with the agenda and theme built in, and Reset restores the file's defaults.
 
 <!--

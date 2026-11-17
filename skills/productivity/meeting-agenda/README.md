@@ -23,7 +23,7 @@ Or, in Claude Code, run `/plugin marketplace add sugatoray/aiskills`, then `/plu
 4 min   Decisions, owners & next steps
 ```
 
-The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), `--theme` (`aurora`, `observatory`, `abyss`, `editorial`, `signal`, or the classics `indigo`, `midnight`, `ocean`, `daylight`, `contrast`), and `--output` (path).
+The agent turns this into agenda JSON, builds the deck with `scripts/build_deck.py`, and hands you `meeting-agenda.html`, along with a table of items and the planned total. Options: `--title`, `--total` (the target length, used to fill in missing item times), `--theme` (`aurora`, `observatory`, `abyss`, `editorial`, `signal`, `clarity`, `clarity-dark`, or the classics `indigo`, `midnight`, `ocean`, `daylight`, `contrast`), and `--output` (path).
 
 `/meeting-agenda --demo` returns the bundled 30-minute demo deck exactly as it ships.
 
@@ -86,7 +86,7 @@ The gear opens **Settings**, which has two tabs. Switch between them by clicking
 
 In both views the last item can't be removed. A problem item gets a red edge and a short message ("Add a title", "Minutes must be more than 0"), and the footer shows how many items need attention.
 
-**Theme** shows the ten themes as cards, each a small preview of that theme. Clicking a card previews the theme on the deck behind the dialog. The chosen card has a ✓.
+**Theme** shows the twelve themes as cards, each a small preview of that theme. Clicking a card previews the theme on the deck behind the dialog. The chosen card has a ✓.
 
 | Theme | Look | Best for |
 |---|---|---|
@@ -95,13 +95,15 @@ In both views the last item can't be removed. A problem item gets a red edge and
 | **Abyss** | Deep teal with slow light shafts, a glowing ring, ultralight numerals | A calm, cinematic look |
 | **Editorial** | Ivory paper, serif italics, terracotta ink, ruled header and footer, a print-style dial | Bright rooms and projectors |
 | **Signal** | Black, white and signal yellow, heavy type, a thick ring; no texture, glow or blur | Accessibility, very poor projectors |
+| **Clarity** | Apple's design principles: a quiet light background, sentence-case labels, the timer on a raised white card, a filled blue Pause button | Bright rooms, a calm and familiar look |
+| **Clarity Dark** | The same in true black, with charcoal cards | Dark rooms, OLED screens |
 | **Indigo** (classic) | Violet and cyan on indigo | General use |
 | **Midnight** | Teal on navy and plum | Dark rooms, a calmer look |
 | **Ocean** | Aqua and coral on deep teal-blue | A cooler alternative |
 | **Daylight** | Light background, dark text | Bright rooms and washed-out projectors |
 | **High contrast** | Black and white, cyan accents, no gradients | Accessibility and very poor projectors |
 
-The classic five look exactly as before. Fonts come from the viewer's own computer (nothing is downloaded): Inter or the system UI font, Iowan Old Style or Charter for Editorial, SF Mono or another monospace for Observatory. The motion in Aurora and Abyss is very slow, and stops for anyone who has asked their system to reduce motion.
+The classic five look exactly as before. Fonts come from the viewer's own computer (nothing is downloaded): Inter or the system UI font, Iowan Old Style or Charter for Editorial, San Francisco and SF Pro Rounded for Clarity, SF Mono or another monospace for Observatory. The motion in Aurora and Abyss is very slow, and stops for anyone who has asked their system to reduce motion.
 
 Every theme keeps the main text at WCAG AAA contrast (7:1) and the small text at AA (4.5:1). The amber and red time warnings look the same in every theme.
 

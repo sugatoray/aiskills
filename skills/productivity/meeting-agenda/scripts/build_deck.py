@@ -27,7 +27,7 @@ import sys
 
 TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / "assets" / "meeting-agenda.html"
 # Must match the THEMES list in assets/meeting-agenda.html (a test checks this).
-THEMES = ("aurora", "observatory", "abyss", "editorial", "signal",
+THEMES = ("aurora", "observatory", "abyss", "editorial", "signal", "clarity", "clarity-dark",
           "indigo", "midnight", "ocean", "daylight", "contrast")
 BLOCK = re.compile(r'(<script type="application/json" id="agenda-data">)(.*?)(</script>)', re.S)
 
