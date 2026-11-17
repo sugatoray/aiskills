@@ -26,7 +26,7 @@ You're picking up work on **aiskills**, a collection of curated AI agent skills.
 
 - **`skills/<group>/<skill>/`** holds the skills themselves: a `SKILL.md` and optional `scripts/`, `assets/`, `tests/` and `meta/`. The groups are development, diagrams, docs, image-styles, newsletters, personas, scrolls, stata and video-related.
 - **`.claude-plugin/marketplace.json`** registers the skills as Claude Code plugins.
-- **`src/`** holds per-family working memory, with its own scrolls under `src/scrolls/`, `src/development/review/` and `src/packages/aiskills/`. The npm package `@sugatoray-ai/aiskills` lives in `src/packages/aiskills`; its release steps are in `src/packages/aiskills/docs/meta/MAINTAINERS.md`.
+- **`src/`** holds per-family working memory, with its own scrolls under `src/scrolls/`, `src/development/review/`, `src/productivity/` and `src/packages/aiskills/`. The npm package `@sugatoray-ai/aiskills` lives in `src/packages/aiskills`; its release steps are in `src/packages/aiskills/docs/meta/MAINTAINERS.md`.
 - **`scripts/`** and the root **`Makefile`** hold repository maintenance. Run `make help` for the targets, for example `make link-skills SKILL=<path>`, which symlinks skills into `.agents/skills/` and `.claude/skills/`.
 - **`.github/workflows/`** holds CI.
 
