@@ -2,13 +2,13 @@
 name: flight-status
 description: "One-shot or repeating flight status reports: journey percentage by distance, miles covered/to-go, live route map, and a timestamped announcement, delivered as a composite report card. Use whenever the user runs /flight-status, asks for a flight's status, or wants recurring flight tracking with visual progress."
 license: MIT
-compatibility: "Python 3.9+ (stdlib only, no dependencies); FlightAware connector CLI (/opt/hatch/bin/flightaware)"
+compatibility: "Python 3.9+ (stdlib only, no dependencies); FlightAware connector CLI (`flightaware` on PATH, or set FLIGHTAWARE_CLI)"
 disable-model-invocation: true
 metadata:
   name: flight-status
   type: skill
   author: sugatoray
-  version: "0.9.8"
+  version: "0.9.9"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/travel/flight-status"
 ---
 
@@ -20,10 +20,11 @@ dashboard fused with the full-width route map).
 
 ## Signature
 
-Run the bundled CLI:
+Run the bundled CLI from this skill's folder (wherever your agent installed
+it):
 
 ```sh
-~/workspace/custom-skills/flight-status/bin/flight-status \
+bin/flight-status \
   -f LX009 \
   [-r 30mins] \
   [-s "2026-10-15 22:12:07"] \
@@ -48,6 +49,10 @@ Run the bundled CLI:
 | `--map-keep-name` | no | Kept map filename. Default: `<flight-lower>-map.png`. |
 
 ## What the CLI does
+
+It calls the FlightAware connector CLI: `$FLIGHTAWARE_CLI` if set, else
+`flightaware` on `PATH`.
+
 
 1. Resolves the flight via `flightaware canonical-flight`, then reads the
    dated leg (`flightaware flight IDENT --date <date>`) and the live
@@ -147,7 +152,7 @@ When `--repeat` is given (e.g. `--repeat=30mins`):
 Red/Green TDD with stdlib unittest, no network (FlightAware is mocked):
 
 ```sh
-cd ~/workspace/custom-skills/flight-status && python3 -m unittest discover -s tests
+python3 -m unittest discover -s tests   # from this skill's folder
 ```
 
 Covers arg parsing and defaults, repeat parsing, haversine math, the

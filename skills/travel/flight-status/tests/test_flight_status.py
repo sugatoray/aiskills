@@ -28,7 +28,7 @@ def load_cli():
     return mod
 
 
-# --- Realistic fixtures (shape matches /opt/hatch/bin/flightaware output) ---
+# --- Realistic fixtures (shape matches the `flightaware` CLI's output) ---
 
 CANONICAL_JSON = {
     "body": {"idents": [{"ident": "SWR009", "ident_type": "designator"}]},
@@ -78,6 +78,51 @@ POSITION_JSON = {
     "ok": True,
 }
 
+
+class FlightAwareCliPathTests(unittest.TestCase):
+    """The FlightAware CLI is found per machine, not at a fixed sandbox path."""
+
+    def test_env_var_wins(self):
+        cli = load_cli()
+        with mock.patch.dict(os.environ, {"FLIGHTAWARE_CLI": "/x/fa"}), \
+                mock.patch.object(cli.shutil, "which", return_value="/usr/bin/flightaware"):
+            self.assertEqual(cli.flightaware_cli(), "/x/fa")
+
+    def test_found_on_path(self):
+        cli = load_cli()
+        env = {k: v for k, v in os.environ.items() if k != "FLIGHTAWARE_CLI"}
+        with mock.patch.dict(os.environ, env, clear=True), \
+                mock.patch.object(cli.shutil, "which", return_value="/usr/bin/flightaware"):
+            self.assertEqual(cli.flightaware_cli(), "/usr/bin/flightaware")
+
+    def test_falls_back_to_bare_name(self):
+        cli = load_cli()
+        env = {k: v for k, v in os.environ.items() if k != "FLIGHTAWARE_CLI"}
+        with mock.patch.dict(os.environ, env, clear=True), \
+                mock.patch.object(cli.shutil, "which", return_value=None), \
+                mock.patch.object(cli.os.path, "isfile", return_value=False):
+            self.assertEqual(cli.flightaware_cli(), "flightaware")
+
+    def test_no_sandbox_path_in_module(self):
+        cli = load_cli()
+        self.assertFalse(hasattr(cli, "FLIGHTAWARE"))
+
+    def test_run_uses_resolved_cli(self):
+        cli = load_cli()
+        done = subprocess.CompletedProcess([], 0, stdout=b"{}", stderr=b"")
+        with mock.patch.object(cli, "flightaware_cli", return_value="/x/fa"), \
+                mock.patch.object(cli.subprocess, "run", return_value=done) as run:
+            cli._run(["airport", "ZRH"])
+        self.assertEqual(run.call_args[0][0], ["/x/fa", "airport", "ZRH"])
+
+    def test_missing_cli_names_the_env_var(self):
+        cli = load_cli()
+        with mock.patch.object(cli, "flightaware_cli", return_value="/nope/fa"), \
+                mock.patch.object(cli.subprocess, "run", side_effect=FileNotFoundError):
+            with self.assertRaises(RuntimeError) as ctx:
+                cli._run(["airport", "ZRH"])
+        self.assertIn("FLIGHTAWARE_CLI", str(ctx.exception))
+        self.assertIn("/nope/fa", str(ctx.exception))
 
 class ArgParsingTests(unittest.TestCase):
     def test_flight_is_required(self):

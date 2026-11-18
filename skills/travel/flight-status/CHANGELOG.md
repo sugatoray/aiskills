@@ -4,6 +4,21 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.9.9] - 2026-11-18
+
+### Fixed
+
+- Removed paths that only existed in the sandbox the skill was built in.
+  The CLI no longer hard-codes `/opt/hatch/bin/flightaware`: it runs
+  `$FLIGHTAWARE_CLI` if set, else `flightaware` found on `PATH`.
+  `SKILL.md`, `meta/MAINTAINERS.md` and `meta/SECURITY.md` no longer point
+  at `~/workspace/custom-skills/flight-status/` or the sandbox CLI path;
+  commands run from the skill's own folder.
+
+  A missing CLI now fails with a message naming `FLIGHTAWARE_CLI`.
+
+  Red/Green TDD: 6 new tests (110 total).
+
 ## [0.9.8] - 2026-10-24
 
 ### Added

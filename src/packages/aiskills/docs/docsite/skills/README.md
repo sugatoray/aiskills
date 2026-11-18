@@ -82,7 +82,7 @@ Alias `travel`. Install the group with `aiskills install -G travel`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`flight-status`](flight-status.md) | 0.9.8 | One-shot or repeating flight status reports: journey percentage by distance, miles covered/to-go, live route map, and a timestamped announcement, delivered… |
+| [`flight-status`](flight-status.md) | 0.9.9 | One-shot or repeating flight status reports: journey percentage by distance, miles covered/to-go, live route map, and a timestamped announcement, delivered… |
 
 ## video-related-skills
 

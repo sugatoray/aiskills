@@ -38,14 +38,17 @@ egress goes."
 ## Network exposure
 
 The skill's only network egress is through the FlightAware connector
-CLI (`/opt/hatch/bin/flightaware`):
+CLI: `$FLIGHTAWARE_CLI` if set, else `flightaware` on `PATH`. It is run
+as an argument list, never through a shell:
 
 - `flightaware canonical-flight` / `flight` / `position` — JSON flight
   facts and live position, read-only queries.
 - `flightaware map` — the route map render, saved to disk.
 
 All authentication and rate-limit handling belong to the connector; the
-skill passes no secrets and stores none. No other network calls are made
+skill passes no secrets and stores none. `FLIGHTAWARE_CLI` names the
+program to run, so it is trusted the same way as `PATH`: whoever sets the
+environment chooses the executable. No other network calls are made
 — there is no tile fetching, no telemetry, no update check.
 
 ## Input handling

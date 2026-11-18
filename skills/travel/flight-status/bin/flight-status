@@ -16,6 +16,9 @@ Outputs (into --out-dir):
     report.json          machine-readable summary
 Plus the announcement text on stdout.
 
+Needs the FlightAware connector CLI: $FLIGHTAWARE_CLI if set, else
+`flightaware` on PATH.
+
 With --repeat, the run still performs one check; repeating on a schedule is
 the caller's job (see SKILL.md).
 """
@@ -33,7 +36,18 @@ import zlib
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-FLIGHTAWARE = "/opt/hatch/bin/flightaware"
+FLIGHTAWARE_ENV = "FLIGHTAWARE_CLI"
+
+
+def flightaware_cli():
+    """Path of the FlightAware connector CLI on this machine.
+
+    $FLIGHTAWARE_CLI if set, else `flightaware` found on PATH, else the
+    bare name (so a missing CLI fails with a clear "not found" error).
+    """
+    return (os.environ.get(FLIGHTAWARE_ENV)
+            or shutil.which("flightaware")
+            or "flightaware")
 
 # Major airport coordinates (IATA -> (lat, lon)). Fallback: `flightaware airport`.
 AIRPORTS = {
@@ -336,7 +350,14 @@ def format_position_label(lat, lon):
 # ------------------------------------------------------- flightaware --
 
 def _run(cmd):
-    proc = subprocess.run([FLIGHTAWARE] + cmd, capture_output=True, text=False)
+    exe = flightaware_cli()
+    try:
+        proc = subprocess.run([exe] + cmd, capture_output=True, text=False)
+    except FileNotFoundError:
+        raise RuntimeError(
+            f"FlightAware CLI not found: {exe}. Put `flightaware` on PATH "
+            f"or set {FLIGHTAWARE_ENV} to its path."
+        ) from None
     if proc.returncode != 0:
         raise RuntimeError(
             f"flightaware {' '.join(cmd)} failed: "

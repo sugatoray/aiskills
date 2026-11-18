@@ -29,7 +29,7 @@ behind how this skill is built, see `SECURITY.md`.
 After touching `bin/flight-status`:
 
 ```sh
-cd ~/workspace/custom-skills/flight-status && python3 -m unittest discover -s tests
+python3 -m unittest discover -s tests   # from the skill's folder
 ```
 
 Covers: arg parsing and defaults, short flags, repeat parsing,
