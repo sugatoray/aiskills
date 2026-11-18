@@ -4,6 +4,6 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 
 - `scripts/link-skills.sh` is untested on macOS and Windows.
 - Only 15 of the repo's 21 skills are linked into `.agents/skills/` and `.claude/skills/`.
-- `flight-status` (#81) is missing `assets/sample-map.png` and `assets/screenshots/`, so 5 of its 104 tests fail.
+- `flight-status` (#81) is missing `assets/sample-map.png` and `assets/screenshots/`, so 3 of its 110 tests fail.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.
