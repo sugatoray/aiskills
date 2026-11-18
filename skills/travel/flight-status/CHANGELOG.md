@@ -4,6 +4,29 @@ All notable changes to the `flight-status` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This skill follows [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-11-18
+
+### Changed
+
+- The skill no longer depends on Meta's Muse, where it was first built,
+  and still works there:
+  - **Card colors:** the card defines its own `--fs-*` color tokens in one
+    `<style>` block, with light and dark (`prefers-color-scheme`) palettes.
+    Each token uses Muse's `--hatch-widget-*` variable when the host sets
+    it. Before, the card used those variables bare, so outside Muse it had
+    no colors at all. `assets/sample_report.html` is updated the same way.
+  - **`SKILL.md`:** delivering the card and repeating are described for any
+    agent (an HTML widget or artifact, else the file; the agent's own
+    scheduler), with Muse's `widget.*`, `tracking.*`, cron `owner:` and
+    `hidden_files/` steps kept as one example.
+  - **`meta/MAINTAINERS.md`:** a new "Portability" section and the
+    FlightAware CLI contract (the subcommands `bin/flight-status` calls),
+    so a wrapper over FlightAware's AeroAPI can stand in for Muse's
+    connector through `FLIGHTAWARE_CLI`.
+  - **`skill.yaml`:** marked as read only by Muse's skill catalog.
+
+  Red/Green TDD: 3 new tests (113 total).
+
 ## [0.9.9] - 2026-11-18
 
 ### Fixed

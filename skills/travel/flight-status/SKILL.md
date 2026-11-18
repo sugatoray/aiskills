@@ -8,7 +8,7 @@ metadata:
   name: flight-status
   type: skill
   author: sugatoray
-  version: "0.9.9"
+  version: "0.10.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/travel/flight-status"
 ---
 
@@ -51,7 +51,9 @@ bin/flight-status \
 ## What the CLI does
 
 It calls the FlightAware connector CLI: `$FLIGHTAWARE_CLI` if set, else
-`flightaware` on `PATH`.
+`flightaware` on `PATH` (Meta's Muse provides one; elsewhere, see
+`meta/MAINTAINERS.md` → "The FlightAware CLI contract"). Without it, only
+`-m` works.
 
 
 1. Resolves the flight via `flightaware canonical-flight`, then reads the
@@ -98,10 +100,11 @@ Every report has two parts, in this order:
    behind schedule — reported at 11:35 PM EDT." Times render in the display
    timezone (default: the user's locale), labeled to match the actual zone
    (EST/EDT, CEST, CDT, …).
-2. **Composite card:** a single HTML widget (via
-   `widget.create_html_file_widget` on `<flight>-card.html`,
-   `fallback_text` "LX009 journey progress") — percentage dashboard fused
-   with the full-width route map, theme-aware, scaling with the screen.
+2. **Composite card:** one self-contained HTML file, `<flight>-card.html`
+   — percentage dashboard fused with the full-width route map, scaling
+   with the screen. It has its own light and dark colors, and takes on the
+   host's theme where one is provided (see "Delivering a one-shot
+   report").
    The card also shows:
    - **Expected arrival** with the previous estimate in brackets when it
      changed, e.g. "Expected arrival **5:05 AM EDT** [old: 4:40 AM EDT]".
@@ -125,8 +128,15 @@ complete: 100% of the distance covered — reported at <time>.").
 
 1. Run the CLI (no `--repeat`).
 2. Send the announcement text as your message.
-3. Attach the card: `widget.create_html_file_widget` on the produced
-   `<flight>-card.html`, embed token on its own line after the text.
+3. Show the card, `<flight>-card.html`, the best way your agent can:
+   - an HTML widget or artifact, if your agent has one, with the fallback
+     text "<flight> journey progress";
+   - otherwise attach the file, or give its path so the user can open it in
+     a browser (it works offline; the map is embedded).
+
+   In Meta's Muse, use `widget.create_html_file_widget` on the file and put
+   the embed token on its own line after the text; the card then uses
+   Muse's `--hatch-widget-*` theme colors.
 4. Keep commands, `fa_flight_id` values and raw status codes out of the
    reply.
 
@@ -134,18 +144,28 @@ complete: 100% of the distance covered — reported at <time>.").
 
 When `--repeat` is given (e.g. `--repeat=30mins`):
 
-1. Create a tracked item for the watch first (`tracking.create`), unless
-   the work belongs to an existing user goal.
-2. Create one interval cron job (e.g. id `flight-status-<slug>`) owned by
-   that item (`owner: goal:<slug>`). Its body must stand alone: run this
-   CLI into the item's `hidden_files/`, then deliver per "Delivering a
-   one-shot report", then `tracking.create_entry`.
+The CLI checks once per run; your agent does the repeating, with
+whatever scheduler it has (a scheduled task, a loop, a cron job).
+
+1. Schedule one recurring job at the cadence (e.g. named
+   `flight-status-<flight>`). Its prompt must stand alone: run this CLI
+   with the same flags and `--out-dir` set to a folder kept for this
+   watch, then deliver per "Delivering a one-shot report".
+2. If your agent has a way to track ongoing work (a task list, a goal),
+   record the watch there and log each report against it.
 3. The job ends the watch when the flight lands: deliver the landing
-   notice + 100% card, then `tracking.set_status` completed (which retires
-   the job). Also stop on confirmed cancellation/diversion.
+   notice + 100% card, then cancel the schedule. Also stop on confirmed
+   cancellation/diversion. If your agent can't schedule, say so and give
+   a one-shot report instead.
 4. Never change, cancel, or rebook anything. Never claim landing from
    percentages or estimates alone — only from an actual landing time or a
    Landed/Arrived status.
+
+In Meta's Muse: create a tracked item first (`tracking.create`) unless the
+work belongs to an existing user goal; own the interval cron job by it
+(`owner: goal:<slug>`); run the CLI into the item's `hidden_files/`; log
+each report with `tracking.create_entry`; and finish with
+`tracking.set_status` completed, which retires the job.
 
 ## Tests
 

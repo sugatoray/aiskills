@@ -29,7 +29,8 @@ flight-status/
 │   └── test_flight_status.py
 ├── CHANGELOG.md
 ├── README.md
-└── SKILL.md
+├── SKILL.md
+└── skill.yaml        (Meta's Muse catalog entry only)
 ```
 
 - **Runtime instructions**: [`SKILL.md`](SKILL.md)

@@ -365,6 +365,46 @@ class FlightAwareParsingTests(unittest.TestCase):
         self.assertEqual(cli.parse_canonical_ident(CANONICAL_JSON), "SWR009")
 
 
+class CardColorTests(unittest.TestCase):
+    """The card renders in color with or without Muse's host theme."""
+
+    TOKENS = ("text", "muted", "accent", "border", "surface", "surface-muted")
+
+    def _card(self, **kw):
+        cli = load_cli()
+        args = dict(pct=35, covered_mi="1,599", remaining_mi="2,940",
+                    altitude="36,000 ft", speed="532 kt",
+                    report_time="11:35 PM EDT",
+                    map_png_bytes=b"\x89PNG\r\n\x1a\nfakepng", map_note="",
+                    eta_latest="5:05 AM", eta_old="4:40 AM",
+                    journey_total="8h 4m", status_pill="En Route",
+                    status_tone="info", time_remaining="5h to go",
+                    position_label="47.5N, 48.4W")
+        args.update(kw)
+        return cli.build_card_html(**args)
+
+    def test_no_host_variable_without_fallback(self):
+        import re
+        html = self._card() + self._card(map_png_bytes=b"")
+        self.assertEqual(re.findall(r"var\(--hatch-widget-[a-z-]+\)", html), [])
+
+    def test_every_token_has_light_and_dark_fallbacks(self):
+        import re
+        html = self._card()
+        self.assertIn('class="fs-card"', html)
+        light, _, dark = html.partition("prefers-color-scheme:dark")
+        self.assertTrue(dark, "no dark-mode block")
+        for t in self.TOKENS:
+            pat = rf"--fs-{t}:var\(--hatch-widget-{t},#[0-9a-f]{{6}}\)"
+            self.assertRegex(light, pat)
+            self.assertRegex(dark, pat)
+
+    def test_styles_use_card_tokens(self):
+        html = self._card()
+        for t in ("text", "muted", "accent", "border", "surface"):
+            self.assertIn(f"var(--fs-{t})", html)
+
+
 class CardTests(unittest.TestCase):
     def test_card_html_contains_key_facts(self):
         cli = load_cli()

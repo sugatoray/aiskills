@@ -502,8 +502,8 @@ def _marker_html(marker, pct):
         return (
             f'<div style="position:absolute;left:{pct}%;top:50%;width:18px;'
             'height:18px;margin:-9px 0 0 -9px;border-radius:50%;'
-            'background:var(--hatch-widget-accent);'
-            'border:3px solid var(--hatch-widget-text);box-sizing:border-box;"></div>'
+            'background:var(--fs-accent);'
+            'border:3px solid var(--fs-text);box-sizing:border-box;"></div>'
         )
     paths = {
         # classic airliner silhouette (points up); rotated to point east
@@ -518,7 +518,7 @@ def _marker_html(marker, pct):
         f'<div style="position:absolute;left:{pct}%;top:50%;width:28px;height:28px;'
         'margin:-14px 0 0 -14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));">'
         '<svg width="28" height="28" viewBox="0 0 24 24" '
-        'style="fill:var(--hatch-widget-text);stroke:var(--hatch-widget-accent);" '
+        'style="fill:var(--fs-text);stroke:var(--fs-accent);" '
         'stroke-width="1" stroke-linejoin="round">'
         f'<path d="{path}"{tr}/></svg></div>'
     )
@@ -528,7 +528,7 @@ def _progress_bar_html(pct, marker="airliner"):
     """Striped-remainder + milestone-tick progress bar with a flight marker."""
     ticks = "".join(
         f'<div style="position:absolute;left:{p}%;top:-3px;bottom:-3px;'
-        f'width:2px;background:var(--hatch-widget-text);opacity:.45;'
+        f'width:2px;background:var(--fs-text);opacity:.45;'
         f'border-radius:1px;"></div>'
         for p in (25, 50, 75)
     )
@@ -539,19 +539,19 @@ def _progress_bar_html(pct, marker="airliner"):
     )
     return (
         '<div style="position:relative;height:14px;border-radius:8px;'
-        'background:var(--hatch-widget-surface-muted);margin-top:10px;'
+        'background:var(--fs-surface-muted);margin-top:10px;'
         'display:flex;">'
         f'<div style="width:{pct}%;border-radius:8px 0 0 8px;'
-        'background:var(--hatch-widget-accent);"></div>'
+        'background:var(--fs-accent);"></div>'
         f'<div style="width:{100 - pct}%;border-radius:0 8px 8px 0;'
         'background:repeating-linear-gradient(-45deg,'
-        'color-mix(in srgb,var(--hatch-widget-accent) 35%,transparent) 0 6px,'
+        'color-mix(in srgb,var(--fs-accent) 35%,transparent) 0 6px,'
         'transparent 6px 12px);"></div>'
         f'{ticks}'
         f'{_marker_html(marker, pct)}'
         '</div>'
         '<div style="position:relative;height:14px;font-size:10px;'
-        'color:var(--hatch-widget-muted);">'
+        'color:var(--fs-muted);">'
         f'{labels}'
         '</div>'
     )
@@ -569,10 +569,10 @@ def _status_pill_html(label, tone):
         )
     else:
         style = (
-            "color:var(--hatch-widget-accent);"
-            "border:1px solid color-mix(in srgb,var(--hatch-widget-accent) "
+            "color:var(--fs-accent);"
+            "border:1px solid color-mix(in srgb,var(--fs-accent) "
             "50%,transparent);"
-            "background:color-mix(in srgb,var(--hatch-widget-accent) "
+            "background:color-mix(in srgb,var(--fs-accent) "
             "14%,transparent);"
         )
     return (
@@ -592,7 +592,7 @@ def _corner_html(status_pill, status_tone, time_remaining):
         parts.append(
             '<div style="font-size:28px;font-weight:700;margin-top:10px;'
             f'line-height:1.1;">{time_remaining}</div>'
-            '<div style="font-size:12px;color:var(--hatch-widget-muted);">'
+            '<div style="font-size:12px;color:var(--fs-muted);">'
             "to go</div>"
         )
     parts.append("</div>")
@@ -846,6 +846,33 @@ def overlay_flown_track(map_png_bytes, fixes, origin_latlon, dest_latlon,
         return map_png_bytes
 
 
+# Card colors. Inside Muse the host theme's --hatch-widget-* variables
+# win; anywhere else (a browser, another agent) these fallbacks apply.
+CARD_PALETTE_LIGHT = {
+    "text": "#1f2933", "muted": "#5f6b7a", "accent": "#0a66c2",
+    "border": "#d6dce3", "surface": "#ffffff", "surface-muted": "#e9edf2",
+}
+CARD_PALETTE_DARK = {
+    "text": "#e6edf3", "muted": "#9aa7b4", "accent": "#4ea1ff",
+    "border": "#30363d", "surface": "#161b22", "surface-muted": "#2a313a",
+}
+
+
+def _card_style_html():
+    def tokens(palette):
+        return "".join(
+            f"--fs-{name}:var(--hatch-widget-{name},{color});"
+            for name, color in palette.items()
+        )
+    return (
+        "<style>"
+        f".fs-card{{{tokens(CARD_PALETTE_LIGHT)}}}"
+        "@media (prefers-color-scheme:dark)"
+        f"{{.fs-card{{{tokens(CARD_PALETTE_DARK)}}}}}"
+        "</style>"
+    )
+
+
 def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
                     report_time, map_png_bytes, map_note,
                     eta_latest="", eta_old="", journey_total="",
@@ -908,16 +935,16 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
     else:
         img_html = (
             '<div style="padding:12px 16px;font-size:12px;'
-            'color:var(--hatch-widget-muted);">Route map unavailable</div>'
+            'color:var(--fs-muted);">Route map unavailable</div>'
         )
     note_html = (
-        f'<div style="font-size:11px;color:var(--hatch-widget-muted);'
+        f'<div style="font-size:11px;color:var(--fs-muted);'
         f'margin-top:6px;">{map_note}</div>'
         if map_note else ""
     )
     if eta_latest:
         old_part = (
-            f' <span style="color:var(--hatch-widget-muted);">'
+            f' <span style="color:var(--fs-muted);">'
             f'[old: {eta_old}]</span>'
             if eta_old and eta_old != eta_latest else ""
         )
@@ -928,7 +955,7 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
     else:
         eta_html = ""
     journey_html = (
-        '<div style="font-size:12px;color:var(--hatch-widget-muted);'
+        '<div style="font-size:12px;color:var(--fs-muted);'
         f'margin-top:4px;">Total journey time {journey_total}</div>'
         if journey_total else ""
     )
@@ -939,21 +966,22 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
     meta_bits.append(f"reported at {report_time}")
     meta_line = " &middot; ".join(meta_bits)
     return (
-        '<div style="box-sizing:border-box;max-width:100%;'
-        'border:1px solid var(--hatch-widget-border);border-radius:14px;'
-        'overflow:hidden;background:var(--hatch-widget-surface);'
-        'color:var(--hatch-widget-text);'
+        f'{_card_style_html()}'
+        '<div class="fs-card" style="box-sizing:border-box;max-width:100%;'
+        'border:1px solid var(--fs-border);border-radius:14px;'
+        'overflow:hidden;background:var(--fs-surface);'
+        'color:var(--fs-text);'
         'font-family:system-ui,-apple-system,sans-serif;">'
         '<div style="padding:14px 16px 4px;">'
         '<div style="font-size:13px;font-weight:600;'
-        'color:var(--hatch-widget-muted);letter-spacing:0.02em;">'
+        'color:var(--fs-muted);letter-spacing:0.02em;">'
         f'{header}</div>'
         '<div style="display:flex;justify-content:space-between;'
         'align-items:flex-start;gap:12px;margin-top:4px;">'
         '<div>'
         f'<div style="font-size:44px;font-weight:700;'
         f'line-height:1.1;">{pct}%</div>'
-        '<div style="font-size:13px;color:var(--hatch-widget-muted);">'
+        '<div style="font-size:13px;color:var(--fs-muted);">'
         'of the journey by distance</div>'
         '</div>'
         f'{corner_html}'
@@ -962,10 +990,10 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
         '<div style="display:flex;justify-content:space-between;'
         'font-size:13px;margin-top:8px;">'
         f'<span>{covered_mi} mi covered</span>'
-        f'<span style="color:var(--hatch-widget-muted);">'
+        f'<span style="color:var(--fs-muted);">'
         f'{remaining_mi} mi to go</span>'
         '</div>'
-        f'<div style="font-size:12px;color:var(--hatch-widget-muted);'
+        f'<div style="font-size:12px;color:var(--fs-muted);'
         f'margin-top:10px;">{meta_line}</div>'
         f'{eta_html}'
         f'{journey_html}'
@@ -973,10 +1001,10 @@ def build_card_html(pct, covered_mi, remaining_mi, altitude, speed,
         '<div style="height:12px;"></div>'
         '</div>'
         f'{img_html}'
-        f'<div style="font-size:11px;color:var(--hatch-widget-muted);'
+        f'<div style="font-size:11px;color:var(--fs-muted);'
         f'padding:8px 16px 12px;">Source: '
         f'<a href="{source_url}" '
-        f'style="color:var(--hatch-widget-accent);">'
+        f'style="color:var(--fs-accent);">'
         f'FlightAware &mdash; live track</a></div>'
         '</div>'
     )

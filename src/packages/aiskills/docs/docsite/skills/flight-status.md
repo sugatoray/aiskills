@@ -5,7 +5,7 @@ One-shot or repeating flight status reports: journey percentage by distance, mil
 | Property | Value |
 | --- | --- |
 | Group | `travel-skills` (alias `travel`) |
-| Version | 0.9.9 |
+| Version | 0.10.0 |
 | Starts | When you ask for it: you type `/flight-status` (your agent doesn't start it on its own) |
 | Needs | Python 3.9+ (stdlib only, no dependencies); FlightAware connector CLI (`flightaware` on PATH, or set FLIGHTAWARE_CLI) |
 | License | MIT |
