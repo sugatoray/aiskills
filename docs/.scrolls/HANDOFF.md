@@ -12,7 +12,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - At the user's request, started `1.5.0-dev` on `claude/aiskills-1.5.0-dev`.
 
 ## Known issues / open threads
-- **No PR for `claude/aiskills-1.5.0-dev` yet** (ROOT-13). Before opening it, the package and scrolls-family scrolls need their own updates: `/scrolls-update -p src/packages/aiskills/docs` (1.4.0 published; AIS-23, AIS-24; #265's features into `SPEC.md`) and `/scrolls-update -p src/scrolls/docs` (#265 merged; `/scrolls-compact` into `SPEC.md`).
+- **No PR for `claude/aiskills-1.5.0-dev` yet** (ROOT-13). The package scrolls (`4ec857a`) and the scrolls-family scrolls (`0a5d174`) now record the 1.4.0 release and #265's merge too, on the same branch.
 - **The 1.4.0 CHANGELOG date** is 2026-11-18, npm's UTC date. In US Eastern time the publish was the evening of 2026-11-17 (the 1.3.0 note judged by US Eastern). The user was asked; no answer yet, so it stays.
 - Nobody has looked at the rebuilt docs site since the tag push (this session can't reach `sugatoray.github.io`): `/` should be 1.4.0 and `/v/` the releases before it; `/dev/` shows 1.5.0-dev once the branch merges.
 - **`tests/test_compact.ps1` has never run** (no `pwsh` in these sessions).
