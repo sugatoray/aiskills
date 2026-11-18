@@ -62,6 +62,17 @@ Shows `scrolls-explainer.html`, an interactive, offline page that shows how the 
 
 Tested: 109 assertions in `test_explain.sh`, including Playwright browser checks and a build-freshness check.
 
+## `/scrolls-compact` (2.6.0, [#265](https://github.com/sugatoray/aiskills/pull/265), merged as `57188d0`; in npm 1.4.0)
+
+Condenses the old history in a project's scrolls (`SPEC.md`, `PLAN.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`) and keeps the full text in git, so the files an agent reads every session stay short without losing anything.
+
+- **What counts as old:** `git blame` dates every line against a base: `--before=YYYYMMDD`, `--base=COMMIT`, or by default the newer of 7 days and 20 commits back on `main`/`master`. Open tickets, every open gap and HANDOFF's open threads are never condensed, however old.
+- **How it runs:** a read-only plan marks each unit old, live or new; the agent condenses only the old units; `--finalize` checks the edits against the plan and makes one `maint(memory): scrolls-compacted` commit, with a tagged checkpoint (`scrolls-compact/<yyyymmdd>-<githash>`), a report in `compacted/scrolls_compact_<yyyymmdd>_<githash>.md`, and a row in `COMPACT.md`. `git revert` undoes it.
+- **Reading the old text back:** `--list`, `--show ID [FILE]` and `--extract ID FILE [-o OUT]`, also after a squash merge or `/scrolls-unhide`.
+- **Examples:** 23 worked examples, every flag, refusal and exit code, with real output (`assets/EXAMPLES.md` plus `assets/examples/`), shown one tab each in `assets/example-viewer.html` and in the docs site's Skills tab.
+
+Tested: `test_compact.sh` 126, `test_examples.sh` 420 (replays every example), and `test_example_viewer.sh` (static, browser, offline and in-frame checks).
+
 ## `src/scrolls/` install pointer
 
 A pointer at `src/scrolls/CLAUDE.md`, separate from the real skill artifacts at `skills/scrolls/`, documenting tested `npx skills add sugatoray/aiskills` install commands: local (project-level), global (user-level), and install-everywhere-for-every-supported-agent (`--all`) forms, plus `owner/repo#branch` pinning. Every command was actually run against the real repo before being written down, then fully cleaned up.

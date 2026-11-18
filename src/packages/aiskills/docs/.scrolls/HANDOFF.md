@@ -3,17 +3,9 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-**`@sugatoray-ai/aiskills` `1.3.0` is published on npm** (`latest`, 2026-11-17T23:07Z, still 2026-11-17 US Eastern, so the CHANGELOG date stands; checked with `npm view`). npm's `gitHead` is `a92ab00`, the squash merge of [#287](https://github.com/sugatoray/aiskills/pull/287) on `master`, and the user pushed the tag `aiskills-v1.3.0` there. It adds colored output and the CLI outputs page (#245), `aiskills config` and the grouped Skills tab (#250), and `run-code-review` 1.3.0; still **17 skills in 9 groups**. Published versions: `0.4.0`–`0.9.0`, `1.0.0`–`1.3.0` (plus npm's hidden `0.0.0-stage` placeholder), each tagged `aiskills-v<version>`. Source in `src/packages/aiskills/`. Docs live at https://sugatoray.github.io/aiskills/, rebuilt on pushes to `master` and on release tags.
+**`@sugatoray-ai/aiskills` `1.4.0` is published on npm** (`latest`, 2026-11-18T01:25Z, the evening of 2026-11-17 US Eastern; checked with `npm view`). npm's `gitHead` is `1780fd5`, the squash merge of [#302](https://github.com/sugatoray/aiskills/pull/302) on `master`, and the user pushed the tag `aiskills-v1.4.0` there (checked). It bundles the new `scrolls-compact` skill (scrolls family 2.6.0; **18 skills in 9 groups**), adds the "Browse the scrolls-compact examples" docs page, makes embedded docs pages follow the light/dark button, and renames `assets/EXAMPLE.md` → `assets/EXAMPLES.md` in three bundled skills; all from [#265](https://github.com/sugatoray/aiskills/pull/265) (`57188d0`).
 
-**`master` is `1.4.0-dev`**: [#291](https://github.com/sugatoray/aiskills/pull/291) merged as `715aca5` (`package.json` `1.4.0-dev`, an empty `## [1.4.0] - Unreleased` section, docs and banner regenerated).
-
-**[#265](https://github.com/sugatoray/aiskills/pull/265) (open, `claude/clever-mendel-k9n73h`, rebased onto `715aca5`) is the first 1.4.0 work.** Its package changes:
-- **Bundles `scrolls-compact`** (scrolls family 2.6.0): **18 skills in 9 groups**. The banner, docs, README groups table and the tests' hardcoded counts (`banner.test.mjs`, `docs-html.test.mjs`) say 18.
-- **Docs page "Browse the scrolls-compact examples"** (`docs/docsite/explainers/scrolls-compact-examples.md`, under Explainers in the Skills tab). It embeds the skill's `assets/example-viewer.html`, copied to `explainers/scrolls-compact-examples.html` through `EXPLAINERS` in `build-skills-docs.mjs`.
-- **`docs-template.html`: embedded pages follow the docs' light/dark button.** Each srcdoc frame gets the effective theme as `data-theme` on its `<html>` (`themedHtml`), and open frames are updated when it changes (`themeFrame`). Pages that use that convention follow it: the example viewer and the CLI outputs page; the scrolls explainer doesn't use it.
-- **Bundled skills renamed `assets/EXAMPLE.md` → `assets/EXAMPLES.md`** (`run-code-review` 1.3.1, `artwallbg` and `commentdrop` 1.0.1); `docs-skills.test.mjs` fails if one ships `EXAMPLE.md` again.
-- **CHANGELOG `[1.4.0] - Unreleased`** lists all of it (Added: the skill, the docs page, the theme sync; Changed: the rename).
-- `npm test`: **519** pass on the branch. Issues: epic #266 (#267–#270, plus the viewer epic #295 with #296–#300, and #301 for the rebase) and #271.
+**Next version `1.5.0-dev`** on branch `claude/aiskills-1.5.0-dev` (from `1780fd5`, commit `1e2ca73`; pushed; no PR yet): `package.json` `1.5.0-dev`, a new `## [1.5.0] - Unreleased` section with the "In development" note and no entries yet, the seven version examples in `reference/cli.md` and `getting-started/installation.md`, and the regenerated banner (`v1.5.0-dev`, checked by eye), `index.html`, `llms-full.txt` and `reference/cli-outputs.html`. `SECURITY.md` keeps `1.4.x`. `npm test`: 519 pass. The root scrolls are updated on it (`10840c4`), and this update too (AIS-25).
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -21,7 +13,7 @@ Layout (decided by the user; see `WISDOM.md` → Constraints):
 package.json            "bin": { aiskills, ais -> bin/aiskills.mjs; aix -> bin/aix.mjs }; scripts incl. docs, docs:skills, docs:html
 CHANGELOG.md            Keep a Changelog + SemVer; ships with the package
 SECURITY.md             reporting + what the package touches + protections; ships
-docs/docsite/           user docs (not published): 53 Markdown pages on #265's branch (51 on master) incl. license.md (GENERATED), images/*.svg, llms.txt, llms-full.txt, index.html
+docs/docsite/           user docs (not published): 53 Markdown pages incl. license.md (GENERATED), images/*.svg, llms.txt, llms-full.txt, index.html
 docs/docsite/skills/    GENERATED: one page per bundled skill + overview (npm run docs:skills)
 docs/banner/            banner: config.yaml, GENERATED aiskills-banner.html (editor page), banner_2x.png, README (not published)
 docs/meta/              ARCHITECTURE, FEATURES, MAINTAINERS (not published)
@@ -38,14 +30,16 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
-- Built [#265](https://github.com/sugatoray/aiskills/pull/265) (see above) on `claude/clever-mendel-k9n73h`. At the user's request, rebased it onto `715aca5` for 1.4.0-dev: the package CHANGELOG entries that had merged into the released `[1.3.0]` moved to `[1.4.0]`, and the generated docs and banner were regenerated at each commit.
-- Earlier this session (before #291): 1.3.0 was released in #287, and `1.4.0-dev` started in #291 (from `claude/aiskills-1.4.0-dev`).
+- Built #265 on `claude/clever-mendel-k9n73h` and rebased it onto `1.4.0-dev`; the user merged it (`57188d0`).
+- Prepared 1.4.0 in #302 (bump, CHANGELOG dated 2026-11-18, SECURITY `1.4.x`, docs regenerated; `npm test` 519, `npm run test:e2e` 8; issues #303 → #304, #305). The user merged it, published 1.4.0 and pushed `aiskills-v1.4.0`.
+- At the user's request, set the next version to `1.5.0-dev`, the same way #291 set `1.4.0-dev`.
+- Scrolls: AIS-23 and AIS-24 ticked, AIS-25 added; the `SPEC.md` release note records 1.4.0, and the examples docs page and the light/dark sync are in `SPEC.md`.
 
 ## Known issues / open threads
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged.** Once it merges, add `scrolls-compact`, the examples docs page and the theme sync to `SPEC.md`, and tick AIS-23.
-- **At the 1.4.0 release, set `SECURITY.md`'s supported versions to `1.4.x`** (it says `1.3.x`), as for 1.3.0.
+- **Open a PR for `claude/aiskills-1.5.0-dev`** when the user asks (AIS-25); it also carries the root scrolls update and this one. The scrolls-family scrolls (`src/scrolls/docs/.scrolls/`) still need their own `/scrolls-update -p src/scrolls/docs`.
+- **The 1.4.0 CHANGELOG date** is `2026-11-18`, npm's UTC date; in US Eastern the publish was the evening of 2026-11-17 (1.2.0's note judged by US Eastern). The user was asked; no answer yet, so it stays.
 - **#250's docs-site commits** (counts, tab numbers, grouped Skills pane) may still lack issues; it merged without this being confirmed.
-- **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.4.0-dev.tgz` on `master` now). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.
+- **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.5.0-dev.tgz` once `1.5.0-dev` merges). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.
 - **Try `aiskills config` on a real machine:** set a few keys and a shell alias, run `aiskills info`, and clone a repo with a `.aiskills.json` to see the project file win and a `!` alias warn.
 - **The CLI outputs page shows the stand-in `npx skills`,** which prints nothing of its own. So `list`, `install` and `skills` show only aiskills's lines; the live artifact shows the real `npx skills` output.
 - **Look at the live docs site:** this session can't reach `sugatoray.github.io`. The build log confirms all six pages were built and deployed, but nobody has viewed them in a browser yet. Check the menu, the find box, switching to `/v/0.8.0/` on a `#page`, and the notices.
@@ -56,5 +50,4 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - **The user's `~/.npmrc`:** `skills` in their `min-release-age-exclude[]` line does nothing for `npx`; they can drop it.
 - **Awaiting the user:** delete the leftover remote branch `claude/focused-faraday-nqvduf`? Should the bundled skills move from MIT too (repo-wide; not done)?
 - `--route` lookups still only tested against a fake registry (AIS-2).
-- Once #230 merges, `/scrolls-*`, `/create-issues-update-pr`, `/create-lib-docs`, `/network-flow` and `/run-code-review` load in this repo through the links in `.claude/skills/`.
 - See `GAP_ANALYSIS.md` for the rest.
