@@ -19,6 +19,9 @@ Every published npm release has an annotated git tag on the commit npm recorded 
 ## `meeting-agenda` skill (productivity group)
 `/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
 
+## `flight-status` skill (travel group, #81)
+`/flight-status` reports a flight's live status, once or on a repeat: journey percentage by distance, miles covered and to go, a route map with the flown track drawn solid, estimated time remaining and arrival, and an announcement, on one report card. It needs the FlightAware connector. The code, tests and history are in `skills/travel/flight-status/` (its own `CHANGELOG.md` and `meta/MAINTAINERS.md`); it has no family scrolls under `src/`.
+
 <!--
 ## <Feature name>
 What it does, from a user's perspective. A pointer to where it lives in the code
