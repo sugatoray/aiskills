@@ -61,6 +61,22 @@ npx skills add sugatoray/aiskills --skill flight-status --global   # global
 npx skills add sugatoray/aiskills --skill flight-status            # local
 ```
 
+**With the `aiskills` npm package** (from 1.6.0), the skill alone or its
+`travel` group:
+
+```
+npx @sugatoray-ai/aiskills install -s flight-status
+npx @sugatoray-ai/aiskills install -G travel
+```
+
+**As a Claude Code plugin** (the whole `travel-skills` group; pick one
+route, not both):
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install travel-skills@sugatoray
+```
+
 ## Quick start
 
 ```sh

@@ -7,6 +7,8 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 **Next version `1.6.0-dev`** on branch `claude/aiskills-1.6.0-dev` (from `b8ad785`, commit `5bdcc58`; pushed; open as [#314](https://github.com/sugatoray/aiskills/pull/314), issues #315 → #316, #317; AIS-28): `package.json` `1.6.0-dev`, a new `## [1.6.0] - Unreleased` section with the "In development" note and no entries yet, the seven version examples in `reference/cli.md` and `getting-started/installation.md`, and the regenerated banner (`v1.6.0-dev`, checked by eye), `index.html`, `llms-full.txt` and `reference/cli-outputs.html`. `SECURITY.md` keeps `1.5.x`. `npm test`: 520 pass. This scrolls update is on it too.
 
+**[#81](https://github.com/sugatoray/aiskills/pull/81)** (stacked on #314, AIS-29) adds the `travel` group with `flight-status`: the first `### Added` entry under `## [1.6.0] - Unreleased`, 20 skills in 11 groups, the banner and docs regenerated (new `docs/docsite/skills/flight-status.md`), and the counts in `banner.test.mjs` and the `<!-- verify -->` outputs of `guides/use-from-an-agent.md`, `reference/cli.md` and `tutorial/01`, `02`, `04`. 521 tests pass.
+
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
 ```text

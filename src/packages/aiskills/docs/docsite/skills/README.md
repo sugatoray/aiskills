@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (19 skills in 10 groups), with what it does and how to install it.
+Every skill in this version of the package (20 skills in 11 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -75,6 +75,14 @@ Alias `productivity`. Install the group with `aiskills install -G productivity`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`meeting-agenda`](meeting-agenda.md) | 1.0.0 | Turn a meeting agenda into a self-contained HTML slide deck with a countdown timer per item: one slide per item (large 01, 02… number, title, optional… |
+
+## travel-skills
+
+Alias `travel`. Install the group with `aiskills install -G travel`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`flight-status`](flight-status.md) | 0.9.8 | One-shot or repeating flight status reports: journey percentage by distance, miles covered/to-go, live route map, and a timestamped announcement, delivered… |
 
 ## video-related-skills
 

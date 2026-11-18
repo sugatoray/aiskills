@@ -119,6 +119,19 @@
       ]
     },
     {
+      "name": "travel-skills",
+      "source": "./travel",
+      "description": "Travel skills: /flight-status reports a flight's live status once or on a repeat: journey percentage by distance, miles covered and to go, a live route map and a timestamped announcement on one report card.",
+      "category": "productivity",
+      "keywords": [
+        "travel",
+        "flight",
+        "flight-status",
+        "flight-tracking",
+        "flightaware"
+      ]
+    },
+    {
       "name": "video-related-skills",
       "source": "./video-related",
       "description": "Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt, real screenshots, TTS voiceover, ducked music) for a library, app or product.",
