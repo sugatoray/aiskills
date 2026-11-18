@@ -15,7 +15,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Design `/scrolls-compact` with the user (`skills/scrolls/scrolls-compact/meta/DESIGN.md`), then build it Red/Green (2.6.0, the family bumped in lockstep), with replay-tested examples split into an index + one file each. On `claude/clever-mendel-k9n73h`.
 - [x] Open a PR for `claude/clever-mendel-k9n73h`: [#265](https://github.com/sugatoray/aiskills/pull/265), created from the Claude Code UI (2026-11-16).
 - [x] File #265's issues: epic #266 with sub-issues #267–#270, and #271 for the `EXAMPLES.md` rename (2026-11-16); then, under #266, the viewer epic #295 (#296–#300) and #301 for the rebase (2026-11-18). The PR body lists them all with `Closes`.
-- [ ] Add `/scrolls-compact` to `SPEC.md` once #265 merges.
+- [x] Add `/scrolls-compact` to `SPEC.md` once #265 merges: merged as `57188d0` (2026-11-18) and shipped in npm 1.4.0.
 - [ ] Later, to revisit (the user's choice, 2026-11-16: one box for now): in `assets/example-viewer.html`, split the "Note" box into two, Premise in the accent tint and Caveats in a warning-style amber.
 - [x] Show `/scrolls-compact`'s examples in the docsite's Skills tab: the page "Browse the scrolls-compact examples" (`explainers/scrolls-compact-examples.md`, under Explainers) embeds `assets/example-viewer.html` (2026-11-16).
 - [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1`, `tests/test_compact.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
