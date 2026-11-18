@@ -3,24 +3,19 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`master` is at `715aca5`:** #287 released 1.3.0 (`a92ab00`), and #291 started `1.4.0-dev` with an empty `## [1.4.0] - Unreleased` section.
-- **npm:** `@sugatoray-ai/aiskills` **1.3.0** is the latest (published 2026-11-17, tagged `aiskills-v1.3.0`). `/scrolls-compact` is **not** in it: it ships in 1.4.0.
-- **`claude/clever-mendel-k9n73h`**, open as **[#265](https://github.com/sugatoray/aiskills/pull/265)**, is **rebased onto `715aca5`** (2026-11-17, at the user's request) and force-pushed. It is part of **1.4.0-dev**:
-  - The new **`/scrolls-compact`** skill and the scrolls family at **2.6.0**. Design: `skills/scrolls/scrolls-compact/meta/DESIGN.md`. Family detail: `src/scrolls/docs/.scrolls/`.
-  - Its 23 replay-tested examples (`assets/EXAMPLES.md` plus `assets/examples/`), and `assets/example-viewer.html`, which shows them one tab each. The docsite shows the viewer in its Skills tab under Explainers, and embedded pages now follow the docs' light/dark button.
-  - `assets/EXAMPLE.md` renamed `assets/EXAMPLES.md` in `run-code-review` (1.3.1), `artwallbg` and `commentdrop` (1.0.1).
-  - The package CHANGELOG lists all of it under `[1.4.0] - Unreleased`. The rebase moved these entries there from `[1.3.0]`, which is released and now matches `master`.
-  - Tests on the rebased branch: package `npm test` 519; `test_compact.sh` 126; `test_examples.sh` 420; `test_example_viewer.sh`; `test_explain.sh` 110; the other scrolls suites; `make test-scripts` 59. All pass.
+- **`master` is at `57188d0`:** [#265](https://github.com/sugatoray/aiskills/pull/265) squash-merged: `/scrolls-compact` (scrolls family 2.6.0), its example viewer and docs page, embedded docs pages following the light/dark button, and the `EXAMPLES.md` rename. The merge closed all 13 of its issues, #266–#271 and #295–#301 (checked).
+- **npm:** `@sugatoray-ai/aiskills` **1.3.0** is the latest. `master` is `1.4.0-dev`.
+- **`claude/aiskills-1.4.0`** (from `57188d0`): prepares the **1.4.0** release, as #287 did for 1.3.0 (Releasing steps 2–3 in `src/packages/aiskills/docs/meta/MAINTAINERS.md`):
+  - `package.json` `1.4.0`, CHANGELOG `## [1.4.0] - 2026-11-18`, `SECURITY.md` `1.4.x`;
+  - the seven docs version examples updated, and the banner (v1.4.0, 18 skills in 9 groups) and docs regenerated (`012f4bb`);
+  - `npm test` 519 and `npm run test:e2e` 8, all pass.
 
 ## What just happened
-- Rebased the branch's 14 commits onto `master` (`715aca5`, 1.4.0-dev). Conflicts:
-  - generated docs and the banner: took `master`'s side, then regenerated with `npm run docs` and `npm run banner:png` at each commit;
-  - the package CHANGELOG: moved this branch's entries into `[1.4.0]`;
-  - the root scrolls: `PLAN.md` keeps `master`'s ROOT-6 and ROOT-9, and this snapshot was rewritten.
-- Earlier on the branch: the example viewer (theme, Note box, docsite page, light/dark sync). Issues for [#265](https://github.com/sugatoray/aiskills/pull/265): epic #266 (#267–#270, plus the viewer epic #295 with #296–#300, and #301 for the rebase) and #271.
+- The user merged #265. At their request: created `claude/aiskills-1.4.0` from `master`, bumped the package to 1.4.0, and ran `/scrolls-update` (this update). Next, in their order: open a release PR like #287, then `/create-issues-update-pr`.
 
 ## Known issues / open threads
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10). Add `/scrolls-compact` to `SPEC.md` once it merges. Its description lists every issue with `Closes`: epic #266 (#267–#270, plus the viewer epic #295 with #296–#300, and #301 for the rebase) and #271. Package detail is in `src/packages/aiskills/docs/.scrolls/` (AIS-23).
-- **`tests/test_compact.ps1` has never run.** This session had no `pwsh`; the same scenario passed through the bash launcher.
+- **After the release PR merges** (ROOT-12): `npm run pack:dry`, `npm publish`, then tag `aiskills-v1.4.0` on its `gitHead` (steps 4–7). If it isn't published on 2026-11-18, change the CHANGELOG date first. Then extend the tag range in `SPEC.md` to `aiskills-v1.4.0`.
+- **The package and scrolls-family scrolls still describe #265 as open** (AIS-23 in `src/packages/aiskills/docs/.scrolls/`, and `src/scrolls/docs/.scrolls/`). This run updated only the root scrolls. Run `/scrolls-update -p src/packages/aiskills/docs` and `/scrolls-update -p src/scrolls/docs` to record the merge and add `/scrolls-compact` to their `SPEC.md`.
+- **`tests/test_compact.ps1` has never run** (no `pwsh` in these sessions).
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).
-- `claude/keen-babbage-2khhu9` still holds merged #215-era history. Reusing it needs a reset from `master` and a force push, which the user must approve.
+- `claude/keen-babbage-2khhu9` still holds merged #215-era history, and `claude/clever-mendel-k9n73h` (#265's branch) only merged history. Deleting or reusing them is the user's call.
