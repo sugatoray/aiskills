@@ -13,6 +13,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.
 
+- **A rebase onto a release can move CHANGELOG entries into the released section, with no conflict.** When #265 was rebased onto `1.4.0-dev`, its package CHANGELOG entries matched context lines inside `## [1.3.0] - 2026-11-17` and merged there silently. After rebasing package work onto a new `-dev` version, check that every new entry sits under `## [x.y.z] - Unreleased`, not under a dated section.
 - After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
 
 - **Cloud sessions can push branches but not tags** (HTTP 403 from the git proxy), and the GitHub tools here can't create tags either. Make the tags locally, check them, and give the user one command to recreate and push them from their own clone. Then verify what reached GitHub.
