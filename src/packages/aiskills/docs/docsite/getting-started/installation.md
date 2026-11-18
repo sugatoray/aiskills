@@ -37,7 +37,7 @@ aiskills path
 ```
 
 ```text
-1.5.0-dev
+1.5.0
 ~/.config/sugatoray/aiskills
 ```
 
