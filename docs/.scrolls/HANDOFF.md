@@ -17,10 +17,10 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
   - generated docs and the banner: took `master`'s side, then regenerated with `npm run docs` and `npm run banner:png` at each commit;
   - the package CHANGELOG: moved this branch's entries into `[1.4.0]`;
   - the root scrolls: `PLAN.md` keeps `master`'s ROOT-6 and ROOT-9, and this snapshot was rewritten.
-- Earlier on the branch: the example viewer (theme, Note box, docsite page, light/dark sync). Issues for [#265](https://github.com/sugatoray/aiskills/pull/265): epic #266 (#267–#270) and #271.
+- Earlier on the branch: the example viewer (theme, Note box, docsite page, light/dark sync). Issues for [#265](https://github.com/sugatoray/aiskills/pull/265): epic #266 (#267–#270, plus the viewer epic #295 with #296–#300, and #301 for the rebase) and #271.
 
 ## Known issues / open threads
-- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10). Add `/scrolls-compact` to `SPEC.md` once it merges. The PR's issue list doesn't yet cover the example viewer, its docsite page or the theme sync.
+- **[#265](https://github.com/sugatoray/aiskills/pull/265) is open, not merged** (ROOT-10). Add `/scrolls-compact` to `SPEC.md` once it merges. Its description lists every issue with `Closes`: epic #266 (#267–#270, plus the viewer epic #295 with #296–#300, and #301 for the rebase) and #271. Package detail is in `src/packages/aiskills/docs/.scrolls/` (AIS-23).
 - **`tests/test_compact.ps1` has never run.** This session had no `pwsh`; the same scenario passed through the bash launcher.
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).
 - `claude/keen-babbage-2khhu9` still holds merged #215-era history. Reusing it needs a reset from `master` and a force push, which the user must approve.
