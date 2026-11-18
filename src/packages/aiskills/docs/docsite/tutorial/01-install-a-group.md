@@ -40,6 +40,10 @@ personas-skills  (alias: personas)
   Persona skills: /prodigy acts as the top performer in any role or field and shares how they frame problems,...
   skills: prodigy
 
+productivity-skills  (alias: productivity)
+  Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown ...
+  skills: meeting-agenda
+
 video-related-skills  (alias: video-related)
   Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...
   skills: dynamic-promo-video

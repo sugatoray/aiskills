@@ -1,0 +1,132 @@
+# Maintainers' notes
+
+## Ground rules
+
+- **One file, no dependencies.** CSS and JS are inline. No CDNs, fonts, images, `fetch` or XHR. `test_file_has_no_external_dependencies` and `test_no_network_requests_on_load` enforce this.
+- **Red/green TDD.** Add or change a test first, watch it fail, then change the HTML.
+- **Never write a literal closing script tag inside the main `<script>`.** That includes comments: the HTML parser ends the block there. This happened once during development and broke the whole page. Write "closing script tag" in prose instead.
+
+## Skill layout
+
+- `SKILL.md`: the agent workflow (input → agenda JSON → `build_deck.py` → verify → deliver).
+- `assets/meeting-agenda.html`: the template, which is also a working deck with the demo agenda.
+- `scripts/build_deck.py`: stdlib-only. `THEMES` must match the page's list. `--demo` copies the template byte for byte (for `/meeting-agenda --demo`) and refuses an agenda, `--title`, `--theme` or `--check` alongside it. `normalize()` mirrors the in-page `normalize()` rules, and `embed()` replaces only the `agenda-data` block, with `<` escaped. Exit 2 on invalid input. Keep its validation in step with the page's.
+- `tests/`: run `python3 -m pytest` from the skill directory.
+
+## Layout of `assets/meeting-agenda.html`
+
+1. `<style>`: colour tokens on `:root`, then the header, stage, timer, footer and editor sections.
+2. Static markup: header (`#meeting-title`, `#btn-edit`), `main` (`#deck`, `#timer`, controls), footer (`#hints`, `#dots`, `#meeting-text`, `#meeting-bar`), and the hidden `#editor` dialog. **Static markup must stay free of rendered slides.** "Save HTML" serializes a copy of the page as it was before rendering.
+3. `<script type="application/json" id="agenda-data">`: the agenda that ships with the file.
+4. The app script, an IIFE in strict mode.
+
+## Data model
+
+```js
+{ title: string, items: [ { minutes: number > 0, title: non-empty string, points: string[] } ] }
+```
+
+`normalize()` is the one gate for every source (file block, `localStorage`, editor). It trims strings, drops empty points, and returns `null` for anything invalid. Callers then fall back to the file defaults. A bare array of items is also accepted.
+
+## State
+
+| Variable | Meaning |
+|---|---|
+| `agenda` | Active agenda |
+| `current` | Index of the visible slide |
+| `elapsed[i]` | ms used on slide *i*, not counting the running segment |
+| `runningSince` | `Date.now()` when the current slide's timer last started, or `null` if paused |
+| `editorOpen`, `resumeAfterEditor` | Editor gating |
+
+Used time is `elapsed[i] + (now - runningSince)` for the current slide. Time is never accumulated by counting ticks, so a throttled background tab doesn't lose time. `setInterval(render, 250)` only repaints.
+
+- `go(i)`: stop the current segment, switch slides, start the new one.
+- Timer thresholds: `warn` when not over and remaining ≤ 20% of planned; `over` when used > planned. The text shows `ceil(remaining)` normally and `+floor(overage)` when over.
+- Meeting bar: one `.seg` per item (`left`/`width` = the item's planned share of the total), each holding a `.seg-fill` whose width is that item's `used*100/planned`, capped at 100%. `.seg.current` marks the visible item, and `.seg.over` marks an item past its own time. On the whole bar, `pct = totalUsed*100/totalPlanned` gives `warn` (≥ 80% and ≤ 100%), `over` (above 100%), and the uncapped rounded tooltip. *History:* the first version had one fill growing from the left by the total, so time on a later item appeared inside item 1's section. Fixed red/green: 5 new tests in `test_footer.py` failed first.
+
+## Slide alignment
+
+All `.slide`s share one grid cell (`grid-area: 1 / 1` in `#deck`). The row is `fit-content(100%)`, so it's as tall as the tallest slide but never taller than the stage, and `#deck` centres that one row (`align-content: safe center`). Each slide sits at the top of the cell (`align-self: start`), so the "Agenda item N of M" line is at the same height on every slide. The spacing inside a slide doesn't depend on the other slides. Inactive slides are `visibility: hidden` rather than `display: none`, so they still size the cell. A slide taller than the stage scrolls inside itself (`max-height: 100%; overflow-y: auto`). The entrance animation is a fade only, so nothing moves vertically between slides. `test_alignment.py` pins this.
+
+## Touch
+
+Pointer events on `main`, for touch and pen only (`pointerType === "mouse"` is ignored), and never while the editor is open or when the press starts on a button or field. The thresholds live in `GESTURE`:
+
+| Constant | Default | Meaning |
+|---|---|---|
+| `SWIPE_MIN_PX` | 50 | Horizontal travel that counts as a swipe (left = next, right = back) |
+| `SWIPE_RATIO` | 1.5 | `|dx|` must be at least this × `|dy|`; otherwise it's a scroll |
+| `TAP_SLOP_PX` | 10 | Movement still counted as a tap or long-press |
+| `LONG_PRESS_MS` | 500 | Hold time for pause/resume (with a toast and `navigator.vibrate(15)`) |
+| `BACK_ZONE` | 0.3 | A tap in the left 30% of the viewport goes back; elsewhere forward. Taps on the timer area don't navigate. |
+
+`main` has `touch-action: pan-y`, so vertical scrolling stays native and sideways moves reach the handler. `#btn-prev`/`#btn-next` and the touch hint (`.hint-touch`) show only under `@media (pointer: coarse)`. The phone sizes are in the `max-width: 720px` block, and `.slide` uses `justify-content: safe center`, so tall content scrolls instead of clipping at the top.
+
+## Themes
+
+Every colour in the stylesheet is a CSS variable. Each theme sets the full list on `[data-theme="<id>"]`, and `html[data-theme]` picks the active one. `--amber` and `--red` are shared on `:root` and never themed, so time warnings look the same everywhere. The ring's gradient stops take `--ring-1` and `--ring-2` through CSS `stop-color`, which overrides the SVG attributes.
+
+The agenda JSON has an optional `"theme"`. `normalize()` maps an unknown or missing value to `aurora` (the first entry in `THEMES`). Apply saves it with the agenda, Save HTML writes it into the copy, and Reset restores the file's value.
+
+There are two kinds of theme:
+
+- **Studio** (`aurora`, `observatory`, `abyss`, `editorial`, `signal`, `clarity`, `clarity-dark`): besides colours, each sets type and dial tokens (`--f-title`, `--f-num`, `--f-time`, `--f-meta`, `--num-style`, `--num-weight`, `--title-weight`, `--ring-w`, `--bezel`, `--glass`, `--glass-line`). Their art direction lives in the "studio themes" block at the end of the stylesheet, under `:root:is([data-theme="aurora"], …)` (CSS nesting), with one block per theme (one shared block for the Clarity pair, which adds `--card`, `--card-shadow`, `--btn-primary`, `--btn-secondary`, `--kbd` and `--bullet` tokens) for texture (`body::before`), grain (`body::after`) and touches such as the dial ticks (`#timer::before`, a masked `repeating-conic-gradient`). The ring glow sits on the whole `#timer svg`: on the circle it would be clipped to a box.
+- **Classic** (`indigo`, `midnight`, `ocean`, `daylight`, `contrast`): colours only, plus one shared block that sets the type and dial tokens to the original values. The studio selectors never match them, so they look exactly as before; `test_studio_themes.py::test_classic_themes_keep_their_look` pins that.
+
+`:root` carries Aurora's tokens as the fallback. Every theme block sets every token, because a card's `data-theme` must not inherit tokens from the page's theme.
+
+Fonts are stacks of locally installed fonts (`--sans`, `--display`, `--serif`, `--mono`): nothing is downloaded, so the deck works offline. The grain is an inline SVG `feTurbulence` data URI. Motion (`aurora`, `shafts`) is decoration only and is switched off under `prefers-reduced-motion`.
+
+The theme cards carry `data-theme` themselves, so each one picks up its own theme's tokens and is a true mini preview; nothing in a card is coloured inline. Card text is tested for contrast against the card's own background.
+
+**To add a theme:**
+1. Add a `[data-theme="<id>"]` block with every variable; copy an existing block of the same kind (studio or classic). For a classic-style theme, add the id to the shared classic block too.
+2. Add an entry to `THEMES` in the page script (id, name, description) and to `THEMES` in `scripts/build_deck.py`. A test checks that the two lists match.
+3. Add the id to `THEMES`/`NAMES` in `tests/test_settings.py`. The contrast and warning-colour tests then cover it automatically.
+
+## Editor flow
+
+`openEditor` stops the timer, shows the sheet, and copies `agenda` into the deck-title field and into `draft`: one `{minutesRaw, title, pointsRaw}` of strings per item. **Both Contents views read and write `draft`, never each other's DOM.** Quick View (`renderQuick`, `.row`s in `#ed-rows`) and Detailed View (`renderDetailed`: `.dv-item`s in `#dv-items`, plus `#dv-detail` for the `sel` item) re-render from it, and only the visible view is in the DOM. Edits update `draft` in place and call `changed()`, which refreshes `#ed-total` and the validation marks without re-rendering, so focus stays put. The last-used view is kept in `localStorage["meetingAgendaView"]`, a per-viewer convenience.
+
+`validate()` checks `draft` (`problems()` gives the per-item messages) and marks whichever view is showing: `.row.invalid` with `.row-err`, or `.dv-item.invalid` with `#dv-err`. It also writes the footer status `#ed-error` ("N items need attention") and dims Apply. Marks only show after the first Apply or Save attempt (`showErrors`), then update live. Apply stays clickable on purpose: clicking it re-checks and explains. `checkOrShow()` switches back to Contents if you press Apply from Theme. Tabs use one helper (`wireTabs`/`setTabs`) for both tab lists: click, ←/→, Home/End. Ctrl/⌘+Enter clicks Apply. Sub-point inputs ignore plain Enter with Ctrl/⌘ held, so the shortcut still works there. `applyAgenda(data, persist)` either writes to `localStorage` (Apply) or clears it (Reset), rebuilds the deck, and resets all timers.
+
+**Save HTML** clones the `PRISTINE` copy of the document (taken at script start, before anything is rendered) and writes `JSON.stringify(...).replace(/</g, "\\u003c")` into `#agenda-data`. It then downloads `"<!doctype html>\n" + outerHTML` as a Blob.
+
+## Tests
+
+`tests/conftest.py` launches Chromium once per session, using `CHROMIUM_PATH` or `/opt/pw-browsers/chromium` if present, and otherwise Playwright's own download. Each test gets a fresh context (empty `localStorage`) and `page.clock.install()`, and `tick(page, seconds)` advances time. `store_agenda(page, items)` seeds `localStorage` and reloads.
+
+| File | Covers |
+|---|---|
+| `test_slides.py` | Self-containment, embedded demo, slide structure, XSS-as-text, corrupt storage |
+| `test_navigation.py` | All navigation keys, clamping, dots, Space/Shift+Space never navigating, Space after a button click acting once |
+| `test_timers.py` | Countdown, per-slide pause, P/R and buttons, amber, red/pulse/count-up |
+| `test_footer.py` | Meeting text, ticks, per-section segments (sizing, fill per item, revisits, overtime cap, current marker), tooltip, amber/red |
+| `test_editor.py` | Rows, gating, add/apply/storage, reorder/remove, last row, validation, cancel/Esc, reset confirm, Save HTML escaping and round-trip |
+| `test_layout.py` | 24 long items, 90-minute item, phone width |
+| `test_screenshots.py` | Asserts each visual state, and saves the four images in `KEEP` to `meta/screenshots/` (the skill is copied on install, so keep it small). Finishes finite animations before capturing, so images aren't caught mid-fade. |
+| `test_studio_themes.py` | Aurora is the default; studio themes first, then classics; cards drawn from their own tokens (no inline colours); per-theme type (serif Editorial, mono Observatory, outlined and italic numerals); dial ticks only on Observatory and Editorial; Aurora/Abyss motion and reduced motion; Signal has no texture, glow or blur; classic themes keep their look; studio themes fit on a phone |
+| `test_clarity_themes.py` | Clarity and Clarity Dark: placed after Signal, quiet backgrounds, a raised timer card that hugs the ring, sentence-case labels, no texture or glow, filled blue Pause, rounded timer digits |
+| `test_theme.py` | The classic Indigo theme (switched to first, since Aurora is the default): background, eyebrow, allotted caption, ring gradient, pill buttons with icons, dash dots filling per item, bar before text, hints wording, plain footer and gear |
+| `test_touch.py` | Phone context (`has_touch`, `is_mobile`): swipes, thresholds, tap zones, long-press, buttons not navigating, prev/next (≥ 44 px), device-specific hints, editor gating, mouse ignored, timer unaffected, phone layout fits, caption inside the ring |
+| `test_settings.py` | Settings tabs (order, ARIA, arrow keys), theme list, live preview, Cancel/Esc revert, Apply persists, Apply from the Theme tab with invalid rows, Save HTML carries the theme, Reset restores the default, unknown-theme fallback, per-theme contrast (AAA title, AA small text), shared warning colours, readable cards, ✓ on the selected card |
+| `test_alignment.py` | The eyebrow line stays at the same height across slides (demo, mixed content, phone), spacing below it is unchanged, the tallest slide is still centred, the entrance has no vertical motion, and only the active slide is visible |
+| `test_settings_views.py` | Quick/Detailed tabs (ARIA, arrow keys), running total, × and Ctrl/⌘+Enter, footer status, edits surviving a view switch, remembered view; Quick View (no repeated labels, actions on hover/focus, auto-growing sub-points, compact minutes); Detailed View (selection, live list, stepper and picks, sub-points add/Enter/remove, add/move/delete, last item kept, validation); phone (bottom sheet, 44 px buttons, stacked layout, no shortcut hint, no tap highlight) |
+| `test_deck_title.py` | Deck title field (label, above the rows), Apply updates the header, the page title and storage, Cancel/Esc discard, blank allowed, Reset restores, Save HTML escaping, shown as text, typing doesn't drive the deck |
+| `test_build_deck.py` | `build_deck.py`: file and stdin input, `--title`, only the data block changes, `<` escaping, each validation error, `--check`, and a built deck rendering in the browser |
+
+Selectors the tests rely on (keep them stable): `.slide`, `.slide.active`, `.num`, `.title`, `.points li`, `#timer(.warn|.over|.paused)`, `#timer-text`, `#ring-progress`, `#btn-pause`, `#btn-reset`, `#btn-edit`, `.eyebrow`, `#timer-sub`, `#ring-grad`, `#dots .dot .dot-fill`, `#f-deck-title`, `#ed-total`, `#ed-close`, `#apply-kbd`, `#settings-tabs`, `#vtab-quick`, `#vtab-detailed`, `#view-quick`, `#view-detailed`, `.row-err`, `.min-wrap`, `.min-unit`, `.row-btns`, `#dv-items .dv-item` (`aria-current`, `.invalid`), `#dv-title`, `#dv-min`, `#dv-minus`, `#dv-plus`, `.dv-pick[data-min]` (`aria-pressed`), `.dv-point`, `.dv-point-remove`, `#dv-add-point`, `#dv-add`, `#dv-up`, `#dv-down`, `#dv-delete`, `#dv-err`, `#dv-list`, `#dv-detail`, `#tab-contents`, `#tab-theme`, `#panel-contents`, `#panel-theme`, `.theme-card[data-theme]` (`aria-checked`), `.theme-name`, `.theme-desc`, `html[data-theme]`, `#btn-prev`, `#btn-next`, `#toast`, `.hint-keys`, `.hint-touch`, `#meeting-text`, `#meeting-bar(.warn|.over) .seg(.current|.over) .seg-fill .tick`, `#editor .row(.invalid)`, `.f-min`, `.f-title`, `.f-points`, `.btn-up`, `.btn-down`, `.btn-remove`, `#ed-add`, `#ed-reset`, `#ed-cancel`, `#ed-save`, `#ed-apply`, `#ed-error`.
+
+## Common changes
+
+- **Theme** (matched to a reference screenshot from the user, pinned by `test_theme.py`): an indigo body (`#2a2386` → `#1d1a68` → `#2b2280`, 135°) with a violet glow at the top-left and a softer one at the bottom-right. Also: a cyan `.eyebrow` label, a violet `.num`, a ring stroked with `#ring-grad` (cyan top-right to violet bottom-left; the SVG is rotated -90°, so the gradient runs from (1,1) to (0,0)), the caption `of M:SS allotted`, pill buttons with `::before` icons (the button text stays `Pause`/`Resume`/`Reset` for the tests), dash-shaped `.dot`s with a `.dot-fill` per item, the meeting bar before the meeting text with a violet-to-cyan fill, and a transparent footer and gear.
+- **Colours:** edit the `:root` tokens. The amber test checks the ring stroke is `#f59e0b`, so update it if you change that token.
+- **Warn threshold:** `WARN_FRACTION` (item ring) and the `80` in `render()` (meeting bar). Update the matching tests.
+- **New per-item field:** add it to `normalize()`, `rowFromItem`, `renderRows`, `readRows`, `collect`, and to the slide build in `build()`. Set it with `textContent`.
+- **Storage key:** `STORAGE_KEY = "meetingAgenda"`. Changing it orphans agendas users already saved.
+
+## Known limits
+
+- Timer state isn't persisted. Reloading the page resets all timers.
+- The meeting title is only editable in the JSON block, not in the editor.
+- Minutes accept any value > 0. The 0.5 step is a UI hint, not a validation rule.

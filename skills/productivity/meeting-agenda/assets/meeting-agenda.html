@@ -1,0 +1,1506 @@
+<!doctype html>
+<html lang="en" data-theme="aurora">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting Agenda</title>
+<style>
+  /* ---------- themes ----------
+     Every colour comes from these variables. Each theme sets the same list on
+     html[data-theme=...]. Warning colours (--amber, --red) are shared by all
+     themes, so "almost out of time" and "over" always look the same. */
+  :root {
+    --amber: #f59e0b; --red: #ef4444;
+  }
+  /* Type stacks. Nothing is downloaded: each stack falls back to fonts the
+     viewer already has, so the deck stays offline. */
+  :root {
+    --sans: "Inter", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --display: "Inter Display", "Inter", "SF Pro Display", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Iowan Old Style", "Charter", "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    --mono: "SF Mono", ui-monospace, "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --classic: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    /* film grain, light (for dark themes) and warm ink (for Editorial) */
+    --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --noise-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Studio themes: each sets every colour token plus its own type, numeral and
+     dial tokens. Their art direction (texture, motion, layout touches) is in the
+     "studio themes" block at the end of this stylesheet. */
+  :root, [data-theme="aurora"] {
+    --bg-solid: #0c0a24;
+    --bg-image: radial-gradient(70% 60% at 15% 0%, #2a1d72 0%, transparent 70%), linear-gradient(170deg, #15113d 0%, #0c0a24 70%);
+    --ink: #f6f4ff; --muted: #a8a3d1; --accent: #5eead4; --accent-ink: #04201c;
+    --num-1: #ffffff; --num-2: rgba(167, 139, 250, .15); --num-glow: transparent;
+    --ring-1: #5eead4; --ring-2: #a78bfa; --ring-glow: rgba(94, 234, 212, .55);
+    --bar-1: #a78bfa; --bar-2: #5eead4; --dot-fill: #5eead4;
+    --dot-current: rgba(255,255,255,.22); --dot-glow: transparent;
+    --surface: rgba(255,255,255,.05); --surface-2: rgba(255,255,255,.1); --line: rgba(255,255,255,.1);
+    --track: rgba(255,255,255,.07); --tick: #0c0a24; --input: rgba(0,0,0,.3);
+    --panel: rgba(18, 15, 48, .96); --overlay: rgba(5,3,20,.6); --title-shadow: transparent; --toast: rgba(18, 15, 48, .94);
+    --f-title: var(--display); --f-num: var(--display); --f-time: var(--display); --f-meta: var(--sans);
+    --num-style: normal; --num-weight: 800; --title-weight: 700; --ring-w: 7; --bezel: transparent;
+    --glass: rgba(255,255,255,.045); --glass-line: rgba(255,255,255,.09);
+  }
+  [data-theme="observatory"] {
+    --bg-solid: #000000;
+    --bg-image: radial-gradient(60% 45% at 50% -10%, rgba(255,255,255,.10), transparent 70%);
+    --ink: #ededed; --muted: #8f8f8f; --accent: #ededed; --accent-ink: #000000;
+    --num-1: #ffffff; --num-2: #ffffff; --num-glow: transparent;
+    --ring-1: #ffffff; --ring-2: #ffffff; --ring-glow: rgba(255,255,255,.35);
+    --bar-1: #ededed; --bar-2: #ededed; --dot-fill: #ededed;
+    --dot-current: #3a3a3a; --dot-glow: transparent;
+    --surface: #0a0a0a; --surface-2: #1a1a1a; --line: #242424;
+    --track: #1c1c1c; --tick: #000000; --input: #0a0a0a;
+    --panel: rgba(10,10,10,.97); --overlay: rgba(0,0,0,.6); --title-shadow: transparent; --toast: #0a0a0a;
+    --f-title: var(--display); --f-num: var(--display); --f-time: var(--mono); --f-meta: var(--mono);
+    --num-style: normal; --num-weight: 300; --title-weight: 600; --ring-w: 3; --bezel: rgba(255,255,255,.22);
+    --glass: #0a0a0a; --glass-line: #242424;
+  }
+  [data-theme="abyss"] {
+    --bg-solid: #01161c;
+    --bg-image: radial-gradient(80% 60% at 30% -10%, rgba(14, 116, 144, .55), transparent 70%),
+                radial-gradient(50% 50% at 100% 110%, rgba(16, 185, 129, .25), transparent 70%),
+                linear-gradient(180deg, #032a33 0%, #01161c 75%);
+    --ink: #e6fbff; --muted: #86b5bf; --accent: #67e8f9; --accent-ink: #02242b;
+    --num-1: #e6fbff; --num-2: #22d3ee; --num-glow: transparent;
+    --ring-1: #67e8f9; --ring-2: #34d399; --ring-glow: rgba(103, 232, 249, .7);
+    --bar-1: #34d399; --bar-2: #67e8f9; --dot-fill: #67e8f9;
+    --dot-current: rgba(103,232,249,.25); --dot-glow: transparent;
+    --surface: rgba(103,232,249,.05); --surface-2: rgba(103,232,249,.1); --line: rgba(103,232,249,.13);
+    --track: rgba(103,232,249,.08); --tick: #01161c; --input: rgba(0,0,0,.28);
+    --panel: rgba(2, 30, 38, .96); --overlay: rgba(0,10,14,.6); --title-shadow: transparent; --toast: rgba(2, 30, 38, .94);
+    --f-title: var(--display); --f-num: var(--display); --f-time: var(--display); --f-meta: var(--sans);
+    --num-style: normal; --num-weight: 200; --title-weight: 600; --ring-w: 5; --bezel: transparent;
+    --glass: rgba(103,232,249,.04); --glass-line: rgba(103,232,249,.12);
+  }
+  [data-theme="editorial"] {
+    --bg-solid: #f4efe4;
+    --bg-image: radial-gradient(90% 70% at 50% 40%, #faf7f0 0%, #f1ebde 100%);
+    --ink: #1d1a16; --muted: #6f675b; --accent: #c2410c; --accent-ink: #fff8f0;
+    --num-1: #c2410c; --num-2: #c2410c; --num-glow: transparent;
+    --ring-1: #c2410c; --ring-2: #c2410c; --ring-glow: transparent;
+    --bar-1: #1d1a16; --bar-2: #1d1a16; --dot-fill: #c2410c;
+    --dot-current: rgba(29,26,22,.25); --dot-glow: transparent;
+    --surface: rgba(29,26,22,.035); --surface-2: rgba(29,26,22,.07); --line: rgba(29,26,22,.14);
+    --track: rgba(29,26,22,.08); --tick: #f4efe4; --input: #ffffff;
+    --panel: #fbf8f2; --overlay: rgba(40,30,20,.3); --title-shadow: transparent; --toast: #fbf8f2;
+    --f-title: var(--serif); --f-num: var(--serif); --f-time: var(--serif); --f-meta: var(--sans);
+    --num-style: italic; --num-weight: 400; --title-weight: 500; --ring-w: 3; --bezel: rgba(29,26,22,.35);
+    --glass: transparent; --glass-line: rgba(29,26,22,.14);
+  }
+  [data-theme="signal"] {
+    --bg-solid: #000000; --bg-image: none;
+    --ink: #ffffff; --muted: #ffffff; --accent: #ffd60a; --accent-ink: #000000;
+    --num-1: #ffffff; --num-2: #ffffff; --num-glow: transparent;
+    --ring-1: #ffd60a; --ring-2: #ffd60a; --ring-glow: transparent;
+    --bar-1: #ffd60a; --bar-2: #ffd60a; --dot-fill: #ffd60a;
+    --dot-current: #ffffff; --dot-glow: transparent;
+    --surface: #000000; --surface-2: #222222; --line: #ffffff;
+    --track: #333333; --tick: #000000; --input: #000000;
+    --panel: #000000; --overlay: rgba(0,0,0,.75); --title-shadow: transparent; --toast: #000000;
+    --f-title: var(--display); --f-num: var(--display); --f-time: var(--display); --f-meta: var(--sans);
+    --num-style: normal; --num-weight: 900; --title-weight: 800; --ring-w: 16; --bezel: transparent;
+    --glass: #000000; --glass-line: #ffffff;
+  }
+
+  /* Clarity and Clarity Dark: Apple's design principles (clarity, deference,
+     depth). Text uses San Francisco where installed, the timer SF Pro Rounded. */
+  [data-theme="clarity"] {
+    --bg-solid: #f5f5f7;
+    --bg-image: linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 60%, #efeff4 100%);
+    --ink: #1d1d1f; --muted: #6e6e73; --accent: #0066cc; --accent-ink: #ffffff;
+    --num-1: #86868b; --num-2: #86868b; --num-glow: transparent;
+    --ring-1: #0a84ff; --ring-2: #5e5ce6; --ring-glow: transparent;
+    --bar-1: #0a84ff; --bar-2: #5e5ce6; --dot-fill: #0071e3;
+    --dot-current: rgba(0,0,0,.18); --dot-glow: transparent;
+    --surface: rgba(0,0,0,.04); --surface-2: rgba(0,0,0,.07); --line: rgba(0,0,0,.1);
+    --track: #e8e8ed; --tick: #ffffff; --input: #ffffff;
+    --panel: rgba(255,255,255,.9); --overlay: rgba(0,0,0,.18); --title-shadow: transparent; --toast: rgba(255,255,255,.92);
+    --f-title: -apple-system, "SF Pro Display", "Inter Display", "Inter", system-ui, sans-serif; --f-num: var(--f-title);
+    --f-time: ui-rounded, "SF Pro Rounded", -apple-system, "Inter Display", system-ui, sans-serif;
+    --f-meta: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    --num-style: normal; --num-weight: 600; --title-weight: 700; --ring-w: 12; --bezel: transparent;
+    --glass: rgba(255,255,255,.72); --glass-line: rgba(0,0,0,.06);
+    --card: #ffffff; --card-shadow: 0 1px 1px rgba(0,0,0,.03), 0 12px 40px -12px rgba(0,0,0,.14);
+    --btn-primary: #0071e3; --btn-secondary: rgba(0,0,0,.05); --kbd: #ffffff; --bullet: #c7c7cc;
+  }
+  [data-theme="clarity-dark"] {
+    --bg-solid: #000000;
+    --bg-image: radial-gradient(80% 60% at 50% -20%, #1c1c1e 0%, transparent 70%);
+    --ink: #f5f5f7; --muted: #98989d; --accent: #0a84ff; --accent-ink: #ffffff;
+    --num-1: #8e8e93; --num-2: #8e8e93; --num-glow: transparent;
+    --ring-1: #0a84ff; --ring-2: #5e5ce6; --ring-glow: transparent;
+    --bar-1: #0a84ff; --bar-2: #5e5ce6; --dot-fill: #0a84ff;
+    --dot-current: rgba(255,255,255,.22); --dot-glow: transparent;
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.1); --line: rgba(255,255,255,.12);
+    --track: #2c2c2e; --tick: #1c1c1e; --input: #1c1c1e;
+    --panel: rgba(28,28,30,.92); --overlay: rgba(0,0,0,.5); --title-shadow: transparent; --toast: rgba(44,44,46,.94);
+    --f-title: -apple-system, "SF Pro Display", "Inter Display", "Inter", system-ui, sans-serif; --f-num: var(--f-title);
+    --f-time: ui-rounded, "SF Pro Rounded", -apple-system, "Inter Display", system-ui, sans-serif;
+    --f-meta: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    --num-style: normal; --num-weight: 600; --title-weight: 700; --ring-w: 12; --bezel: transparent;
+    --glass: rgba(28,28,30,.72); --glass-line: rgba(255,255,255,.08);
+    --card: #1c1c1e; --card-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 12px 40px -12px rgba(0,0,0,.8);
+    --btn-primary: #0a84ff; --btn-secondary: rgba(255,255,255,.1); --kbd: #2c2c2e; --bullet: #48484a;
+  }
+
+  /* Classic themes: the original five, unchanged. They share the system font and
+     the original numeral and ring. */
+  [data-theme="indigo"], [data-theme="midnight"], [data-theme="ocean"], [data-theme="daylight"], [data-theme="contrast"] {
+    --f-title: var(--classic); --f-num: var(--classic); --f-time: var(--classic); --f-meta: var(--classic);
+    --num-style: normal; --num-weight: 900; --title-weight: 800; --ring-w: 14; --bezel: transparent;
+    --glass: transparent; --glass-line: transparent;
+  }
+  [data-theme="indigo"] {
+    --bg-solid: #241f7a;
+    --bg-image:
+      radial-gradient(ellipse at top left, rgba(124, 92, 255, .55) 0%, transparent 55%),   /* violet glow */
+      radial-gradient(ellipse at bottom right, rgba(110, 80, 230, .35) 0%, transparent 60%),
+      linear-gradient(135deg, #2a2386 0%, #1d1a68 55%, #2b2280 100%);                     /* indigo base */
+    --ink: #f5f3ff; --muted: #c4c0f0; --accent: #2dd4bf; --accent-ink: #052e2b;
+    --num-1: #8b5cf6; --num-2: #6d4cff; --num-glow: rgba(109, 76, 255, .35);
+    --ring-1: #22d3ee; --ring-2: #6d4cff; --ring-glow: rgba(34, 211, 238, .25);
+    --bar-1: #6d4cff; --bar-2: #22d3ee; --dot-fill: #22d3ee;
+    --dot-current: rgba(109, 76, 255, .55); --dot-glow: rgba(109, 76, 255, .6);
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.12); --line: rgba(255,255,255,.12);
+    --track: rgba(255,255,255,.1); --tick: rgba(20,16,70,.9); --input: rgba(0,0,0,.3);
+    --panel: rgba(24, 20, 78, .97); --overlay: rgba(5,2,15,.6); --title-shadow: rgba(10, 6, 40, .35);
+    --toast: rgba(15, 12, 60, .92);
+  }
+  [data-theme="midnight"] {
+    --bg-solid: #141a3a;
+    --bg-image:
+      radial-gradient(ellipse at top left, #3a2a6b 0%, transparent 55%),
+      linear-gradient(135deg, #0f1530, #2e1a47);
+    --ink: #f4f1ff; --muted: #b9b0d8; --accent: #2dd4bf; --accent-ink: #052e2b;
+    --num-1: #2dd4bf; --num-2: #a78bfa; --num-glow: rgba(45, 212, 191, .2);
+    --ring-1: #2dd4bf; --ring-2: #a78bfa; --ring-glow: rgba(45, 212, 191, .2);
+    --bar-1: #a78bfa; --bar-2: #2dd4bf; --dot-fill: #2dd4bf;
+    --dot-current: rgba(167, 139, 250, .5); --dot-glow: rgba(167, 139, 250, .5);
+    --surface: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.12); --line: rgba(255,255,255,.12);
+    --track: rgba(255,255,255,.1); --tick: rgba(10,8,30,.9); --input: rgba(0,0,0,.3);
+    --panel: rgba(20, 16, 44, .97); --overlay: rgba(5,2,15,.6); --title-shadow: rgba(0, 0, 0, .35);
+    --toast: rgba(15, 12, 40, .92);
+  }
+  [data-theme="ocean"] {
+    --bg-solid: #0b3142;
+    --bg-image:
+      radial-gradient(ellipse at top left, rgba(56, 189, 248, .30) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(251, 113, 133, .16) 0%, transparent 60%),
+      linear-gradient(135deg, #0c3a4f 0%, #082636 55%, #0b3346 100%);
+    --ink: #f0fbff; --muted: #a9d3e0; --accent: #5eead4; --accent-ink: #042f2e;
+    --num-1: #5eead4; --num-2: #38bdf8; --num-glow: rgba(56, 189, 248, .3);
+    --ring-1: #5eead4; --ring-2: #fb7185; --ring-glow: rgba(94, 234, 212, .25);
+    --bar-1: #38bdf8; --bar-2: #5eead4; --dot-fill: #5eead4;
+    --dot-current: rgba(251, 113, 133, .6); --dot-glow: rgba(251, 113, 133, .5);
+    --surface: rgba(255,255,255,.07); --surface-2: rgba(255,255,255,.13); --line: rgba(255,255,255,.14);
+    --track: rgba(255,255,255,.11); --tick: rgba(4,24,34,.9); --input: rgba(0,0,0,.28);
+    --panel: rgba(8, 38, 54, .97); --overlay: rgba(0,10,15,.6); --title-shadow: rgba(0, 20, 30, .4);
+    --toast: rgba(6, 30, 44, .92);
+  }
+  [data-theme="daylight"] {
+    --bg-solid: #f6f7fb;
+    --bg-image:
+      radial-gradient(ellipse at top left, rgba(109, 76, 255, .10) 0%, transparent 55%),
+      linear-gradient(135deg, #ffffff 0%, #f2f3fa 60%, #eceffa 100%);
+    --ink: #15132b; --muted: #4b4868; --accent: #0f766e; --accent-ink: #ffffff;
+    --num-1: #6d4cff; --num-2: #4f2fd9; --num-glow: rgba(109, 76, 255, .15);
+    --ring-1: #0891b2; --ring-2: #6d4cff; --ring-glow: rgba(8, 145, 178, .15);
+    --bar-1: #6d4cff; --bar-2: #0891b2; --dot-fill: #0891b2;
+    --dot-current: rgba(109, 76, 255, .45); --dot-glow: rgba(109, 76, 255, .3);
+    --surface: rgba(20,19,43,.05); --surface-2: rgba(20,19,43,.10); --line: rgba(20,19,43,.14);
+    --track: rgba(20,19,43,.10); --tick: rgba(255,255,255,.95); --input: #ffffff;
+    --panel: rgba(255, 255, 255, .98); --overlay: rgba(20,19,43,.35); --title-shadow: transparent;
+    --toast: rgba(255, 255, 255, .96);
+  }
+  [data-theme="contrast"] {
+    --bg-solid: #000000;
+    --bg-image: none;
+    --ink: #ffffff; --muted: #e5e5e5; --accent: #00e5ff; --accent-ink: #000000;
+    --num-1: #ffffff; --num-2: #ffffff; --num-glow: transparent;
+    --ring-1: #00e5ff; --ring-2: #00e5ff; --ring-glow: transparent;
+    --bar-1: #00e5ff; --bar-2: #00e5ff; --dot-fill: #00e5ff;
+    --dot-current: #ffffff; --dot-glow: transparent;
+    --surface: #000000; --surface-2: #1a1a1a; --line: #ffffff;
+    --track: #4d4d4d; --tick: #000000; --input: #000000;
+    --panel: #000000; --overlay: rgba(0,0,0,.75); --title-shadow: transparent;
+    --toast: #000000;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background-color: var(--bg-solid);
+    background-image: var(--bg-image);
+    color: var(--ink);
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  button:disabled { cursor: not-allowed; opacity: .35; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* header */
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 3vw, 40px) 0; }
+  #meeting-title { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); overflow-wrap: anywhere; }
+  #btn-edit { background: transparent; border: 0; border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; flex: none; opacity: .85; }
+  #btn-edit:hover { opacity: 1; background-color: var(--surface); }
+  #btn-edit svg { width: 24px; height: 24px; }
+
+  /* stage */
+  main { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(16px, 4vw, 56px); padding: clamp(12px, 3vh, 32px) clamp(16px, 5vw, 72px); overflow: hidden; }
+  /* All slides share one grid cell, sized to the tallest slide (capped at the stage),
+     and that cell is centred once. Each slide sits at the top of the cell, so the
+     "Agenda item N of M" line lands at the same height on every slide. */
+  #deck { min-height: 0; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: fit-content(100%); align-content: safe center; }
+  .slide { grid-area: 1 / 1; align-self: start; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; min-width: 0; visibility: hidden; }
+  .slide.active { visibility: visible; animation: enter .35s ease-out; }
+  @keyframes enter { from { opacity: 0; } to { opacity: 1; } }   /* fade only: nothing moves vertically */
+  .eyebrow { margin-bottom: .6em; font-size: clamp(12px, 1.9vh, 17px); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+  .num {
+    font-size: clamp(56px, 13vh, 140px); font-weight: 900; line-height: .9; letter-spacing: -.02em;
+    background: linear-gradient(160deg, var(--num-1), var(--num-2) 70%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px var(--num-glow));
+  }
+  .title { margin: .35em 0 .4em; font-size: clamp(28px, 6vh, 64px); line-height: 1.1; font-weight: 800; overflow-wrap: anywhere; text-shadow: 0 2px 14px var(--title-shadow); }
+  .points { margin: 0; padding-left: 1.2em; font-size: clamp(17px, 2.8vh, 28px); color: var(--ink); opacity: .9; overflow-wrap: anywhere; }
+  .points li { margin: .3em 0; }
+  .points li::marker { color: var(--accent); }
+
+  /* timer */
+  #timer-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  #timer { position: relative; width: clamp(150px, 34vh, 280px); aspect-ratio: 1; }
+  #timer svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  #ring-grad stop:first-child { stop-color: var(--ring-1); }
+  #ring-grad stop:last-child { stop-color: var(--ring-2); }
+  #ring-track { fill: none; stroke: var(--track); stroke-width: 14; }
+  #ring-progress { fill: none; stroke: url(#ring-grad); stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .25s linear; filter: drop-shadow(0 0 10px var(--ring-glow)); }
+  #timer.warn #ring-progress { stroke: var(--amber); }
+  #timer.over #ring-progress { stroke: var(--red); }
+  #timer.over { animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0)); } 50% { transform: scale(1.04); filter: drop-shadow(0 0 18px rgba(239,68,68,.7)); } }
+  #timer-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  #timer-text { font-size: clamp(30px, 7vh, 60px); font-weight: 700; font-variant-numeric: tabular-nums; }
+  #timer.warn #timer-text { color: var(--amber); }
+  #timer.over #timer-text { color: var(--red); }
+  #timer-sub { font-size: clamp(12px, 1.9vh, 16px); font-weight: 600; color: var(--muted); }
+  #timer.paused #timer-text { opacity: .55; }
+  .controls { display: flex; gap: 8px; }
+  .controls button { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px; font-weight: 600; }
+  .controls button::before { display: inline-block; margin-right: .45em; text-align: center; }
+  #btn-pause::before { content: "\275A\275A"; letter-spacing: -.12em; font-size: .7em; }
+  #btn-pause[data-state="paused"]::before { content: "\25B6\FE0E"; }
+  #btn-reset::before { content: "\21BA"; }
+  .controls button:hover { background: var(--surface-2); filter: brightness(1.15); }
+
+  /* footer */
+  footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 10px clamp(16px, 3vw, 40px) 16px; background: transparent; font-size: 13px; }
+  #hints { color: var(--ink); font-weight: 600; }
+  #hints kbd { font: 600 12px/1 system-ui, sans-serif; border: 0; border-radius: 4px; padding: 3px 6px; background: var(--surface-2); color: var(--ink); }
+  #hints .sep { color: var(--muted); margin: 0 .3em; }
+  #dots { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; flex: 1 1 160px; }
+  /* one dash per item; it fills with the time spent on that item */
+  .dot { width: 24px; height: 6px; padding: 0; border: 0; border-radius: 3px; background: var(--track); overflow: hidden; display: block; }
+  .dot-fill { display: block; height: 100%; width: 0; background: var(--dot-fill); }
+  .dot.over .dot-fill { background: var(--red); }
+  .dot[aria-current="step"] { width: 34px; background: var(--dot-current); box-shadow: 0 0 10px var(--dot-glow); }
+  #meeting { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  #meeting-text { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #meeting-bar { position: relative; width: clamp(140px, 20vw, 280px); height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  /* one segment per item, sized by its planned minutes; each fills with the time spent on that item */
+  #meeting-bar .seg { position: absolute; top: 0; bottom: 0; overflow: hidden; }
+  #meeting-bar .seg.current { background: var(--surface-2); }
+  #meeting-bar .seg-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--bar-1), var(--bar-2)); transition: width .25s linear; }
+  #meeting-bar.warn .seg-fill { background: var(--amber); }
+  #meeting-bar.over .seg-fill, #meeting-bar .seg.over .seg-fill { background: var(--red); }
+  #meeting-bar .tick { position: absolute; z-index: 1; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--tick); }
+
+  /* ---------- settings (gear) ----------
+     One sheet: header with close, underline tabs (Contents | Theme), a scrolling body,
+     and a footer with one primary action. Contents offers two views of one draft:
+     Quick View (an inline list) and Detailed View (list + detail). */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  #editor { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--overlay); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  #editor[hidden] { display: none; }
+  .ed-panel { width: min(800px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 40px 80px -20px rgba(0,0,0,.55); overflow: hidden; }
+  .ed-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 0 20px; }
+  .ed-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  #ed-close { width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; display: grid; place-items: center; }
+  #ed-close:hover { background: var(--surface-2); color: var(--ink); }
+  .ed-tabs { display: flex; gap: 20px; padding: 0 20px; margin-top: 6px; border-bottom: 1px solid var(--line); }
+  .ed-tabs button { position: relative; border: 0; background: transparent; padding: 10px 0 11px; font-weight: 500; color: var(--muted); border-radius: 0; }
+  .ed-tabs button:hover { color: var(--ink); }
+  .ed-tabs button[aria-selected="true"] { color: var(--ink); }
+  .ed-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--ink); }
+  .ed-tabpanel { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 18px 20px 12px; }
+  .ed-tabpanel[hidden] { display: none; }
+  .ed-note { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+
+  /* deck title: a heading you can type into */
+  #f-deck-title { width: 100%; font: 650 22px/1.25 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.02em; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid transparent; padding: 2px 0 4px; border-radius: 0; }
+  #f-deck-title:hover { border-bottom-color: var(--line); }
+  #f-deck-title:focus { outline: none; border-bottom-color: var(--accent); }
+  #f-deck-title::placeholder { color: var(--muted); opacity: .6; }
+  .dt-help { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+  .dt-help label { color: inherit; }
+
+  /* view switch + running total */
+  .ed-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 0 8px; }
+  .seg { display: inline-flex; padding: 2px; border-radius: 9px; background: var(--surface); border: 1px solid var(--line); }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 5px 12px; border-radius: 7px; font-size: 13px; font-weight: 550; }
+  .seg button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  #ed-total { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ed-view[hidden] { display: none; }
+
+  /* Quick View: hairline rows, inline fields, actions on hover/focus */
+  #ed-rows { border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto; gap: 12px; align-items: start; padding: 12px 8px 12px 6px; border-bottom: 1px solid var(--line); }
+  .row:hover { background: var(--surface); }
+  .row:focus-within { background: var(--surface); box-shadow: inset 2px 0 0 var(--accent); }
+  .row.invalid { background: rgba(239,68,68,.07); box-shadow: inset 2px 0 0 var(--red); }
+  .row-num { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 3px; }
+  .row .f-title, .row .f-points { display: block; width: 100%; color: var(--ink); background: transparent; border: 0; border-radius: 0; padding: 1px 0; font: inherit; }
+  .row .f-title { font-size: 15px; font-weight: 600; border-bottom: 1px solid transparent; }
+  .row .f-title:focus { outline: none; border-bottom-color: var(--accent); }
+  .row .f-points { margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--line); font-size: 13.5px; line-height: 1.5; color: var(--muted); resize: none; overflow: hidden; min-height: 1.5em; }
+  .row .f-points:focus { outline: none; color: var(--ink); }
+  .row .f-title::placeholder, .row .f-points::placeholder { color: var(--muted); opacity: .6; }
+  .row-err { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--red); }
+  .min-wrap { display: inline-flex; align-items: baseline; gap: 3px; padding: 3px 9px 3px 7px; border-radius: 7px; background: var(--surface-2); cursor: text; }
+  .min-wrap:focus-within { box-shadow: 0 0 0 1px var(--accent); }
+  .f-min { width: 2.1em; padding: 0; border: 0; background: transparent; color: var(--ink); font: 600 14px/1.4 system-ui, sans-serif; text-align: right; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield; }
+  .f-min:focus { outline: none; }
+  .f-min::-webkit-inner-spin-button, .f-min::-webkit-outer-spin-button, #dv-min::-webkit-inner-spin-button, #dv-min::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .min-unit { font-size: 12px; color: var(--muted); }
+  .row-btns { display: flex; gap: 2px; opacity: 0; }
+  .row:hover .row-btns, .row:focus-within .row-btns { opacity: 1; }
+  .icon-btn { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); display: grid; place-items: center; font-size: 14px; }
+  .icon-btn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+  .btn-remove:hover:not(:disabled), #dv-delete:hover:not(:disabled) { color: var(--red); }
+  .add-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 6px; border: 0; background: transparent; color: var(--muted); font-weight: 550; text-align: left; border-radius: 8px; }
+  .add-btn::before { content: "+"; color: var(--accent); font-size: 17px; font-weight: 600; line-height: 1; width: 22px; text-align: center; }
+  .add-btn:hover { color: var(--ink); background: var(--surface); }
+
+  /* Detailed View: list on the left, the selected item on the right */
+  #view-detailed { display: grid; grid-template-columns: 250px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; min-height: 340px; }
+  #view-detailed[hidden] { display: none; }
+  #dv-list { border-right: 1px solid var(--line); padding: 6px; display: flex; flex-direction: column; gap: 1px; }
+  .dv-item { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); text-align: left; }
+  .dv-item:hover { background: var(--surface); }
+  .dv-item[aria-current="true"] { background: var(--surface-2); }
+  .dv-item.invalid { box-shadow: inset 2px 0 0 var(--red); }
+  .dv-no, .dv-m { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .dv-ti { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dv-detail { padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .dv-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+  #dv-no-label { font-size: 12.5px; color: var(--muted); }
+  .dv-acts { display: flex; gap: 2px; }
+  .dv-label { font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  #dv-title { width: 100%; font: 650 20px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.01em; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 2px 0 8px; border-radius: 0; }
+  #dv-title:focus { outline: none; border-bottom-color: var(--accent); }
+  .dv-dur { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .stepper button { width: 36px; border: 0; background: transparent; color: var(--muted); font-size: 16px; }
+  .stepper button:hover { background: var(--surface-2); color: var(--ink); }
+  .stepper label { display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 10px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+  #dv-min { width: 3em; border: 0; background: transparent; color: var(--ink); font: 600 15px/1.3 system-ui, sans-serif; text-align: right; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
+  #dv-min:focus { outline: none; }
+  .stepper:focus-within { box-shadow: 0 0 0 1px var(--accent); }
+  .dv-picks { display: flex; gap: 6px; }
+  .dv-pick { min-width: 36px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .dv-pick:hover { color: var(--ink); background: var(--surface); }
+  .dv-pick[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+  #dv-points { display: flex; flex-direction: column; }
+  .dv-point-row { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
+  .dv-point-row::before { content: "–"; color: var(--muted); }
+  .dv-point { flex: 1; min-width: 0; padding: 8px 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; }
+  .dv-point:focus { outline: none; }
+  .dv-point-row:focus-within { border-bottom-color: var(--accent); }
+  .dv-point-remove { opacity: 0; }
+  .dv-point-row:hover .dv-point-remove, .dv-point-row:focus-within .dv-point-remove { opacity: 1; }
+  #dv-add-point { padding: 9px 0; }
+  #dv-err { font-size: 12px; font-weight: 600; color: var(--red); margin: 6px 0 0; }
+
+  /* Theme panel */
+  #theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  /* Each card carries data-theme, so it picks up that theme's tokens: a real
+     miniature with its own background, numeral, ring and type. No colours are
+     hard-coded per card, so a card can't drift from its theme. */
+  .theme-card { position: relative; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background-color: var(--bg-solid); background-image: var(--bg-image); color: var(--ink); text-align: left; }
+  .theme-card[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .theme-card[aria-checked="true"]::after { content: "✓"; position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; background: var(--accent); color: var(--accent-ink); }
+  .theme-swatch { position: relative; display: block; height: 104px; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .theme-swatch s { position: absolute; left: 14px; top: 12px; font: var(--num-style) var(--num-weight) 42px/1 var(--f-num); letter-spacing: -.04em; color: var(--num-1); text-decoration: none; }
+  [data-theme="observatory"] .theme-swatch s { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.7); }
+  .theme-swatch b { position: absolute; top: 16px; right: 16px; width: 50px; height: 50px; border-radius: 50%; border: max(2px, calc(var(--ring-w) * .35px)) solid var(--ring-1); border-right-color: var(--track); transform: rotate(-45deg); box-shadow: 0 0 12px var(--ring-glow); }
+  .theme-swatch i { position: absolute; left: 14px; right: 14px; bottom: 14px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--bar-1), var(--bar-2)); }
+  .theme-name { padding: 12px 14px 0; font-family: var(--f-title); font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
+  .theme-desc { padding: 3px 14px 14px; font-size: 12.5px; color: var(--muted); }
+
+  /* footer: quiet secondary actions on the left, one primary on the right */
+  .ed-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); }
+  .ed-actions .spacer { flex: 1; }
+  .ed-actions button { height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 550; font-size: 13.5px; }
+  .btn-quiet { border: 0; background: transparent; color: var(--muted); }
+  .btn-quiet:hover { color: var(--ink); background: var(--surface); }
+  #ed-save::before { content: "\2193"; margin-right: 6px; }
+  .btn-secondary { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  .btn-secondary:hover { background: var(--surface-2); }
+  #ed-apply { border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 650; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset; display: inline-flex; align-items: center; gap: 8px; }
+  #ed-apply.dim { opacity: .55; }
+  #ed-apply kbd { font: 500 11px/1 system-ui, sans-serif; opacity: .65; }
+  #ed-error { margin: 0; color: var(--red); font-size: 13px; font-weight: 600; }
+
+  /* touch: gestures on the stage, prev/next buttons, touch hints, a toast for long-press */
+  main { touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  button { touch-action: manipulation; }
+  #nav { display: flex; align-items: center; justify-content: center; gap: 12px; flex: 1 1 160px; }
+  #nav #dots { flex: 0 1 auto; }
+  .nav-btn { display: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-size: 26px; line-height: 1; padding: 0 0 3px; place-items: center; flex: none; }
+  .hint-touch { display: none; }
+  #toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 8px); padding: 8px 16px; border-radius: 999px; background: var(--toast); color: var(--ink); border: 1px solid var(--line); font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (hover: none) {
+    .row-btns, .dv-point-remove { opacity: 1; }
+  }
+  @media (pointer: coarse) {
+    #apply-kbd { display: none; }
+    .nav-btn { display: grid; }
+    .hint-keys { display: none; }
+    .hint-touch { display: inline; }
+    .controls button { min-height: 44px; padding: 10px 18px; }
+    .dot { height: 8px; }
+  }
+
+  @media (max-width: 720px) {
+    main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+    #timer { width: clamp(120px, 20vh, 170px); }
+    #timer-text { font-size: clamp(24px, 4.4vh, 36px); }
+    #timer-sub { font-size: 11px; }
+    .eyebrow { font-size: 11px; letter-spacing: .12em; }
+    .num { font-size: clamp(44px, 8vh, 72px); }
+    .title { font-size: clamp(22px, 3.4vh, 32px); }
+    .points { font-size: clamp(15px, 2.1vh, 18px); }
+    #timer-wrap { flex-direction: row; }
+    .controls { flex-direction: column; }
+    #editor { padding: 0; align-items: flex-end; }
+    .ed-panel { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .ed-tabpanel { padding: 16px; }
+    .row { grid-template-columns: 22px minmax(0, 1fr) auto; }
+    .row-btns { grid-column: 2 / -1; justify-content: flex-end; }
+    #view-detailed { grid-template-columns: minmax(0, 1fr); }
+    #dv-list { border-right: 0; border-bottom: 1px solid var(--line); }
+    .ed-actions { padding: 12px 16px 20px; }
+    .ed-actions button { height: 44px; }
+    .ed-actions .spacer { flex-basis: 100%; height: 0; }
+    #ed-cancel { flex: 1; }
+    #ed-apply { flex: 2; justify-content: center; }
+  }
+
+  /* ---------- studio themes: art direction ----------
+     Only the five studio themes get these rules; the classic five never match
+     this selector, so they look exactly as before. */
+  :root:is([data-theme="aurora"], [data-theme="observatory"], [data-theme="abyss"], [data-theme="editorial"], [data-theme="signal"], [data-theme="clarity"], [data-theme="clarity-dark"]) {
+    body { font-family: var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+    header, main, footer { position: relative; z-index: 2; }
+    body::before, body::after { content: ""; position: fixed; pointer-events: none; z-index: 0; }
+    body::after { inset: 0; z-index: 1; background-image: var(--noise); mix-blend-mode: overlay; opacity: .55; }
+
+    #meeting-title { font: 600 12px/1 var(--f-meta); letter-spacing: .22em; }
+    .eyebrow { font-family: var(--f-meta); font-size: clamp(11px, 1.55vh, 14px); font-weight: 600; letter-spacing: .2em; }
+    .num {
+      font-family: var(--f-num); font-style: var(--num-style); font-weight: var(--num-weight);
+      font-size: clamp(88px, 22vh, 230px); line-height: .82; letter-spacing: -.055em; padding-right: .08em;
+      background: linear-gradient(180deg, var(--num-1) 20%, var(--num-2) 100%); -webkit-background-clip: text; background-clip: text;
+      filter: none;
+    }
+    .title { font-family: var(--f-title); font-weight: var(--title-weight); font-size: clamp(30px, 6.6vh, 72px); line-height: 1.02; letter-spacing: -.035em; text-shadow: none; max-width: 16ch; text-wrap: balance; }
+    .points { color: var(--muted); opacity: 1; padding-left: 0; list-style: none; font-size: clamp(16px, 2.5vh, 24px); }
+    .points li { display: flex; gap: .8em; align-items: baseline; }
+    .points li::before { content: ""; flex: none; width: .9em; height: 1px; background: var(--accent); transform: translateY(-.32em); }
+
+    #timer { width: clamp(170px, 38vh, 320px); }
+    #ring-track, #ring-progress { stroke-width: var(--ring-w); }
+    /* the glow sits on the whole SVG: on the circle itself it would be clipped to a box */
+    #ring-progress { filter: none; }
+    #timer svg { overflow: visible; filter: drop-shadow(0 0 6px var(--ring-glow)) drop-shadow(0 0 20px var(--ring-glow)); }
+    #timer.warn { --ring-glow: rgba(245, 158, 11, .45); }
+    #timer.over { --ring-glow: rgba(239, 68, 68, .55); }
+    #timer-text { font-family: var(--f-time); font-weight: 500; font-size: clamp(36px, 8.5vh, 76px); letter-spacing: -.04em; }
+    #timer-sub { font-family: var(--f-meta); font-weight: 500; font-size: clamp(11px, 1.6vh, 14px); letter-spacing: .04em; }
+    .controls { gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .controls button { border: 0; background: transparent; font: 550 13.5px/1 var(--f-meta); padding: 9px 16px; letter-spacing: .01em; }
+    .controls button:hover { background: var(--surface-2); filter: none; }
+
+    footer { margin: 0 clamp(12px, 2.4vw, 32px) clamp(12px, 2vh, 20px); padding: 10px 16px; border-radius: 14px; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); font-family: var(--f-meta); font-size: 12.5px; }
+    #hints { color: var(--muted); font-weight: 500; }
+    #hints kbd { font: 500 11.5px/1 var(--f-meta); background: transparent; border: 1px solid var(--line); color: var(--ink); padding: 4px 6px; border-radius: 5px; }
+    .dot { height: 3px; border-radius: 2px; width: 22px; }
+    .dot[aria-current="step"] { width: 40px; box-shadow: none; }
+    #meeting-bar { height: 4px; border-radius: 2px; }
+    #meeting-text { color: var(--muted); font-size: 12px; }
+
+    @media (pointer: coarse) { .controls button { min-height: 44px; } .dot { height: 6px; } }
+    @media (max-width: 720px) {
+      .num { font-size: clamp(44px, 8vh, 72px); }
+      .title { font-size: clamp(22px, 3.4vh, 32px); max-width: none; }
+      .points { font-size: clamp(15px, 2.1vh, 18px); }
+      #timer { width: clamp(120px, 20vh, 170px); }
+      #timer-text { font-size: clamp(24px, 4.4vh, 36px); }
+      #timer-sub { font-size: 11px; }
+      .controls { flex-direction: column; border-radius: 16px; }
+      footer { margin: 0; border-radius: 0; border-width: 1px 0 0; }
+    }
+  }
+
+  /* Aurora: a slow-drifting violet aurora, a glass dial, a "live" pill */
+  :root[data-theme="aurora"] {
+    body::before {
+      inset: -20%; filter: blur(40px); animation: aurora 28s ease-in-out infinite alternate;
+      background:
+        radial-gradient(30% 35% at 22% 18%, rgba(124, 58, 237, .65), transparent 70%),
+        radial-gradient(26% 30% at 70% 10%, rgba(192, 38, 211, .35), transparent 70%),
+        radial-gradient(30% 32% at 85% 85%, rgba(20, 184, 166, .30), transparent 70%),
+        radial-gradient(22% 25% at 40% 75%, rgba(79, 70, 229, .35), transparent 70%);
+    }
+    .eyebrow { display: inline-flex; align-self: flex-start; align-items: center; gap: .7em; padding: .55em 1em .55em .85em; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-line); color: var(--ink); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .eyebrow::before { content: ""; width: .55em; height: .55em; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(94,234,212,.18), 0 0 12px var(--accent); }
+    #timer::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.09), rgba(255,255,255,.02) 70%); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 30px 60px -20px rgba(0,0,0,.6); }
+  }
+  @keyframes aurora { 0% { transform: translate3d(0, 0, 0) rotate(0); } 50% { transform: translate3d(3%, 2%, 0) rotate(4deg); } 100% { transform: translate3d(-2%, 4%, 0) rotate(-3deg); } }
+
+  /* Observatory and Editorial: a watch-dial bezel, 60 ticks, brighter every 5 */
+  :root:is([data-theme="observatory"], [data-theme="editorial"]) #timer::before {
+    content: ""; position: absolute; inset: -9%; border-radius: 50%; opacity: .9;
+    background: repeating-conic-gradient(from -.6deg, var(--bezel) 0 1.2deg, transparent 1.2deg 30deg),
+                repeating-conic-gradient(from -.3deg, var(--bezel) 0 .6deg, transparent .6deg 6deg);
+    -webkit-mask: radial-gradient(circle closest-side, transparent 88%, #000 88.5%, #000 96%, transparent 96.5%);
+            mask: radial-gradient(circle closest-side, transparent 88%, #000 88.5%, #000 96%, transparent 96.5%);
+  }
+
+  /* Observatory: pure black, a fading blueprint grid, hairline numerals, mono timer */
+  :root[data-theme="observatory"] {
+    body::before {
+      inset: 0; background-size: 64px 64px; background-position: -1px -1px;
+      background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      -webkit-mask: radial-gradient(70% 60% at 50% 40%, #000 20%, transparent 80%); mask: radial-gradient(70% 60% at 50% 40%, #000 20%, transparent 80%);
+    }
+    body::after { opacity: .35; }
+    .eyebrow { color: var(--muted); font-weight: 400; letter-spacing: .08em; text-transform: none; }
+    .eyebrow::before { content: "\25CF\00A0"; color: #3ecf8e; font-size: .75em; vertical-align: .15em; }
+    .num { background: none; -webkit-text-fill-color: transparent; -webkit-text-stroke: 1.25px rgba(255,255,255,.55); }
+    .title { color: #ffffff; background: linear-gradient(180deg, #ffffff 30%, #9a9a9a 110%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .points li::before { background: #555555; }
+    #timer-text { font-weight: 400; letter-spacing: -.06em; }
+    .controls { border-radius: 10px; }
+    .controls button { border-radius: 6px; }
+    footer { margin-bottom: 0; padding: 12px 0 16px; border-radius: 0; border-width: 1px 0 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+
+  /* Abyss: light shafts through deep water, a bioluminescent ring */
+  :root[data-theme="abyss"] {
+    body::before {
+      inset: 0; filter: blur(6px); animation: shafts 18s ease-in-out infinite alternate;
+      background: repeating-linear-gradient(103deg, rgba(103,232,249,.07) 0 3%, transparent 3% 9%, rgba(103,232,249,.04) 9% 10.5%, transparent 10.5% 17%);
+      -webkit-mask: linear-gradient(180deg, #000 0%, transparent 65%); mask: linear-gradient(180deg, #000 0%, transparent 65%);
+    }
+    .num { letter-spacing: -.07em; }
+    #timer-text { font-weight: 300; text-shadow: 0 0 24px rgba(103,232,249,.45); }
+    #timer::after { content: ""; position: absolute; inset: 10%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, rgba(103,232,249,.12), transparent 70%); }
+  }
+  @keyframes shafts { from { transform: translateX(-2%); } to { transform: translateX(2%); } }
+  /* motion is decoration only: switch it off for anyone who asks the OS to reduce motion */
+  @media (prefers-reduced-motion: reduce) { html body::before { animation: none !important; } }
+
+  /* Editorial: ivory paper, serif italics, terracotta ink, ruled header and footer */
+  :root[data-theme="editorial"] {
+    body::before { inset: 0; box-shadow: inset 0 0 160px rgba(120, 90, 50, .12); }
+    body::after { background-image: var(--noise-ink); mix-blend-mode: multiply; opacity: 1; }
+    header { margin: 0 clamp(16px, 3vw, 40px); padding: 18px 0 12px; border-bottom: 1px solid var(--ink); }
+    #meeting-title { color: var(--ink); }
+    .eyebrow { display: flex; align-items: center; gap: 1em; color: var(--ink); }
+    .eyebrow::after { content: ""; flex: 0 0 4em; height: 1px; background: var(--accent); }
+    .num { letter-spacing: -.03em; line-height: .95; padding: 0 .12em 0 .02em; }
+    .title { letter-spacing: -.02em; line-height: 1.06; }
+    .points { font-family: var(--serif); font-style: italic; color: #4a4339; }
+    #timer-text { font-weight: 400; letter-spacing: -.02em; }
+    #timer-sub { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; }
+    #timer.warn, #timer.over { --ring-glow: transparent; }
+    .controls { background: transparent; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .controls button { border: 1px solid var(--ink); border-radius: 999px; }
+    .controls button:hover { background: var(--ink); color: var(--bg-solid); }
+    footer { margin: 0 clamp(16px, 3vw, 40px); padding: 12px 0 16px; border: 0; border-top: 1px solid var(--ink); border-radius: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+
+  /* Signal: black, white and signal yellow. No texture, glow or blur. */
+  :root[data-theme="signal"] {
+    body::after { display: none; }
+    #timer svg { filter: none; }
+    .eyebrow { align-self: flex-start; padding: .45em .7em; background: var(--accent); color: #000000; font-weight: 800; letter-spacing: .14em; }
+    .num { background: none; -webkit-text-fill-color: #ffffff; letter-spacing: -.06em; }
+    .points { color: #ffffff; font-weight: 600; }
+    .points li::before { width: .6em; height: 4px; transform: translateY(-.3em); }
+    #timer-text { font-weight: 800; }
+    #timer-sub { color: #ffffff; font-weight: 700; }
+    .controls { gap: 8px; padding: 0; border: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .controls button { border: 2px solid #ffffff; border-radius: 6px; font-weight: 800; }
+    .controls button:hover { background: #ffffff; color: #000000; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    footer { border: 2px solid #ffffff; border-radius: 0; background: #000000; backdrop-filter: none; -webkit-backdrop-filter: none; font-weight: 600; }
+    #hints, #meeting-text { color: #ffffff; }
+    .dot { height: 6px; border-radius: 0; }
+    #meeting-bar { height: 8px; border-radius: 0; }
+  }
+
+  /* Clarity and Clarity Dark: content first on a quiet background, sentence-case
+     labels, no texture or glow, and the timer on a raised card like a widget. */
+  :root:is([data-theme="clarity"], [data-theme="clarity-dark"]) {
+    body::after { display: none; }
+    #meeting-title { font: 600 15px/1.2 var(--f-meta); letter-spacing: -.01em; text-transform: none; color: var(--ink); }
+    .eyebrow { color: var(--accent); text-transform: none; letter-spacing: -.005em; font-weight: 600; font-size: clamp(14px, 2.1vh, 19px); }
+    .num { background: none; -webkit-text-fill-color: var(--num-1); font-size: clamp(64px, 15vh, 160px); letter-spacing: -.04em; line-height: .9; }
+    .title { letter-spacing: -.03em; line-height: 1.05; max-width: 18ch; }
+    .points { font-weight: 400; }
+    .points li::before { width: 6px; height: 6px; border-radius: 50%; background: var(--bullet); transform: translateY(-.25em); }
+    #timer-wrap { align-self: center; gap: 18px; padding: clamp(20px, 3.4vh, 36px) clamp(20px, 3vw, 40px) clamp(18px, 3vh, 30px); border-radius: 32px; background: var(--card); box-shadow: var(--card-shadow); }
+    #timer-text { font-weight: 600; letter-spacing: -.02em; }
+    #timer-sub { color: var(--muted); letter-spacing: 0; font-size: clamp(12px, 1.7vh, 15px); }
+    #timer svg { filter: none; }
+    .controls { gap: 8px; padding: 0; border: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .controls button { border-radius: 980px; padding: 9px 18px; font: 500 14px/1 var(--f-meta); }
+    #btn-pause { background: var(--btn-primary); color: #ffffff; }
+    #btn-reset { background: var(--btn-secondary); color: var(--ink); }
+    .controls button:hover { filter: brightness(1.08); }
+    footer { background: var(--glass); border: 1px solid var(--glass-line); border-radius: 18px; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 8px 30px -12px rgba(0,0,0,.12); }
+    #hints kbd { background: var(--kbd); border: 0; box-shadow: 0 0 0 .5px var(--line), 0 1px 1px rgba(0,0,0,.08); color: var(--ink); }
+    .dot { width: 6px; height: 6px; border-radius: 3px; }
+    .dot[aria-current="step"] { width: 28px; }
+    #meeting-bar { height: 6px; border-radius: 3px; }
+    @media (max-width: 720px) {
+      #timer-wrap { padding: 14px 16px; border-radius: 24px; }
+      .num { font-size: clamp(44px, 8vh, 72px); }
+      footer { margin: 0; border-radius: 0; border-width: 1px 0 0; }
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="meeting-title"></h1>
+  <button id="btn-edit" type="button" aria-label="Edit agenda" title="Edit agenda">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</header>
+
+<main>
+  <div id="deck" aria-live="polite"></div>
+  <div id="timer-wrap">
+    <div id="timer" role="timer" aria-label="Item timer">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <!-- the svg is rotated -90deg, so (1,1) is the top-right: cyan there, violet bottom-left -->
+          <linearGradient id="ring-grad" x1="1" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#22d3ee"/>
+            <stop offset="1" stop-color="#6d4cff"/>
+          </linearGradient>
+        </defs>
+        <circle id="ring-track" cx="100" cy="100" r="90"/>
+        <circle id="ring-progress" cx="100" cy="100" r="90" stroke-dasharray="565.487" stroke-dashoffset="0"/>
+      </svg>
+      <div id="timer-center"><div id="timer-text">0:00</div><div id="timer-sub">remaining</div></div>
+    </div>
+    <div class="controls">
+      <button id="btn-pause" type="button">Pause</button>
+      <button id="btn-reset" type="button">Reset</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div id="hints"><span class="hint-keys" title="Also: PgUp/PgDn to navigate, Home/End for first/last"><kbd>←</kbd> <kbd>→</kbd> navigate<span class="sep">·</span><kbd>Space</kbd> <kbd>P</kbd> pause/resume<span class="sep">·</span><kbd>R</kbd> reset timer</span><span class="hint-touch">Swipe or tap to navigate<span class="sep">·</span>Hold to pause</span></div>
+  <div id="nav">
+    <button id="btn-prev" class="nav-btn" type="button" aria-label="Previous item">‹</button>
+    <nav id="dots" aria-label="Agenda items"></nav>
+    <button id="btn-next" class="nav-btn" type="button" aria-label="Next item">›</button>
+  </div>
+  <div id="meeting">
+    <div id="meeting-bar" role="progressbar" aria-label="Meeting time used"></div>
+    <span id="meeting-text"></span>
+  </div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div id="editor" role="dialog" aria-modal="true" aria-labelledby="ed-heading" hidden>
+  <div class="ed-panel">
+    <div class="ed-head">
+      <h2 id="ed-heading">Settings</h2>
+      <button id="ed-close" type="button" aria-label="Close settings" title="Close (Esc)">×</button>
+    </div>
+    <div id="settings-tabs" class="ed-tabs" role="tablist" aria-label="Settings sections">
+      <button id="tab-contents" type="button" role="tab" aria-selected="true" aria-controls="panel-contents">Contents</button>
+      <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme</button>
+    </div>
+
+    <div id="panel-contents" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-contents">
+      <input id="f-deck-title" type="text" autocomplete="off" spellcheck="true" placeholder="Untitled meeting">
+      <p class="dt-help"><label for="f-deck-title">Deck title</label> · shown top-left and in the browser tab</p>
+
+      <div class="ed-toolbar">
+        <div class="seg" role="tablist" aria-label="Contents view">
+          <button id="vtab-quick" type="button" role="tab" aria-selected="true" aria-controls="view-quick">Quick View</button>
+          <button id="vtab-detailed" type="button" role="tab" aria-selected="false" aria-controls="view-detailed" tabindex="-1">Detailed View</button>
+        </div>
+        <span id="ed-total" aria-live="polite"></span>
+      </div>
+
+      <div id="view-quick" class="ed-view" role="tabpanel" aria-labelledby="vtab-quick">
+        <div id="ed-rows"></div>
+        <button id="ed-add" class="add-btn" type="button">Add item</button>
+      </div>
+
+      <div id="view-detailed" class="ed-view" role="tabpanel" aria-labelledby="vtab-detailed" hidden>
+        <div id="dv-list">
+          <div id="dv-items" aria-label="Agenda items"></div>
+          <button id="dv-add" class="add-btn" type="button">Add item</button>
+        </div>
+        <div id="dv-detail">
+          <div class="dv-top">
+            <span id="dv-no-label"></span>
+            <div class="dv-acts">
+              <button id="dv-up" class="icon-btn" type="button" aria-label="Move item up" title="Move up">↑</button>
+              <button id="dv-down" class="icon-btn" type="button" aria-label="Move item down" title="Move down">↓</button>
+              <button id="dv-delete" class="icon-btn" type="button" aria-label="Delete item" title="Delete item">✕</button>
+            </div>
+          </div>
+          <label class="dv-label" for="dv-title">Title</label>
+          <input id="dv-title" type="text" autocomplete="off" placeholder="Untitled item">
+          <span class="dv-label" id="dv-dur-label">Duration</span>
+          <div class="dv-dur" role="group" aria-labelledby="dv-dur-label">
+            <div class="stepper">
+              <button id="dv-minus" type="button" aria-label="One minute less">−</button>
+              <label><input id="dv-min" type="number" step="0.5" min="0.5" aria-label="Minutes"><span class="min-unit">min</span></label>
+              <button id="dv-plus" type="button" aria-label="One minute more">+</button>
+            </div>
+            <div class="dv-picks">
+              <button class="dv-pick" type="button" data-min="5">5</button>
+              <button class="dv-pick" type="button" data-min="10">10</button>
+              <button class="dv-pick" type="button" data-min="15">15</button>
+              <button class="dv-pick" type="button" data-min="30">30</button>
+            </div>
+          </div>
+          <span class="dv-label">Sub-points</span>
+          <div id="dv-points"></div>
+          <button id="dv-add-point" class="add-btn" type="button">Add a sub-point</button>
+          <p id="dv-err" hidden></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-theme" class="ed-tabpanel" role="tabpanel" aria-labelledby="tab-theme" hidden>
+      <p class="ed-note">Click a theme to preview it behind this window. Apply keeps it; Cancel goes back.</p>
+      <div id="theme-grid" role="radiogroup" aria-label="Theme"></div>
+    </div>
+
+    <div class="ed-actions">
+      <button id="ed-reset" class="btn-quiet" type="button">Reset to defaults</button>
+      <p id="ed-error" role="status" hidden></p>
+      <span class="spacer"></span>
+      <button id="ed-save" class="btn-quiet" type="button">Save HTML</button>
+      <button id="ed-cancel" class="btn-secondary" type="button">Cancel</button>
+      <button id="ed-apply" type="button">Apply <kbd id="apply-kbd" aria-hidden="true">Ctrl ↵</kbd></button>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="agenda-data">
+{
+  "title": "Team Planning Meeting",
+  "items": [
+    { "minutes": 10, "title": "Priorities for 2026 & 2027",
+      "points": ["What are the priorities for 2026?", "What are the priorities for 2027?"] },
+    { "minutes": 8, "title": "Identify trainings for 2027",
+      "points": ["Skill gaps vs. priorities", "Candidate courses & certifications", "Who attends, and when"] },
+    { "minutes": 5, "title": "Resourcing & budget",
+      "points": ["Headcount needs", "Training budget estimate"] },
+    { "minutes": 3, "title": "Risks & blockers",
+      "points": ["Top risks to the plan", "Dependencies on other teams"] },
+    { "minutes": 4, "title": "Decisions, owners & next steps",
+      "points": ["Confirm decisions", "Assign owners & dates", "Schedule follow-up"] }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "meetingAgenda";
+  // Theme ids must match scripts/build_deck.py THEMES (a test checks this).
+  // Swatch colours only draw the preview cards; the real colours are in the CSS.
+  var THEMES = [
+    { id: "aurora",      name: "Aurora",        desc: "Drifting violet aurora, glass dial, live status pill. The default." },
+    { id: "observatory", name: "Observatory",   desc: "Pure black, blueprint grid, hairline numerals, a watch-dial timer." },
+    { id: "abyss",       name: "Abyss",         desc: "Light shafts through deep water, a bioluminescent ring." },
+    { id: "editorial",   name: "Editorial",     desc: "Ivory paper, serif italics, terracotta ink. For bright rooms." },
+    { id: "signal",      name: "Signal",        desc: "Black, white, signal yellow. No glow, no blur." },
+    { id: "clarity",     name: "Clarity",       desc: "Light and calm. Content first, the timer on a raised card." },
+    { id: "clarity-dark", name: "Clarity Dark", desc: "The same, in true black with charcoal cards." },
+    { id: "indigo",      name: "Indigo",        desc: "Classic. Violet and cyan on indigo." },
+    { id: "midnight",    name: "Midnight",      desc: "Classic. Teal on navy and plum." },
+    { id: "ocean",       name: "Ocean",         desc: "Classic. Aqua and coral on deep teal-blue." },
+    { id: "daylight",    name: "Daylight",      desc: "Classic. Light, for bright rooms and projectors." },
+    { id: "contrast",    name: "High contrast", desc: "Classic. Black and white, cyan accents, no blur." }
+  ];
+  var DEFAULT_THEME = THEMES[0].id;
+  function knownTheme(t) { return THEMES.some(function (x) { return x.id === t; }) ? t : DEFAULT_THEME; }
+  function setTheme(t) { document.documentElement.setAttribute("data-theme", knownTheme(t)); }
+  var RING_C = 2 * Math.PI * 90;
+  var WARN_FRACTION = 0.2;
+
+  // Pristine copy of the page, taken before anything is rendered, used by "Save HTML".
+  var PRISTINE = document.documentElement.cloneNode(true);
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;   // user text is only ever set as textContent
+    return n;
+  }
+
+  // ---------- data ----------
+  function normalize(raw) {
+    var data = Array.isArray(raw) ? { items: raw } : raw;
+    if (!data || !Array.isArray(data.items) || data.items.length === 0) return null;
+    var items = [];
+    for (var i = 0; i < data.items.length; i++) {
+      var it = data.items[i] || {};
+      var minutes = Number(it.minutes);
+      var title = typeof it.title === "string" ? it.title.trim() : "";
+      if (!(minutes > 0) || !isFinite(minutes) || !title) return null;
+      var points = Array.isArray(it.points) ? it.points.filter(function (p) { return typeof p === "string" && p.trim(); }).map(function (p) { return p.trim(); }) : [];
+      items.push({ minutes: minutes, title: title, points: points });
+    }
+    return { title: typeof data.title === "string" ? data.title : "", theme: knownTheme(data.theme), items: items };
+  }
+
+  var FILE_DEFAULTS = normalize(JSON.parse($("#agenda-data").textContent)) || { title: "", items: [{ minutes: 5, title: "Agenda item", points: [] }] };
+
+  function loadAgenda() {
+    try {
+      var s = localStorage.getItem(STORAGE_KEY);
+      if (s) { var d = normalize(JSON.parse(s)); if (d) return d; }
+    } catch (e) { /* storage blocked or corrupt: fall back */ }
+    return clone(FILE_DEFAULTS);
+  }
+  function saveAgenda(d) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch (e) {} }
+  function clearAgenda() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+  function clone(d) { return JSON.parse(JSON.stringify(d)); }
+
+  // ---------- state ----------
+  var agenda = loadAgenda();
+  var current = 0;
+  var elapsed = [];          // ms used per slide (excluding the running segment)
+  var runningSince = null;   // Date.now() when the current slide's timer last started, or null if paused
+  var editorOpen = false;
+  var resumeAfterEditor = false;
+
+  function now() { return Date.now(); }
+  function plannedMs(i) { return agenda.items[i].minutes * 60000; }
+  function usedMs(i) { return elapsed[i] + (i === current && runningSince != null ? now() - runningSince : 0); }
+  function totalPlannedMs() { return agenda.items.reduce(function (s, it) { return s + it.minutes * 60000; }, 0); }
+  function totalUsedMs() { var s = 0; for (var i = 0; i < agenda.items.length; i++) s += usedMs(i); return s; }
+
+  function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return m + ":" + (s < 10 ? "0" : "") + s; }
+
+  function start() { if (runningSince == null) runningSince = now(); }
+  function stop() { if (runningSince != null) { elapsed[current] += now() - runningSince; runningSince = null; } }
+
+  // ---------- build ----------
+  function build() {
+    var deck = $("#deck"), dots = $("#dots"), bar = $("#meeting-bar");
+    deck.textContent = ""; dots.textContent = "";
+    bar.textContent = "";
+    $("#meeting-title").textContent = agenda.title || "";
+    setTheme(agenda.theme);
+    document.title = agenda.title || "Meeting Agenda";
+
+    var total = totalPlannedMs(), acc = 0;
+    agenda.items.forEach(function (it, i) {
+      var s = el("section", "slide");
+      s.setAttribute("aria-label", "Item " + (i + 1));
+      s.appendChild(el("div", "eyebrow", "Agenda item " + (i + 1) + " of " + agenda.items.length + " · " + it.minutes + " min"));
+      s.appendChild(el("div", "num", String(i + 1).padStart(2, "0")));
+      s.appendChild(el("h2", "title", it.title));
+      if (it.points.length) {
+        var ul = el("ul", "points");
+        it.points.forEach(function (p) { ul.appendChild(el("li", null, p)); });
+        s.appendChild(ul);
+      }
+      deck.appendChild(s);
+
+      var d = el("button", "dot");
+      d.type = "button";
+      d.appendChild(el("span", "dot-fill"));
+      d.setAttribute("aria-label", "Go to item " + (i + 1) + ": " + it.title);
+      d.title = (i + 1) + ". " + it.title;
+      d.addEventListener("click", function () { go(i); d.blur(); });
+      dots.appendChild(d);
+
+      var seg = el("div", "seg");
+      seg.style.left = (acc * 100 / total) + "%";
+      seg.style.width = (it.minutes * 60000 * 100 / total) + "%";
+      seg.title = (i + 1) + ". " + it.title;
+      seg.appendChild(el("div", "seg-fill"));
+      bar.appendChild(seg);
+
+      acc += it.minutes * 60000;
+      if (i < agenda.items.length - 1) {
+        var t = el("div", "tick");
+        t.setAttribute("style", "left:" + (acc * 100 / total) + "%");
+        bar.appendChild(t);
+      }
+    });
+    elapsed = agenda.items.map(function () { return 0; });
+    runningSince = null;
+  }
+
+  function go(i) {
+    i = Math.max(0, Math.min(agenda.items.length - 1, i));
+    if (i === current) return;
+    stop();
+    current = i;
+    start();
+    render();
+  }
+
+  // ---------- render ----------
+  function render() {
+    var slides = document.querySelectorAll(".slide"), dots = document.querySelectorAll(".dot");
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].classList.toggle("active", i === current);
+      if (i === current) dots[i].setAttribute("aria-current", "step"); else dots[i].removeAttribute("aria-current");
+      dots[i].classList.toggle("done", i < current);
+      var du = usedMs(i), dp = plannedMs(i);
+      dots[i].classList.toggle("over", du > dp);
+      dots[i].firstChild.style.width = +Math.min(100, du * 100 / dp).toFixed(2) + "%";
+    }
+
+    var planned = plannedMs(current), used = usedMs(current);
+    var over = used > planned;
+    var remaining = planned - used;
+    var timer = $("#timer");
+    timer.classList.toggle("over", over);
+    timer.classList.toggle("warn", !over && remaining <= planned * WARN_FRACTION);
+    timer.classList.toggle("paused", runningSince == null);
+    $("#timer-text").textContent = over ? "+" + fmt(Math.floor((used - planned) / 1000)) : fmt(Math.ceil(remaining / 1000));
+    var allotted = fmt(Math.round(planned / 1000)) + " allotted";
+    $("#timer-sub").textContent = over ? "over " + allotted : (runningSince == null ? "paused · of " : "of ") + allotted;
+    $("#ring-progress").setAttribute("stroke-dashoffset", String(over ? 0 : RING_C * Math.min(1, used / planned)));
+    $("#btn-pause").textContent = runningSince == null ? "Resume" : "Pause";
+    $("#btn-pause").setAttribute("data-state", runningSince == null ? "paused" : "running");
+
+    var tp = totalPlannedMs(), tu = totalUsedMs();
+    $("#meeting-text").textContent = "Meeting: " + fmt(Math.floor(tu / 1000)) + " used / " + fmt(Math.round(tp / 1000)) + " planned";
+    var bar = $("#meeting-bar"), pct = tu * 100 / tp;
+    bar.classList.toggle("over", tu > tp);
+    bar.classList.toggle("warn", tu <= tp && pct >= 80);
+    bar.title = Math.round(pct) + "% used";
+    bar.setAttribute("aria-valuenow", String(Math.round(pct)));
+    bar.querySelectorAll(".seg").forEach(function (seg, i) {
+      var u = usedMs(i), p = plannedMs(i);
+      seg.classList.toggle("current", i === current);
+      seg.classList.toggle("over", u > p);
+      seg.firstChild.style.width = +Math.min(100, u * 100 / p).toFixed(2) + "%";
+    });
+  }
+
+  // ---------- timer controls ----------
+  function togglePause() { if (runningSince == null) start(); else stop(); render(); }
+  function resetTimer() { var running = runningSince != null; runningSince = null; elapsed[current] = 0; if (running) start(); render(); }
+
+  $("#btn-pause").addEventListener("click", function (e) { togglePause(); e.currentTarget.blur(); });
+  $("#btn-reset").addEventListener("click", function (e) { resetTimer(); e.currentTarget.blur(); });
+
+  // ---------- keyboard ----------
+  document.addEventListener("keydown", function (e) {
+    if (editorOpen) {
+      if (e.key === "Escape") { e.preventDefault(); closeEditor(); }
+      else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $("#ed-apply").click(); }
+      return;   // never change slides or timers while editing
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key, handled = true;
+    if (k === "ArrowRight" || k === "PageDown") go(current + 1);
+    else if (k === "ArrowLeft" || k === "PageUp") go(current - 1);
+    else if (k === "Home") go(0);
+    else if (k === "End") go(agenda.items.length - 1);
+    else if (k === " ") { if (!e.shiftKey && !e.repeat) togglePause(); }   // Space pauses/resumes, like a video player
+    else if (k === "p" || k === "P") togglePause();
+    else if (k === "r" || k === "R") resetTimer();
+    else handled = false;
+    if (handled) e.preventDefault();
+  });
+
+  // ---------- touch ----------
+  // Defaults follow common presentation apps (Keynote, Google Slides, reveal.js) and
+  // story viewers: swipe left = next, swipe right = back; tap the right 70% = next,
+  // the left 30% = back; long-press = pause/resume. Touch and pen only: a mouse click
+  // never changes slides. Gestures that start on a button or field are left alone.
+  var GESTURE = {
+    SWIPE_MIN_PX: 50,       // horizontal distance that counts as a swipe
+    SWIPE_RATIO: 1.5,       // |dx| must beat |dy| by this much (else it's a scroll)
+    TAP_SLOP_PX: 10,        // movement allowed for a tap or long-press
+    LONG_PRESS_MS: 500,     // hold time for pause/resume
+    BACK_ZONE: 0.3          // tap in the left 30% of the screen goes back
+  };
+  var touch = null, toastTimer = null;
+
+  function toast(text) {
+    var t = $("#toast");
+    t.textContent = text;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 1200);
+  }
+
+  $("main").addEventListener("pointerdown", function (e) {
+    if (editorOpen || e.pointerType === "mouse" || !e.isPrimary) return;
+    if (e.target.closest("button, a, input, textarea, select")) return;
+    var t = touch = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, held: false,
+                      onTimer: !!e.target.closest("#timer-wrap") };
+    t.timer = setTimeout(function () {
+      if (touch !== t || t.moved) return;
+      t.held = true;
+      togglePause();
+      toast(runningSince == null ? "Paused" : "Resumed");
+      try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) {}
+    }, GESTURE.LONG_PRESS_MS);
+  });
+  window.addEventListener("pointermove", function (e) {
+    if (!touch || e.pointerId !== touch.id) return;
+    if (Math.hypot(e.clientX - touch.x, e.clientY - touch.y) > GESTURE.TAP_SLOP_PX) {
+      touch.moved = true;
+      clearTimeout(touch.timer);
+    }
+  });
+  window.addEventListener("pointerup", function (e) {
+    if (!touch || e.pointerId !== touch.id) return;
+    var t = touch; touch = null;
+    clearTimeout(t.timer);
+    if (t.held || editorOpen) return;
+    var dx = e.clientX - t.x, dy = e.clientY - t.y;
+    if (Math.abs(dx) >= GESTURE.SWIPE_MIN_PX && Math.abs(dx) >= GESTURE.SWIPE_RATIO * Math.abs(dy)) {
+      go(current + (dx < 0 ? 1 : -1));
+    } else if (!t.moved && Math.hypot(dx, dy) <= GESTURE.TAP_SLOP_PX && !t.onTimer) {
+      go(current + (e.clientX < window.innerWidth * GESTURE.BACK_ZONE ? -1 : 1));
+    }
+  });
+  window.addEventListener("pointercancel", function (e) {
+    if (touch && e.pointerId === touch.id) { clearTimeout(touch.timer); touch = null; }
+  });
+  $("main").addEventListener("contextmenu", function (e) { if (touch || e.pointerType === "touch") e.preventDefault(); });
+  $("#btn-prev").addEventListener("click", function (e) { go(current - 1); e.currentTarget.blur(); });
+  $("#btn-next").addEventListener("click", function (e) { go(current + 1); e.currentTarget.blur(); });
+
+  // ---------- editor (Settings) ----------
+  // One draft, two views. Quick View and Detailed View both read and write `draft`;
+  // switching views re-renders from it, so unsaved edits carry across.
+  var showErrors = false;
+  var draft = [];            // [{ minutesRaw, title, pointsRaw }] — strings, as typed
+  var sel = 0;               // selected item in Detailed View
+  var VIEW_KEY = "meetingAgendaView";
+  var view = (function () {
+    try { return localStorage.getItem(VIEW_KEY) === "detailed" ? "detailed" : "quick"; } catch (e) { return "quick"; }
+  })();
+  var draftTheme = DEFAULT_THEME;
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function num(v) { var m = Number(String(v).trim()); return String(v).trim() === "" || !isFinite(m) ? NaN : m; }
+  function fmtMin(n) { return String(Math.round(n * 10) / 10); }
+  function rowFromItem(it) { return { minutesRaw: String(it.minutes), title: it.title, pointsRaw: it.points.join("\n") }; }
+  function readRows() { return draft.map(function (r) { return { minutesRaw: r.minutesRaw, title: r.title, pointsRaw: r.pointsRaw }; }); }
+  function rowEls() { return Array.prototype.slice.call(document.querySelectorAll("#ed-rows .row")); }
+  function pointsOf(r) { return r.pointsRaw === "" ? [] : r.pointsRaw.split("\n"); }
+
+  function problems(r) {
+    var out = [], m = num(r.minutesRaw);
+    if (!r.title.trim()) out.push("Add a title");
+    if (!(m > 0)) out.push("Minutes must be more than 0");
+    return out;
+  }
+
+  function updateTotal() {
+    var n = draft.length, sum = 0;
+    draft.forEach(function (r) { var m = num(r.minutesRaw); if (m > 0) sum += m; });
+    $("#ed-total").textContent = n + " item" + (n === 1 ? "" : "s") + " · " + fmtMin(sum) + " min planned";
+  }
+
+  // Marks invalid items in whichever view is showing, and the footer status. Returns validity.
+  function validate() {
+    var bad = 0, items = document.querySelectorAll(".dv-item"), rows = rowEls();
+    draft.forEach(function (r, i) {
+      var p = problems(r), show = showErrors && p.length > 0, msg = p.join(" · ");
+      if (p.length) bad++;
+      if (rows[i]) {
+        rows[i].classList.toggle("invalid", show);
+        var e = $(".row-err", rows[i]); e.textContent = show ? msg : ""; e.hidden = !show;
+      }
+      if (items[i]) items[i].classList.toggle("invalid", show);
+      if (i === sel && view === "detailed") { var de = $("#dv-err"); de.textContent = show ? msg : ""; de.hidden = !show; }
+    });
+    var st = $("#ed-error");
+    st.hidden = !(showErrors && bad);
+    st.textContent = bad === 1 ? "1 item needs attention" : bad + " items need attention";
+    $("#ed-apply").classList.toggle("dim", showErrors && bad > 0);
+    return bad === 0;
+  }
+  function changed() { updateTotal(); validate(); }
+
+  function autosize(ta) {
+    ta.style.height = "auto";
+    if (ta.scrollHeight) ta.style.height = ta.scrollHeight + "px";
+  }
+
+  // ----- Quick View -----
+  function renderQuick() {
+    var host = $("#ed-rows");
+    host.textContent = "";
+    draft.forEach(function (r, i) {
+      var row = el("div", "row");
+      row.appendChild(el("div", "row-num", pad(i + 1)));
+
+      var body = el("div", "row-body");
+      var t = el("input", "f-title");
+      t.type = "text"; t.value = r.title; t.placeholder = "Untitled item"; t.autocomplete = "off";
+      t.setAttribute("aria-label", "Title of item " + (i + 1));
+      t.addEventListener("input", function () { r.title = t.value; changed(); });
+      var p = el("textarea", "f-points");
+      p.rows = 1; p.value = r.pointsRaw; p.placeholder = "Add sub-points…";
+      p.setAttribute("aria-label", "Sub-points for item " + (i + 1) + ", one per line");
+      p.addEventListener("input", function () { r.pointsRaw = p.value; autosize(p); });
+      var err = el("div", "row-err"); err.hidden = true;
+      body.appendChild(t); body.appendChild(p); body.appendChild(err);
+      row.appendChild(body);
+
+      var mw = el("label", "min-wrap");
+      var m = el("input", "f-min");
+      m.type = "number"; m.step = "0.5"; m.min = "0.5"; m.value = r.minutesRaw;
+      m.setAttribute("aria-label", "Minutes for item " + (i + 1));
+      m.addEventListener("input", function () { r.minutesRaw = m.value; changed(); });
+      mw.appendChild(m); mw.appendChild(el("span", "min-unit", "min"));
+      row.appendChild(mw);
+
+      var b = el("div", "row-btns");
+      [["btn-up", "↑", "Move up", i === 0, -1], ["btn-down", "↓", "Move down", i === draft.length - 1, 1]].forEach(function (cfg) {
+        var btn = el("button", cfg[0] + " icon-btn", cfg[1]);
+        btn.type = "button"; btn.title = cfg[2]; btn.setAttribute("aria-label", cfg[2] + " item " + (i + 1)); btn.disabled = cfg[3];
+        btn.addEventListener("click", function () { move(i, cfg[4]); });
+        b.appendChild(btn);
+      });
+      var rm = el("button", "btn-remove icon-btn", "✕");
+      rm.type = "button"; rm.title = "Remove item"; rm.setAttribute("aria-label", "Remove item " + (i + 1));
+      rm.disabled = draft.length === 1;
+      rm.addEventListener("click", function () { remove(i); });
+      b.appendChild(rm);
+      row.appendChild(b);
+
+      host.appendChild(row);
+      autosize(p);
+    });
+    changed();
+  }
+
+  // ----- Detailed View -----
+  function minLabel(r) { var m = num(r.minutesRaw); return m > 0 ? fmtMin(m) + "m" : "–"; }
+
+  function renderDetailedList() {
+    var list = $("#dv-items");
+    list.textContent = "";
+    draft.forEach(function (r, i) {
+      var b = el("button", "dv-item");
+      b.type = "button";
+      if (i === sel) b.setAttribute("aria-current", "true");
+      b.appendChild(el("span", "dv-no", pad(i + 1)));
+      b.appendChild(el("span", "dv-ti", r.title.trim() || "Untitled item"));
+      b.appendChild(el("span", "dv-m", minLabel(r)));
+      b.addEventListener("click", function () { sel = i; renderDetailed(); });
+      list.appendChild(b);
+    });
+  }
+  function refreshListItem() {
+    var it = document.querySelectorAll(".dv-item")[sel], r = draft[sel];
+    if (!it) return;
+    $(".dv-ti", it).textContent = r.title.trim() || "Untitled item";
+    $(".dv-m", it).textContent = minLabel(r);
+  }
+  function refreshPicks() {
+    var m = num(draft[sel].minutesRaw);
+    document.querySelectorAll(".dv-pick").forEach(function (b) {
+      b.setAttribute("aria-pressed", Number(b.getAttribute("data-min")) === m ? "true" : "false");
+    });
+  }
+  function setMinutes(v) {
+    draft[sel].minutesRaw = String(v);
+    $("#dv-min").value = draft[sel].minutesRaw;
+    refreshListItem(); refreshPicks(); changed();
+  }
+  function renderPoints(focusIndex) {
+    var r = draft[sel], pts = pointsOf(r), host = $("#dv-points");
+    host.textContent = "";
+    pts.forEach(function (text, k) {
+      var line = el("div", "dv-point-row");
+      var inp = el("input", "dv-point");
+      inp.type = "text"; inp.value = text; inp.placeholder = "Sub-point";
+      inp.setAttribute("aria-label", "Sub-point " + (k + 1));
+      inp.addEventListener("input", function () { var a = pointsOf(r); a[k] = inp.value; r.pointsRaw = a.join("\n"); });
+      inp.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          var a = pointsOf(r); a.splice(k + 1, 0, ""); r.pointsRaw = a.join("\n"); renderPoints(k + 1);
+        } else if (e.key === "Backspace" && inp.value === "") {
+          e.preventDefault();
+          var b = pointsOf(r); b.splice(k, 1); r.pointsRaw = b.join("\n"); renderPoints(Math.max(0, k - 1));
+        }
+      });
+      var x = el("button", "dv-point-remove icon-btn", "✕");
+      x.type = "button"; x.setAttribute("aria-label", "Remove sub-point " + (k + 1));
+      x.addEventListener("click", function () { var a = pointsOf(r); a.splice(k, 1); r.pointsRaw = a.join("\n"); renderPoints(); });
+      line.appendChild(inp); line.appendChild(x);
+      host.appendChild(line);
+    });
+    if (focusIndex != null) { var all = document.querySelectorAll(".dv-point"); if (all[focusIndex]) all[focusIndex].focus(); }
+  }
+  function renderDetailed() {
+    sel = Math.max(0, Math.min(sel, draft.length - 1));
+    renderDetailedList();
+    var r = draft[sel];
+    $("#dv-no-label").textContent = "Item " + (sel + 1) + " of " + draft.length;
+    $("#dv-title").value = r.title;
+    $("#dv-min").value = r.minutesRaw;
+    $("#dv-up").disabled = sel === 0;
+    $("#dv-down").disabled = sel === draft.length - 1;
+    $("#dv-delete").disabled = draft.length === 1;
+    refreshPicks();
+    renderPoints();
+    changed();
+  }
+  function moveSel(dir) {
+    var j = sel + dir;
+    if (j < 0 || j >= draft.length) return;
+    var tmp = draft[sel]; draft[sel] = draft[j]; draft[j] = tmp; sel = j;
+    renderDetailed();
+  }
+
+  $("#dv-title").addEventListener("input", function () { draft[sel].title = $("#dv-title").value; refreshListItem(); changed(); });
+  $("#dv-min").addEventListener("input", function () { draft[sel].minutesRaw = $("#dv-min").value; refreshListItem(); refreshPicks(); changed(); });
+  $("#dv-plus").addEventListener("click", function () { var m = num(draft[sel].minutesRaw); setMinutes((m > 0 ? m : 0) + 1); });
+  $("#dv-minus").addEventListener("click", function () { var m = num(draft[sel].minutesRaw); setMinutes(Math.max(0.5, (m > 0 ? m : 1) - 1)); });
+  document.querySelectorAll(".dv-pick").forEach(function (b) {
+    b.addEventListener("click", function () { setMinutes(Number(b.getAttribute("data-min"))); });
+  });
+  $("#dv-add-point").addEventListener("click", function () {
+    var r = draft[sel], a = pointsOf(r); a.push(""); r.pointsRaw = a.join("\n"); renderPoints(a.length - 1);
+  });
+  $("#dv-add").addEventListener("click", function () {
+    draft.push({ minutesRaw: "5", title: "", pointsRaw: "" });
+    sel = draft.length - 1; renderDetailed(); $("#dv-title").focus();
+  });
+  $("#dv-up").addEventListener("click", function () { moveSel(-1); });
+  $("#dv-down").addEventListener("click", function () { moveSel(1); });
+  $("#dv-delete").addEventListener("click", function () {
+    if (draft.length <= 1) return;           // never remove the last item
+    draft.splice(sel, 1); renderDetailed();
+  });
+
+  // ----- shared editor actions -----
+  function move(i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= draft.length) return;
+    var tmp = draft[i]; draft[i] = draft[j]; draft[j] = tmp;
+    renderQuick();
+    var btn = $(dir < 0 ? ".btn-up" : ".btn-down", rowEls()[j]);
+    if (btn && !btn.disabled) btn.focus();
+  }
+  function remove(i) {
+    if (draft.length <= 1) return;           // never remove the last row
+    draft.splice(i, 1);
+    renderQuick();
+  }
+
+  function collect() {
+    return {
+      title: $("#f-deck-title").value.trim(),
+      theme: draftTheme,
+      items: draft.map(function (r) {
+        return {
+          minutes: num(r.minutesRaw),
+          title: r.title.trim(),
+          points: r.pointsRaw.split("\n").map(function (s) { return s.trim(); }).filter(Boolean)
+        };
+      })
+    };
+  }
+
+  // Tabs (ARIA tablist): click or arrow keys / Home / End.
+  function wireTabs(names, tabId, select) {
+    names.forEach(function (t, i) {
+      var tab = $("#" + tabId(t));
+      tab.addEventListener("click", function () { select(t, false); });
+      tab.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (e.key === "Home") d = -i; else if (e.key === "End") d = names.length - 1 - i;
+        if (!d) return;
+        e.preventDefault();
+        select(names[(i + d + names.length) % names.length], true);
+      });
+    });
+  }
+  function setTabs(names, tabId, panelId, name) {
+    names.forEach(function (t) {
+      var tab = $("#" + tabId(t)), on = t === name;
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+      $("#" + panelId(t)).hidden = !on;
+    });
+  }
+
+  var TABS = ["contents", "theme"];
+  function selectTab(name, focus) {
+    setTabs(TABS, function (t) { return "tab-" + t; }, function (t) { return "panel-" + t; }, name);
+    if (focus) $("#tab-" + name).focus();
+  }
+  wireTabs(TABS, function (t) { return "tab-" + t; }, selectTab);
+
+  var VIEWS = ["quick", "detailed"];
+  function selectView(name, focus) {
+    view = name;
+    try { localStorage.setItem(VIEW_KEY, name); } catch (e) {}
+    setTabs(VIEWS, function (v) { return "vtab-" + v; }, function (v) { return "view-" + v; }, name);
+    if (name === "quick") { $("#dv-items").textContent = ""; renderQuick(); }
+    else { $("#ed-rows").textContent = ""; renderDetailed(); }
+    if (focus) $("#vtab-" + name).focus();
+  }
+  wireTabs(VIEWS, function (v) { return "vtab-" + v; }, selectView);
+
+  function renderThemes() {
+    var grid = $("#theme-grid");
+    grid.textContent = "";
+    THEMES.forEach(function (th) {
+      var card = el("button", "theme-card");
+      card.type = "button";
+      card.setAttribute("role", "radio");
+      card.setAttribute("data-theme", th.id);
+      card.setAttribute("aria-checked", th.id === draftTheme ? "true" : "false");
+      var sw = el("span", "theme-swatch");   // drawn entirely from the card's own theme tokens
+      sw.appendChild(el("s", null, "01")); sw.appendChild(el("b")); sw.appendChild(el("i"));
+      card.appendChild(sw);
+      card.appendChild(el("span", "theme-name", th.name));
+      card.appendChild(el("span", "theme-desc", th.desc));
+      card.addEventListener("click", function () {
+        draftTheme = th.id;
+        setTheme(th.id);               // live preview behind the dialog
+        renderThemes();
+        var again = document.querySelector('.theme-card[data-theme="' + th.id + '"]');
+        if (again) again.focus();
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  function openEditor() {
+    if (editorOpen) return;
+    editorOpen = true;
+    resumeAfterEditor = runningSince != null;
+    stop(); render();
+    showErrors = false;
+    $("#editor").hidden = false;     // visible first, so text areas can measure themselves
+    $("#f-deck-title").value = agenda.title;
+    draft = agenda.items.map(rowFromItem);
+    sel = 0;
+    draftTheme = agenda.theme;
+    renderThemes();
+    selectTab("contents", false);
+    selectView(view, false);
+    var first = view === "quick" ? $("#ed-rows .f-title") : $("#dv-title");
+    if (first) first.focus();
+  }
+
+  function closeEditor() {
+    editorOpen = false;
+    setTheme(agenda.theme);            // drop any un-applied preview
+    $("#editor").hidden = true;
+    if (resumeAfterEditor) start();
+    render();
+    $("#btn-edit").focus();
+  }
+
+  function applyAgenda(data, persist) {
+    agenda = data;
+    if (persist) saveAgenda(agenda); else clearAgenda();
+    var keep = current;
+    build();
+    current = Math.min(keep, agenda.items.length - 1);
+    editorOpen = false;
+    $("#editor").hidden = true;
+    start();
+    render();
+  }
+
+  function checkOrShow() {
+    showErrors = true;
+    if (validate()) return true;
+    selectTab("contents", false);
+    validate();
+    return false;
+  }
+
+  try {   // show the platform's shortcut on the Apply button
+    if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $("#apply-kbd").textContent = "⌘↵";
+  } catch (e) {}
+
+  $("#btn-edit").addEventListener("click", openEditor);
+  $("#ed-cancel").addEventListener("click", closeEditor);
+  $("#ed-close").addEventListener("click", closeEditor);
+  $("#ed-add").addEventListener("click", function () {
+    draft.push({ minutesRaw: "5", title: "", pointsRaw: "" });
+    renderQuick();
+    var titles = document.querySelectorAll("#ed-rows .f-title");
+    titles[titles.length - 1].focus();
+  });
+  $("#ed-apply").addEventListener("click", function () {
+    if (!checkOrShow()) return;
+    applyAgenda(collect(), true);
+  });
+  $("#ed-reset").addEventListener("click", function () {
+    if (!window.confirm("Reset the agenda to the file defaults? Your saved changes in this browser will be discarded.")) return;
+    applyAgenda(clone(FILE_DEFAULTS), false);
+  });
+  $("#ed-save").addEventListener("click", function () {
+    if (!checkOrShow()) return;
+    var copy = PRISTINE.cloneNode(true);
+    // Escape every "<" so a title containing a closing script tag cannot end the data block early.
+    copy.querySelector("#agenda-data").textContent =
+      "\n" + JSON.stringify(collect(), null, 2).replace(/</g, "\\u003c") + "\n";
+    var html = "<!doctype html>\n" + copy.outerHTML + "\n";
+    var url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+    var a = document.createElement("a");
+    a.href = url; a.download = "meeting-agenda.html";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  });
+
+  // ---------- go ----------
+  build();
+  current = 0;
+  start();
+  render();
+  setInterval(function () { if (!editorOpen) render(); }, 250);
+})();
+</script>
+</body>
+</html>

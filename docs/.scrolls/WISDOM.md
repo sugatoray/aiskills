@@ -22,10 +22,13 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **The package tests only see git-tracked skills.** `sandbox({ realSkills: true })` copies the tracked skills, so a new skill is invisible to `npm run docs` and `npm test` until it is `git add`ed. Stage it first. Then expect hardcoded counts to fail in `banner.test.mjs` and `docs-html.test.mjs` (skills, skills per group, explainer tabs) and the docs examples' expected output in the Markdown pages: update them, and regenerate with `npm run docs` and `npm run banner:png`.
 - **Adding a control to the docs header breaks the phone layout.** The search input can't render narrower than its padding (about 68px), so it overlaps the next button rather than shrinking. Check the header at iPhone width for sideways scroll and overlap; the docs browser tests do this for the version menu.
 
+- **A new skill or group changes hard-coded numbers in the package tests and docs.** After `npm run docs` and `npm run banner:png`, expect to update `banner.test.mjs` (skill and group counts, the `#pills` counts), the `<!-- verify -->` outputs that list groups or skills (`guides/use-from-an-agent.md`, `reference/cli.md`, `tutorial/01`, `02`, `04`), and, for a new `.skillsignore`, the one-line `"ignored"` sample in `reference/files.md`. The package suite only counts git-tracked skills, so `git add` the skill first.
+- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/productivity/docs/.scrolls/WISDOM.md`.
+
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
 
-- (none recorded yet)
+- **Don't ship TDD logs inside a skill.** `npx skills add` copies the whole skill folder, nobody using the skill reads the logs, and they go stale with the next change (`*.log` is gitignored anyway). Keep the tests as the proof, and put the red/green story in the PR description and commit messages. The user decided this for `meeting-agenda` on 2026-11-16.
 
 ## Wisdom — best practices and Red/Green TDD
 Best practices worth reusing.

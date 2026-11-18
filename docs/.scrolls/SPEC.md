@@ -16,6 +16,9 @@ Every page's header has a version menu with a **Find a version** box (partial or
 ## Release tags (`aiskills-vX.Y.Z`)
 Every published npm release has an annotated git tag on the commit npm recorded as its `gitHead`, with the publish time in the message: `aiskills-v0.4.0`–`aiskills-v1.4.0` so far. New releases are tagged the same way (`src/packages/aiskills/docs/meta/MAINTAINERS.md` → Releasing, step 6).
 
+## `meeting-agenda` skill (productivity group)
+`/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
+
 <!--
 ## <Feature name>
 What it does, from a user's perspective. A pointer to where it lives in the code

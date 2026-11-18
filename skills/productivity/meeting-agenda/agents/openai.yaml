@@ -1,0 +1,6 @@
+interface:
+  display_name: "Meeting Agenda"
+  short_description: "Timed slide deck from a meeting agenda"
+  default_prompt: "Use $meeting-agenda to turn this agenda into a slide deck with a countdown timer per item."
+policy:
+  allow_implicit_invocation: false

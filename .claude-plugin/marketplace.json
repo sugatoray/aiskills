@@ -106,6 +106,19 @@
       ]
     },
     {
+      "name": "productivity-skills",
+      "source": "./productivity",
+      "description": "Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown per item, a per-item meeting progress bar and an in-page editor.",
+      "category": "productivity",
+      "keywords": [
+        "productivity",
+        "meetings",
+        "agenda",
+        "slides",
+        "timer"
+      ]
+    },
+    {
       "name": "video-related-skills",
       "source": "./video-related",
       "description": "Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt, real screenshots, TTS voiceover, ducked music) for a library, app or product.",
