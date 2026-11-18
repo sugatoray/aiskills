@@ -8,7 +8,7 @@ entry point; a `SCROLLS.md` file tells new sessions to read it first, with
 a short `CLAUDE.md` pointer to `SCROLLS.md` and a matching `AGENTS.md`
 pointer to `CLAUDE.md` for other agent harnesses.
 
-All eight commands work the same way on macOS, Linux, and Windows. Every
+All nine commands work the same way on macOS, Linux, and Windows. Every
 bundled script — all but `/scrolls-setup`, which needs none — ships as
 both a bash (`.sh`) and a PowerShell (`.ps1`, PowerShell 7+) version.
 
@@ -27,15 +27,16 @@ each command does, step by step.
 | [`/scrolls-unhide`](scrolls-unhide/) | The opposite of `/scrolls-hide`: renames `docs/.scrolls/` to visible `docs/scrolls/`, rewriting path references so nothing breaks. |
 | [`/scrolls-remove`](scrolls-remove/) | The opposite of `/scrolls-setup`. It removes `docs/.scrolls/` and `SCROLLS.md` and strips the scrolls pointers from `CLAUDE.md`/`AGENTS.md`, all as one `maint(memory): scrolls-removed` commit that records the previous commit's SHA for restoring. `-x`/`--purge` deletes pointer files outright. |
 | [`/scrolls-restore`](scrolls-restore/) | The counterpart to `/scrolls-remove`. Restores the memory from the newest removal checkpoint, or from any commit, into the repo as it is now: the folders come back and the stubs are re-inserted, and nothing else is rolled back. `--onto` mounts it on another branch through a temporary worktree. |
+| [`/scrolls-compact`](scrolls-compact/) | Condenses the old history in `SPEC.md`, `PLAN.md`, `HANDOFF.md`, `GAP_ANALYSIS.md` and `GAP_CONTEXT.md` (older than `--before`/`--base`, or by default the newer of 7 days and 20 commits), never touching open tickets, gaps or threads. One `maint(memory): scrolls-compacted` commit records the checkpoint where the full text stays, with a report in `compacted/` and a row in `COMPACT.md`. `--list`/`--show`/`--extract` read old history back out of git. |
 | [`/scrolls-help`](scrolls-help/) | Crisp, example-driven reference for the whole family — what each command does, their shared flags, and common usage examples. Supports `-e`/`--online` to serve it as a styled local page (light/dark and colorize/plain toggles) instead of chat text. |
 | [`/scrolls-explainer`](scrolls-explainer/) | Opens `scrolls-explainer.html`: an interactive, offline page with one tab per command that animates what it does, step by step, with a callout for each step and full keyboard navigation. With no flags (= `--show`) it opens the bundled page in place; `-o` copies it to a file or folder (`-f` overwrites, `--open` opens the copy); `--build` regenerates it from the `scrolls-*` skills as they are now. |
 
 ## Shared flags
 
 `/scrolls-setup`, `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide`,
-`/scrolls-remove`, and `/scrolls-restore` share a common set of flags for
+`/scrolls-remove`, `/scrolls-restore`, and `/scrolls-compact` share a common set of flags for
 targeting *where* the scrolls folder lives, so the same mental model
-applies across all six:
+applies across all seven:
 
 | Flag | Meaning |
 | --- | --- |
@@ -45,6 +46,7 @@ applies across all six:
 | `-r`, `--recurse` | Scan/sweep recursively instead of checking one exact location (e.g. every package in a monorepo in one run). |
 | `-x`, `--purge [files]` | `/scrolls-remove` only. Deletes the named pointer files outright (`SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all`, the default), even when they hold other content. |
 | `--onto REF`, `-b NAME` | `/scrolls-restore` only. Commit the restored memory onto another branch (or a new branch `NAME` at any commit) through a temporary worktree. |
+| `--before=YYYYMMDD`, `--base=COMMIT` | `/scrolls-compact` only. The compaction base: content last changed before that date, or in that commit or its ancestors. Without either, the newer of `--keep-days` (7) and `--keep-commits` (20) wins. |
 | `-u`, `--unhide` | `/scrolls-setup` only — create the folder visible (`scrolls`) instead of dotfile-hidden (`.scrolls`). |
 
 Default (no `-p`/`-t`/`-l`): the current directory, with a warning first if
@@ -73,9 +75,10 @@ Command-specific additions:
 - `/scrolls-setup` — `assets/templates/` for the scaffolded markdown
   files. No bundled script or `tests/`: file creation goes through
   Read/Write/Edit tools directly, not a script.
-- `/scrolls-remove`, `/scrolls-restore` — `scripts/remove.py` /
-  `scripts/restore.py` (all the logic, stdlib Python) with thin `.sh`/`.ps1`
-  launchers, and `tests/`.
+- `/scrolls-remove`, `/scrolls-restore`, `/scrolls-compact` — `scripts/remove.py` /
+  `scripts/restore.py` / `scripts/compact.py` (all the logic, stdlib Python) with thin `.sh`/`.ps1`
+  launchers, and `tests/`. `/scrolls-compact` also has
+  `assets/templates/COMPACT.md` and `meta/DESIGN.md`.
 - `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide` — `scripts/`
   (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green TDD) for
   their one bundled script.
@@ -98,6 +101,6 @@ carrying out a request — neither is ever read as instructions while a
 
 This directory (`skills/scrolls/`) has its own `meta/MAINTAINERS.md` and
 `CHANGELOG.md` too — family-wide maintainer notes (shared conventions
-across all eight, versioning, where the installable artifacts live) and a
+across all nine, versioning, where the installable artifacts live) and a
 family-wide change log for anything that isn't tied to a single skill's
 own version, neither of which belong in any single skill's own docs.

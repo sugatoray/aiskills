@@ -135,7 +135,7 @@ P="$(cat "$PAGE" 2>/dev/null)"
 assert "page exists" test -s "$PAGE"
 assert_match "$P" "<meta name=\"scrolls-explainer-version\" content=\"$VERSION\">" "page is stamped with the SKILL.md version"
 assert_match "$P" "scrolls $VERSION" "version shows in the page header"
-for c in setup update hide unhide remove restore help; do
+for c in setup update hide unhide remove restore compact help; do
   assert_match "$P" "\"label\": ?\"/scrolls-$c\"" "has a /scrolls-$c tab"
 done
 assert_match "$P" '"session":' "has the New session tab"
@@ -260,7 +260,7 @@ assert_no_match "$P2" '"label": ?"/scrolls-hide"' "no /scrolls-hide tab"
 assert_no_match "$P2" '"id": ?"hide"' "no /scrolls-hide block"
 assert_match "$P2" '"label": ?"/scrolls-unhide"' "other tabs kept"
 if command -v node >/dev/null 2>&1 && node -e "require('playwright')" >/dev/null 2>&1; then
-  OUT="$(SCROLLS_TABS=setup,session,update,unhide,remove,restore,help node "$HERE/browser/check_page.cjs" "$X/assets/$NAME" 2>&1)"; CODE=$?
+  OUT="$(SCROLLS_TABS=setup,session,update,unhide,remove,restore,compact,help node "$HERE/browser/check_page.cjs" "$X/assets/$NAME" 2>&1)"; CODE=$?
   assert_exit "$CODE" 0 "the page without /scrolls-hide still works in a browser"
   [ "$CODE" -eq 0 ] || printf '%s\n' "$OUT"
 fi

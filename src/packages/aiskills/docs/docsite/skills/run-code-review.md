@@ -5,7 +5,7 @@ Runs a thorough, evidence-based code review of a pull request, branch, diff, set
 | Property | Value |
 | --- | --- |
 | Group | `review-skills` (alias `review`) |
-| Version | 1.3.0 |
+| Version | 1.3.1 |
 | Starts | When you ask for it: you type `/run-code-review` (your agent doesn't start it on its own) |
 | Needs | Read access to the code under review. git for diff-based scope (2.30 or later for --base). python3 (standard library only) for scripts/detect_languages.py, scripts/check_formats.py and scripts/render_report.py. The linters, type checkers and test runners named in each TOOLING.md are used when the project already has them; none is required. |
 | License | MIT |
@@ -48,7 +48,7 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/run-
 - `SKILL.md`
 - `agents/claude-code.yaml`
 - `agents/openai.yaml`
-- `assets/EXAMPLE.md`
+- `assets/EXAMPLES.md`
 - `assets/report-example.json`
 - `assets/report-template.html`
 - `meta/MAINTAINERS.md`

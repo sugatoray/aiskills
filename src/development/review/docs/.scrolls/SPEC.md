@@ -32,7 +32,7 @@ A parser, formatter or validator checks these before anything is read, and the r
 
 Maps the files in scope to languages and to the reference files to read, and lists vendored, generated, lock, `filtered` and unsupported files separately so nothing is dropped silently. It owns the option parsing that `check_formats.py` reuses, and has `--json` for machine-readable output. Standard library only.
 
-## Worked examples: `assets/EXAMPLE.md` (1.1.0)
+## Worked examples: `assets/EXAMPLES.md` (1.1.0; named `EXAMPLE.md` until 1.3.1)
 
 Ten examples on one small demo repository: a full review with the complete report, each option, the options combined, plain-language requests, what a wrong flag returns, and follow-ups (apply the fixes, post to a PR). Linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
 

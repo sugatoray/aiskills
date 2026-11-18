@@ -1,0 +1,5 @@
+interface:
+  display_name: "Scrolls-Compact"
+  short_description: "Condenses older Scrolls memory history and keeps the full text in git at a recorded, tagged checkpoint."
+policy:
+  allow_implicit_invocation: false

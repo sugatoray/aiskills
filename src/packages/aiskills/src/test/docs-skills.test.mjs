@@ -135,6 +135,18 @@ describe("docs/docsite/skills/", () => {
       assert.deepEqual(listed, shipped, `${name}: files`);
     }
   });
+
+  test("every skill's worked examples are named assets/EXAMPLES.md, never assets/EXAMPLE.md", () => {
+    for (const name of box.names) {
+      const dir = join(box.current.root, "skills", name);
+      const shipped = listTree(dir);
+      assert.ok(!shipped.includes("assets/EXAMPLE.md"), `${name}: rename assets/EXAMPLE.md to assets/EXAMPLES.md`);
+      for (const f of ["SKILL.md", "README.md"]) {
+        if (!existsSync(join(dir, f))) continue;
+        assert.doesNotMatch(readFileSync(join(dir, f), "utf8"), /\bEXAMPLE\.md\b/, `${name}/${f}: links to EXAMPLE.md`);
+      }
+    }
+  });
 });
 
 describe("docs/docsite/license.md", () => {
@@ -214,6 +226,7 @@ describe("explainer pages in the docs (docs/docsite/explainers/)", () => {
     const { EXPLAINERS } = await load();
     assert.ok(EXPLAINERS && Object.keys(EXPLAINERS).length > 0, "build-skills-docs.mjs exports EXPLAINERS");
     assert.equal(EXPLAINERS["explainers/scrolls-explainer.html"], "skills/scrolls/scrolls-explainer/assets/scrolls-explainer.html");
+    assert.equal(EXPLAINERS["explainers/scrolls-compact-examples.html"], "skills/scrolls/scrolls-compact/assets/example-viewer.html");
     for (const [rel, src] of Object.entries(EXPLAINERS)) {
       const copy = join(DOCS, rel);
       assert.ok(existsSync(copy), `${rel} is missing: run npm run docs:skills`);

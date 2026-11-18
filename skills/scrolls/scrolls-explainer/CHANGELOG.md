@@ -3,6 +3,16 @@
 All notable changes to the `scrolls-explainer` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.6.0] - 2026-11-15
+
+### Changed
+
+- Synced to `2.6.0` to stay in lockstep with the other `scrolls-*`
+  skills. The minor bump is for the new `/scrolls-compact` skill; see
+  `../CHANGELOG.md`.
+- `README.md`: the install commands that list every `scrolls-*` skill
+  now include `scrolls-compact`.
+
 ## [2.5.0] - 2026-11-12
 
 ### Added

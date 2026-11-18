@@ -10,7 +10,7 @@ import { describe, test } from "node:test";
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 
-import { PKG_SRC, tempDir } from "./helpers.mjs";
+import { PKG_SRC, REPO_ROOT, tempDir } from "./helpers.mjs";
 
 const DOCS = join(PKG_SRC, "docs", "docsite");
 const OUT = join(DOCS, "index.html");
@@ -77,7 +77,7 @@ describe("build-docs-html", () => {
     assert.ok(want.length >= 9, "the overview has a section per group");
     assert.deepEqual(skills.nav.groups.map((g) => ({ label: g.label, pages: g.pages })), want);
     assert.deepEqual(skills.nav.top, ["skills/README.md"], "the overview stays on top");
-    assert.deepEqual(skills.nav.extra, [{ label: "Explainers", pages: ["explainers/scrolls.md"] }], "the explainer is not a skill");
+    assert.deepEqual(skills.nav.extra, [{ label: "Explainers", pages: ["explainers/scrolls-compact-examples.md", "explainers/scrolls.md"] }], "the explainers are not skills");
     const everyPage = [...skills.nav.top, ...skills.nav.groups.flatMap((g) => g.pages), ...skills.nav.extra.flatMap((x) => x.pages)];
     assert.deepEqual(everyPage.sort(), [...skills.pages].sort(), "every page of the tab is listed once");
     for (const tab of data(build(DOCS).html).tabs.filter((t) => t.id !== "skills")) assert.equal(tab.nav, undefined, `${tab.id}: a plain list`);
@@ -112,6 +112,7 @@ describe("build-docs-html", () => {
     const d = data(build(DOCS).html);
     // [the HTML page, the docs page that embeds it, the tab that lists that docs page]
     const served = [
+      ["explainers/scrolls-compact-examples.html", "explainers/scrolls-compact-examples.md", "Skills"],
       ["explainers/scrolls-explainer.html", "explainers/scrolls.md", "Skills"],
       ["reference/cli-outputs.html", "reference/cli-outputs.md", "Reference"],
     ];
@@ -361,8 +362,8 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       const groups = await open();
       assert.ok(groups.length >= 9);
       assert.deepEqual(groups.filter(([, e]) => e === "true").map(([g]) => g), [groups[0][0]], "on the overview, the first group starts open");
-      assert.match(await page.locator("#side .nav-group > button").first().innerText(), /scrolls-skills\s*8/);
-      assert.equal(await page.locator("#side .nav-group").first().locator("ul a").count(), 8);
+      assert.match(await page.locator("#side .nav-group > button").first().innerText(), /scrolls-skills\s*9/);
+      assert.equal(await page.locator("#side .nav-group").first().locator("ul a").count(), 9);
       assert.ok(await page.locator("#side .side-label", { hasText: "Explainers" }).count(), "an Explainers section");
       assert.equal(await page.locator("#side a", { hasText: "See how the scrolls skills work" }).count(), 1);
       // Toggle a group open and shut.
@@ -484,10 +485,90 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
       await page.waitForSelector("#doc iframe");
       const frame = page.frameLocator("#doc iframe");
       await frame.locator("#network-flow[data-ready=true]").waitFor();
-      assert.equal(await frame.locator(".rf-tab").count(), 9, "Overview plus 8 tabs");
+      assert.equal(await frame.locator(".rf-tab").count(), 10, "Overview plus 9 tabs");
       const box = await page.locator("#doc iframe").boundingBox();
       const doc = await page.locator("#doc").boundingBox();
       assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
+      assert.deepEqual(errors, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the scrolls-compact examples page embeds the example viewer: its tabs, links and Note boxes work in the frame", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(OUT).href + "#explainers-scrolls-compact-examples");
+      await page.waitForSelector("#doc iframe");
+      assert.equal(await page.locator("#side a", { hasText: "Browse the scrolls-compact examples" }).count(), 1, "listed under Explainers");
+      const frame = page.frameLocator("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      const examples = readdirSync(join(REPO_ROOT, "skills/scrolls/scrolls-compact/assets/examples")).filter((f) => /^example_\d{3}\.md$/.test(f)).length;
+      assert.equal(await frame.locator("nav.tabs a[role=tab]").count(), examples + 1, "Index plus one tab per example");
+      assert.equal(await frame.locator(".doc .pc").count(), examples, "one Note box per example");
+      const outer = page.url();
+      await frame.locator('nav.tabs a[data-tab="example-021"]').click();
+      assert.equal(await frame.locator("#tab-example-021").isVisible(), true, "a tab opens inside the frame");
+      assert.match(await frame.locator("#tab-example-021 .doc h1").innerText(), /Example-21/);
+      await frame.locator('#tab-example-021 .doc a:text("← All examples")').click();
+      assert.equal(await frame.locator("#tab-index").isVisible(), true, "the back-link opens the Index tab");
+      await frame.locator('#tab-index .doc table a[data-src="examples/example_007.md"] >> nth=0').click();
+      assert.equal(await frame.locator("#tab-example-007").isVisible(), true, "an index link opens its example");
+      await frame.locator('#tab-example-007 [data-step="next"]').click();
+      assert.equal(await frame.locator("#tab-example-008").isVisible(), true, "Next works");
+      assert.equal(page.url(), outer, "the frame's tabs don't change the docs page's address");
+      const box = await page.locator("#doc iframe").boundingBox();
+      const doc = await page.locator("#doc").boundingBox();
+      assert.ok(box.width > doc.width * 0.95 && box.height >= 600, `iframe ${box.width}x${box.height} fills the column`);
+      // Full-size: an overlay in this page, as for the scrolls explainer.
+      await page.click('#doc a:has-text("Open the examples full-size")');
+      await page.waitForSelector(".explainer-overlay iframe");
+      await page.frameLocator(".explainer-overlay iframe").locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator(".explainer-overlay").count(), 0, "Esc closes it");
+      assert.deepEqual(errors, []);
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test("the embedded example viewer follows the docs' light/dark theme, not only the system's", async () => {
+    const browser = await playwright.chromium.launch();
+    try {
+      const context = await browser.newContext({ viewport: { width: 1400, height: 900 }, colorScheme: "dark" });
+      const page = await context.newPage();
+      const errors = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto(pathToFileURL(OUT).href + "#explainers-scrolls-compact-examples");
+      await page.waitForSelector("#doc iframe");
+      const frame = page.frameLocator("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      const docs = () => page.evaluate(() => document.documentElement.getAttribute("data-effective"));
+      const bg = (f) => f.locator("body").evaluate((b) => getComputedStyle(b).backgroundColor);
+      const WHITE = "rgb(255, 255, 255)", BLACK = "rgb(0, 0, 0)";
+      assert.equal(await docs(), "dark");
+      assert.equal(await bg(frame), BLACK, "dark system, dark docs: dark viewer");
+      await page.click("#theme-btn");
+      assert.equal(await docs(), "light");
+      await page.waitForFunction(() => getComputedStyle(document.querySelector("#doc iframe").contentDocument.body).backgroundColor === "rgb(255, 255, 255)", null, { timeout: 3000 }).catch(() => {});
+      assert.equal(await bg(frame), WHITE, "the docs switched to light on a dark system: the viewer is light too");
+      // The full-size overlay opens in the docs' theme.
+      await page.click('#doc a:has-text("Open the examples full-size")');
+      const over = page.frameLocator(".explainer-overlay iframe");
+      await over.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      assert.equal(await bg(over), WHITE, "the full-size viewer is light too");
+      await page.keyboard.press("Escape");
+      // The choice is saved: after a reload the viewer opens light.
+      await page.reload();
+      await page.waitForSelector("#doc iframe");
+      await frame.locator("body[data-ready=true]").waitFor({ timeout: 10000 });
+      assert.equal(await bg(frame), WHITE, "after a reload, the saved light theme applies to the viewer");
+      await page.click("#theme-btn");
+      assert.equal(await docs(), "dark");
+      assert.equal(await bg(frame), BLACK, "and back to dark");
       assert.deepEqual(errors, []);
     } finally {
       await browser.close();
@@ -513,7 +594,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
         await page.waitForSelector("#doc iframe");
         assert.equal(await page.getAttribute("#doc iframe", "src"), null, "no src on the frame");
         await page.frameLocator("#doc iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
-        assert.equal(await page.frameLocator("#doc iframe").locator(".rf-tab").count(), 9, "the embedded explainer loads with all its tabs");
+        assert.equal(await page.frameLocator("#doc iframe").locator(".rf-tab").count(), 10, "the embedded explainer loads with all its tabs");
         // "Open the explainer full-size": an overlay in this page, not a navigation.
         const before = page.url();
         await page.click('#doc a:has-text("Open the explainer full-size")');
@@ -523,7 +604,7 @@ describe("index.html in a browser", { skip: noBrowser }, () => {
         const ov = await page.locator(".explainer-overlay").boundingBox();
         assert.ok(Math.abs(ov.width - viewport.width) <= 1 && Math.abs(ov.height - viewport.height) <= 1, `overlay ${ov.width}x${ov.height} fills the screen`);
         await page.frameLocator(".explainer-overlay iframe").locator("#network-flow[data-ready=true]").waitFor({ timeout: 10000 });
-        assert.equal(await page.frameLocator(".explainer-overlay iframe").locator(".rf-tab").count(), 9);
+        assert.equal(await page.frameLocator(".explainer-overlay iframe").locator(".rf-tab").count(), 10);
         const overflow = await page.frameLocator(".explainer-overlay iframe").locator("body").evaluate(() => document.documentElement.scrollWidth > innerWidth);
         assert.equal(overflow, false, "the explainer fits the screen width");
         await page.click(".explainer-overlay .explainer-close");

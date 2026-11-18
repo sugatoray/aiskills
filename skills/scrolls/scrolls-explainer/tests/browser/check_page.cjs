@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 
 const file = process.argv[2];
 const shots = process.argv[3];
-const ALL_TABS = ['setup', 'session', 'update', 'hide', 'unhide', 'remove', 'restore', 'help'];
+const ALL_TABS = ['setup', 'session', 'update', 'hide', 'unhide', 'remove', 'restore', 'compact', 'help'];
 // SCROLLS_TABS: the tabs a rebuilt page should have (e.g. after a skill was
 // deactivated). The keyboard walk-through below assumes the full set.
 const TABS = process.env.SCROLLS_TABS ? process.env.SCROLLS_TABS.split(',') : ALL_TABS;

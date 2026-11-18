@@ -53,7 +53,7 @@ separate install step).
 
 **Pick skills interactively, global or local** — omit `--skill`/`--yes`
 and the CLI prompts you to choose the agent and which skills to install;
-select all eight `scrolls-*` skills (or just `scrolls-explainer`) at the
+select all nine `scrolls-*` skills (or just `scrolls-explainer`) at the
 prompt:
 
 ```
@@ -71,8 +71,8 @@ npx skills add sugatoray/aiskills --skill scrolls-explainer            # local
 **Fully unattended, every scrolls-* skill, global or project:**
 
 ```
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --yes            # project
-npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-explainer --global --yes   # global
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-compact scrolls-explainer --yes            # project
+npx skills add sugatoray/aiskills --skill scrolls-help scrolls-setup scrolls-update scrolls-hide scrolls-unhide scrolls-remove scrolls-restore scrolls-compact scrolls-explainer --global --yes   # global
 ```
 
 **Fully unattended, just this skill, global or project:**

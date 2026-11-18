@@ -1,7 +1,7 @@
 {
   "eyebrow": "sugatoray/aiskills · scrolls {version}",
   "title": "How the scrolls-* skills work",
-  "subtitle": "The scrolls-* slash commands create, maintain, move, remove and restore a project's cross-session memory. Pick a command tab to watch what it does, step by step.",
+  "subtitle": "The scrolls-* slash commands create, maintain, move, remove, restore and compact a project's cross-session memory. Pick a command tab to watch what it does, step by step.",
   "colors": {
     "cmd": "#4F9DFF",
     "pointer": "#B57CFF",
@@ -82,12 +82,20 @@
       "detail": "The counterpart to /scrolls-remove. Finds the newest removal checkpoint (or takes any commit), brings back the scrolls folders and re-inserts the pointer stubs into the files as they are today. Nothing else in the repo is rolled back. --onto mounts the memory on another branch through a temporary worktree."
     },
     {
+      "id": "compact",
+      "name": "/scrolls-compact",
+      "kind": "Compact · in time",
+      "sub": "Checkpoint in git",
+      "color": "cmd",
+      "detail": "Condenses the old parts of SPEC, PLAN, HANDOFF and the GAP files: older than --before / --base, or by default the newer of 7 days and 20 commits, as git blame shows. Open tickets, gaps and open threads stay word for word. Records ONE commit, maint(memory): scrolls-compacted, naming the checkpoint where the full text stays, and tags it."
+    },
+    {
       "id": "git",
       "name": "Git history",
       "kind": "Checkpoints",
-      "sub": "scrolls-removed commits",
+      "sub": "Removal + compaction checkpoints",
       "color": "git",
-      "detail": "Where /scrolls-remove leaves its checkpoint and /scrolls-restore finds it. /scrolls-update's session_diff also reads it to see what changed since the scrolls were last updated."
+      "detail": "Where /scrolls-remove leaves its checkpoint and /scrolls-restore finds it, and where /scrolls-compact keeps the full text it condensed. /scrolls-update's session_diff also reads it to see what changed since the scrolls were last updated."
     },
     {
       "id": "help",
@@ -184,6 +192,14 @@
       "sub": "Constraints · traps · lessons",
       "color": "memory",
       "detail": "Constraints, traps, ditches and lessons. An entry is added only when the session actually taught something new."
+    },
+    {
+      "id": "compactmd",
+      "name": "COMPACT.md",
+      "kind": "Index · by /scrolls-compact",
+      "sub": "+ compacted/ reports",
+      "color": "memory",
+      "detail": "The compaction history: one table row per compaction, and the plain git commands to read old text back. Each report in compacted/ names the checkpoint and every compacted file's blob id. Only /scrolls-compact writes them."
     }
   ],
   "edges": [
@@ -360,6 +376,36 @@
       "from": "restore",
       "to": "claude",
       "kind": "cmd"
+    },
+    {
+      "id": "compact-git",
+      "from": "compact",
+      "to": "git",
+      "kind": "git"
+    },
+    {
+      "id": "compact-spec",
+      "from": "compact",
+      "to": "spec",
+      "kind": "cmd"
+    },
+    {
+      "id": "compact-plan",
+      "from": "compact",
+      "to": "plan",
+      "kind": "cmd"
+    },
+    {
+      "id": "compact-compactmd",
+      "from": "compact",
+      "to": "compactmd",
+      "kind": "cmd"
+    },
+    {
+      "id": "starter-compactmd",
+      "from": "starter",
+      "to": "compactmd",
+      "kind": "memory"
     },
     {
       "id": "help-out",
@@ -691,6 +737,48 @@
         }
       ]
     },
+    "compact": {
+      "label": "/scrolls-compact",
+      "summary": "Condenses old history at a point in time, and keeps the full text in git at a checkpoint.",
+      "scope": [
+        "compact-git",
+        "compact-spec",
+        "compact-plan",
+        "compact-compactmd",
+        "starter-compactmd"
+      ],
+      "steps": [
+        {
+          "edge": "compact-git",
+          "title": "Find what is old",
+          "text": "git blame dates every line. The base is the newer of 7 days and 20 commits back, or --before / --base.",
+          "at": "git"
+        },
+        {
+          "edge": "compact-spec",
+          "title": "Condense the history",
+          "text": "Old feature sections shrink to one line each; done tickets and stale handoff notes go.",
+          "at": "spec"
+        },
+        {
+          "edge": "compact-plan",
+          "title": "Keep live state",
+          "text": "Open tickets, every gap and HANDOFF's open threads stay word for word, however old.",
+          "at": "plan"
+        },
+        {
+          "edge": "compact-compactmd",
+          "title": "Index the checkpoint",
+          "text": "A report goes into compacted/ and a row into COMPACT.md. STARTER.md lists COMPACT.md once."
+        },
+        {
+          "edge": "compact-git",
+          "title": "Record and tag it",
+          "text": "One commit, maint(memory): scrolls-compacted, names the checkpoint; a tag keeps it alive. --extract reads old text back.",
+          "at": "compact"
+        }
+      ]
+    },
     "help": {
       "label": "/scrolls-help",
       "summary": "A reference for the whole family. It changes nothing in the repo.",
@@ -791,10 +879,18 @@
       ],
       "help": [
         0,
-        6
+        7
       ],
       "helpref": [
         1,
+        7
+      ],
+      "compact": [
+        0,
+        6
+      ],
+      "compactmd": [
+        3,
         6
       ]
     },
@@ -865,7 +961,7 @@
       ],
       "help": [
         0,
-        6
+        7
       ],
       "plan": [
         2,
@@ -873,7 +969,7 @@
       ],
       "helpref": [
         0,
-        7
+        8
       ],
       "gaps": [
         2,
@@ -882,6 +978,14 @@
       "wisdom": [
         2,
         8
+      ],
+      "compact": [
+        0,
+        6
+      ],
+      "compactmd": [
+        1,
+        6
       ]
     },
     "narrow": {
@@ -959,14 +1063,22 @@
       ],
       "help": [
         0,
-        9
+        11
       ],
       "wisdom": [
         1,
         9
       ],
       "helpref": [
+        1,
+        11
+      ],
+      "compact": [
         0,
+        10
+      ],
+      "compactmd": [
+        1,
         10
       ]
     }
@@ -978,12 +1090,13 @@
     "note": "Shared flags: -p path · -t repo root · -l current dir · -r recurse"
   },
   "sources": {
-    "scrolls-help": "fddb7450237dfee908ab51a47f5470d556f9895537450aab122d0866def59b06",
+    "scrolls-compact": "31ba73d1dad44200a8fef2708c1c3bc6f70476790ad47f6285a351bc70f6273d",
+    "scrolls-help": "964aaa9f7d0f22fb7d583ca950e18217a99ca9d7fcbd265fbdbf19ecd0e095f3",
     "scrolls-hide": "6d9734dc78036b5c0bfd0f387f9bb77dd16bb69761ffdcee141c9a0a2ffa558b",
     "scrolls-remove": "1623ee1f0a5886c634857a36e9b1d12d0ebb497fabc7793216ffa683c3fe4d03",
     "scrolls-restore": "c6398ac09815bcf1391efff868e838c51ba75b45ce74662974518c10ce138dff",
     "scrolls-setup": "5456b21097f5decc049432903e0f3019b4e4a6c085aad622cd84a6c44df4b2b3",
     "scrolls-unhide": "6082ca023fc2b098bb53b04a801ae52d2617e5ebab9101809a78ac3c360bf78e",
-    "scrolls-update": "a77dc6a9a9bc0b778900acdfa4e49aedc60a8ea1cd3c3df54574dc3d88d27d0a"
+    "scrolls-update": "9856eab7694183e27f83b8dae351ca957612ec1bfda39dee8168351ea700e21b"
   }
 }

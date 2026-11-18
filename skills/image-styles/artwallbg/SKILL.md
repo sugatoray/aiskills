@@ -8,7 +8,7 @@ metadata:
   name: artwallbg
   type: skill
   author: sugatoray
-  version: "1.0.0"
+  version: "1.0.1"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/image-styles/artwallbg"
 ---
 
@@ -18,4 +18,4 @@ Interpret `/artwallbg {{ context }}` as `/visualize [[ {{ context | default="a g
 
 Generate and display the actual image using the available image-generation tool, rather than merely writing a prompt or describing it. Make the wall monumental relative to the subject, with visible spray-paint art and a vivid illustrated scene. Avoid adding text unless requested.
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/artwallbg` prompts and their outputs.
+See [assets/EXAMPLES.md](assets/EXAMPLES.md) for example `/artwallbg` prompts and their outputs.

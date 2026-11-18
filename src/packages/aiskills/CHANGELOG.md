@@ -24,6 +24,33 @@ In development: `package.json` is `1.4.0-dev` (a SemVer pre-release, so it
 sorts below `1.4.0`) while changes collect here. At release, set it to `1.4.0`
 and date this section.
 
+### Added
+
+- **New bundled skill: `scrolls-compact`**, in the `scrolls-skills` group
+  (alias `scrolls`). `/scrolls-compact` condenses the old history in a
+  project's scrolls (what `git blame` shows is older than a date, a commit,
+  or by default the newer of 7 days and 20 commits) and keeps the full text
+  in git at a recorded, tagged checkpoint; `--list`, `--show` and
+  `--extract` read it back. The scrolls skills move to `2.6.0` together. The
+  package now bundles 18 skills in 9 groups: `aiskills install -s
+  scrolls-compact`, or `aiskills install -G scrolls` for the whole group. See
+  the skill's own `CHANGELOG.md` for its history.
+- **Docs: Browse the scrolls-compact examples**, a new page in the Skills tab
+  (under Explainers). It embeds the skill's `assets/example-viewer.html`: the
+  index and all 23 worked examples, one tab each, with real output.
+- **Docs: embedded pages follow the docs' light/dark choice.** The theme
+  button now also switches the example viewer and the CLI outputs page (in
+  the page and full-size), through `data-theme` on their `<html>`; before,
+  they followed only the system setting.
+
+### Changed
+
+- **Bundled skills `run-code-review` 1.3.1, `artwallbg` 1.0.1 and
+  `commentdrop` 1.0.1:** each skill's worked examples are now in
+  `assets/EXAMPLES.md` (was `assets/EXAMPLE.md`), the name every bundled
+  skill uses. The content is unchanged. A test now fails if a bundled skill
+  ships `assets/EXAMPLE.md` again.
+
 ## [1.3.0] - 2026-11-17
 
 ### Added

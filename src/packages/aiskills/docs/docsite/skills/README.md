@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (17 skills in 9 groups), with what it does and how to install it.
+Every skill in this version of the package (18 skills in 9 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -10,14 +10,15 @@ Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`scrolls-explainer`](scrolls-explainer.md) | 2.5.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
-| [`scrolls-help`](scrolls-help.md) | 2.5.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
-| [`scrolls-hide`](scrolls-hide.md) | 2.5.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
-| [`scrolls-remove`](scrolls-remove.md) | 2.5.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
-| [`scrolls-restore`](scrolls-restore.md) | 2.5.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
-| [`scrolls-setup`](scrolls-setup.md) | 2.5.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
-| [`scrolls-unhide`](scrolls-unhide.md) | 2.5.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
-| [`scrolls-update`](scrolls-update.md) | 2.5.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
+| [`scrolls-compact`](scrolls-compact.md) | 2.6.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
+| [`scrolls-explainer`](scrolls-explainer.md) | 2.6.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
+| [`scrolls-help`](scrolls-help.md) | 2.6.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
+| [`scrolls-hide`](scrolls-hide.md) | 2.6.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
+| [`scrolls-remove`](scrolls-remove.md) | 2.6.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
+| [`scrolls-restore`](scrolls-restore.md) | 2.6.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
+| [`scrolls-setup`](scrolls-setup.md) | 2.6.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
+| [`scrolls-unhide`](scrolls-unhide.md) | 2.6.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
+| [`scrolls-update`](scrolls-update.md) | 2.6.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
 
 ## stata-skills
 
@@ -41,7 +42,7 @@ Alias `review`. Install the group with `aiskills install -G review`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`run-code-review`](run-code-review.md) | 1.3.0 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
+| [`run-code-review`](run-code-review.md) | 1.3.1 | Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds… |
 
 ## docs-skills
 
@@ -81,8 +82,8 @@ Alias `image-styles`. Install the group with `aiskills install -G image-styles`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`artwallbg`](artwallbg.md) | 1.0.0 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
-| [`commentdrop`](commentdrop.md) | 1.0.0 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
+| [`artwallbg`](artwallbg.md) | 1.0.1 | Create a vivid illustrated image of a subject in front of a huge spray-painted wall. |
+| [`commentdrop`](commentdrop.md) | 1.0.1 | Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing. |
 
 This section is generated from the skills' own `SKILL.md` files by `npm run docs:skills`.
 

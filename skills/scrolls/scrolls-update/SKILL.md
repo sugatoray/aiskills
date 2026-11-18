@@ -8,7 +8,7 @@ metadata:
   name: scrolls-update
   type: skill
   author: sugatoray
-  version: "2.5.0"
+  version: "2.6.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-update"
 ---
 
@@ -101,6 +101,8 @@ The core six's generic rules (from `STARTER.md`):
 - **`WISDOM.md`** — add an entry under the right section (**Constraints** / **Traps** / **Ditches** / **Wisdom**) only when something genuinely new was learned — a bug that bit you, a pattern worth reusing, a hard constraint discovered. Don't force an entry if the session didn't teach anything new.
 
 For any project-specific scrolls beyond this core set, use the convention `STARTER.md` documents for that specific file — don't default to the generic rules above for a file that says it works differently.
+
+Leave `COMPACT.md` and the `compacted/` folder alone, if they exist. Only `/scrolls-compact` writes them. A condensed `## Compacted features` block or a `<!-- scrolls-compact: … -->` marker in another file is history, not something to update; keep it as it is.
 
 ### 6. Don't fabricate or over-claim
 

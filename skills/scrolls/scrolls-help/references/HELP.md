@@ -15,7 +15,7 @@ Every command here works the same way on macOS, Linux, and Windows — each bund
 
 That covers the typical single-repo workflow completely. Everything below is for less common cases: running from a subdirectory, monorepos, and toggling the folder's visibility.
 
-## The six commands
+## The seven commands
 
 | Command | Does |
 |---|---|
@@ -25,6 +25,7 @@ That covers the typical single-repo workflow completely. Everything below is for
 | `/scrolls-unhide` | Renames an existing `.scrolls/` folder to visible `scrolls/`. |
 | `/scrolls-remove` | Removes the scrolls system and commits the removal, recording the previous commit so it can be undone. |
 | `/scrolls-restore` | Brings the memory back from the newest removal checkpoint (or any commit) into the repo as it is now, optionally `--onto` another branch. |
+| `/scrolls-compact` | Condenses old history in the scrolls and commits it, recording a checkpoint where the full text stays. Open tickets, gaps and threads are never touched. |
 
 `/scrolls-hide` and `/scrolls-unhide` are retrofit tools — for a brand-new project, `/scrolls-setup -u` already creates it visible in one step, no separate toggle needed.
 
@@ -32,17 +33,18 @@ That covers the typical single-repo workflow completely. Everything below is for
 
 ## Flags
 
-All six commands share the same location flags. `-u` only makes sense on `setup`, `-x` only on `remove`, and `--onto`/`-b` only on `restore`; `-r` means something specific to each command.
+All seven commands share the same location flags. `-u` only makes sense on `setup`, `-x` only on `remove`, `--onto`/`-b` only on `restore`, and `--before`/`--base` only on `compact`; `-r` means something specific to each command.
 
-| Flag | Meaning | setup | update | hide / unhide | remove | restore |
-|---|---|---|---|---|---|---|
-| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable | repeatable | repeatable |
-| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode | sweep mode | sweep mode |
-| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — | — | — |
-| `-x`, `--purge [files]` | Also delete these pointer files outright: `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all` (default) | — | — | — | ✓ | — |
-| `--onto REF`, `-b NAME` | Put the restored memory on another branch (or a new branch at any commit), without touching the current checkout | — | — | — | — | ✓ |
+| Flag | Meaning | setup | update | hide / unhide | remove | restore | compact |
+|---|---|---|---|---|---|---|---|
+| `-p`, `--path <dir>` | Use a specific docs folder / base directory instead of the default | single value | single value | repeatable | repeatable | repeatable | single value |
+| `-t`, `--reporoot` | Use the git repository's top level, regardless of cwd | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `-l`, `--local` | Use the current directory explicitly (same as the default, stated on purpose) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `-r`, `--recurse` | See below — meaning differs per command | pre-creation duplicate scan | fallback search | sweep mode | sweep mode | sweep mode | fallback search |
+| `-u`, `--unhide` | Create the folder visible (`scrolls`) instead of hidden (`.scrolls`) | ✓ | — | — | — | — | — |
+| `-x`, `--purge [files]` | Also delete these pointer files outright: `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md`, another file name, or `all` (default) | — | — | — | ✓ | — | — |
+| `--onto REF`, `-b NAME` | Put the restored memory on another branch (or a new branch at any commit), without touching the current checkout | — | — | — | — | ✓ | — |
+| `--before=YYYYMMDD`, `--base=COMMIT` | Compact content older than that date, or than that commit. Default: the newer of 7 days (`--keep-days`) and 20 commits (`--keep-commits`) | — | — | — | — | — | ✓ |
 
 `-p`, `-t`, and `-l` are three ways to answer the same question ("where?") — pick at most one. `-r` is independent and stacks with any of them, or with none.
 
@@ -52,6 +54,7 @@ All six commands share the same location flags. `-u` only makes sense on `setup`
 - `/scrolls-hide -r` / `/scrolls-unhide -r` — without it, these check exactly one location; with it, they sweep an entire directory tree for every matching folder (e.g. every package in a monorepo, in one run).
 - `/scrolls-remove -r` — removes every scrolls folder under the directory, with each one's pointer files, in a single commit.
 - `/scrolls-restore -r` — restores every folder from the checkpoint under the directory, not just the one at the exact spot (undoes a `remove -r` sweep).
+- `/scrolls-compact -r` — if nothing's at the exact spot, searches recursively, like `update`. It compacts one folder per run, so it stops and lists them if it finds more than one.
 
 **Default, with no flags at all**: everything happens relative to the current directory. If that's not the git repository's root, `/scrolls-setup` and `/scrolls-update` say so and check with you before proceeding — cwd still wins if you don't have a preference, it just won't happen silently.
 
@@ -125,6 +128,19 @@ Mount the memory onto another branch, or a new branch at a release tag, without 
 /scrolls-restore --onto v1.4.0 -b memory/v1.4.0
 ```
 
+**Compact old history** — condense what's older than a week or 20 commits, keep the full text in git:
+```
+/scrolls-compact
+/scrolls-compact --before=20261101
+/scrolls-compact --base=v1.4.0 -n
+```
+It shows the plan, condenses only the `old` parts, then makes one `maint(memory): scrolls-compacted` commit, writes a report to `compacted/`, adds a row to `COMPACT.md`, and tags the checkpoint. Read old text back later:
+```
+/scrolls-compact --list
+/scrolls-compact --extract 1 SPEC.md
+/scrolls-compact --show 1 PLAN.md
+```
+
 **Show someone how it works** — an animated, offline page, one tab per command:
 ```
 /scrolls-explainer
@@ -136,11 +152,14 @@ Mount the memory onto another branch, or a new branch at a release tag, without 
 
 - `docs/.scrolls/STARTER.md` (or `docs/scrolls/STARTER.md`) is the entry point: it lists the other six files in reading order and says when to update each.
 - `SCROLLS.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory." A short `CLAUDE.md` pointer (`See @SCROLLS.md.`) sits next to it, and a matching `AGENTS.md` pointer (`See @CLAUDE.md`) beside that, for harnesses that read those files instead.
+- `COMPACT.md` and `compacted/` appear after the first `/scrolls-compact`: the compaction history and its reports. Only `/scrolls-compact` writes them.
 - The six other files: `SPEC.md` (features, updated when they ship), `HANDOFF.md` (session snapshot, overwritten each time, not appended), `GAP_ANALYSIS.md`/`GAP_CONTEXT.md` (known gaps and why they exist), `PLAN.md` (prioritized backlog), `WISDOM.md` (constraints, traps, ditches, and lessons worth reusing).
 
 ## Troubleshooting
 
 - **"`/scrolls-restore` says the folder already exists."** The memory is already there. Run `/scrolls-update` to bring it up to date, or pass `-f` to replace it with the checkpoint's version.
+- **"`/scrolls-compact` says nothing to compact."** Everything is newer than the base, or is live state (open tickets, gaps, open threads). Cut deeper with `--keep-days`, `--keep-commits`, `--before` or `--base`.
+- **"`/scrolls-compact --finalize` refused."** An edit touched a `live` or `new` unit, the text around the units, or a file outside the scope, or a changed file lacks this run's marker line. Your edits are kept; fix the named line and run `--finalize` again.
 - **"`/scrolls-remove` refused to run."** Something it would delete has uncommitted, untracked, or ignored changes, or unrelated changes are already staged. The restore point only holds committed content, so it won't risk anything else. Commit or discard those changes, then run it again.
 - **"It created a second scrolls system in a subdirectory I didn't expect."** You ran `/scrolls-setup` or `/scrolls-update` from somewhere other than the repo root without `-t`. Re-run with `-t` to target the repo root, or `-p`/`-l` to be explicit about where you meant.
 - **"hide/unhide didn't find anything."** By default they check exactly one location (`<base>/docs/.scrolls` or `.../scrolls`). Add `-r` to search recursively, or `-t` if you meant the repo root.

@@ -5,7 +5,7 @@ Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page t
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Starts | When you ask for it: you type `/scrolls-explainer` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); any modern web browser to view the page; --build also needs the network-flow skill |
 | License | MIT |

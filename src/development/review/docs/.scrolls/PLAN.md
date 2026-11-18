@@ -14,6 +14,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] 1.1.0: `-l`/`--lang`, `-s`/`--security`, scope flags, `SECURITY.md` and `WISDOM.md` in every language folder, HTML/CSS/Markdown/XML.
 - [x] 1.1.0: tool-first XML, JSON, YAML and TOML with `scripts/check_formats.py`; XML keeps its full review.
 - [x] `assets/EXAMPLE.md` with ten examples, linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
+- [x] 1.3.1: rename it `assets/EXAMPLES.md`, the name every skill uses (on `claude/clever-mendel-k9n73h`, #265).
 - [x] Set up `src/development/review/` (this scroll set) and the `src/development/meta/review` symlink.
 - [x] Make the JSON line-number test pass on Python 3.13 (`a59957b`).
 - [x] Rename the subgroup `reviews` → `review` and the plugin `reviews-skills` → `review-skills` (`ec71a5c`).
@@ -23,4 +24,4 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Rename `/code-review` → `/run-code-review` to avoid Claude Code's built-in (`7f2bff3`, #225).
 - [x] #215 and the #216 parent retitled to `/run-code-review`.
 
-Not planned: a captured agent run to replace the sample report in `assets/EXAMPLE.md`. The user declined it; see `GAP_CONTEXT.md`.
+Not planned: a captured agent run to replace the sample report in `assets/EXAMPLES.md`. The user declined it; see `GAP_CONTEXT.md`.

@@ -10,7 +10,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-17 skills, sorted by name.
+18 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
@@ -22,6 +22,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 | [`network-flow`](skills/network-flow.md) | diagrams | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/SKILL.md) |
 | [`prodigy`](skills/prodigy.md) | personas | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/SKILL.md) |
 | [`run-code-review`](skills/run-code-review.md) | review | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/review/run-code-review/SKILL.md) |
+| [`scrolls-compact`](skills/scrolls-compact.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-compact/SKILL.md) |
 | [`scrolls-explainer`](skills/scrolls-explainer.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-explainer/SKILL.md) |
 | [`scrolls-help`](skills/scrolls-help.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-help/SKILL.md) |
 | [`scrolls-hide`](skills/scrolls-hide.md) | scrolls | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/scrolls/scrolls-hide/SKILL.md) |

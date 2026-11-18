@@ -8,7 +8,7 @@ metadata:
   name: commentdrop
   type: skill
   author: sugatoray
-  version: "1.0.0"
+  version: "1.0.1"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/image-styles/commentdrop"
 ---
 
@@ -22,4 +22,4 @@ By default, add a small set of staggered, floating social-style cards: rounded l
 
 Use the available image-editing tool to produce and display the edited image. Include the source image and any style reference as inputs. If exact text is important, preserve it as accurately as the tool allows; do not claim verbatim accuracy without verification. Do not present a description alone as the completed result.
 
-See [assets/EXAMPLE.md](assets/EXAMPLE.md) for example `/commentdrop` prompts and their outputs.
+See [assets/EXAMPLES.md](assets/EXAMPLES.md) for example `/commentdrop` prompts and their outputs.
