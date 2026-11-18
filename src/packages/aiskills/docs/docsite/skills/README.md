@@ -1,6 +1,6 @@
 # Bundled skills
 
-Every skill in this version of the package (18 skills in 9 groups), with what it does and how to install it.
+Every skill in this version of the package (19 skills in 10 groups), with what it does and how to install it.
 
 Install them all with `aiskills install`, or pick by group (`-G`), by name (`-s`) or by [pattern](../reference/patterns.md). `aiskills groups` shows the same grouping for the version you have installed.
 
@@ -67,6 +67,14 @@ Alias `personas`. Install the group with `aiskills install -G personas`.
 | Skill | Version | What it does |
 | --- | --- | --- |
 | [`prodigy`](prodigy.md) | 1.0.0 | Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and… |
+
+## productivity-skills
+
+Alias `productivity`. Install the group with `aiskills install -G productivity`.
+
+| Skill | Version | What it does |
+| --- | --- | --- |
+| [`meeting-agenda`](meeting-agenda.md) | 1.0.0 | Turn a meeting agenda into a self-contained HTML slide deck with a countdown timer per item: one slide per item (large 01, 02… number, title, optional… |
 
 ## video-related-skills
 

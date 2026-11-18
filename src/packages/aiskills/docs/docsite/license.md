@@ -10,7 +10,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-18 skills, sorted by name.
+19 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |

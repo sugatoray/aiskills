@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: <!-- count:skills -->18<!-- /count --> skills in <!-- count:groups -->9<!-- /count --> groups, at the version you installed.
+- **Skills in one package**: <!-- count:skills -->19<!-- /count --> skills in <!-- count:groups -->10<!-- /count --> groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -53,12 +53,13 @@ aiskills install -G scrolls -a claude-code
 ### Skills
 
 <!-- skills:start -->
-- [Bundled skills](skills/README.md): all <!-- count:skills -->18<!-- /count --> skills in the package, in <!-- count:groups -->9<!-- /count --> groups, with what each does.
+- [Bundled skills](skills/README.md): all <!-- count:skills -->19<!-- /count --> skills in the package, in <!-- count:groups -->10<!-- /count --> groups, with what each does.
 - [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
 - [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…
 - [create-lib-docs](skills/create-lib-docs.md): Writes top-grade, verified user documentation for a library, CLI or framework as a folder of Markdown pages plus SVG diagrams, structured the way FastAPI,…
 - [dynamic-promo-video](skills/dynamic-promo-video.md): Build a short narrated promo/intro video (HTML scenes, zoom/tilt, voiceover, music) for a library, app or product.
+- [meeting-agenda](skills/meeting-agenda.md): Turn a meeting agenda into a self-contained HTML slide deck with a countdown timer per item: one slide per item (large 01, 02… number, title, optional…
 - [network-flow](skills/network-flow.md): Create working interactive network and architecture diagrams with moving packets, orthogonal connections, scenario playback, and selectable nodes.
 - [prodigy](skills/prodigy.md): Act as the top performer in a given role or field and produce a five-part playbook: (1) how they understand the problem, constraints, stakeholders and…
 - [run-code-review](skills/run-code-review.md): Runs a thorough, evidence-based code review of a pull request, branch, diff, set of files or whole repository, at the bar a senior or staff engineer holds…

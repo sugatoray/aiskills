@@ -24,6 +24,18 @@ In development: `package.json` is `1.5.0-dev` (a SemVer pre-release, so it
 sorts below `1.5.0`) while changes collect here. At release, set it to `1.5.0`
 and date this section.
 
+### Added
+
+- **New skill group `productivity`** (`productivity-skills`, alias
+  `productivity`) with the **`meeting-agenda`** skill: turns an agenda into an
+  offline HTML slide deck with a countdown timer per item, a per-item meeting
+  progress bar, touch controls, an in-page editor (Quick View and Detailed
+  View) and twelve themes, Aurora by default. It runs only when invoked by
+  name. The package now bundles 19 skills in 10 groups: `aiskills install -s
+  meeting-agenda`, or `aiskills install -G productivity` for the group. The
+  skill's screenshots are left out of the package by its `.skillsignore`. See
+  the skill's own `CHANGELOG.md` for its history.
+
 ## [1.4.0] - 2026-11-18
 
 ### Added
@@ -57,11 +69,6 @@ and date this section.
 
 ### Added
 
-- **New skill group `productivity`** (`productivity-skills`) with the
-  **`meeting-agenda`** skill: turns an agenda into an offline HTML slide deck
-  with a countdown timer per item and an in-page editor. The bundle now has
-  18 skills in 10 groups. The skill's screenshots are left out of the package
-  by its `.skillsignore`.
 - **`aiskills config`**, like `git config`: `aiskills config <key>` prints a
   default, `aiskills config <key> <value>` sets it, `--unset <key>` removes it,
   and `--list` (with `--show-origin` or `--json`) shows what is set. Defaults
