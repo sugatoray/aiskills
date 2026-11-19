@@ -328,6 +328,41 @@ with every skill twice — pick one.
 
 ---
 
+### ✈️ Travel
+
+Skills for trips and travel days: tracking flights and what's coming next.
+
+**Installation**:
+
+Run one of the following, choose the skill by name: `flight-status` and install interactively.
+
+```sh
+npx skills add sugatoray/aiskills               # project-level
+npx skills add sugatoray/aiskills --global      # user-level (RECOMMENDED)
+```
+
+<details>
+<summary><strong>Alternate: Claude Code plugin</strong></summary>
+
+Installs the whole family as a managed, read-only bundle from this
+repo's marketplace. Installing both this and `npx skills` leaves you
+with every skill twice — pick one.
+
+```
+/plugin marketplace add sugatoray/aiskills
+/plugin install travel-skills@sugatoray
+```
+
+</details>
+
+> 💡 For more information, refer to the [**Travel README.md**](skills/travel/README.md).
+
+| Skill Group | Skill Name | Short Description |
+|:---:|:---|:---|
+| [Travel](skills/travel/README.md) | `flight-status` | Reports a flight's live status once or on a repeat (`-r`): journey percentage by distance (haversine, never the provider's progress), miles covered and to go, a fresh route map with the flown track drawn solid, estimated time remaining and arrival, and a timestamped announcement, all on one composite report card. Needs the FlightAware connector. See [usage](skills/travel/flight-status/README.md). |
+
+---
+
 ### 🎬 Video Related
 
 Skills that produce videos from code, real screenshots, narration and music.

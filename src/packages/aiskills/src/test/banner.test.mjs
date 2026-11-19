@@ -73,9 +73,9 @@ describe("values", () => {
     const local = market.plugins.filter((p) => typeof p.source === "string");
     assert.deepEqual(v.groups, local.map((p) => p.name.replace(/-skills$/, "")));
     assert.equal(v.groups_count, String(local.length));
-    assert.equal(v.skills_count, "19"); // 20 in the repo; skills/newsletters/.skillsignore leaves newsletter-ai out
+    assert.equal(v.skills_count, "20"); // 21 in the repo; skills/newsletters/.skillsignore leaves newsletter-ai out
     assert.equal(v.version_label, `v${pkg.version}`);
-    assert.equal(v.counts_label, `19 skills · ${local.length} groups`);
+    assert.equal(v.counts_label, `20 skills · ${local.length} groups`);
   });
 
   test("the banner's theme is Lights Out by default, and must be a known theme", async () => {
@@ -114,7 +114,7 @@ describe("render", () => {
     const v = resolveValues(readConfig());
     const banner = bannerMarkup(render(v));
     assert.ok(banner.includes(`<b>v${pkg.version}</b>`));
-    assert.ok(banner.includes("19 skills · 10 groups"));
+    assert.ok(banner.includes("20 skills · 11 groups"));
     assert.ok(banner.includes(`npm install -g ${pkg.name}`));
     for (const g of v.groups) assert.ok(banner.includes(`<span class="pill">${g}</span>`), g);
     assert.ok(banner.includes(`skills@${SKILLS_CLI_VERSION} add`), "pinned skills version in the demo");
@@ -278,12 +278,12 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
       await p.keyboard.press("Enter");
       await p.keyboard.type("extra");
       await p.click("#editToggle");
-      assert.equal(await p.locator("#pills .pill").count(), 11); // 10 group pills + the one typed in
+      assert.equal(await p.locator("#pills .pill").count(), 12); // 11 group pills + the one typed in
       await p.reload({ waitUntil: "networkidle" });
       assert.equal(await p.textContent("#banner .tagline"), "Edited.");
       await p.click("#resetBtn");
       assert.notEqual(await p.textContent("#banner .tagline"), "Edited.");
-      assert.equal(await p.locator("#pills .pill").count(), 10); // Reset: back to the 10 groups
+      assert.equal(await p.locator("#pills .pill").count(), 11); // Reset: back to the 11 groups
     }));
 
   test("ink that can't be read on a background can't be chosen", () =>

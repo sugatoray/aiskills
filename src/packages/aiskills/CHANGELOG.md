@@ -24,6 +24,18 @@ In development: `package.json` is `1.6.0-dev` (a SemVer pre-release, so it
 sorts below `1.6.0`) while changes collect here. At release, set it to `1.6.0`
 and date this section.
 
+### Added
+
+- **New skill group `travel`** (`travel-skills`, alias `travel`) with the
+  **`flight-status`** skill: one-shot or repeating flight status reports with
+  the journey percentage by distance, miles covered and to go, a fresh route
+  map with the flown track drawn solid, estimated time remaining and arrival,
+  and a timestamped announcement on one composite report card. It needs the
+  FlightAware connector and runs only when invoked by name. The package now
+  bundles 20 skills in 11 groups: `aiskills install -s flight-status`, or
+  `aiskills install -G travel` for the group. See the skill's own
+  `CHANGELOG.md` for its history.
+
 ## [1.5.0] - 2026-11-18
 
 ### Added

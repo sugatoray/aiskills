@@ -1,0 +1,11 @@
+{
+  "name": "travel-skills",
+  "version": "1.0.0",
+  "description": "Travel skills: /flight-status reports a flight's live status once or on a repeat: journey percentage by distance, miles covered and to go, a live route map and a timestamped announcement on one report card.",
+  "author": {"name": "Sugato Ray", "url": "https://github.com/sugatoray"},
+  "homepage": "https://github.com/sugatoray/aiskills",
+  "repository": "https://github.com/sugatoray/aiskills",
+  "license": "MIT",
+  "keywords": ["travel", "flight", "flight-status", "flight-tracking", "flightaware"],
+  "skills": ["./flight-status"]
+}

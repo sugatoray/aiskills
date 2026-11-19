@@ -10,7 +10,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-19 skills, sorted by name.
+20 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
@@ -19,6 +19,7 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |
 | [`create-lib-docs`](skills/create-lib-docs.md) | docs | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/docs/create-lib-docs/SKILL.md) |
 | [`dynamic-promo-video`](skills/dynamic-promo-video.md) | video-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/video-related/dynamic-promo-video/SKILL.md) |
+| [`flight-status`](skills/flight-status.md) | travel | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/travel/flight-status/SKILL.md) |
 | [`meeting-agenda`](skills/meeting-agenda.md) | productivity | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/productivity/meeting-agenda/SKILL.md) |
 | [`network-flow`](skills/network-flow.md) | diagrams | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/diagrams/network-flow/SKILL.md) |
 | [`prodigy`](skills/prodigy.md) | personas | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/personas/prodigy/SKILL.md) |

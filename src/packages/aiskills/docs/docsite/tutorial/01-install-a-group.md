@@ -44,6 +44,10 @@ productivity-skills  (alias: productivity)
   Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown ...
   skills: meeting-agenda
 
+travel-skills  (alias: travel)
+  Travel skills: /flight-status reports a flight's live status once or on a repeat: journey percentage by dis...
+  skills: flight-status
+
 video-related-skills  (alias: video-related)
   Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...
   skills: dynamic-promo-video
