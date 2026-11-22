@@ -1,6 +1,6 @@
 # agent-sessions-insight
 
-Shows how you use your coding agents. It reads the session logs already on your machine (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, or any agent that writes JSONL), counts them, and the agent turns the numbers into one tabbed, offline HTML report: how often you use agents, for what kinds of work, with which tools and habits, and where the friction is.
+Shows how you use your coding agents. It reads the session logs already on your machine (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, Grok CLI, or any agent that writes JSONL), counts them, and the agent turns the numbers into one tabbed, offline HTML report: how often you use agents, for what kinds of work, with which tools and habits, and where the friction is.
 
 It is read-only and offline. It never changes an agent's data folder and sends nothing anywhere.
 
@@ -23,9 +23,9 @@ Or, in Claude Code, run `/plugin marketplace add sugatoray/aiskills`, then `/plu
 | Claude Code, OpenCode | `/agent-sessions-insight` |
 | Codex CLI | `$agent-sessions-insight` |
 | Pi | `/skill:agent-sessions-insight` |
-| Copilot CLI, Devin CLI and others | Ask for "agent-sessions-insight" by name |
+| Copilot CLI, Devin CLI, Grok CLI and others | Ask for "agent-sessions-insight" by name |
 
-Options: `--days N` (default 180), `--agents claude-code,codex,pi,opencode,copilot-cli,devin`, `--extra NAME=PATH` (repeatable; read another agent's JSONL folder, e.g. `--extra hermes=~/.hermes/sessions`), and `--output` (the HTML path).
+Options: `--days N` (default 180), `--agents claude-code,codex,pi,opencode,copilot-cli,devin,grok`, `--extra NAME=PATH` (repeatable; read another agent's JSONL folder, e.g. `--extra hermes=~/.hermes/sessions`), and `--output` (the HTML path).
 
 You get `agent-sessions-insight.html`, `agent-sessions-insight-data.json` (the counted numbers) and `agent-sessions-insight-insights.json` (the agent's reading) in the working directory.
 
@@ -50,13 +50,14 @@ python3 scripts/build_report.py --data agent-sessions-insight-data.json   # numb
 | OpenCode | `.local/share/opencode/` (JSON storage and SQLite, opened read-only) |
 | GitHub Copilot CLI | `.copilot/session-state/` |
 | Devin CLI | `.local/share/devin/cli/` (`sessions/<id>/log.jsonl`, or the older `sessions.db`, opened read-only) |
+| Grok CLI | `.grok/sessions/` (`<encoded cwd>/<id>/updates.jsonl`, or `chat_history.jsonl`; `--extra grok=PATH` if `GROK_HOME` is set) |
 | Anything else | The folder you pass with `--extra` |
 
 Prompts are kept only as snippets of at most 160 characters. Nothing leaves your machine, and the skill doesn't publish the report unless you ask.
 
 ## Limits
 
-- The OpenCode SQLite column names are inferred, and the Copilot CLI event schema is undocumented (the parser is tolerant, so prompt and tool counts may be zero). The Devin CLI log format is undocumented too; the adapter follows the layout other tools have observed, so its tool counts may be zero. Hermes has no documented format, so it uses the generic parser. Open an issue with a redacted sample if your logs don't parse.
+- The OpenCode SQLite column names are inferred, and the Copilot CLI event schema is undocumented (the parser is tolerant, so prompt and tool counts may be zero). The Devin CLI and Grok CLI log formats are undocumented too; the adapters follow the layouts other tools have observed, so their tool counts may be zero. Hermes has no documented format, so it uses the generic parser. Open an issue with a redacted sample if your logs don't parse.
 - Session length is first to last event, so a session left open reads long.
 - Agents may delete old logs, so a long window can undercount early months.
 - "Kinds of work" and "friction" are the agent's reading of project names and first prompts. The Exact numbers tab holds the counted figures.

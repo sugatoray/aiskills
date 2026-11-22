@@ -4,6 +4,7 @@ import argparse, json, os, re, sqlite3, statistics, sys, datetime as dt
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import unquote
 
 UTC = dt.timezone.utc
 DOCS = {"CLAUDE.md", "HANDOFF.md", "MEMORY.md", "SPEC.md", "README.md", "CHANGELOG.md", "AGENTS.md"}
@@ -387,6 +388,81 @@ def parse_devin(root):
     return finish(out)
 
 
+# ---------- Grok CLI: ~/.grok/sessions/<percent-encoded cwd>/<uuid>/ (summary.json, updates.jsonl, chat_history.jsonl) ----------
+def _grok_args(a):
+    if isinstance(a, str):
+        try:
+            a = json.loads(a)
+        except ValueError:
+            return {}
+    return a if isinstance(a, dict) else {}
+
+
+def _grok_tool(s, name, a):
+    cmd = a.get("command", "")
+    note_tool(s, name or "?", " ".join(map(str, cmd)) if isinstance(cmd, list) else str(cmd),
+              [a.get("path"), a.get("file_path"), a.get("filePath")])
+
+
+def _grok_updates(s, path):
+    """updates.jsonl: one ACP session update per line, with a unix-seconds timestamp (or _meta.agentTimestampMs)."""
+    seen_prompts = set()
+    for e in read_jsonl(path):
+        prm = e.get("params") if isinstance(e.get("params"), dict) else {}
+        meta = prm.get("_meta") if isinstance(prm.get("_meta"), dict) else {}
+        touch(s, to_dt(e.get("timestamp") or meta.get("agentTimestampMs") or meta.get("timestamp")))
+        u = prm.get("update") if isinstance(prm.get("update"), dict) else {}
+        kind = u.get("sessionUpdate")
+        if kind == "user_message_chunk":
+            pid = meta.get("promptId")
+            if pid is not None and pid in seen_prompts:
+                continue                                  # a later chunk of a prompt already counted
+            c = u.get("content") if isinstance(u.get("content"), dict) else {}
+            text = ((c.get("_meta") or {}).get("displayText") or c.get("text") or "").strip()
+            if text and not text.startswith("<"):
+                seen_prompts.add(pid)
+                note_prompt(s, text)
+        elif kind == "tool_call":
+            name = ((u.get("_meta") or {}).get("x.ai/tool") or {}).get("name") or u.get("title")
+            _grok_tool(s, name, _grok_args(u.get("rawInput")))
+
+
+def _grok_chat_history(s, path):
+    """chat_history.jsonl: the model's messages, typed system/user/reasoning/assistant/tool_result; no timestamps."""
+    for e in read_jsonl(path):
+        kind = e.get("type")
+        if kind == "user":
+            x = text_of(e.get("content")).strip()
+            if x and not x.startswith("<"):
+                note_prompt(s, x)
+        elif kind == "assistant":
+            for tc in e.get("tool_calls") or []:
+                if isinstance(tc, dict):
+                    f = tc.get("function") if isinstance(tc.get("function"), dict) else tc
+                    _grok_tool(s, f.get("name"), _grok_args(f.get("arguments")))
+
+
+def parse_grok(root):
+    out = []
+    for d in sorted(Path(root).glob("*/*")):
+        if not d.is_dir():
+            continue
+        summ = load_json(d / "summary.json")
+        summ = summ if isinstance(summ, dict) else {}
+        if str(summ.get("session_kind") or "").startswith("subagent"):
+            continue                                       # subagents are part of their parent's work, like Claude sidechains
+        info = summ.get("info") if isinstance(summ.get("info"), dict) else {}
+        s = Session("grok", info.get("id") or d.name,
+                    project=base(info.get("cwd")) or base(unquote(d.parent.name)) or "(unknown)")
+        touch(s, to_dt(summ.get("created_at"))); touch(s, to_dt(summ.get("updated_at")))
+        if (d / "updates.jsonl").is_file():
+            _grok_updates(s, d / "updates.jsonl")
+        elif (d / "chat_history.jsonl").is_file():
+            _grok_chat_history(s, d / "chat_history.jsonl")
+        out.append(s)
+    return finish(out)
+
+
 # ---------- generic fallback: any JSONL with timestamps, role/content and tool_use-like lines ----------
 def parse_generic(root, agent="generic"):
     out = []
@@ -419,6 +495,7 @@ AGENTS = {
     "opencode": (".local/share/opencode", parse_opencode),
     "copilot-cli": (".copilot/session-state", parse_copilot),
     "devin": (".local/share/devin/cli", parse_devin),
+    "grok": (".grok/sessions", parse_grok),
 }
 
 

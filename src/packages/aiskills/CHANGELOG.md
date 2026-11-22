@@ -28,7 +28,7 @@ and date this section.
 
 - **New bundled skill: `agent-sessions-insight`**, in the `productivity-skills`
   group (alias `productivity`). It reads the local session logs of Claude Code,
-  Codex CLI, Pi, OpenCode, GitHub Copilot CLI and Devin CLI (or any agent that
+  Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI and Grok CLI (or any agent that
   writes JSONL) and turns them into one offline, tabbed HTML report of how often
   and for what the agents are used. It is read-only, sends nothing anywhere,
   and runs only when invoked by name. The package now bundles 20 skills in 10

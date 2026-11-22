@@ -1,8 +1,8 @@
 ---
 name: agent-sessions-insight
-description: "Analyze how often and for what kinds of work the user uses their coding agents (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, or any other agent that writes JSONL session logs), from the session logs on their own machine, and present it as one tabbed, offline HTML report: sessions, active days, prompts, session length, busiest months/weekdays/hours, projects, tools, slash commands, test runs, doc-file edits, and a per-agent split. Use when the user invokes /agent-sessions-insight (or $agent-sessions-insight, /skill:agent-sessions-insight), or asks how they use Claude Code, Codex, Pi, OpenCode, Copilot CLI or Devin, how often, what they use it for, or for a usage review of their coding agents. Read-only and offline: it never changes the agents' data and sends nothing anywhere."
+description: "Analyze how often and for what kinds of work the user uses their coding agents (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, Grok CLI, or any other agent that writes JSONL session logs), from the session logs on their own machine, and present it as one tabbed, offline HTML report: sessions, active days, prompts, session length, busiest months/weekdays/hours, projects, tools, slash commands, test runs, doc-file edits, and a per-agent split. Use when the user invokes /agent-sessions-insight (or $agent-sessions-insight, /skill:agent-sessions-insight), or asks how they use Claude Code, Codex, Pi, OpenCode, Copilot CLI, Devin or Grok, how often, what they use it for, or for a usage review of their coding agents. Read-only and offline: it never changes the agents' data and sends nothing anywhere."
 license: MIT
-compatibility: "Python 3.9+ (stdlib only) to read the logs; any modern browser to view the report; optional pytest to run the bundled tests. Works from any agent that can run a shell command and write a file: Claude Code, Codex CLI, GitHub Copilot CLI, Pi, OpenCode, Devin CLI, Hermes"
+compatibility: "Python 3.9+ (stdlib only) to read the logs; any modern browser to view the report; optional pytest to run the bundled tests. Works from any agent that can run a shell command and write a file: Claude Code, Codex CLI, GitHub Copilot CLI, Pi, OpenCode, Devin CLI, Grok CLI, Hermes"
 disable-model-invocation: true
 metadata:
   name: agent-sessions-insight
@@ -23,7 +23,7 @@ Leave `README.md`, `CHANGELOG.md`, `meta/` and `scripts/make_demo.py` (it rebuil
 
 ## Rules
 
-1. **Read-only.** Never write into, move or delete anything under an agent's data folder (`~/.claude`, `~/.codex`, `~/.pi`, `~/.local/share/opencode`, `~/.copilot`, `~/.local/share/devin`, …). The collector only reads. Write the outputs to the current working directory.
+1. **Read-only.** Never write into, move or delete anything under an agent's data folder (`~/.claude`, `~/.codex`, `~/.pi`, `~/.local/share/opencode`, `~/.copilot`, `~/.local/share/devin`, `~/.grok`, …). The collector only reads. Write the outputs to the current working directory.
 2. **Offline.** Make no network calls. The report is one self-contained HTML file with inline CSS and JS: no CDN, no web fonts, no `fetch`.
 3. **Private by default.** Session logs hold prompts, file paths and project names. Don't publish, upload or share the report, and don't paste prompt text into chat beyond the short snippets the collector keeps (160 characters), unless the user asks. If an artifact or sharing tool exists, tell the user the report is local and offer it; don't publish unasked.
 4. **Exact vs judged.** Counts the collector returns are exact. Anything you infer (what kind of work a project is, a habit, a friction point) is your reading: label it as judgement and base it on the visible evidence (project names, first prompts, tools, slash commands).
@@ -36,7 +36,7 @@ Leave `README.md`, `CHANGELOG.md`, `meta/` and `scripts/make_demo.py` (it rebuil
 | Option | Default | Contract |
 | --- | --- | --- |
 | `--days N` | `180` | Look-back window. Sessions that started earlier are ignored. |
-| `--agents a,b` | All known agents that have logs | Limit to: `claude-code`, `codex`, `pi`, `opencode`, `copilot-cli`, `devin`. |
+| `--agents a,b` | All known agents that have logs | Limit to: `claude-code`, `codex`, `pi`, `opencode`, `copilot-cli`, `devin`, `grok`. |
 | `--extra NAME=PATH` | None | Override where a known agent keeps its logs, or read another agent's JSONL folder with the generic parser (e.g. `--extra hermes=~/.hermes/sessions`). Repeatable. |
 | `--output` | `agent-sessions-insight.html` in the working directory | Path of the HTML report. |
 | `--demo` | Off | Skip collecting; write the bundled demo report (made-up data) with `build_report.py --demo`, so the user can see what they'll get. |
@@ -73,6 +73,7 @@ Where each agent's logs are read from (relative to `--home`):
 | OpenCode (`opencode`) | `.local/share/opencode/storage/…` or its SQLite database | JSON files / SQLite (read-only) |
 | GitHub Copilot CLI (`copilot-cli`) | `.copilot/session-state/<id>/events.jsonl` | JSONL; schema undocumented, tolerant parser |
 | Devin CLI (`devin`) | `.local/share/devin/cli/sessions/<id>/log.jsonl` (+ `meta.json`), or the older `sessions.db` | JSONL / SQLite (read-only) |
+| Grok CLI (`grok`) | `.grok/sessions/<encoded cwd>/<id>/updates.jsonl` (+ `summary.json`), or `chat_history.jsonl` | JSONL; subagent sessions skipped |
 | Any other (`--extra NAME=PATH`) | The folder you give | Generic JSONL parser |
 
 The JSON has two keys. `summary`: `window_days`, `sessions`, `active_days`, `prompts`, `first`, `last`, `median_minutes`, `longest_minutes`, `median_gap_days`, `longest_gap_days`, `per_agent`, `per_month`, `per_weekday`, `per_hour`, `projects`, `tools`, `commands`, `doc_edits`, `test_runs`. `sessions`: one row per session with `agent`, a shortened `id`, `project`, `start`, `minutes`, `prompts`, `first_prompt` (at most 160 characters), `top_tools` and `commands`.
@@ -147,6 +148,7 @@ Give the user:
 - **OpenCode SQLite:** column names are inferred. A database whose tables differ is skipped, not guessed at; its JSON storage, if present, is still read.
 - **Copilot CLI:** the event schema isn't documented. Dates, session counts and lengths should be reliable; prompt and tool counts may be zero.
 - **Devin CLI:** the log format isn't documented; the adapter follows the layout other tools have observed (per-session `log.jsonl` in newer versions, `sessions.db` in older ones). Sessions, dates and prompts should be reliable; tool counts are read from assistant `tool_calls` and may be zero if your version records them elsewhere.
+- **Grok CLI:** the log format isn't documented; the adapter follows the layout other tools have observed (one folder per session under `~/.grok/sessions/`, with `summary.json` and `updates.jsonl`). Subagent sessions are skipped, like Claude Code's sidechains. A session with only `chat_history.jsonl` has no per-message times, so its length is `created_at` to `updated_at`. If `GROK_HOME` moves the folder, pass `--extra grok=$GROK_HOME/sessions`.
 - **Generic parser (Hermes and others):** reads timestamps, user messages and tool calls where they are recognisable. Treat its prompt and tool counts as approximate.
 - **Session length** is first to last event in the log, so a session left open overnight reads as long.
 - **Local time:** days, weekdays and hours use the machine's local timezone.

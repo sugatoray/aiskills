@@ -74,7 +74,7 @@ Alias `productivity`. Install the group with `aiskills install -G productivity`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`agent-sessions-insight`](agent-sessions-insight.md) | 1.0.0 | Analyze how often and for what kinds of work the user uses their coding agents (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, or any… |
+| [`agent-sessions-insight`](agent-sessions-insight.md) | 1.0.0 | Analyze how often and for what kinds of work the user uses their coding agents (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, Grok… |
 | [`meeting-agenda`](meeting-agenda.md) | 1.0.0 | Turn a meeting agenda into a self-contained HTML slide deck with a countdown timer per item: one slide per item (large 01, 02… number, title, optional… |
 
 ## video-related-skills

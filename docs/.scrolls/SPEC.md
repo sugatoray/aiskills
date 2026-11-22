@@ -20,7 +20,7 @@ Every published npm release has an annotated git tag on the commit npm recorded 
 `/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
 
 ## `agent-sessions-insight` skill (productivity group)
-`/agent-sessions-insight` reads the session logs coding agents keep on the user's machine (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, or any JSONL-logging agent) and builds one offline HTML report of how often and for what they're used: the agent writes a short reading as JSON and a bundled template renders it with the counted numbers, so every report looks the same. Read-only and offline; the template opens as a fictional demo. Its spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/agent-sessions-insight/`. In [#320](https://github.com/sugatoray/aiskills/pull/320), unmerged.
+`/agent-sessions-insight` reads the session logs coding agents keep on the user's machine (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, Grok CLI, or any JSONL-logging agent) and builds one offline HTML report of how often and for what they're used: the agent writes a short reading as JSON and a bundled template renders it with the counted numbers, so every report looks the same. Read-only and offline; the template opens as a fictional demo. Its spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/agent-sessions-insight/`. In [#320](https://github.com/sugatoray/aiskills/pull/320), unmerged.
 
 <!--
 ## <Feature name>

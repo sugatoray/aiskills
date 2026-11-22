@@ -190,6 +190,56 @@ def devin_sqlite_fixture(home, ids=("dv9",)):
     c.commit(); c.close()
 
 
+GROK = (".grok", "sessions")
+GROK_CWD = "%2Fw%2Fdemo-app"
+
+
+def grok_update(ts, kind, **fields):
+    upd = {"sessionUpdate": kind}
+    upd.update(fields)
+    return {"timestamp": epoch(ts), "method": "session/update",
+            "params": {"sessionId": "s", "_meta": {"agentTimestampMs": epoch(ts) * 1000}, "update": upd}}
+
+
+def grok_updates_fixture(home):
+    d = home.joinpath(*GROK) / GROK_CWD / "0190a1b2-0000-7000-8000-000000000001"
+    js(d / "summary.json", {"info": {"id": "0190a1b2-0000-7000-8000-000000000001", "cwd": "/w/demo-app"},
+                            "created_at": "2026-11-19T09:00:00Z", "updated_at": "2026-11-19T09:40:00Z",
+                            "session_summary": "t"})
+    first = grok_update("2026-11-19T09:00:00+00:00", "user_message_chunk",
+                        content={"type": "text", "text": "add a cache<system-reminder>x</system-reminder>",
+                                 "_meta": {"displayText": "add a cache"}})
+    first["params"]["_meta"]["promptId"] = "p1"
+    again = grok_update("2026-11-19T09:00:01+00:00", "user_message_chunk", content={"type": "text", "text": " please"})
+    again["params"]["_meta"]["promptId"] = "p1"          # second chunk of the same prompt
+    second = grok_update("2026-11-19T09:30:00+00:00", "user_message_chunk", content={"type": "text", "text": "now document it"})
+    second["params"]["_meta"]["promptId"] = "p2"
+    jl(d / "updates.jsonl", [
+        first, again,
+        grok_update("2026-11-19T09:01:00+00:00", "agent_message_chunk", content={"type": "text", "text": "ok"}),
+        grok_update("2026-11-19T09:02:00+00:00", "tool_call", toolCallId="c1", rawInput={"command": "pytest -q"},
+                    _meta={"x.ai/tool": {"name": "run_terminal_command"}}),
+        grok_update("2026-11-19T09:03:00+00:00", "tool_call_update", toolCallId="c1", status="completed"),
+        second,
+        grok_update("2026-11-19T09:31:00+00:00", "tool_call", toolCallId="c2", rawInput={"path": "/w/demo-app/README.md"},
+                    _meta={"x.ai/tool": {"name": "edit_file"}}),
+    ], trailing_garbage=True)
+
+
+def grok_chat_history_fixture(home):
+    d = home.joinpath(*GROK) / "%2Fw%2Fother-app" / "0190a1b2-0000-7000-8000-000000000002"
+    js(d / "summary.json", {"info": {"id": "0190a1b2-0000-7000-8000-000000000002", "cwd": "/w/other-app"},
+                            "created_at": "2026-11-18T14:00:00Z", "updated_at": "2026-11-18T14:30:00Z"})
+    jl(d / "chat_history.jsonl", [
+        {"type": "system", "content": "You are Grok"},
+        {"type": "user", "content": "explain the parser"},
+        {"type": "reasoning", "id": "r1", "summary": [{"type": "summary_text", "text": "thinking"}]},
+        {"type": "assistant", "content": "", "id": "a1",
+         "tool_calls": [{"id": "c1", "name": "read_file", "arguments": json.dumps({"path": "/w/other-app/AGENTS.md"})}]},
+        {"type": "tool_result", "tool_call_id": "c1", "content": "..."},
+    ])
+
+
 # ---------- adapters ----------
 class ClaudeAdapter(Base):
     def test_counts_and_signals(self):
@@ -322,6 +372,43 @@ class DevinAdapter(Base):
         self.assertEqual((s.id, s.project, s.prompts), ("dv1", "(unknown)", 2))
 
 
+class GrokAdapter(Base):
+    root = property(lambda self: self.home.joinpath(*GROK))
+
+    def test_updates_log(self):
+        grok_updates_fixture(self.home)
+        (s,) = collect.parse_grok(self.root)
+        self.assertEqual((s.agent, s.id, s.project), ("grok", "0190a1b2-0000-7000-8000-000000000001", "demo-app"))
+        self.assertEqual((s.prompts, s.first_prompt), (2, "add a cache"))         # chunks of one prompt count once
+        self.assertEqual((s.tools["run_terminal_command"], s.tools["edit_file"], s.test_runs), (1, 1, 1))
+        self.assertEqual(dict(s.docs), {"README.md": 1})
+        self.assertEqual(s.minutes, 40.0)
+
+    def test_chat_history_fallback(self):
+        grok_chat_history_fixture(self.home)
+        (s,) = collect.parse_grok(self.root)
+        self.assertEqual((s.project, s.prompts, s.first_prompt), ("other-app", 1, "explain the parser"))
+        self.assertEqual((s.tools["read_file"], dict(s.docs)), (1, {"AGENTS.md": 1}))
+        self.assertEqual(s.minutes, 30.0)
+
+    def test_subagent_sessions_are_skipped(self):
+        grok_chat_history_fixture(self.home)
+        d = self.root / "%2Fw%2Fother-app" / "0190a1b2-0000-7000-8000-000000000002"
+        js(d / "summary.json", {"info": {"id": "x", "cwd": "/w/other-app"}, "session_kind": "subagent",
+                                "created_at": "2026-11-18T14:00:00Z", "updated_at": "2026-11-18T14:30:00Z"})
+        self.assertEqual(collect.parse_grok(self.root), [])
+
+    def test_folder_without_summary_uses_the_folder_names(self):
+        grok_updates_fixture(self.home)
+        d = self.root / GROK_CWD / "0190a1b2-0000-7000-8000-000000000001"
+        (d / "summary.json").unlink()
+        (s,) = collect.parse_grok(self.root)
+        self.assertEqual((s.id, s.project, s.prompts), ("0190a1b2-0000-7000-8000-000000000001", "demo-app", 2))
+
+    def test_missing_root(self):
+        self.assertEqual(collect.parse_grok(self.home / "nope"), [])
+
+
 class GenericAdapter(Base):
     def test_role_content_jsonl(self):
         jl(self.home / "x" / "a.jsonl", [
@@ -335,10 +422,10 @@ class GenericAdapter(Base):
 # ---------- discovery, summary, CLI ----------
 class Discover(Base):
     def test_all_agents_found_and_filterable(self):
-        for f in (claude_fixture, codex_fixture, pi_fixture, opencode_json_fixture, copilot_fixture, devin_dir_fixture):
+        for f in (claude_fixture, codex_fixture, pi_fixture, opencode_json_fixture, copilot_fixture, devin_dir_fixture, grok_updates_fixture):
             f(self.home)
         agents = {s.agent for s in collect.discover(self.home)}
-        self.assertEqual(agents, {"claude-code", "codex", "pi", "opencode", "copilot-cli", "devin"})
+        self.assertEqual(agents, {"claude-code", "codex", "pi", "opencode", "copilot-cli", "devin", "grok"})
         only = collect.discover(self.home, agents=["codex"])
         self.assertEqual({s.agent for s in only}, {"codex"})
 

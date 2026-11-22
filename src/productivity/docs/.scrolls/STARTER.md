@@ -33,7 +33,7 @@ This directory (`src/productivity/`) is **not** where the productivity skills li
 
 `agent-sessions-insight/`:
 - `SKILL.md`: the agent workflow (check → collect → read → build report → verify → deliver), with options `--days`, `--agents`, `--extra NAME=PATH` and `--output`.
-- `scripts/collect.py`: standard-library Python, read-only, offline. One `parse_<agent>()` per agent (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI), a generic JSONL parser, `discover()`, `summarize()` and the CLI.
+- `scripts/collect.py`: standard-library Python, read-only, offline. One `parse_<agent>()` per agent (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, Grok CLI), a generic JSONL parser, `discover()`, `summarize()` and the CLI.
 - `scripts/build_report.py` and `assets/agent-sessions-insight.html`: the builder validates the collector's JSON and the agent's insights JSON and writes them into the template's data block (`<` escaped). The template is one offline page with eight tabs and ships with demo data; `--demo` copies it as is. `scripts/make_demo.py` regenerates that demo (`--check` to test it is current).
 - `tests/`: `test_collect.py` and `test_build_report.py` (stdlib), `test_report_page.py` (Playwright; skipped without it). Run `python3 -m unittest discover -s tests -v` (or `python3 -m pytest`) from `skills/productivity/agent-sessions-insight/`; `pip install playwright` first in cloud sessions.
 - `meta/MAINTAINERS.md` (how to add an agent, red/green) and `meta/SECURITY.md`; `CHANGELOG.md`, `README.md` and `agents/openai.yaml`.
