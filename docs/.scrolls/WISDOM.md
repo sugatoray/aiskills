@@ -14,6 +14,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.
 
+- **Moving a folder that holds relative symlinks breaks them silently.** `git mv` keeps the link text, so after moving `src/{scrolls,development,productivity}` one level deeper, every link into `skills/` needed one more `../`. After any such move, list the links (`find <dir> -type l`), re-point them, and check each resolves (`[ -e link ]`), then run `make check-skill-links`.
 - **Two open branches can take the same ticket numbers.** #314 and #320 both used ROOT-16 and AIS-28; the rebase surfaced it. When rebasing onto a `master` that gained scrolls tickets, renumber this branch's tickets (and every scrolls and PR line that cites them).
 - **A rebase onto a release can move CHANGELOG entries into the released section, with no conflict.** When #265 was rebased onto `1.4.0-dev`, its package CHANGELOG entries matched context lines inside `## [1.3.0] - 2026-11-17` and merged there silently. After rebasing package work onto a new `-dev` version, check that every new entry sits under `## [x.y.z] - Unreleased`, not under a dated section.
 - After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/skills/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
