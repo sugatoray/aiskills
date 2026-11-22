@@ -1,6 +1,6 @@
 # STARTER.md — Read Me First
 
-You're picking up work on **productivity skills**, the `productivity` skill family (plugin `productivity-skills`). Its skills are `meeting-agenda` and `agent-sessions-insight`. Before making changes, read the following files **in this exact order**:
+You're picking up work on **scrolls (aiskills)**, the agentic-memory ("scrolls") skill family shipped in the `sugatoray/aiskills` repo. Before making changes, read the following files **in this exact order**:
 
 1. **`docs/.scrolls/SPEC.md`** — What the project does, feature by feature. Read this first so you understand the full surface area before you read anything else. Update this when you SHIP a feature (not when you start one).
 2. **`docs/.scrolls/HANDOFF.md`** — The "change of guard" note: current state, what just happened, recent bugs and their root causes. This is short-lived/tactical — read it to know what the *previous* session left you with. Update this at the **end of every session** (overwrite stale entries, don't let it grow forever — it's a snapshot, not a changelog).
@@ -22,22 +22,7 @@ You're picking up work on **productivity skills**, the `productivity` skill fami
 - Always use Red/Green TDD while developing or fixing code. _This is also mentioned inside **WISDOM.md**_.
 
 ## Quick orientation
-This directory (`src/productivity/`) is **not** where the productivity skills live. They are at `skills/productivity/`, with the family's `README.md` and `.claude-plugin/plugin.json` (plugin `productivity-skills`, registered in the repo's `.claude-plugin/marketplace.json`). There are two skills. `meeting-agenda/`:
-- `SKILL.md`: the agent workflow, with options `--title`, `--total`, `--theme`, `--output` and `--demo`.
-- `assets/meeting-agenda.html`: the template, which is also a working 30-minute demo deck. One self-contained HTML file with no dependencies.
-- `scripts/build_deck.py`: standard-library Python. Validates agenda JSON and writes it into the template with `<` escaped. `--demo` copies the template byte for byte.
-- `tests/`: pytest + Playwright. Run `python3 -m pytest` from `skills/productivity/meeting-agenda/`. In cloud sessions, first run `pip install pytest playwright`; the tests use `/opt/pw-browsers/chromium`.
-- `meta/MAINTAINERS.md` (layout, themes, Settings, touch, alignment) and `meta/SECURITY.md`.
-- `meta/screenshots/`, left out of the npm package by its `.skillsignore`.
-- `CHANGELOG.md`, `README.md` and `agents/openai.yaml`.
 
-`agent-sessions-insight/`:
-- `SKILL.md`: the agent workflow (check → collect → read → build report → verify → deliver), with options `--days`, `--agents`, `--extra NAME=PATH` and `--output`.
-- `scripts/collect.py`: standard-library Python, read-only, offline. One `parse_<agent>()` per agent (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, Grok CLI), a generic JSONL parser, `discover()`, `summarize()` and the CLI.
-- `scripts/build_report.py` and `assets/agent-sessions-insight.html`: the builder validates the collector's JSON and the agent's insights JSON and writes them into the template's data block (`<` escaped). The template is one offline page with eight tabs and ships with demo data; `--demo` copies it as is. `scripts/make_demo.py` regenerates that demo (`--check` to test it is current).
-- `tests/`: `test_collect.py` and `test_build_report.py` (stdlib), `test_report_page.py` (Playwright; skipped without it). Run `python3 -m unittest discover -s tests -v` (or `python3 -m pytest`) from `skills/productivity/agent-sessions-insight/`; `pip install playwright` first in cloud sessions.
-- `meta/MAINTAINERS.md` (how to add an agent, red/green) and `meta/SECURITY.md`; `CHANGELOG.md`, `README.md` and `agents/openai.yaml`.
-
-This `docs/.scrolls/` folder holds the narrative and process memory of the work on `skills/productivity/` only. The skill's `CHANGELOG.md` is the authoritative record of what shipped, and its `meta/MAINTAINERS.md` holds the design notes; these scrolls point to them rather than repeating them. The `aiskills` npm package that bundles the skill has its own scrolls at `src/packages/aiskills/docs/.scrolls/`. Repo-wide scrolls are at the root's `docs/.scrolls/`.
+This directory (`src/skills/scrolls/`) is **not** where the `scrolls-*` skill artifacts live — those are at `skills/scrolls/` (nine skills: `scrolls-setup`, `scrolls-update`, `scrolls-hide`, `scrolls-unhide`, `scrolls-remove`, `scrolls-restore`, `scrolls-compact`, `scrolls-help`, `scrolls-explainer`, each with its own `SKILL.md`, `meta/MAINTAINERS.md`, and `CHANGELOG.md`; `scrolls-help` additionally has `meta/SECURITY.md` and `scrolls-compact` `meta/DESIGN.md`; `scrolls-compact` is on branch `claude/clever-mendel-k9n73h`, not yet merged). `src/skills/scrolls/CLAUDE.md` is a hand-written pointer there, plus tested `npx skills add sugatoray/aiskills` install instructions. This `docs/.scrolls/` folder is this session's own dogfood application of the family's convention: it records the memory of the multi-session effort that hardened, restructured, and versioned the `scrolls-*` family itself. See `skills/scrolls/CHANGELOG.md` (symlinked at `src/skills/scrolls/CHANGELOG.md`) for the authoritative, version-by-version record of what shipped in the skills themselves — this scroll set is the narrative/process memory around that work, not a duplicate of it.
 
 As the project grows, this file may end up pointing to additional `docs/.scrolls/*.md` files for specialized topics (architecture decisions, security reviews, subsystem deep-dives). If you add one, list it here in the numbered order above with the same "read this when / update this when" treatment as the core six, so future sessions don't have to guess whether it's load-bearing.

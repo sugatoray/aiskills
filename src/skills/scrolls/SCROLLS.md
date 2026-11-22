@@ -10,8 +10,8 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 
 This directory also holds three symlinks into the actual `scrolls-*` skill sources at `skills/scrolls/`, so the family's own governance docs are reachable from here without duplicating them:
 
-- `meta` → `../../skills/scrolls/meta` (family-wide `MAINTAINERS.md`)
-- `README.md` → `../../skills/scrolls/README.md`
-- `CHANGELOG.md` → `../../skills/scrolls/CHANGELOG.md`
+- `meta` → `../../../skills/scrolls/meta` (family-wide `MAINTAINERS.md`)
+- `README.md` → `../../../skills/scrolls/README.md`
+- `CHANGELOG.md` → `../../../skills/scrolls/CHANGELOG.md`
 
-These are symlinks, not copies — editing through them edits the real files at `skills/scrolls/`. `src/scrolls/CLAUDE.md` remains the one file that's genuinely local to this directory (a hand-written install pointer, not part of the skill artifacts).
+These are symlinks, not copies — editing through them edits the real files at `skills/scrolls/`. `src/skills/scrolls/CLAUDE.md` remains the one file that's genuinely local to this directory (a hand-written install pointer, not part of the skill artifacts).

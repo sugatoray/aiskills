@@ -37,7 +37,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 - Scrolls: AIS-23 and AIS-24 ticked, AIS-25 added; the `SPEC.md` release note records 1.4.0, and the examples docs page and the light/dark sync are in `SPEC.md`.
 
 ## Known issues / open threads
-- **Open a PR for `claude/aiskills-1.5.0-dev`** when the user asks (AIS-25); it also carries the root scrolls update and this one. The scrolls-family scrolls (`src/scrolls/docs/.scrolls/`) still need their own `/scrolls-update -p src/scrolls/docs`.
+- **Open a PR for `claude/aiskills-1.5.0-dev`** when the user asks (AIS-25); it also carries the root scrolls update and this one. The scrolls-family scrolls (`src/skills/scrolls/docs/.scrolls/`) still need their own `/scrolls-update -p src/skills/scrolls/docs`.
 - **The 1.4.0 CHANGELOG date** is `2026-11-18`, npm's UTC date; in US Eastern the publish was the evening of 2026-11-17 (1.2.0's note judged by US Eastern). The user was asked; no answer yet, so it stays.
 - **#250's docs-site commits** (counts, tab numbers, grouped Skills pane) may still lack issues; it merged without this being confirmed.
 - **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.5.0-dev.tgz` once `1.5.0-dev` merges). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.

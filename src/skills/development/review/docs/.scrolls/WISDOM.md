@@ -13,7 +13,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - Folder names follow the names the user gave: `review_powershell-script` and `review_shellscript`, not `review_powershell` or `review_shell`.
 - One version in two files: `run-code-review/SKILL.md`'s `metadata.version` and `skills/development/review/.claude-plugin/plugin.json`. The plugin's `description` must be identical in `plugin.json` and the root `marketplace.json`.
 - XML is tool-first **and** keeps its full review. That was the user's explicit choice; don't cut `review_xml/` down to the short form the other three tool-first formats use.
-- `src/development/review/` holds memory and symlinks only. Never copy skill content into `src/`; edit it at `skills/development/review/`.
+- `src/skills/development/review/` holds memory and symlinks only. Never copy skill content into `src/`; edit it at `skills/development/review/`.
 
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.

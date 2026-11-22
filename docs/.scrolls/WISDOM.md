@@ -16,7 +16,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 
 - **Two open branches can take the same ticket numbers.** #314 and #320 both used ROOT-16 and AIS-28; the rebase surfaced it. When rebasing onto a `master` that gained scrolls tickets, renumber this branch's tickets (and every scrolls and PR line that cites them).
 - **A rebase onto a release can move CHANGELOG entries into the released section, with no conflict.** When #265 was rebased onto `1.4.0-dev`, its package CHANGELOG entries matched context lines inside `## [1.3.0] - 2026-11-17` and merged there silently. After rebasing package work onto a new `-dev` version, check that every new entry sits under `## [x.y.z] - Unreleased`, not under a dated section.
-- After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
+- After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/skills/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
 
 - **Cloud sessions can push branches but not tags** (HTTP 403 from the git proxy), and the GitHub tools here can't create tags either. Make the tags locally, check them, and give the user one command to recreate and push them from their own clone. Then verify what reached GitHub.
 - **This session's network can't reach `sugatoray.github.io`** (403 at the proxy). To verify a docs deploy, read the workflow's build job log (`get_job_logs`): `build-site.mjs` prints each page it wrote and a `site:` summary line, and the artifact step lists every file. Then ask the user to look at the live pages.
@@ -25,7 +25,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **Adding a control to the docs header breaks the phone layout.** The search input can't render narrower than its padding (about 68px), so it overlaps the next button rather than shrinking. Check the header at iPhone width for sideways scroll and overlap; the docs browser tests do this for the version menu.
 
 - **A new skill or group changes hard-coded numbers in the package tests and docs.** After `npm run docs` and `npm run banner:png`, expect to update `banner.test.mjs` (skill and group counts, the `#pills` counts), the `<!-- verify -->` outputs that list groups or skills (`guides/use-from-an-agent.md`, `reference/cli.md`, `tutorial/01`, `02`, `04`), and, for a new `.skillsignore`, the one-line `"ignored"` sample in `reference/files.md`. The package suite only counts git-tracked skills, so `git add` the skill first.
-- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/productivity/docs/.scrolls/WISDOM.md`.
+- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/skills/productivity/docs/.scrolls/WISDOM.md`.
 
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.

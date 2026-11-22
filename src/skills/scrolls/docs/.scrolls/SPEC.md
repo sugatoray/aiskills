@@ -2,7 +2,7 @@
 
 What scrolls (aiskills) does, feature by feature. Add a section per feature when it ships — describe *what* it does and *why* it matters to a user, not the implementation detail (that belongs in code comments or `WISDOM.md`).
 
-Scope note: "features" here are the capabilities the `scrolls-*` skill family itself ships to the people who install it via `npx skills add sugatoray/aiskills`, not features of this `src/scrolls/` pointer directory (which has none of its own — it just points elsewhere and records this history).
+Scope note: "features" here are the capabilities the `scrolls-*` skill family itself ships to the people who install it via `npx skills add sugatoray/aiskills`, not features of this `src/skills/scrolls/` pointer directory (which has none of its own — it just points elsewhere and records this history).
 
 ## Bounded lifecycle for scrolls-help's local server
 
@@ -73,9 +73,9 @@ Condenses the old history in a project's scrolls (`SPEC.md`, `PLAN.md`, `HANDOFF
 
 Tested: `test_compact.sh` 126, `test_examples.sh` 420 (replays every example), and `test_example_viewer.sh` (static, browser, offline and in-frame checks).
 
-## `src/scrolls/` install pointer
+## `src/skills/scrolls/` install pointer
 
-A pointer at `src/scrolls/CLAUDE.md`, separate from the real skill artifacts at `skills/scrolls/`, documenting tested `npx skills add sugatoray/aiskills` install commands: local (project-level), global (user-level), and install-everywhere-for-every-supported-agent (`--all`) forms, plus `owner/repo#branch` pinning. Every command was actually run against the real repo before being written down, then fully cleaned up.
+A pointer at `src/skills/scrolls/CLAUDE.md`, separate from the real skill artifacts at `skills/scrolls/`, documenting tested `npx skills add sugatoray/aiskills` install commands: local (project-level), global (user-level), and install-everywhere-for-every-supported-agent (`--all`) forms, plus `owner/repo#branch` pinning. Every command was actually run against the real repo before being written down, then fully cleaned up.
 
 ## Per-skill `README.md`
 

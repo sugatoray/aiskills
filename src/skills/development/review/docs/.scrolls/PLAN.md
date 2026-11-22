@@ -15,7 +15,7 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] 1.1.0: tool-first XML, JSON, YAML and TOML with `scripts/check_formats.py`; XML keeps its full review.
 - [x] `assets/EXAMPLE.md` with ten examples, linked from `SKILL.md`, `README.md` and `CHANGELOG.md`.
 - [x] 1.3.1: rename it `assets/EXAMPLES.md`, the name every skill uses (on `claude/clever-mendel-k9n73h`, #265).
-- [x] Set up `src/development/review/` (this scroll set) and the `src/development/meta/review` symlink.
+- [x] Set up `src/skills/development/review/` (this scroll set) and the `src/skills/development/meta/review` symlink.
 - [x] Make the JSON line-number test pass on Python 3.13 (`a59957b`).
 - [x] Rename the subgroup `reviews` → `review` and the plugin `reviews-skills` → `review-skills` (`ec71a5c`).
 - [x] `/run-code-review` 1.2.0: `-o` (`.html`, `.md`, `.json`), `-f`, `--open`, `--host-type`, line links to GitHub or GitLab (`cd84a6c`).
