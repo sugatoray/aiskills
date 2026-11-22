@@ -217,7 +217,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.5.0
+  aiskills version : 1.6.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
@@ -376,7 +376,7 @@ aiskills rel 3
   1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
 
-installed: 1.5.0 (not published on npm)
+installed: 1.6.0-dev (not published on npm)
 more: aiskills rel all
 
 changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
@@ -406,7 +406,7 @@ aiskills rel --downloads
   0.9.0    2026-11-15 (6 days ago)                           –
   0.8.0    2026-11-12 (9 days ago)                           –
 
-installed: 1.5.0 (not published on npm)
+installed: 1.6.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
@@ -439,7 +439,7 @@ aiskills rel 1 --downloads 7d --table
   VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
   1.2.0    2026-11-21 (today)  latest                   –
 
-installed: 1.5.0 (not published on npm)
+installed: 1.6.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
@@ -579,7 +579,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.5.0 — Sugato Ray's agent skills
+aiskills 1.6.0-dev — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -755,7 +755,7 @@ ais -v
 ```
 
 ```text
-1.5.0
+1.6.0-dev
 ```
 
 ## Options

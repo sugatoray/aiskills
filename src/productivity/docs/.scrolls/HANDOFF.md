@@ -3,7 +3,7 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`meeting-agenda` 1.0.0** (unreleased; ships with the package's 1.5.0) is on branch `claude/sweet-hawking-7u1fpc`, rebased onto `master` at `90a835c` (`1.5.0-dev`) on 2026-11-18. The pre-rebase head is kept locally as `backup/pre-rebase-272`. PR [sugatoray/aiskills#272](https://github.com/sugatoray/aiskills/pull/272) was squash-merged into `master` as `f27b875` on 2026-11-18, closing #273–#286. It ships in the package's 1.5.0 release, prepared on `claude/aiskills-1.5.0`.
+- **`meeting-agenda` 1.0.0** (published in the package's 1.5.0, 2026-11-18) is on branch `claude/sweet-hawking-7u1fpc`, rebased onto `master` at `90a835c` (`1.5.0-dev`) on 2026-11-18. The pre-rebase head is kept locally as `backup/pre-rebase-272`. PR [sugatoray/aiskills#272](https://github.com/sugatoray/aiskills/pull/272) was squash-merged into `master` as `f27b875` on 2026-11-18, closing #273–#286. It shipped in the package's 1.5.0 (#310, published to npm 2026-11-18T03:01Z, tagged `aiskills-v1.5.0`).
 - **Tests:** 226 skill tests pass (`build_deck.py` included). So do the npm package's 520 tests (the skill is bundled; the package docs and banner were regenerated for the new `productivity` group).
 - **Registered:** in `.claude-plugin/marketplace.json` (`productivity-skills`), the root `README.md`, and as links in `.claude/skills/` and `.agents/skills/`.
 - **These scrolls** (`src/productivity/docs/.scrolls/`) were set up at the end of the session that built the skill. Until then, the work was recorded in the repo-root scrolls (`docs/.scrolls/`), which still hold a short summary.

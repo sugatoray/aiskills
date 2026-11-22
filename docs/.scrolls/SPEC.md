@@ -14,7 +14,7 @@ https://sugatoray.github.io/aiskills/ keeps the docs of several versions:
 Every page's header has a version menu with a **Find a version** box (partial or fuzzy match, ranked). Switching keeps the page you're on. The dev and older pages say what they are and link to the latest. Each page is built from its release tag (`git archive`) by today's builder, so old docs get today's design. A pushed `aiskills-v*` tag rebuilds the site. Code: `src/packages/aiskills/src/scripts/docs/build-site.mjs` (`npm run docs:site`), `build-docs-html.mjs` (`--version`, `--menu`), `.github/workflows/aiskills-docs.yml`.
 
 ## Release tags (`aiskills-vX.Y.Z`)
-Every published npm release has an annotated git tag on the commit npm recorded as its `gitHead`, with the publish time in the message: `aiskills-v0.4.0`–`aiskills-v1.4.0` so far. New releases are tagged the same way (`src/packages/aiskills/docs/meta/MAINTAINERS.md` → Releasing, step 6).
+Every published npm release has an annotated git tag on the commit npm recorded as its `gitHead`, with the publish time in the message: `aiskills-v0.4.0`–`aiskills-v1.5.0` so far. New releases are tagged the same way (`src/packages/aiskills/docs/meta/MAINTAINERS.md` → Releasing, step 6).
 
 ## `meeting-agenda` skill (productivity group)
 `/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
