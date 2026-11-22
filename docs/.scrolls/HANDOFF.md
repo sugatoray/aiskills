@@ -15,6 +15,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - Checked npm: 1.5.0 is published (`latest`) and tagged. Rebased #320 onto `master`'s `1.6.0-dev`, fixed the conflicts, regenerated the docs and banner (521 package and 77 skill tests pass), force-pushed with the user's approval, and corrected the PR description.
 
 - At the user's request, moved the per-family memory folders `src/{scrolls,development,productivity}` to `src/skills/{scrolls,development,productivity}` (on #320). Their symlinks into `skills/` got one more `../`; every path in the scrolls, `SCROLLS.md` files and `skills/scrolls/meta/MAINTAINERS.md` was updated. `skills/scrolls/CHANGELOG.md` keeps the old paths as history.
+- At the user's request, ran `/scrolls-setup` for the video-related family at `src/skills/video-related/`, set up like `src/skills/productivity/` (its own `SCROLLS.md`, `CLAUDE.md`, `AGENTS.md` and seven scrolls; `STARTER.md` orients on `skills/video-related/dynamic-promo-video/`). The other six scrolls hold the templates' placeholders until work on that skill fills them.
 
 ## Known issues / open threads
 - **The 1.4.0 and 1.5.0 CHANGELOG dates** are 2026-11-18, npm's UTC date. In US Eastern time both were published on the evening of 2026-11-17 (01:25Z and 03:01Z; the 1.3.0 note judged by US Eastern). The user was asked about 1.4.0; no answer yet, so both stay.
