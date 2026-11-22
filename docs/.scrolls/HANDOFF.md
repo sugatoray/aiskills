@@ -3,9 +3,8 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-- **`master` is at `b8ad785`:** [#310](https://github.com/sugatoray/aiskills/pull/310) (release 1.5.0) squash-merged; it closed #311–#313. Before it, #272 (`meeting-agenda`, `f27b875`).
+- **`master` is at `0999e6f`:** [#314](https://github.com/sugatoray/aiskills/pull/314) (`1.6.0-dev`, ROOT-16) squash-merged. Before it, [#310](https://github.com/sugatoray/aiskills/pull/310) (release 1.5.0) squash-merged; it closed #311–#313. Before it, #272 (`meeting-agenda`, `f27b875`).
 - **npm:** `@sugatoray-ai/aiskills` **1.5.0 is published** (`latest`, 2026-11-18T03:01Z; npm `gitHead` `b8ad785`). The user pushed the annotated tag `aiskills-v1.5.0` on it, which rebuilds the docs site with 1.5.0 at the root.
-- **`claude/aiskills-1.6.0-dev`** (from `b8ad785`; pushed; open as **[#314](https://github.com/sugatoray/aiskills/pull/314), issues #315 → #316, #317 (`Closes` in its body)**, ROOT-16): the package's next version, `1.6.0-dev`, as #291 set `1.4.0-dev`: an empty `## [1.6.0] - Unreleased` section, the seven docs version examples, and the banner and docs regenerated (`5bdcc58`). `SECURITY.md` keeps `1.5.x`. 520 package tests pass. This scrolls update is on it too.
 - **`claude/wonderful-ptolemy-my8ha8`** → PR [#320](https://github.com/sugatoray/aiskills/pull/320) (ROOT-17), one squashed commit: the new `agent-sessions-insight` productivity skill (applied from the user's patch, renamed from `agent-session-insight`). It reads local session logs (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, generic JSONL) and fills a bundled offline HTML template via `scripts/build_report.py`; `scripts/make_demo.py` rebuilds the template's fictional demo. Skill tests: 77 pass (Playwright tests need `pip install playwright`). The bundle is 20 skills in 10 groups; package docs and banner regenerated, `## [1.6.0] - Unreleased` CHANGELOG entry, `npm test` 521 pass. Family detail: `src/productivity/docs/.scrolls/`.
 
 ## What just happened
@@ -20,4 +19,4 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - **`tests/test_compact.ps1` has never run** (no `pwsh` in these sessions).
 - #230's scrolls commit has no issue. Filing one under #231 was offered; the user hasn't answered (ROOT-3).
 - Branches holding only merged history, deletable at the user's call: `claude/clever-mendel-k9n73h` (#265), `claude/aiskills-1.4.0` (#302), `claude/aiskills-1.5.0-dev` (#306), `claude/sweet-hawking-7u1fpc` (#272), `claude/aiskills-1.5.0` (#310), `claude/keen-babbage-2khhu9` (#215 era). The pre-rebase copy of #272 exists only as a local branch, `backup/pre-rebase-272`, in that session.
-- **#320 was squashed and force-pushed** at the user's request. The PR timeline records the force-push.
+- **#320 was squashed and force-pushed** at the user's request, then rebased onto `0999e6f` (`1.6.0-dev`): its package CHANGELOG entry now sits under `## [1.6.0] - Unreleased`, and its tickets were renumbered to ROOT-17 and AIS-29 because #314 used ROOT-16 and AIS-28.
