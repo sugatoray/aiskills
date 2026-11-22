@@ -35,6 +35,14 @@ and date this section.
   groups: `aiskills install -s agent-sessions-insight`. See the skill's own
   `CHANGELOG.md` for its history.
 
+### Changed
+
+- **Group-level maintainer notes are no longer in the package.** A new
+  `skills/.skillsignore` leaves out every skill group's and subgroup's `meta/`
+  folder (for example `scrolls/meta/`, `development/review/meta/`). They are
+  notes for maintainers of the repo and were shipped under `.aiskills/nested/`
+  by mistake. A `meta/` inside a skill folder still ships with the skill.
+
 ## [1.5.0] - 2026-11-18
 
 ### Added

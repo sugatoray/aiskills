@@ -4470,7 +4470,7 @@ Written when the package is built, and copied to the install folder.
     "scrolls-setup": "scrolls/scrolls-setup"
   },
   "extras": ["scrolls/README.md", "scrolls/.claude-plugin/plugin.json"],
-  "ignored": ["newsletters/newsletter-ai/", "productivity/meeting-agenda/meta/screenshots/"]
+  "ignored": ["development/meta/", "development/repo-related/meta/", "development/review/meta/", "diagrams/meta/", "docs/meta/", "image-styles/meta/", "newsletters/meta/", "newsletters/newsletter-ai/", "personas/meta/", "productivity/meeting-agenda/meta/screenshots/", "productivity/meta/", "scrolls/meta/", "stata/meta/", "video-related/meta/"]
 }
 ```
 
@@ -4479,8 +4479,8 @@ Written when the package is built, and copied to the install folder.
 | `format` | number | Version of this file's shape; currently `1`. |
 | `description` | string | A note for people reading the file. |
 | `skills` | object: skill name → string | Each skill's original folder, relative to the repo's `skills/`. Used for `--nested` and for groups. |
-| `extras` | string[] | Files outside any skill folder (READMEs, `plugin.json`, `meta/`), stored in the package under `.aiskills/nested/` at these paths. |
-| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`, and `productivity/meeting-agenda/meta/screenshots/`, from `skills/productivity/meeting-agenda/.skillsignore`. |
+| `extras` | string[] | Files outside any skill folder (READMEs and `plugin.json`), stored in the package under `.aiskills/nested/` at these paths. |
+| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: every group's and subgroup's `meta/` folder, from `skills/.skillsignore`; `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`; and `productivity/meeting-agenda/meta/screenshots/`, from `skills/productivity/meeting-agenda/.skillsignore`. A `meta/` inside a skill folder ships. |
 
 ## The package
 
@@ -4548,7 +4548,7 @@ See also: [How aiskills works](../concepts/how-it-works.md) · [Layouts](../conc
 
 The rule syntax of `.skillsignore` files, which leave files, folders or whole skills out of the package when it is built; this page is exhaustive.
 
-A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users. The repo uses one: `skills/newsletters/.skillsignore` holds `newsletter-ai/`, which leaves that skill out of the package (it stays installable from the repo with `npx skills add`).
+A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users. The repo uses three. `skills/.skillsignore` holds `/*/meta/` and `/development/*/meta/`, which leave the maintainer notes at group and subgroup level out of the package (a `meta/` inside a skill folder still ships). `skills/newsletters/.skillsignore` holds `newsletter-ai/`, which leaves that skill out of the package (it stays installable from the repo with `npx skills add`). `skills/productivity/meeting-agenda/.skillsignore` leaves that skill's screenshots out.
 
 ## Syntax
 

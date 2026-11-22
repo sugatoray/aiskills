@@ -2,7 +2,7 @@
 
 The rule syntax of `.skillsignore` files, which leave files, folders or whole skills out of the package when it is built; this page is exhaustive.
 
-A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users. The repo uses one: `skills/newsletters/.skillsignore` holds `newsletter-ai/`, which leaves that skill out of the package (it stays installable from the repo with `npx skills add`).
+A `.skillsignore` can sit in the repo's `skills/` folder or any folder below it. Its rules apply to that folder and below. It is read only when the package is built (`npm pack`), so it matters to maintainers, not to users. The repo uses three. `skills/.skillsignore` holds `/*/meta/` and `/development/*/meta/`, which leave the maintainer notes at group and subgroup level out of the package (a `meta/` inside a skill folder still ships). `skills/newsletters/.skillsignore` holds `newsletter-ai/`, which leaves that skill out of the package (it stays installable from the repo with `npx skills add`). `skills/productivity/meeting-agenda/.skillsignore` leaves that skill's screenshots out.
 
 ## Syntax
 
