@@ -8,6 +8,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - **Dates:** use the user's date (US Eastern), not the server's. On 2026-11-13 the user corrected a reply that used the server date, 2026-11-14.
 - **History:** keep it clean. Rebase PR branches onto `master`; never merge `master` into them.
 - **Force pushes** need the user's explicit approval each time. The session's classifier blocks them otherwise.
+- **Nothing from the user's private data goes into this public repo:** not their session logs, chats or private artifacts (not even an artifact ID in a note), and not their real repo or project names used as samples. Demo and test data must be visibly fictional and generic. Check new fixtures, demos, scrolls and PR text for this before pushing.
 - **PRs:** don't open one unless asked. Edit an existing PR description minimally, and keep its `- Closes #N -- title` issue list in sync.
 
 ## Traps — avoid them always
