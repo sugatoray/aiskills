@@ -14,6 +14,15 @@ You give it an agenda (pasted text, notes, a document, or JSON) and get back one
   - **Theme:** twelve themes, previewed live: seven studio themes (Aurora, the default; Observatory; Abyss; Editorial; Signal; Clarity; Clarity Dark), then the five classics (Indigo, Midnight, Ocean, Daylight, High contrast).
   - **Buttons:** Apply (or Ctrl/⌘+Enter) remembers the agenda in the browser, Save HTML downloads a copy with the agenda and theme built in, and Reset restores the file's defaults.
 
+## `/agent-sessions-insight`: how you use your coding agents (PR [#320](https://github.com/sugatoray/aiskills/pull/320), unmerged)
+It reads the session logs coding agents already keep on the user's machine and gives back one offline, tabbed HTML report, `agent-sessions-insight.html`, plus the counted numbers in `agent-sessions-insight-data.json`. It runs only when invoked by name: `/agent-sessions-insight`, `$agent-sessions-insight` in Codex, `/skill:agent-sessions-insight` in Pi. Options: `--days N` (default 180), `--agents`, `--extra NAME=PATH` (another agent's folder, read with the generic parser) and `--output`.
+
+- **Agents read:** Claude Code, Codex CLI, Pi, OpenCode (JSON storage and SQLite), GitHub Copilot CLI and Devin CLI (per-session `log.jsonl` or the older `sessions.db`), plus any JSONL-logging agent through `--extra`.
+- **Report:** sessions, active days, prompts, session length, busiest months, weekdays and hours, projects, tools, slash commands, test runs, doc-file edits and a per-agent split. Counted figures are exact; "kinds of work" and "friction" are the agent's reading and are labelled as such.
+- **Built from a template:** the agent doesn't write HTML. It writes its reading as a small insights JSON (overview, kinds, habits, friction, agents), and `scripts/build_report.py` fills the bundled template with that and the counted numbers. Every run looks the same. The page works offline, in light and dark, and at phone width, with a tooltip and a table behind every chart. `--demo` gives the template as is, with made-up data, so a user can see the report before running it.
+- **Every judgement is checkable:** habits are numbered cards with a "Seen in" line, friction points carry evidence, the Friction tab lists open threads with a next step, and a "What this is based on" banner says which logs were read and what was missing. Months are stacked by agent with totals; a button overrides the system's light or dark theme.
+- **Privacy:** read-only (SQLite opened `mode=ro`), no network, prompts kept as snippets of at most 160 characters, and the report isn't published unless the user asks.
+
 <!--
 ## <Feature name>
 What it does, from a user's perspective. A pointer to where it lives in the code

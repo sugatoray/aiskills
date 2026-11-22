@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent Sessions Insight"
+  short_description: "How you use your coding agents, from local session logs"
+  default_prompt: "Use $agent-sessions-insight to analyze how often and for what I use my coding agents, and give me a tabbed HTML report."
+policy:
+  allow_implicit_invocation: false

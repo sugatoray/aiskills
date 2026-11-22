@@ -30,6 +30,7 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
+- On `claude/wonderful-ptolemy-my8ha8` ([#320](https://github.com/sugatoray/aiskills/pull/320), AIS-29): bundled the new `agent-sessions-insight` skill (20 skills in 10 groups). `npm run docs` and `npm run banner:png` were rerun. The banner counts in `banner.test.mjs` and four docs examples were updated to match, and the CHANGELOG has a new `## [1.6.0] - Unreleased` section above `1.5.0`. `npm test`: 521 pass. `package.json` is still `1.5.0`; the next version bump is the user's call.
 - Built #265 on `claude/clever-mendel-k9n73h` and rebased it onto `1.4.0-dev`; the user merged it (`57188d0`).
 - Prepared 1.4.0 in #302 (bump, CHANGELOG dated 2026-11-18, SECURITY `1.4.x`, docs regenerated; `npm test` 519, `npm run test:e2e` 8; issues #303 → #304, #305). The user merged it, published 1.4.0 and pushed `aiskills-v1.4.0`.
 - At the user's request, set the next version to `1.5.0-dev`, the same way #291 set `1.4.0-dev`.

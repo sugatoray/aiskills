@@ -8,5 +8,6 @@ Concrete list of what is NOT implemented yet, or is a known partial/simplified i
 - Minutes accept any value above 0. The 0.5 step is a UI hint, not a validation rule.
 - The tests regenerate tracked screenshots on every run (see HANDOFF).
 - The studio themes' art direction needs a 2023+ browser (CSS nesting); older browsers get their colours only.
+- `agent-sessions-insight`: the Copilot CLI and Devin CLI log formats are undocumented and the OpenCode SQLite columns are inferred; none of the three adapters has been checked against real logs. Devin's tool counts may read zero.
 
 See `GAP_CONTEXT.md` for the reasoning behind each entry.

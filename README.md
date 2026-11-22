@@ -299,7 +299,7 @@ Skills that help run day-to-day work: meetings, planning and follow-through.
 
 **Installation**:
 
-Run one of the following, choose the skill by name: `meeting-agenda` and install interactively.
+Run one of the following, choose the skill by name: `meeting-agenda` or `agent-sessions-insight` and install interactively.
 
 ```sh
 npx skills add sugatoray/aiskills               # project-level
@@ -325,6 +325,7 @@ with every skill twice — pick one.
 | Skill Group | Skill Name | Short Description |
 |:---:|:---|:---|
 | [Productivity](skills/productivity/README.md) | `meeting-agenda` | Turns an agenda into one offline HTML slide deck: a slide per item with a ring countdown (amber in the last 20%, red with a `+M:SS` count-up past zero), keyboard and dot navigation, a meeting progress bar that fills per item, and a built-in editor that applies to the browser or downloads an updated copy. See [usage](skills/productivity/meeting-agenda/README.md). |
+| [Productivity](skills/productivity/README.md) | `agent-sessions-insight` | Shows how often and for what you use your coding agents (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, or any JSONL-logging agent), from the session logs on your machine, as one offline tabbed HTML report: sessions, active days, session length, busiest times, projects, tools, slash commands, test runs and a per-agent split. Read-only; nothing leaves your machine. See [usage](skills/productivity/agent-sessions-insight/README.md). |
 
 ---
 

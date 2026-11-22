@@ -20,6 +20,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **`data-theme` on the theme cards makes each card pick up its own theme's colours.** Card text became unreadable until each card also got its own theme's background. That's intended now, so keep it.
 - **A slide in a flex column with `justify-content: center` clips its top when the content overflows.** The shared grid cell with `align-content: safe center` avoids this; see MAINTAINERS → Slide alignment.
 - **Check the demo data before writing a fixture assumption.** A test assumed demo item 4 had no sub-points; it has two.
+- **Playwright's `locator.count()` counts hidden elements, and a panel can hold more than one table.** A filter test on `#panel-data tbody tr` saw 8 rows: hidden rows plus the "How this was collected" table. Scope to the table's own id and use `:visible` (`#sessions-table tbody tr:visible`).
 
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.
@@ -41,3 +42,5 @@ Best practices worth reusing.
 - **Mock up before redesigning.** For visual changes, render static mockups to PNG (scratchpad HTML plus Playwright) and get the user's pick before writing code.
 - **In cloud sessions:** `pip install pytest playwright`, then launch Chromium with `executable_path="/opt/pw-browsers/chromium"`. `conftest.py` does this.
 - **After changing the skill, run the npm package tests too:** `cd src/packages/aiskills && npm run docs && npm run banner:png && npm test`. They regenerate the skill's docs page and check the file list. `git add` new skill files first.
+- **Make a report template double as its demo, and build the demo data with the real code.** `agent-sessions-insight`'s template holds demo data made by `collect.summarize()` on made-up sessions, so its numbers agree with its rows (a test checks `sessions` and `per_agent` against the rows). Hand-typed demo numbers drift. Keep the generator in the skill (`scripts/make_demo.py`) with a test that the shipped demo equals a fresh build, so a stale demo fails CI instead of going unnoticed.
+- **Playwright's `inner_text()` is empty for content inside a closed `<details>`** (it isn't rendered). Use `text_content()` to check a chart's fallback table.

@@ -24,6 +24,17 @@ In development: `package.json` is `1.6.0-dev` (a SemVer pre-release, so it
 sorts below `1.6.0`) while changes collect here. At release, set it to `1.6.0`
 and date this section.
 
+### Added
+
+- **New bundled skill: `agent-sessions-insight`**, in the `productivity-skills`
+  group (alias `productivity`). It reads the local session logs of Claude Code,
+  Codex CLI, Pi, OpenCode, GitHub Copilot CLI and Devin CLI (or any agent that
+  writes JSONL) and turns them into one offline, tabbed HTML report of how often
+  and for what the agents are used. It is read-only, sends nothing anywhere,
+  and runs only when invoked by name. The package now bundles 20 skills in 10
+  groups: `aiskills install -s agent-sessions-insight`. See the skill's own
+  `CHANGELOG.md` for its history.
+
 ## [1.5.0] - 2026-11-18
 
 ### Added

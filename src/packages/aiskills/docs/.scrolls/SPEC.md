@@ -102,5 +102,7 @@ Skills tab → Explainers → **Browse the scrolls-compact examples** shows `/sc
 ## Bundled skills: the `productivity` group
 `aiskills install -G productivity` (group `productivity-skills`) installs `meeting-agenda`, which turns an agenda into an offline HTML slide deck with a timer per item (see `src/productivity/docs/.scrolls/SPEC.md`). The bundle is 19 skills in 10 groups. New in 1.5.0 (#272, published).
 
+Unreleased ([#320](https://github.com/sugatoray/aiskills/pull/320)): the group also gets `agent-sessions-insight`, which turns local coding-agent session logs (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI) into an offline HTML usage report. The bundle becomes 20 skills in 10 groups (`aiskills install -s agent-sessions-insight`).
+
 ## Docs site: embedded pages follow the light/dark button
 Pages embedded in the docs (the example viewer, the CLI outputs page) follow the docs' light/dark choice, in the page and full-size, and switch at once when it changes; before, they followed only the system setting. New in 1.4.0 (#265, published).

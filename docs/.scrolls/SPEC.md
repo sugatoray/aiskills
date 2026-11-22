@@ -19,6 +19,9 @@ Every published npm release has an annotated git tag on the commit npm recorded 
 ## `meeting-agenda` skill (productivity group)
 `/meeting-agenda` turns an agenda into an offline HTML slide deck with a timer per item. Its full spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/meeting-agenda/`.
 
+## `agent-sessions-insight` skill (productivity group)
+`/agent-sessions-insight` reads the session logs coding agents keep on the user's machine (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, or any JSONL-logging agent) and builds one offline HTML report of how often and for what they're used. Read-only and offline. Its spec is in `src/productivity/docs/.scrolls/SPEC.md`; the code is in `skills/productivity/agent-sessions-insight/`. In [#320](https://github.com/sugatoray/aiskills/pull/320), unmerged.
+
 <!--
 ## <Feature name>
 What it does, from a user's perspective. A pointer to where it lives in the code
