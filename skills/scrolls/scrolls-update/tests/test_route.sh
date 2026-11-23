@@ -173,6 +173,26 @@ assert_match "$out" "Not in the router table" "the empty table lists no nested s
 assert_no_match "$out" "Listed but missing" "the empty table's placeholder row is not read as a scroll set"
 rm -rf "$dirK"
 
+echo; echo "=== Scenario L: a folder named 'scrolls', and a row that names only its scroll set ==="
+dirL="$(new_repo)"; make_set "$dirL"; make_set "$dirL/src/memory/scrolls"; make_set "$dirL/pkgs/x"
+cat > "$dirL/docs/.scrolls/STARTER.md" <<'EOF2'
+# STARTER
+
+## Where memory lives
+
+| Scope | Scroll set |
+| --- | --- |
+| Repo-wide | `docs/.scrolls/` (this one) |
+| The package `@scope/x` | `pkgs/x/docs/.scrolls/` |
+| scrolls family (`skills/scrolls/`) | `src/memory/scrolls/docs/.scrolls/` |
+EOF2
+commit_all "$dirL"
+mkdir -p "$dirL/skills/scrolls/tool"; echo x > "$dirL/skills/scrolls/tool/SKILL.md"
+out="$(cd "$dirL" && bash "$SCRIPT" 2>&1)"
+assert_routed "$out" "skills/scrolls/tool/SKILL.md" "src/memory/scrolls/docs/.scrolls" "a covered folder named 'scrolls' is a scope, not a scroll set"
+assert_no_match "$out" "Not in the router table" "a row naming only the scroll set (no folder) still lists it"
+rm -rf "$dirL"
+
 echo
 echo "$TOTAL checks, $FAILURES failed"
 [ "$FAILURES" -eq 0 ]

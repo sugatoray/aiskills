@@ -78,14 +78,24 @@ def find_sets(root, start_rel):
     return sorted(set(found))
 
 
+def is_set_path(root, rel):
+    """A scroll set path: ends in .scrolls or scrolls inside a docs folder, or holds a STARTER.md.
+    (A covered folder that merely ends in 'scrolls', like skills/scrolls/, is not one.)"""
+    parts = norm(rel).split("/")
+    if parts[-1] not in SET_NAMES:
+        return False
+    return (len(parts) >= 2 and parts[-2] == "docs") or os.path.isfile(os.path.join(root, norm(rel), "STARTER.md"))
+
+
 def router_rows(root, set_rel):
-    """(covered folder, scroll set) pairs from a set's 'Where memory lives' table."""
+    """(covered folder, scroll set) pairs from a set's 'Where memory lives' table, plus every
+    scroll set the table names (a row may name only the set, when it covers its own folder)."""
     path = os.path.join(root, set_rel, "STARTER.md")
     try:
         lines = open(path, encoding="utf-8", errors="replace").read().splitlines()
     except OSError:
-        return []
-    rows, inside, home = [], False, home_of(set_rel)
+        return [], set()
+    rows, named, inside, home = [], set(), False, home_of(set_rel)
     for line in lines:
         s = line.strip()
         if s.startswith("## "):
@@ -96,15 +106,16 @@ def router_rows(root, set_rel):
         cells = [c.strip() for c in s.strip("|").split("|")]
         if len(cells) < 2:
             continue
-        targets = [t for t in re.findall(r"`([^`]+)`", cells[-1]) if norm(t).endswith(SET_NAMES)]
+        targets = [x for x in re.findall(r"`([^`]+)`", cells[-1]) if is_set_path(root, join(home, x))]
         if not targets:
             continue
         target = join(home, targets[-1])
+        named.add(target)
         for c in cells[:-1]:
             for scope in re.findall(r"`([^`]+)`", c):
-                if scope.endswith("/") and not norm(scope).endswith(SET_NAMES):
+                if scope.endswith("/") and not is_set_path(root, join(home, scope)):
                     rows.append((join(home, scope), target))
-    return rows
+    return rows, named
 
 
 def changed_files(root, set_rel, since):
@@ -177,9 +188,9 @@ def main(argv):
     coverage = [(home_of(s), s) for s in nested]
     listed = set()
     for s in [top] + nested:
-        for scope, target in router_rows(root, s):
-            coverage.append((scope, target))
-            listed.add(target)
+        rows, named = router_rows(root, s)
+        coverage.extend(rows)
+        listed |= named
 
     try:
         files, since_rev = changed_files(root, top, since)
