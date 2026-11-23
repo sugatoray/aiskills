@@ -3,7 +3,7 @@
 # @sugatoray-ai/aiskills
 
 All of the agent skills from [sugatoray/aiskills](https://github.com/sugatoray/aiskills)
-(scrolls, stata, personas, diagrams, docs, development, video, image styles), packaged
+(scrolls, stata, personas, diagrams, docs, development, productivity, video, image styles), packaged
 for npm. Every file under the repo's `skills/` folder ships, except what a
 [`.skillsignore`](#leaving-files-out-skillsignore) leaves out. The skills are
 flattened to one folder per skill (`skills/<skill-name>/`), and the repo's
@@ -14,6 +14,13 @@ how-to guides, concepts, and a complete CLI, environment and error reference).
 The same docs as one page with tabs and search: **<https://sugatoray.github.io/aiskills/>**
 (or open [docs/docsite/index.html](docs/docsite/index.html) in a browser). AI agents can
 load [docs/docsite/llms.txt](docs/docsite/llms.txt).
+
+## What’s new in 1.6.0
+
+- Install `agent-sessions-insight` to explore local coding-agent session activity in an offline HTML report: `aiskills install -s agent-sessions-insight`.
+- Scrolls 2.7.0 routes updates to the appropriate nested scroll set and keeps the parent set as a router.
+
+See the [changelog](CHANGELOG.md) for the complete release notes.
 
 ## Install
 

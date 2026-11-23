@@ -1,6 +1,6 @@
 {
   "name": "@sugatoray-ai/aiskills",
-  "version": "1.6.0-dev",
+  "version": "1.6.0",
   "description": "Curated agent skills (scrolls agentic memory and more) for every coding agent, in one npm package.",
   "keywords": [
     "agent-skills",
