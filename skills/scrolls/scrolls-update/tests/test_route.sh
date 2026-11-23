@@ -153,6 +153,21 @@ out="$(cd "$dirJ" && bash "$SCRIPT" 2>&1)"
 assert_routed "$out" "tools/cli/run.sh" "tools/cli/docs/scrolls" "a set named 'scrolls' (unhidden) is found"
 rm -rf "$dirJ"
 
+echo; echo "=== Scenario K: the scrolls-setup STARTER.md template has an empty router table ==="
+TEMPLATE="$(dirname "$SKILL_DIR")/scrolls-setup/assets/templates/STARTER.md"
+tpl="$(cat "$TEMPLATE")"
+assert_match "$tpl" "^## Where memory lives" "the template has a 'Where memory lives' section"
+assert_match "$tpl" "^\| Scope \| Scroll set \|" "the section holds a Scope / Scroll set table"
+dirK="$(new_repo)"; make_set "$dirK"; make_set "$dirK/packages/api"
+sed 's/{{PROJECT_NAME}}/demo/g; s/{{PROJECT_TAGLINE}}//g; s#{{SCROLLS_PATH}}#docs/.scrolls#g; s/{{QUICK_ORIENTATION}}/x/g' "$TEMPLATE" > "$dirK/docs/.scrolls/STARTER.md"
+commit_all "$dirK"; mkdir -p "$dirK/packages/api/src"; echo x > "$dirK/packages/api/src/a.py"
+out="$(cd "$dirK" && bash "$SCRIPT" 2>&1)"; code=$?
+assert_exit "$code" 0 "a set made from the template routes cleanly"
+assert_routed "$out" "packages/api/src/a.py" "packages/api/docs/.scrolls" "nesting still routes with the empty table"
+assert_match "$out" "Not in the router table" "the empty table lists no nested set yet"
+assert_no_match "$out" "Listed but missing" "the empty table's placeholder row is not read as a scroll set"
+rm -rf "$dirK"
+
 echo
 echo "$TOTAL checks, $FAILURES failed"
 [ "$FAILURES" -eq 0 ]

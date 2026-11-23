@@ -442,6 +442,11 @@
           "text": "It creates docs/.scrolls/ (or docs/scrolls/ with -u) and writes STARTER.md: the map listing every scroll and how to update it."
         },
         {
+          "edge": "setup-starter",
+          "title": "Join a parent set",
+          "text": "If a scroll set already exists higher up, the new one gets a row in that parent's 'Where memory lives' table, so later updates are routed down to it."
+        },
+        {
           "edge": "starter-handoff",
           "title": "Create HANDOFF.md",
           "text": "The current-state snapshot: where things stand and what's open.",
@@ -580,6 +585,11 @@
           "edge": "update-starter",
           "title": "Read the map",
           "text": "STARTER.md says which scrolls exist and each one's update rule, including any the project added itself."
+        },
+        {
+          "edge": "update-starter",
+          "title": "Route nested work",
+          "text": "The route script sends each change to the scroll set that covers it: a nested one, or one named in STARTER.md's 'Where memory lives' table. That set records it; the top level keeps only a pointer."
         },
         {
           "edge": "starter-handoff",
@@ -1095,8 +1105,8 @@
     "scrolls-hide": "6d9734dc78036b5c0bfd0f387f9bb77dd16bb69761ffdcee141c9a0a2ffa558b",
     "scrolls-remove": "1623ee1f0a5886c634857a36e9b1d12d0ebb497fabc7793216ffa683c3fe4d03",
     "scrolls-restore": "c6398ac09815bcf1391efff868e838c51ba75b45ce74662974518c10ce138dff",
-    "scrolls-setup": "5456b21097f5decc049432903e0f3019b4e4a6c085aad622cd84a6c44df4b2b3",
+    "scrolls-setup": "1aa85c3759a03e261bba1f5835d04d203ac8c57aff5e740847e27af9e461c53d",
     "scrolls-unhide": "6082ca023fc2b098bb53b04a801ae52d2617e5ebab9101809a78ac3c360bf78e",
-    "scrolls-update": "9856eab7694183e27f83b8dae351ca957612ec1bfda39dee8168351ea700e21b"
+    "scrolls-update": "b638485e04018df91566a912a27359014609ecb88fa255d102f28f932c9cb1a5"
   }
 }
