@@ -25,9 +25,11 @@ plugin name minus `-skills`: `video-related`.
 
 **Keep it in sync, every time:**
 
-- **Version:** today `plugin.json` says `1.0.0` while `dynamic-promo-video/SKILL.md` says `1.6.2`:
-  the plugin was not bumped with the skill's releases. Decide whether the plugin should follow the
-  skill (as in `../../stata/` and `../../docs/`) before the next release, and record the rule here.
+- **Version:** `plugin.json`'s `"version"` must equal `dynamic-promo-video/SKILL.md`'s
+  `metadata.version` (both `1.6.2` today), as in `../../stata/` and `../../docs/`. Two files, one
+  version, bumped in the same commit, together with the skill's `CHANGELOG.md`. Until 2026-11-23 the
+  plugin stayed at `1.0.0` through the skill's releases; `PluginVersionTest` in
+  `../dynamic-promo-video/tests/test_scripts.py` now fails if the two differ.
 - **New skill:** add its `./<skill-name>` path to the `"skills"` array in the commit that adds it,
   and a row to `../README.md`.
 - **Skill retired:** remove its entry in the commit that renames its `SKILL.md` away (see

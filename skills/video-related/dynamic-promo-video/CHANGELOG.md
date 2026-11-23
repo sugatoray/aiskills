@@ -3,6 +3,14 @@
 All notable changes to this skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Test: the `video-related-skills` plugin's version equals this skill's
+  `metadata.version` (skipped when the skill is installed without its group
+  folder). The plugin moved from 1.0.0 to 1.6.2 to match.
+
 ## [1.6.2] - 2026-11-11
 
 ### Changed

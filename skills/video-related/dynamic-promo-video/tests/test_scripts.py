@@ -401,5 +401,18 @@ class DemoTest(unittest.TestCase):
             self.assertIn("missing: vo0.mp3", r.stderr)
 
 
+
+class PluginVersionTest(unittest.TestCase):
+    """The family's plugin version follows this skill (its only member)."""
+
+    def test_plugin_version_equals_skill_version(self):
+        manifest = os.path.join(os.path.dirname(SKILL), ".claude-plugin", "plugin.json")
+        if not os.path.exists(manifest):
+            self.skipTest("installed without its group folder; no plugin.json to compare")
+        with open(os.path.join(SKILL, "SKILL.md"), encoding="utf-8") as f:
+            skill_version = re.search(r'^\s*version:\s*"([^"]+)"', f.read(), re.M).group(1)
+        with open(manifest, encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["version"], skill_version)
+
 if __name__ == "__main__":
     unittest.main()
