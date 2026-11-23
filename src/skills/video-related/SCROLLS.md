@@ -10,6 +10,6 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 
 The video-related skills live at `skills/video-related/`, not here. One symlink reaches the family's maintainer notes from `src/` without duplicating them:
 
-- `meta` → `../../../skills/video-related/meta` (the family's `MAINTAINERS.md`)
+- `meta` → `../../../skills/video-related/meta`, so `meta/MAINTAINERS.md` here opens `skills/video-related/meta/MAINTAINERS.md` (the family's maintainer notes)
 
 It is a symlink, not a copy: editing through it edits the real file at `skills/video-related/meta/`. Each skill keeps its own `CHANGELOG.md` and `meta/MAINTAINERS.md` inside its folder.

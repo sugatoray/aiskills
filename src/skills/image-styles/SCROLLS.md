@@ -10,6 +10,6 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 
 The image-styles skills live at `skills/image-styles/`, not here. One symlink reaches the family's maintainer notes from `src/` without duplicating them:
 
-- `meta` → `../../../skills/image-styles/meta` (the family's `MAINTAINERS.md`)
+- `meta` → `../../../skills/image-styles/meta`, so `meta/MAINTAINERS.md` here opens `skills/image-styles/meta/MAINTAINERS.md` (the family's maintainer notes)
 
 It is a symlink, not a copy: editing through it edits the real file at `skills/image-styles/meta/`. Each skill keeps its own `CHANGELOG.md` and `meta/MAINTAINERS.md` inside its folder.

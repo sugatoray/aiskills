@@ -38,6 +38,8 @@ This directory (`src/skills/productivity/`) is **not** where the productivity sk
 - `tests/`: `test_collect.py` and `test_build_report.py` (stdlib), `test_report_page.py` (Playwright; skipped without it). Run `python3 -m unittest discover -s tests -v` (or `python3 -m pytest`) from `skills/productivity/agent-sessions-insight/`; `pip install playwright` first in cloud sessions.
 - `meta/MAINTAINERS.md` (how to add an agent, red/green) and `meta/SECURITY.md`; `CHANGELOG.md`, `README.md` and `agents/openai.yaml`.
 
+One symlink reaches the family's own notes from here: the `meta` folder here → `../../../skills/productivity/meta`, so `meta/MAINTAINERS.md` here opens `skills/productivity/meta/MAINTAINERS.md` (the family's maintainer notes: what the two skills share, plugin manifest, version rule, tests).
+
 This `docs/.scrolls/` folder holds the narrative and process memory of the work on `skills/productivity/` only. The skill's `CHANGELOG.md` is the authoritative record of what shipped, and its `meta/MAINTAINERS.md` holds the design notes; these scrolls point to them rather than repeating them. The `aiskills` npm package that bundles the skill has its own scrolls at `src/packages/aiskills/docs/.scrolls/`. Repo-wide scrolls are at the root's `docs/.scrolls/`.
 
 As the project grows, this file may end up pointing to additional `docs/.scrolls/*.md` files for specialized topics (architecture decisions, security reviews, subsystem deep-dives). If you add one, list it here in the numbered order above with the same "read this when / update this when" treatment as the core six, so future sessions don't have to guess whether it's load-bearing.

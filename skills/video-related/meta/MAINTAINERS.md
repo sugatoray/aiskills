@@ -11,7 +11,7 @@ artifact, the same arrangement as `../../stata/meta/MAINTAINERS.md`. Don't inven
 before a second skill exists.
 
 Working memory for this family (narrative, plans, traps) is in `src/skills/video-related/docs/.scrolls/`;
-start from its `STARTER.md`.
+start from its `STARTER.md`. `src/skills/video-related/meta` links back to this folder.
 
 This `meta/` folder is for maintainers of this repo: `skills/.skillsignore` keeps every group- and
 subgroup-level `meta/` out of the npm package. A `meta/` inside a skill folder still ships.

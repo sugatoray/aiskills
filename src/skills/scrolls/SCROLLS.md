@@ -10,7 +10,7 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 
 This directory also holds three symlinks into the actual `scrolls-*` skill sources at `skills/scrolls/`, so the family's own governance docs are reachable from here without duplicating them:
 
-- `meta` → `../../../skills/scrolls/meta` (family-wide `MAINTAINERS.md`)
+- `meta` → `../../../skills/scrolls/meta`, so `meta/MAINTAINERS.md` here opens `skills/scrolls/meta/MAINTAINERS.md` (the family-wide maintainer notes)
 - `README.md` → `../../../skills/scrolls/README.md`
 - `CHANGELOG.md` → `../../../skills/scrolls/CHANGELOG.md`
 

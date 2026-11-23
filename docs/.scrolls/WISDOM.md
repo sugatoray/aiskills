@@ -9,6 +9,7 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - **History:** keep it clean. Rebase PR branches onto `master`; never merge `master` into them.
 - **Force pushes** need the user's explicit approval each time. The session's classifier blocks them otherwise.
 - **Nothing from the user's private data goes into this public repo:** not their session logs, chats or private artifacts (not even an artifact ID in a note), and not their real repo or project names used as samples. Demo and test data must be visibly fictional and generic. Check new fixtures, demos, scrolls and PR text for this before pushing.
+- **Every memory folder under `src/skills/` links to its `meta/`.** `src/skills/<group>/` (or `src/skills/development/<subgroup>/`) has a `meta` symlink to `skills/<group>/meta` (relative: one `../` per level, e.g. `../../../skills/productivity/meta`), and its `SCROLLS.md` and `STARTER.md` say which file that reaches: "`meta/MAINTAINERS.md` here opens `skills/<group>/meta/MAINTAINERS.md`". `src/skills/development/meta` links to `skills/development/meta`. Do the same when setting up scrolls for another family, and check with `realpath <folder>/meta/MAINTAINERS.md`.
 - **PRs:** don't open one unless asked. Edit an existing PR description minimally, and keep its `- Closes #N -- title` issue list in sync.
 
 ## Traps — avoid them always

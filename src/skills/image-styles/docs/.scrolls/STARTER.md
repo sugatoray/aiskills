@@ -28,7 +28,7 @@ This directory (`src/skills/image-styles/`) is **not** where the image-styles sk
 - Each has `SKILL.md` (the invocation and output contract; explicit invocation only, `disable-model-invocation: true`), `README.md`, `CHANGELOG.md`, `agents/openai.yaml`, `assets/EXAMPLES.md` and `meta/MAINTAINERS.md`. Both need an image-generation or image-editing tool; there are no scripts or tests.
 - Checks, from the skills' own notes: validate the frontmatter and agent YAML, keep the plugin and marketplace entries in step with the skill names and paths, and forward-test typical and default invocations with an image tool when one is available. Never claim generated images were checked without running the tool.
 
-One symlink reaches the family's own notes from here: `meta` → `../../../skills/image-styles/meta` (the family's `MAINTAINERS.md`: plugin manifest, version rule).
+One symlink reaches the family's own notes from here: the `meta` folder here → `../../../skills/image-styles/meta`, so `meta/MAINTAINERS.md` here opens `skills/image-styles/meta/MAINTAINERS.md` (the family's maintainer notes: plugin manifest, version rule).
 
 This `docs/.scrolls/` folder holds the narrative and process memory of the work on `skills/image-styles/` only. Each skill's `CHANGELOG.md` is the authoritative record of what shipped, and the `meta/MAINTAINERS.md` files hold the design notes; these scrolls point to them rather than repeating them. The `aiskills` npm package that bundles the skills has its own scrolls at `src/packages/aiskills/docs/.scrolls/`. Repo-wide scrolls are at the root's `docs/.scrolls/`.
 
