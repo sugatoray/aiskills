@@ -10,7 +10,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - **Checks, all local:** `python3 -m pytest skills/development/review/run-code-review/tests` passed 308 tests at #223's head on Python 3.13 (292 plus 16 skips on 3.10, without `tomllib`); 71 of them are 1.2.0's (57 renderer, 14 browser). `npm test` passes 428. Both `claude plugin validate … --strict` runs pass. The repository runs no workflow on pull requests.
 - **npm package:** `@sugatoray-ai/aiskills` **1.2.0** bundles `/run-code-review` 1.2.0 (17 skills in 9 groups); published by the owner after #223 merged.
 - **1.3.1 is on `master` and on npm:** merged in [#265](https://github.com/sugatoray/aiskills/pull/265) (`57188d0`, 2026-11-18) and bundled in `@sugatoray-ai/aiskills` 1.4.0. `assets/EXAMPLE.md` is renamed `assets/EXAMPLES.md`, the name every skill uses; `SKILL.md`, `README.md` and `meta/MAINTAINERS.md` link to it, and `review-skills` `plugin.json` is `1.3.1`. The content is unchanged. A package test (`docs-skills.test.mjs`) fails if any bundled skill ships `assets/EXAMPLE.md` again. Earlier entries below say `EXAMPLE.md` because that was its name then.
-- **This folder:** `src/skills/development/review/` and `src/skills/development/meta/review` were created on 2026-11-12 as `…/reviews` and renamed on 2026-11-13. See "What just happened", items 5 and 7.
+- **This folder:** `src/skills/development/review/` and `src/skills/development/meta/review` were created on 2026-11-12 as `…/reviews` and renamed on 2026-11-13. See "What just happened", items 5 and 7. (Since 2026-11-23 the subgroup's `meta/` link is `src/skills/development/review/meta`, and `src/skills/development/meta` links to the development family's `meta/`.)
 
 ## What just happened
 

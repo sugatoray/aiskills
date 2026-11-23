@@ -31,6 +31,8 @@ This directory (`src/skills/video-related/`) is **not** where the video-related 
 - `tests/test_scripts.py`: unit tests plus an end-to-end run of the template. Tests skip when ffmpeg, numpy, Node or Playwright is missing, and never call the TTS service. Run `python3 -m unittest discover -s skills/video-related/dynamic-promo-video/tests -p 'test_*.py'` and `node --check skills/video-related/dynamic-promo-video/scripts/render.js` from the repo root.
 - `meta/MAINTAINERS.md` (layout, the demo clips, checks), `CHANGELOG.md` (keep it in step with `metadata.version` in `SKILL.md`), `README.md`, and `agents/claude-code.yaml` and `agents/openai.yaml`.
 
+One symlink reaches the family's own notes from here: `meta` → `../../../skills/video-related/meta` (the family's `MAINTAINERS.md`: plugin manifest, version rule, tests).
+
 This `docs/.scrolls/` folder holds the narrative and process memory of the work on `skills/video-related/` only. The skill's `CHANGELOG.md` is the authoritative record of what shipped, and its `meta/MAINTAINERS.md` holds the design notes; these scrolls point to them rather than repeating them. The `aiskills` npm package that bundles the skill has its own scrolls at `src/packages/aiskills/docs/.scrolls/`. Repo-wide scrolls are at the root's `docs/.scrolls/`.
 
 As the project grows, this file may end up pointing to additional `docs/.scrolls/*.md` files for specialized topics (architecture decisions, security reviews, subsystem deep-dives). If you add one, list it here in the numbered order above with the same "read this when / update this when" treatment as the core six, so future sessions don't have to guess whether it's load-bearing.

@@ -7,6 +7,9 @@ versioning, see its `meta/MAINTAINERS.md`:
 - [`artwallbg/meta/MAINTAINERS.md`](../artwallbg/meta/MAINTAINERS.md)
 - [`commentdrop/meta/MAINTAINERS.md`](../commentdrop/meta/MAINTAINERS.md)
 
+Working memory for this family (narrative, plans, traps) is in `src/skills/image-styles/docs/.scrolls/`;
+start from its `STARTER.md`. `src/skills/image-styles/meta` links back to this folder.
+
 This `meta/` folder is for maintainers of this repo: `skills/.skillsignore` keeps every group- and
 subgroup-level `meta/` out of the npm package. A `meta/` inside a skill folder still ships.
 

@@ -10,7 +10,8 @@ its own installable plugin with its own maintainer notes:
   (`run-code-review`).
 
 Working memory for each subgroup is in `src/skills/development/<subgroup>/docs/.scrolls/` (`review/`
-and `repo-related/`), with `src/skills/development/meta/<subgroup>` linking to that subgroup's `meta/`.
+and `repo-related/`), with `src/skills/development/<subgroup>/meta` linking to that subgroup's `meta/`, and
+`src/skills/development/meta` linking to this folder.
 
 This `meta/` folder is for maintainers of this repo: `skills/.skillsignore` keeps every group- and
 subgroup-level `meta/` out of the npm package. A `meta/` inside a skill folder still ships.
