@@ -54,11 +54,11 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   Older `.ps1` files still have non-ASCII comments or strings and call
   `pwsh` by name; bring each up to this rule when you next touch it.
   No 5.1 is available in the cloud sessions; `pwsh` 7 is (see below).
-- **Running the `.ps1` suites without `pwsh` installed**: install it from
-  conda-forge, e.g. with Miniforge (`bash Miniforge3-Linux-x86_64.sh -b -p
-  <dir>`, then `<dir>/bin/conda create -y -p <env> -c conda-forge
-  powershell`) and put `<env>/bin` on `PATH`. That is how all nine `.ps1`
-  suites were first run (2026-11-23).
+- **Running the `.ps1` suites without `pwsh` installed**: from the repo
+  root, `make setup-pwsh` installs it from conda-forge (and conda, as
+  Miniforge, first if needed; see `scripts/README.md`), then prints the
+  `export PATH=...` line to add. That is how all nine `.ps1` suites were
+  first run (2026-11-23).
 - **Shared location flags** (`-p`/`-t`/`-l`/`-r`, plus `-u` on
   `scrolls-setup` only): keep semantics and defaults identical across
   every command that takes them. `../README.md`'s "Shared flags" table
