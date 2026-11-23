@@ -43,7 +43,7 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
   when scroll sets are nested (a new `scripts/route.py` with `.sh`/`.ps1`
   launchers), keeping the top-level set as a router; `/scrolls-setup` adds a
   new set to its parent's `## Where memory lives` table, and its `STARTER.md`
-  template has that section. See `skills/scrolls/CHANGELOG.md`.
+  template has that section. The `scrolls-explainer` page now illustrates\n  both steps. See the scrolls skills' changelogs for details.\n\n### Fixed\n\n- **`scrolls-help` on PowerShell:** `open_help.ps1 --stop <port>` now passes\n  the port as one argument, so it can find and stop the help server.
 
 ## [1.5.0] - 2026-11-18
 
