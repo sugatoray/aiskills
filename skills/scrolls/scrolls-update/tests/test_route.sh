@@ -144,6 +144,11 @@ out="$(cd "$dirI" && bash "$SCRIPT" sub/docs/.scrolls --since "$first" 2>&1)"; c
 assert_exit "$code" 0 "accepts a scroll set path"
 assert_routed "$out" "sub/b.py" "sub/docs/.scrolls" "--since limits the commits"
 assert_no_match "$out" "sub/a.py" "a file before --since is left out"
+out="$(cd "$dirI" && bash "$SCRIPT" sub/docs/.scrolls --since HEAD~1 2>&1)"
+assert_match "$out" "since [0-9a-f]{7}," "a ref name in --since is shown as its short commit id"
+out="$(cd "$dirI" && bash "$SCRIPT" sub/docs/.scrolls --since no-such-ref 2>&1)"; code=$?
+assert_exit "$code" 2 "an unknown --since revision exits 2"
+assert_match "$out" "unknown revision" "and says why"
 rm -rf "$dirI"
 
 echo; echo "=== Scenario J: the visible 'scrolls' name and nested sets inside a nested set ==="

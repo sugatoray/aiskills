@@ -17,7 +17,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Step 5, "Route the work": record each part of the session in the scroll
   set that covers it, keep only repo-wide notes and pointers in the top
   level, and add unlisted nested sets to the router table.
-- `tests/test_route.sh` (11 scenarios, 30 checks) and the PowerShell parity
+- `tests/test_route.sh` (11 scenarios, 33 checks) and the PowerShell parity
   harness `tests/test_route.ps1`.
 
 ### Changed

@@ -113,6 +113,10 @@ def changed_files(root, set_rel, since):
         code, out = git(["log", "-1", "--format=%H", "--", set_rel], root)
         since = out.strip() if code == 0 else ""
     if since:
+        code, out = git(["rev-parse", "--verify", "--quiet", since + "^{commit}"], root)
+        if code != 0:
+            raise ValueError("unknown revision for --since: %s" % since)
+        since = out.strip()
         code, out = git(["diff", "--name-only", since + "..HEAD"], root)
         if code == 0:
             files += out.splitlines()
@@ -177,7 +181,11 @@ def main(argv):
             coverage.append((scope, target))
             listed.add(target)
 
-    files, since_rev = changed_files(root, top, since)
+    try:
+        files, since_rev = changed_files(root, top, since)
+    except ValueError as e:
+        print("route: %s" % e, file=sys.stderr)
+        return 2
     in_base = [f for f in files if not base or f == base or f.startswith(base + "/")]
 
     print("== Scroll sets under %s ==" % (base or "the repository root"))
