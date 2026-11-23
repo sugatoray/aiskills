@@ -3,6 +3,24 @@
 All notable changes to the `scrolls-help` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.7.0] - 2026-11-23
+
+### Fixed
+
+- `open_help.ps1 --stop <port>` never found the server: the port, the only
+  argument left after `--stop`, was a single string, and PowerShell splatted
+  it character by character (`39059` became `3 9 0 5 9`). It is now kept an
+  array. `tests/test_open_help.ps1` scenario 3 had been failing on this (the
+  `.ps1` suites had not been run before); it passes now (14/14). The file is
+  also ASCII only now, for Windows PowerShell 5.1.
+
+### Changed
+
+- Synced to `2.7.0` to stay in lockstep with the other `scrolls-*`
+  skills. The minor bump is for nested scroll sets
+  and routing in `/scrolls-update` and `/scrolls-setup`; see
+  `../CHANGELOG.md`.
+
 ## [2.6.0] - 2026-11-15
 
 ### Changed

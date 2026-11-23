@@ -34,6 +34,31 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   `.sh`/`.ps1` are thin launchers that
   pass flags through unchanged; `scrolls-explainer` (`explain.py`)
   follows the same pattern.
+- **PowerShell 5.1 compatibility**: every `.ps1` (scripts and tests) must
+  run in Windows PowerShell 5.1 as well as PowerShell 7+. In practice:
+  - ASCII only. 5.1 reads a UTF-8 file without a BOM in the Windows code
+    page, so an em dash in a printed string comes out garbled.
+  - No syntax newer than 5.1: no `??`, `?.`, ternary `a ? b : c`,
+    pipeline chains `&&`/`||`, `ForEach-Object -Parallel`, `$IsWindows`,
+    or `Join-Path` with more than two parts.
+  - Run native commands (Python, git) with `$ErrorActionPreference =
+    'Continue'`: under `'Stop'`, 5.1 turns their redirected stderr into a
+    terminating error.
+  - Keep forwarded arguments an array, `@($args | Select-Object -Skip 1)`:
+    a single leftover string is splatted character by character
+    (`/scrolls-help --stop 39059` once passed `3 9 0 5 9`).
+  - Test harnesses start the script under test with the PowerShell that
+    runs them, `(Get-Process -Id $PID).Path`, not `pwsh` by name (5.1-only
+    machines have no `pwsh`).
+  `scrolls-update`'s `route.ps1` and `test_route.ps1` follow all of this.
+  Older `.ps1` files still have non-ASCII comments or strings and call
+  `pwsh` by name; bring each up to this rule when you next touch it.
+  No 5.1 is available in the cloud sessions; `pwsh` 7 is (see below).
+- **Running the `.ps1` suites without `pwsh` installed**: from the repo
+  root, `make setup-pwsh` installs it from conda-forge (and conda, as
+  Miniforge, first if needed; see `scripts/README.md`), then prints the
+  `export PATH=...` line to add. That is how all nine `.ps1` suites were
+  first run (2026-11-23).
 - **Shared location flags** (`-p`/`-t`/`-l`/`-r`, plus `-u` on
   `scrolls-setup` only): keep semantics and defaults identical across
   every command that takes them. `../README.md`'s "Shared flags" table
@@ -47,7 +72,7 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
   for the right reason, then make it pass.
 - **Versioning — locked in lockstep**: all nine `scrolls-*` skills
   share a single version number, kept identical across every skill's
-  `metadata.version` in `SKILL.md` — as of this writing, `2.6.0`
+  `metadata.version` in `SKILL.md` — as of this writing, `2.7.0`
   everywhere. A version bump is still only warranted by a change
   visible to an actual `/scrolls-*` invocation (new/changed flag,
   changed default, changed behavior) somewhere in the family — pure

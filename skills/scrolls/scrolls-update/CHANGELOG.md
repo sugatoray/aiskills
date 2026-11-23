@@ -3,6 +3,33 @@
 All notable changes to the `scrolls-update` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.7.0] - 2026-11-23
+
+### Added
+
+- `scripts/route.py` (stdlib Python; `route.sh` and `route.ps1` are thin
+  launchers): finds the scroll sets nested under the top-level one (a
+  bounded, pruned search), reads `## Where memory lives` router tables, and
+  lists every changed file (since the set was last touched, or `--since REV`,
+  plus uncommitted) under the deepest scroll set that covers it. It reports
+  nested sets missing from the router table and listed sets with no
+  `STARTER.md`. Read-only.
+- Step 5, "Route the work": record each part of the session in the scroll
+  set that covers it, keep only repo-wide notes and pointers in the top
+  level, and add unlisted nested sets to the router table.
+- `tests/test_route.sh` (12 scenarios, 35 checks) and the PowerShell parity
+  harness `tests/test_route.ps1` (7 checks, run under PowerShell 7).
+  `route.ps1` and `test_route.ps1` are written for Windows PowerShell 5.1 as
+  well: ASCII only, no newer syntax, native commands run with
+  `$ErrorActionPreference = 'Continue'`, and the harness starts the launcher
+  with the PowerShell that runs it.
+
+### Changed
+
+- Step 1 with `-r`: when the sets found are nested, the outermost is the top
+  level; only sibling sets make it ask which one. Later steps renumbered
+  (the report is now step 8).
+
 ## [2.6.0] - 2026-11-15
 
 ### Changed

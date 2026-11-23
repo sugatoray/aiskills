@@ -50,7 +50,7 @@ All seven commands share the same location flags. `-u` only makes sense on `setu
 
 **What `-r`/`--recurse` does on each command**, since it's the one flag that isn't a location picker:
 - `/scrolls-setup -r` — before creating anything, scans recursively for a scrolls folder that already exists nearby, and checks with you rather than silently creating a disconnected duplicate.
-- `/scrolls-update -r` — if nothing's at the exact expected spot, searches recursively instead of just reporting "not set up" (and asks you to pick if it finds more than one).
+- `/scrolls-update -r` — if nothing's at the exact expected spot, searches recursively instead of just reporting "not set up". If it finds several nested inside one another, it uses the outermost and routes work down to the others; if they sit side by side, it asks you to pick.
 - `/scrolls-hide -r` / `/scrolls-unhide -r` — without it, these check exactly one location; with it, they sweep an entire directory tree for every matching folder (e.g. every package in a monorepo, in one run).
 - `/scrolls-remove -r` — removes every scrolls folder under the directory, with each one's pointer files, in a single commit.
 - `/scrolls-restore -r` — restores every folder from the checkpoint under the directory, not just the one at the exact spot (undoes a `remove -r` sweep).
@@ -74,6 +74,7 @@ All seven commands share the same location flags. `-u` only makes sense on `setu
 ```
 /scrolls-setup -p packages/api/docs
 ```
+If the repository root already has scrolls, this also adds a row for `packages/api/` to the root's `## Where memory lives` table, so later updates are routed to the package's own scrolls.
 
 **Wrapping up a work session:**
 ```
@@ -152,6 +153,7 @@ It shows the plan, condenses only the `old` parts, then makes one `maint(memory)
 
 - `docs/.scrolls/STARTER.md` (or `docs/scrolls/STARTER.md`) is the entry point: it lists the other six files in reading order and says when to update each.
 - `SCROLLS.md`, at the same level as `docs`, points every session at `STARTER.md` first — that's the whole mechanism that makes this "memory." A short `CLAUDE.md` pointer (`See @SCROLLS.md.`) sits next to it, and a matching `AGENTS.md` pointer (`See @CLAUDE.md`) beside that, for harnesses that read those files instead.
+- **Nested scroll sets:** a folder below the top level (a monorepo package, say) can have its own scrolls. The top level's `STARTER.md` then works as a router: its `## Where memory lives` table lists the nested sets (and any folder whose memory lives elsewhere). `/scrolls-setup` adds the row when it creates a nested set, and `/scrolls-update` records each change in the set that covers it, keeping only a pointer at the top.
 - `COMPACT.md` and `compacted/` appear after the first `/scrolls-compact`: the compaction history and its reports. Only `/scrolls-compact` writes them.
 - The six other files: `SPEC.md` (features, updated when they ship), `HANDOFF.md` (session snapshot, overwritten each time, not appended), `GAP_ANALYSIS.md`/`GAP_CONTEXT.md` (known gaps and why they exist), `PLAN.md` (prioritized backlog), `WISDOM.md` (constraints, traps, ditches, and lessons worth reusing).
 

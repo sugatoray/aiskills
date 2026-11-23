@@ -53,3 +53,25 @@ Source it, don't run it: `source scripts/test_install_myskills.sh`, then
 - `testbranch.create`: `git checkout -b trash/deleteme`
 - `install.myskills`: install this repository's skills for Claude Code, then stash the result
 - `testbranch.delete`: stash, return to `master` and delete the test branch
+
+## setup-conda.sh and setup-pwsh.sh
+
+Install the tools the skills' tests need when a machine (or a cloud session) lacks them:
+conda, as [Miniforge](https://github.com/conda-forge/miniforge) (conda-forge is its default
+channel), and PowerShell (`pwsh`) from conda-forge, to run the `.ps1` test suites on Linux or
+macOS.
+
+```sh
+make setup-conda              # Miniforge in ~/miniforge3, unless a conda is already there
+make setup-pwsh               # pwsh in ~/miniforge3/envs/pwsh (installs conda first if needed)
+make setup-pwsh DRY_RUN=1     # show the commands without installing anything
+make setup-pwsh CONDA_DIR=/opt/miniforge3 PWSH_ENV=/opt/pwsh
+```
+
+Both do nothing if the tool is already installed, and print the `export PATH=...` line to add.
+`setup-conda.sh` picks the installer for Linux (x86_64, aarch64, ppc64le) or macOS (x86_64,
+arm64); on Windows, run the Miniforge `.exe` by hand (Windows PowerShell 5.1 is built in, and
+PowerShell 7 installs with `winget install Microsoft.PowerShell`). The scripts can also be run
+directly: `bash scripts/setup-pwsh.sh [--dry-run]`. `scripts/tests/test_setup_tools.sh` tests
+them with fake `curl`, `conda` and `pwsh` commands, so it downloads nothing.
+

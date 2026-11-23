@@ -3,6 +3,21 @@
 All notable changes to the `scrolls-setup` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.7.0] - 2026-11-23
+
+### Added
+
+- Step 5: a new scroll set is registered in the nearest parent scroll set's
+  `## Where memory lives` table (the section is added to the parent's
+  `STARTER.md` if it predates it), so `/scrolls-update` routes work down to it.
+- `assets/templates/STARTER.md`: a `## Where memory lives` section with a
+  Scope / Scroll set table, so every new scroll set states how memory is
+  routed.
+
+### Changed
+
+- "Report back" is now step 6.
+
 ## [2.6.0] - 2026-11-15
 
 ### Changed

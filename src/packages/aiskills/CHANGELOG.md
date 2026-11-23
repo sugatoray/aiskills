@@ -42,6 +42,12 @@ and date this section.
   folder (for example `scrolls/meta/`, `development/review/meta/`). They are
   notes for maintainers of the repo and were shipped under `.aiskills/nested/`
   by mistake. A `meta/` inside a skill folder still ships with the skill.
+- **Bundled scrolls skills updated to 2.7.0 (nested scroll sets).**
+  `/scrolls-update` now routes each change to the scroll set that covers it
+  when scroll sets are nested (a new `scripts/route.py` with `.sh`/`.ps1`
+  launchers), keeping the top-level set as a router; `/scrolls-setup` adds a
+  new set to its parent's `## Where memory lives` table, and its `STARTER.md`
+  template has that section. See `skills/scrolls/CHANGELOG.md`.
 
 ## [1.5.0] - 2026-11-18
 

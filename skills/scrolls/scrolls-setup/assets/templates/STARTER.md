@@ -17,6 +17,14 @@ You're picking up work on **{{PROJECT_NAME}}**{{PROJECT_TAGLINE}}. Before making
 - **PLAN.md**: whenever ticket status changes, or priorities shift based on new requests.
 - **WISDOM.md**: whenever you hit a new trap/bug, make a mistake worth not repeating, or land on a pattern worth reusing.
 
+## Where memory lives
+This scroll set records the work in this folder and below, **except** where a folder has its own scroll set (a nested `docs/.scrolls` or `docs/scrolls`, or one this table points to). Work in such a folder is recorded in that set; this one keeps at most a one-line pointer to it. Add a row whenever a scroll set is set up below this one, or whenever a folder's memory lives somewhere else. `/scrolls-update` routes changes by this table and by nesting (its `scripts/route.sh`).
+
+| Scope | Scroll set |
+| --- | --- |
+| Everything not listed below | `{{SCROLLS_PATH}}/` (this one) |
+| (none yet) | |
+
 ## Development strategy
 
 - Always use Red/Green TDD while developing or fixing code. _This is also mentioned inside **WISDOM.md**_.

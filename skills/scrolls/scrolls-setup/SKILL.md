@@ -8,7 +8,7 @@ metadata:
   name: scrolls-setup
   type: skill
   author: sugatoray
-  version: "2.6.0"
+  version: "2.7.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-setup"
 ---
 
@@ -118,7 +118,11 @@ Then do the same, in that same directory, for `AGENTS.md` — the convention sev
 - **`AGENTS.md` exists but doesn't already reference `CLAUDE.md`**: insert the line near the top, separated by blank lines from surrounding content, the same way as above — don't touch anything else already in the file.
 - **`AGENTS.md` already references `CLAUDE.md`** (or already points straight at `SCROLLS.md`/`SCROLLS_PATH/STARTER.md` itself): leave it alone; note this to the user instead of duplicating.
 
-### 5. Report back
+### 5. Register the new set with a parent scroll set, if there is one
+
+If a scroll set already exists higher up (look upward from `BASE_DIR`, or the folder above `DOCS_BASE` for `-p`, to the repository root, for a `docs/.scrolls` or `docs/scrolls` with a `STARTER.md`), the nearest one is this set's **parent**, and it routes work in this folder down to the new set. Add a row for the new set to the parent's `STARTER.md` `## Where memory lives` table: the folder it covers (in `backticks`, ending in `/`) and its scroll set path (in `backticks`), both relative to the parent's folder. If the parent's `STARTER.md` predates that section, add it, copied from this skill's `assets/templates/STARTER.md`. If the memory you just created covers a folder other than its own (e.g. memory kept in `src/memory/foo/` for code in `skills/foo/`), name that folder in the row instead. Never change anything else in the parent. `/scrolls-update`'s `scripts/route.sh` reports any nested set that's missing from a parent's table.
+
+### 6. Report back
 
 Summarize what was created vs. what already existed and was left untouched — including whether `SCROLLS.md`, `CLAUDE.md`, and `AGENTS.md` were created, updated, or left alone — and name the two or three things most worth the user's attention next: filling in `STARTER.md`'s quick-orientation paragraph if you had to guess at it, and writing the first real `SPEC.md` entry once something ships.
 

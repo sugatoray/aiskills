@@ -5,7 +5,7 @@ Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory syste
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-compact` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |

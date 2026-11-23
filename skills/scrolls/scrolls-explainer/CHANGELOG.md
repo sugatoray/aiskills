@@ -3,6 +3,14 @@
 All notable changes to the `scrolls-explainer` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.7.0] - 2026-11-23
+
+### Changed
+
+- Synced to `2.7.0`. The update tab has a "Route nested work" step and the
+  setup tab a "Join a parent set" step; the page is rebuilt and the browser
+  check's step counts follow (update 10, setup 11).
+
 ## [2.6.0] - 2026-11-15
 
 ### Changed

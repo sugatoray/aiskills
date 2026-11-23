@@ -13,7 +13,13 @@ For people developing this skill — not read as part of answering a
   `metadata.version` in `SKILL.md`.
 - `../scripts/` — `session_diff.sh` (bash), `session_diff.ps1`
   (PowerShell): cross-checks conversation memory against git for step 4.
-- `../tests/` — Red/Green regression suite for both.
+  `route.py` (all the logic, stdlib Python 3.9+) with thin `route.sh`/
+  `route.ps1` launchers: routes changed files to nested scroll sets for
+  step 5. It reads `## Where memory lives` tables in the shape
+  `../../scrolls-setup/assets/templates/STARTER.md` ships; change both
+  together.
+- `../tests/` — Red/Green regression suites: `test_session_diff.*` and
+  `test_route.*` (`test_route.ps1` is the PowerShell parity harness).
 - `../agents/openai.yaml` — OpenAI-agent interface metadata.
 
 Step 2 (`SCROLLS.md`/`CLAUDE.md`/`AGENTS.md` backfill) reads its three
@@ -30,7 +36,9 @@ After touching either script:
 
 ```
 bash tests/test_session_diff.sh
+bash tests/test_route.sh
 pwsh tests/test_session_diff.ps1   # where pwsh is available
+pwsh tests/test_route.ps1
 ```
 
 ## Frontmatter validation

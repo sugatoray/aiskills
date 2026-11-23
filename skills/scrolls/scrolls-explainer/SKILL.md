@@ -8,7 +8,7 @@ metadata:
   name: scrolls-explainer
   type: skill
   author: sugatoray
-  version: "2.6.0"
+  version: "2.7.0"
   source_url: "https://github.com/sugatoray/aiskills/tree/master/skills/scrolls/scrolls-explainer"
 ---
 

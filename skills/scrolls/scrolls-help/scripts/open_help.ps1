@@ -1,11 +1,11 @@
 #!/usr/bin/env pwsh
 # Launches serve_help.py in the background on an OS-assigned localhost
-# port and prints the URL once the server confirms it's ready — rather
+# port and prints the URL once the server confirms it's ready, rather
 # than guessing a fixed startup delay. The server keeps running after
 # this script exits; prints its PID so the caller can stop it later.
 #
 # PowerShell port of open_help.sh. serve_help.py itself needs no porting
-# — it's pure stdlib Python, already cross-platform — but the *launcher*
+# (it's pure stdlib Python, already cross-platform), but the *launcher*
 # does: bash's nohup/disown/mktemp don't exist on native Windows, and
 # Windows commonly has only "python" on PATH rather than "python3".
 # Requires PowerShell 7+ (pwsh).
@@ -25,7 +25,9 @@ function Resolve-Python {
 $Python = Resolve-Python
 
 if ($args.Count -gt 0 -and $args[0] -eq "--stop") {
-    $rest = if ($args.Count -gt 1) { $args[1..($args.Count - 1)] } else { @() }
+    # @(...) keeps a single remaining argument (the port) an array; a bare string
+    # would be splatted character by character ("39059" -> 3 9 0 5 9).
+    $rest = @($args | Select-Object -Skip 1)
     & $Python $ServeScript --stop @rest
     exit $LASTEXITCODE
 }
@@ -53,7 +55,7 @@ while ((Get-Date) -lt $deadline) {
         $url = $Matches[1]
         Write-Host $url
         $port = if ($url -match ':(\d+)/?$') { $Matches[1] } else { "" }
-        Write-Host "(pid $($proc.Id) — stop it with: $PSCommandPath --stop $port; it also shuts itself down after being idle; log at $StdoutLog / $StderrLog)"
+        Write-Host "(pid $($proc.Id), stop it with: $PSCommandPath --stop $port; it also shuts itself down after being idle; log at $StdoutLog / $StderrLog)"
         exit 0
     }
     if ($proc.HasExited) {

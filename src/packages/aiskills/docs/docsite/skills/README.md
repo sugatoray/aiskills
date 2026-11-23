@@ -10,15 +10,15 @@ Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`scrolls-compact`](scrolls-compact.md) | 2.6.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
-| [`scrolls-explainer`](scrolls-explainer.md) | 2.6.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
-| [`scrolls-help`](scrolls-help.md) | 2.6.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
-| [`scrolls-hide`](scrolls-hide.md) | 2.6.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
-| [`scrolls-remove`](scrolls-remove.md) | 2.6.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
-| [`scrolls-restore`](scrolls-restore.md) | 2.6.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
-| [`scrolls-setup`](scrolls-setup.md) | 2.6.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
-| [`scrolls-unhide`](scrolls-unhide.md) | 2.6.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
-| [`scrolls-update`](scrolls-update.md) | 2.6.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
+| [`scrolls-compact`](scrolls-compact.md) | 2.7.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
+| [`scrolls-explainer`](scrolls-explainer.md) | 2.7.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
+| [`scrolls-help`](scrolls-help.md) | 2.7.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
+| [`scrolls-hide`](scrolls-hide.md) | 2.7.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
+| [`scrolls-remove`](scrolls-remove.md) | 2.7.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
+| [`scrolls-restore`](scrolls-restore.md) | 2.7.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
+| [`scrolls-setup`](scrolls-setup.md) | 2.7.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
+| [`scrolls-unhide`](scrolls-unhide.md) | 2.7.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
+| [`scrolls-update`](scrolls-update.md) | 2.7.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
 
 ## stata-skills
 
