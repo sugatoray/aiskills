@@ -27,10 +27,12 @@ jobs:
       - name: Generate banner
         run: npm run banner:png
       - name: Test package
-        run: npm test
+        run: env -u GITHUB_ACTIONS npm test
       - name: Test installation
+        if: always()
         run: npm run test:e2e
       - name: Audit dependency
+        if: always()
         run: npm run audit:skills
       - name: Upload banner
         if: always()
