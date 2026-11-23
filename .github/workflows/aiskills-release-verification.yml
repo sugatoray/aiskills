@@ -30,7 +30,7 @@ jobs:
         run: env -u GITHUB_ACTIONS npm test
       - name: Test installation
         if: always()
-        run: npm run test:e2e
+        run: env -u CI -u GITHUB_ACTIONS npm run test:e2e
       - name: Audit dependency
         if: always()
         run: npm run audit:skills
