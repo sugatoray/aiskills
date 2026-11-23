@@ -38,6 +38,7 @@ Versioning entry) — one shared number across the family, currently:
   - `/scrolls-update` gains `scripts/route.py` (with `route.sh`/`route.ps1` launchers) and a new step 5 that routes each change to the deepest scroll set covering it, by nesting or by a `## Where memory lives` table in `STARTER.md`. With `-r`, nested sets resolve to the outermost; sibling sets still make it ask.
   - `/scrolls-setup` registers a new set in its nearest parent's `Where memory lives` table, and the `STARTER.md` template ships that section.
   - `/scrolls-explainer`'s update and setup tabs show the new steps.
+- **PowerShell.** All nine `.ps1` test suites ran for the first time (PowerShell 7, from conda-forge). They found one bug: `/scrolls-help`'s `open_help.ps1 --stop <port>` splatted the port character by character, so it never stopped the server; fixed. `meta/MAINTAINERS.md` now requires `.ps1` files to work in Windows PowerShell 5.1, and lists how.
 
 ## 2026-11-15 (2.6.0)
 

@@ -18,7 +18,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   set that covers it, keep only repo-wide notes and pointers in the top
   level, and add unlisted nested sets to the router table.
 - `tests/test_route.sh` (11 scenarios, 33 checks) and the PowerShell parity
-  harness `tests/test_route.ps1`.
+  harness `tests/test_route.ps1` (7 checks, run under PowerShell 7).
+  `route.ps1` and `test_route.ps1` are written for Windows PowerShell 5.1 as
+  well: ASCII only, no newer syntax, native commands run with
+  `$ErrorActionPreference = 'Continue'`, and the harness starts the launcher
+  with the PowerShell that runs it.
 
 ### Changed
 
