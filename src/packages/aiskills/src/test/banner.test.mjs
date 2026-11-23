@@ -122,6 +122,14 @@ describe("render", () => {
     assert.ok(banner.includes("github.com/sugatoray/aiskills"));
   });
 
+  test("the banner shows the social icons and handle", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const banner = bannerMarkup(render(resolveValues(readConfig())));
+    assert.match(banner, /class="social-signature"/);
+    for (const platform of ["X", "LinkedIn", "GitHub"]) assert.ok(banner.includes(`aria-label="${platform}"`));
+    assert.ok(banner.includes("@sugatoray"));
+  });
+
   test("no install step (AIS-7): the tagline says one npm package, and the box shows npm install, then aiskills install", async () => {
     const { resolveValues, readConfig, render } = await load();
     const v = resolveValues(readConfig());

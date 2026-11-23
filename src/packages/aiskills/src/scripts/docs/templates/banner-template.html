@@ -235,7 +235,10 @@
   #banner .pill:nth-child(6n+4) { --dot: var(--green); }
   #banner .pill:nth-child(6n+5) { --dot: var(--amber); }
   #banner .pill:nth-child(6n+6) { --dot: var(--coral); }
-  #banner .harnesses .url { margin-left: auto; font: 500 15px/1 "JetBrains Mono", monospace; color: var(--muted); white-space: nowrap; }
+  #banner .social-footer { margin-left: auto; flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; color: var(--muted); }
+  #banner .social-signature { display: flex; align-items: center; gap: 12px; font: 500 15px/1 "JetBrains Mono", monospace; white-space: nowrap; }
+  #banner .social-signature svg { display: block; width: 17px; height: 17px; fill: currentColor; }
+  #banner .harnesses .url { font: 500 15px/1 "JetBrains Mono", monospace; color: var(--muted); white-space: nowrap; }
 
   #banner .term-body .o { color: #93a6a9; }
   #banner .name { letter-spacing: -6px; }
@@ -364,7 +367,15 @@
           <div class="pills" id="pills" data-edit>
 {{ pills_html }}
           </div>
-          <span class="url" data-edit>{{ repo_label }}</span>
+          <div class="social-footer">
+            <div class="social-signature">
+              <svg viewBox="0 0 24 24" role="img" aria-label="X"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.64 7.584H.47l8.6-9.835L0 1.153h7.594l5.243 6.932zM17.61 20.644h2.039L6.486 3.24H4.298z"/></svg>
+              <svg viewBox="0 0 24 24" role="img" aria-label="LinkedIn"><path d="M20.447 2H3.553C2.695 2 2 2.676 2 3.51v16.98C2 21.324 2.695 22 3.553 22h16.894C21.305 22 22 21.324 22 20.49V3.51C22 2.676 21.305 2 20.447 2zM7.931 18.748H4.977V9.2h2.954v9.548zM6.454 7.895a1.713 1.713 0 1 1 0-3.426 1.713 1.713 0 0 1 0 3.426zm12.294 10.853h-2.95v-4.644c0-1.107-.02-2.531-1.544-2.531-1.545 0-1.781 1.206-1.781 2.451v4.724H9.523V9.2h2.831v1.305h.04c.394-.747 1.357-1.535 2.791-1.535 2.985 0 3.563 1.965 3.563 4.52v5.258z"/></svg>
+              <svg viewBox="0 0 24 24" role="img" aria-label="GitHub"><path d="M12 .297a12 12 0 0 0-3.793 23.387c.6.111.82-.26.82-.577v-2.234c-3.338.726-4.043-1.416-4.043-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.809 1.304 3.493.997.108-.775.418-1.305.762-1.605-2.665-.304-5.467-1.332-5.467-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.323 3.3 1.23a11.48 11.48 0 0 1 6.006 0c2.29-1.553 3.297-1.23 3.297-1.23.653 1.652.242 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.61-2.807 5.624-5.48 5.921.43.372.823 1.102.823 2.222v3.294c0 .32.216.694.825.576A12.002 12.002 0 0 0 12 .297z"/></svg>
+              <span data-edit>@sugatoray</span>
+            </div>
+            <span class="url" data-edit>{{ repo_label }}</span>
+          </div>
         </div>
       </div>
     </div>
