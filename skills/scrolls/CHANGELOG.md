@@ -22,15 +22,22 @@ Versioning entry) — one shared number across the family, currently:
 
 | Skill | Version |
 | --- | --- |
-| `scrolls-setup` | 2.6.0 |
-| `scrolls-update` | 2.6.0 |
-| `scrolls-hide` | 2.6.0 |
-| `scrolls-unhide` | 2.6.0 |
-| `scrolls-help` | 2.6.0 |
-| `scrolls-remove` | 2.6.0 |
-| `scrolls-restore` | 2.6.0 |
-| `scrolls-compact` | 2.6.0 |
-| `scrolls-explainer` | 2.6.0 |
+| `scrolls-setup` | 2.7.0 |
+| `scrolls-update` | 2.7.0 |
+| `scrolls-hide` | 2.7.0 |
+| `scrolls-unhide` | 2.7.0 |
+| `scrolls-help` | 2.7.0 |
+| `scrolls-remove` | 2.7.0 |
+| `scrolls-restore` | 2.7.0 |
+| `scrolls-compact` | 2.7.0 |
+| `scrolls-explainer` | 2.7.0 |
+
+## 2026-11-23 (2.7.0)
+
+- **Nested scroll sets and routing.** A scroll set can have others below it (a monorepo package with its own memory, or a family whose memory lives in another folder). The top-level set is then a router: work in a covered folder is recorded in that folder's set, and the top level keeps at most a pointer.
+  - `/scrolls-update` gains `scripts/route.py` (with `route.sh`/`route.ps1` launchers) and a new step 5 that routes each change to the deepest scroll set covering it, by nesting or by a `## Where memory lives` table in `STARTER.md`. With `-r`, nested sets resolve to the outermost; sibling sets still make it ask.
+  - `/scrolls-setup` registers a new set in its nearest parent's `Where memory lives` table, and the `STARTER.md` template ships that section.
+  - `/scrolls-explainer`'s update and setup tabs show the new steps.
 
 ## 2026-11-15 (2.6.0)
 

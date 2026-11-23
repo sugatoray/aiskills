@@ -3,6 +3,15 @@
 All notable changes to the `scrolls-remove` skill are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.7.0] - 2026-11-23
+
+### Changed
+
+- Synced to `2.7.0` to stay in lockstep with the other `scrolls-*`
+  skills; no functional change. The minor bump is for nested scroll sets
+  and routing in `/scrolls-update` and `/scrolls-setup`; see
+  `../CHANGELOG.md`.
+
 ## [2.6.0] - 2026-11-15
 
 ### Changed

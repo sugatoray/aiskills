@@ -5,7 +5,7 @@ Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, H
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-update` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -49,8 +49,13 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scro
 - `agents/openai.yaml`
 - `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
+- `scripts/route.ps1`
+- `scripts/route.py`
+- `scripts/route.sh`
 - `scripts/session_diff.ps1`
 - `scripts/session_diff.sh`
+- `tests/test_route.ps1`
+- `tests/test_route.sh`
 - `tests/test_session_diff.ps1`
 - `tests/test_session_diff.sh`
 

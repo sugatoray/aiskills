@@ -22,7 +22,7 @@ each command does, step by step.
 | Command | Purpose |
 | --- | --- |
 | [`/scrolls-setup`](scrolls-setup/) | Creates `docs/.scrolls/` for a project that doesn't have it yet: `STARTER.md`, `SPEC.md`, `HANDOFF.md`, `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md`, `WISDOM.md`, plus `SCROLLS.md`, a short `CLAUDE.md` pointer to it, and a matching `AGENTS.md` pointer to `CLAUDE.md`. |
-| [`/scrolls-update`](scrolls-update/) | Updates an existing `docs/.scrolls/` to reflect what happened in the current session, following each file's own update rule. The counterpart to `/scrolls-setup` — use this one for every session afterward. |
+| [`/scrolls-update`](scrolls-update/) | Updates an existing `docs/.scrolls/` to reflect what happened in the current session, following each file's own update rule. With nested scroll sets, it records each change in the set that covers it and keeps the top level as a router. The counterpart to `/scrolls-setup` — use this one for every session afterward. |
 | [`/scrolls-hide`](scrolls-hide/) | Renames an already-set-up `docs/scrolls/` to dotfile-hidden `docs/.scrolls/`, rewriting path references so nothing breaks. Retrofit path for a project set up visible. |
 | [`/scrolls-unhide`](scrolls-unhide/) | The opposite of `/scrolls-hide`: renames `docs/.scrolls/` to visible `docs/scrolls/`, rewriting path references so nothing breaks. |
 | [`/scrolls-remove`](scrolls-remove/) | The opposite of `/scrolls-setup`. It removes `docs/.scrolls/` and `SCROLLS.md` and strips the scrolls pointers from `CLAUDE.md`/`AGENTS.md`, all as one `maint(memory): scrolls-removed` commit that records the previous commit's SHA for restoring. `-x`/`--purge` deletes pointer files outright. |
@@ -79,9 +79,12 @@ Command-specific additions:
   `scripts/restore.py` / `scripts/compact.py` (all the logic, stdlib Python) with thin `.sh`/`.ps1`
   launchers, and `tests/`. `/scrolls-compact` also has
   `assets/templates/COMPACT.md` and `meta/DESIGN.md`.
-- `/scrolls-update`, `/scrolls-hide`, `/scrolls-unhide` — `scripts/`
-  (bash + PowerShell) and `tests/` (bash + PowerShell, Red/Green TDD) for
-  their one bundled script.
+- `/scrolls-hide`, `/scrolls-unhide` — `scripts/` (bash + PowerShell)
+  and `tests/` (bash + PowerShell, Red/Green TDD) for their one bundled
+  script.
+- `/scrolls-update` — `scripts/session_diff.sh`/`.ps1`, plus
+  `scripts/route.py` (stdlib Python) with thin `route.sh`/`route.ps1`
+  launchers for routing to nested scroll sets; `tests/` for both.
 - `/scrolls-help` — `references/HELP.md`, its canonical,
   presented-to-users content; `scripts/`/`tests/` for its `-e`/`--online`
   local server; and `meta/SECURITY.md` alongside `MAINTAINERS.md`,

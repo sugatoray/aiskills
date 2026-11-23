@@ -5,7 +5,7 @@ Shows a crisp, example-driven reference for the whole scrolls skill family (/scr
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-help` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |

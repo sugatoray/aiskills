@@ -331,15 +331,15 @@ Alias `scrolls`. Install the group with `aiskills install -G scrolls`.
 
 | Skill | Version | What it does |
 | --- | --- | --- |
-| [`scrolls-compact`](scrolls-compact.md) | 2.6.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
-| [`scrolls-explainer`](scrolls-explainer.md) | 2.6.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
-| [`scrolls-help`](scrolls-help.md) | 2.6.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
-| [`scrolls-hide`](scrolls-hide.md) | 2.6.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
-| [`scrolls-remove`](scrolls-remove.md) | 2.6.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
-| [`scrolls-restore`](scrolls-restore.md) | 2.6.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
-| [`scrolls-setup`](scrolls-setup.md) | 2.6.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
-| [`scrolls-unhide`](scrolls-unhide.md) | 2.6.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
-| [`scrolls-update`](scrolls-update.md) | 2.6.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
+| [`scrolls-compact`](scrolls-compact.md) | 2.7.0 | Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory system at a point in time, and saves a git checkpoint of everything it condenses. |
+| [`scrolls-explainer`](scrolls-explainer.md) | 2.7.0 | Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page that explains how the scrolls skill family works (/scrolls-setup,… |
+| [`scrolls-help`](scrolls-help.md) | 2.7.0 | Shows a crisp, example-driven reference for the whole scrolls skill family (/scrolls-setup, /scrolls-update, /scrolls-hide, /scrolls-unhide,… |
+| [`scrolls-hide`](scrolls-hide.md) | 2.7.0 | Converts an already-set-up docs/scrolls/ working-memory folder from visible (scrolls) to dotfile-hidden (.scrolls), renaming the folder and rewriting the… |
+| [`scrolls-remove`](scrolls-remove.md) | 2.7.0 | Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git repository — the exact opposite of /scrolls-setup. |
+| [`scrolls-restore`](scrolls-restore.md) | 2.7.0 | Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git history — the counterpart to /scrolls-remove. |
+| [`scrolls-setup`](scrolls-setup.md) | 2.7.0 | Sets up a minimal docs/.scrolls/ working-memory system for a project — a small set of cross-session memory files (STARTER.md, SPEC.md, HANDOFF.md,… |
+| [`scrolls-unhide`](scrolls-unhide.md) | 2.7.0 | Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hidden (.scrolls) to visible (scrolls), renaming the folder and rewriting the… |
+| [`scrolls-update`](scrolls-update.md) | 2.7.0 | Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, HANDOFF.md, GAP_ANALYSIS.md, GAP_CONTEXT.md, PLAN.md, WISDOM.md, and any… |
 
 ## stata-skills
 
@@ -1136,7 +1136,7 @@ Compacts the history in a docs/.scrolls/ (or docs/scrolls/) project-memory syste
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-compact` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |
@@ -1228,7 +1228,7 @@ Shows, copies or rebuilds scrolls-explainer.html: an interactive, offline page t
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-explainer` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); any modern web browser to view the page; --build also needs the network-flow skill |
 | License | MIT |
@@ -1293,7 +1293,7 @@ Shows a crisp, example-driven reference for the whole scrolls skill family (/scr
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-help` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1355,7 +1355,7 @@ Converts an already-set-up docs/scrolls/ working-memory folder from visible (scr
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-hide` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1414,7 +1414,7 @@ Removes a docs/.scrolls/ (or docs/scrolls/) project-memory system from a git rep
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-remove` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |
@@ -1474,7 +1474,7 @@ Restores a docs/.scrolls/ (or docs/scrolls/) project-memory system from git hist
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-restore` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies); git |
 | License | MIT |
@@ -1534,7 +1534,7 @@ Sets up a minimal docs/.scrolls/ working-memory system for a project — a small
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-setup` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1599,7 +1599,7 @@ Converts an already-set-up docs/.scrolls/ working-memory folder from dotfile-hid
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-unhide` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1658,7 +1658,7 @@ Updates an existing docs/.scrolls/ project-memory system (STARTER.md, SPEC.md, H
 | Property | Value |
 | --- | --- |
 | Group | `scrolls-skills` (alias `scrolls`) |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Starts | When you ask for it: you type `/scrolls-update` (your agent doesn't start it on its own) |
 | Needs | bash (macOS/Linux/WSL) or PowerShell 7+ (pwsh) or PowerShell (older versions: powershell.exe); Python 3.9+ (stdlib only, no dependencies) |
 | License | MIT |
@@ -1702,8 +1702,13 @@ The files that ship with the skill, in `~/.config/sugatoray/aiskills/skills/scro
 - `agents/openai.yaml`
 - `assets/EXAMPLES.md`
 - `meta/MAINTAINERS.md`
+- `scripts/route.ps1`
+- `scripts/route.py`
+- `scripts/route.sh`
 - `scripts/session_diff.ps1`
 - `scripts/session_diff.sh`
+- `tests/test_route.ps1`
+- `tests/test_route.sh`
 - `tests/test_session_diff.ps1`
 - `tests/test_session_diff.sh`
 
