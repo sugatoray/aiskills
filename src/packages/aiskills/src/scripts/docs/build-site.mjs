@@ -20,7 +20,7 @@
 // Used only to build the docs, so it is not published.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,6 +30,33 @@ import { main as buildPage } from "./build-docs-html.mjs";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = resolve(HERE, "..", "..", "..");
 const TAG = /^aiskills-v(\d+)\.(\d+)\.(\d+)$/;
+const SITE_URL = "https://sugatoray.github.io/aiskills/";
+const CARD_DESC = "Curated agent skills, including Scrolls agentic memory, for Claude Code, Codex, Cursor and more.";
+
+/** Social crawlers read the HTML head without executing JavaScript. */
+function addSocialCard(file, path) {
+  const url = SITE_URL + path;
+  const image = SITE_URL + "social-card.png";
+  const tags = [
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="aiskills">',
+    '<meta property="og:title" content="aiskills documentation">',
+    `<meta property="og:description" content="${CARD_DESC}">`,
+    `<meta property="og:url" content="${url}">`,
+    `<meta property="og:image" content="${image}">`,
+    '<meta property="og:image:type" content="image/png">',
+    '<meta property="og:image:width" content="2560">',
+    '<meta property="og:image:height" content="1280">',
+    '<meta property="og:image:alt" content="aiskills agent skills documentation banner">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title" content="aiskills documentation">',
+    `<meta name="twitter:description" content="${CARD_DESC}">`,
+    `<meta name="twitter:image" content="${image}">`,
+    '<meta name="twitter:image:alt" content="aiskills agent skills documentation banner">',
+  ].join("\n");
+  const html = readFileSync(file, "utf8");
+  writeFileSync(file, html.replace("</head>", `${tags}\n</head>`));
+}
 
 /** The release tags (aiskills-vX.Y.Z, no pre-releases), newest version first. */
 export function releaseTags(tags) {
@@ -125,6 +152,8 @@ export function main(argv = process.argv.slice(2), { pkgDir = PKG_DIR, repo = nu
     if (!page.source) {
       buildPage([join(pkgDir, "docs", "docsite"), "--out", pageOut, "--ref", ref,
         "--banner", join(pkgDir, "docs", "banner", "aiskills-banner.html"), "--version", page.version, ...menu]);
+      addSocialCard(pageOut, page.path);
+      if (page.kind === "latest") copyFileSync(join(pkgDir, "docs", "banner", "banner_2x.png"), join(out, "social-card.png"));
       continue;
     }
     const tagged = docsAtTag(repo, page.source, pkgRel);
@@ -132,6 +161,11 @@ export function main(argv = process.argv.slice(2), { pkgDir = PKG_DIR, repo = nu
       const banner = join(tagged.docs, "banner", "aiskills-banner.html");
       buildPage([join(tagged.docs, "docsite"), "--out", pageOut, "--ref", page.source,
         ...(existsSync(banner) ? ["--banner", banner] : ["--no-banner"]), "--version", page.version, ...menu]);
+      addSocialCard(pageOut, page.path);
+      if (page.kind === "latest") {
+        const taggedImage = join(tagged.docs, "banner", "banner_2x.png");
+        copyFileSync(existsSync(taggedImage) ? taggedImage : join(pkgDir, "docs", "banner", "banner_2x.png"), join(out, "social-card.png"));
+      }
     } finally {
       rmSync(tagged.dir, { recursive: true, force: true });
     }

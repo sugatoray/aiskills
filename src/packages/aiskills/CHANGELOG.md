@@ -22,6 +22,9 @@ its own `CHANGELOG.md` inside its folder under `skills/`.
 
 ### Added
 
+- **Documentation social card:** links to the documentation site include
+  Open Graph and X/Twitter metadata and use the current release's banner as
+  a large image preview.
 - **New bundled skill: `agent-sessions-insight`**, in the `productivity-skills`
   group (alias `productivity`). It reads the local session logs of Claude Code,
   Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI and Grok CLI (or any agent that
