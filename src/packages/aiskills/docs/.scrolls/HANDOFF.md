@@ -6,7 +6,6 @@ Release 1.6.0 is prepared in [#344](https://github.com/sugatoray/aiskills/pull/3
 
 ## Validation and remaining work
 
-- Documentation checker: 55 pages, no problems. `npm run pack:dry`: passed, 421 files. `npm run audit:skills`: passed for `skills@1.7.6`, no advisories.
-- Regenerate `docs/banner/banner_2x.png` with `npm run banner:png`: Chromium could not create a socket in the execution environment. The full test suite did not complete cleanly and browser tests failed to launch.
-- `npm run test:e2e`: 7 passed, 1 failed because an npm environment warning changed expected output. Rerun the suite in a suitable environment and investigate any remaining failures.
-- After checks and merge, follow `docs/meta/MAINTAINERS.md` → Releasing: publish from clean, up-to-date `master` and tag npm's recorded `gitHead`.
+- GitHub Actions run 45116511551 verified the committed banner and docs: `npm test` passed 522 tests, `npm run test:e2e` passed 8 tests, and `npm run audit:skills` passed. The test process omitted `GITHUB_ACTIONS`, and the end-to-end process also omitted `CI` so the upstream skills CLI did not impose a frozen lockfile; the end-to-end fixture keeps telemetry disabled.
+- The docs checker reported 55 pages and no problems; the package dry run listed 421 files. The banner is rendered at 2560 × 1280 and its source fingerprint passes.
+- After merge, follow `docs/meta/MAINTAINERS.md` → Releasing: publish from clean, up-to-date `master` and tag npm's recorded `gitHead`.
