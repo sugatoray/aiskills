@@ -1,0 +1,5 @@
+# Leave group- and subgroup-level meta/ folders (maintainer notes for this repo) out of the
+# @sugatoray-ai/aiskills npm package. A meta/ inside a skill folder still ships.
+# Syntax: src/packages/aiskills/docs/docsite/reference/skillsignore.md
+/*/meta/
+/development/*/meta/

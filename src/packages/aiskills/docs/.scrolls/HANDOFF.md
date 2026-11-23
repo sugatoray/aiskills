@@ -5,7 +5,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 ## Current state
 **`@sugatoray-ai/aiskills` `1.5.0` is published on npm** (`latest`, 2026-11-18T03:01Z, the evening of 2026-11-17 US Eastern; checked against the registry). npm's `gitHead` is `b8ad785`, the squash merge of [#310](https://github.com/sugatoray/aiskills/pull/310) on `master`, and the user pushed the annotated tag `aiskills-v1.5.0` there (checked). It bundles the new `productivity` group with `meeting-agenda` (**19 skills in 10 groups**), from [#272](https://github.com/sugatoray/aiskills/pull/272) (`f27b875`).
 
-**Next version `1.6.0-dev`** on branch `claude/aiskills-1.6.0-dev` (from `b8ad785`, commit `5bdcc58`; pushed; open as [#314](https://github.com/sugatoray/aiskills/pull/314), issues #315 → #316, #317; AIS-28): `package.json` `1.6.0-dev`, a new `## [1.6.0] - Unreleased` section with the "In development" note and no entries yet, the seven version examples in `reference/cli.md` and `getting-started/installation.md`, and the regenerated banner (`v1.6.0-dev`, checked by eye), `index.html`, `llms-full.txt` and `reference/cli-outputs.html`. `SECURITY.md` keeps `1.5.x`. `npm test`: 520 pass. This scrolls update is on it too.
+**`master` is `1.6.0-dev`**: [#314](https://github.com/sugatoray/aiskills/pull/314) (AIS-28) squash-merged into `master` as `0999e6f`: `package.json` `1.6.0-dev`, a new `## [1.6.0] - Unreleased` section with the "In development" note and no entries yet, the seven version examples in `reference/cli.md` and `getting-started/installation.md`, and the regenerated banner (`v1.6.0-dev`, checked by eye), `index.html`, `llms-full.txt` and `reference/cli-outputs.html`. `SECURITY.md` keeps `1.5.x`. `npm test`: 520 pass. This scrolls update is on it too.
 
 Layout (decided by the user; see `WISDOM.md` → Constraints):
 
@@ -30,13 +30,14 @@ LICENSE                 Apache-2.0, the package's own (committed; never vendored
 ```
 
 ## What just happened (this session)
+- On `claude/wonderful-ptolemy-my8ha8` ([#320](https://github.com/sugatoray/aiskills/pull/320), AIS-29), later rebased onto `master`'s `1.6.0-dev`. A new `skills/.skillsignore` (`/*/meta/`, `/development/*/meta/`) now keeps every group- and subgroup-level `meta/` out of the package: they had been shipping under `.aiskills/nested/` (scrolls, docs, stata, both development subgroups), while a skill's own `meta/` still ships. A packaging test (every shipped `meta/` sits next to a `SKILL.md`) failed on 12 folders first; `reference/files.md` and `reference/skillsignore.md` list the rules, and the 1.6.0 CHANGELOG has a "Changed" entry. `npm test`: 522 pass. Earlier on the same branch: bundled the new `agent-sessions-insight` skill (20 skills in 10 groups). `npm run docs` and `npm run banner:png` were rerun. The banner counts in `banner.test.mjs` and four docs examples were updated to match, and the CHANGELOG has a new `## [1.6.0] - Unreleased` section above `1.5.0`. `npm test`: 521 pass. `package.json` is still `1.5.0`; the next version bump is the user's call.
 - Built #265 on `claude/clever-mendel-k9n73h` and rebased it onto `1.4.0-dev`; the user merged it (`57188d0`).
 - Prepared 1.4.0 in #302 (bump, CHANGELOG dated 2026-11-18, SECURITY `1.4.x`, docs regenerated; `npm test` 519, `npm run test:e2e` 8; issues #303 → #304, #305). The user merged it, published 1.4.0 and pushed `aiskills-v1.4.0`.
 - At the user's request, set the next version to `1.5.0-dev`, the same way #291 set `1.4.0-dev`.
 - Scrolls: AIS-23 and AIS-24 ticked, AIS-25 added; the `SPEC.md` release note records 1.4.0, and the examples docs page and the light/dark sync are in `SPEC.md`.
 
 ## Known issues / open threads
-- **Open a PR for `claude/aiskills-1.5.0-dev`** when the user asks (AIS-25); it also carries the root scrolls update and this one. The scrolls-family scrolls (`src/scrolls/docs/.scrolls/`) still need their own `/scrolls-update -p src/scrolls/docs`.
+- **Open a PR for `claude/aiskills-1.5.0-dev`** when the user asks (AIS-25); it also carries the root scrolls update and this one. The scrolls-family scrolls (`src/skills/scrolls/docs/.scrolls/`) still need their own `/scrolls-update -p src/skills/scrolls/docs`.
 - **The 1.4.0 CHANGELOG date** is `2026-11-18`, npm's UTC date; in US Eastern the publish was the evening of 2026-11-17 (1.2.0's note judged by US Eastern). The user was asked; no answer yet, so it stays.
 - **#250's docs-site commits** (counts, tab numbers, grouped Skills pane) may still lack issues; it merged without this being confirmed.
 - **Installing from a local pack:** `npm pack` names the tarball after `package.json`'s version (`sugatoray-ai-aiskills-1.5.0-dev.tgz` once `1.5.0-dev` merges). The user hit npm's misleading "seems to be corrupted" (`ENOENT`) by typing `…-1.3.0.tgz`. `npm i -g "$(npm pack --silent)"` avoids that.

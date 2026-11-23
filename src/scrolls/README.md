@@ -1,1 +1,0 @@
-../../skills/scrolls/README.md

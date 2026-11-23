@@ -42,7 +42,7 @@ personas-skills  (alias: personas)
 
 productivity-skills  (alias: productivity)
   Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown ...
-  skills: meeting-agenda
+  skills: agent-sessions-insight, meeting-agenda
 
 video-related-skills  (alias: video-related)
   Video skills: /dynamic-promo-video builds a short narrated promo or intro video (HTML scenes with zoom/tilt...

@@ -10,10 +10,11 @@ The `@sugatoray-ai/aiskills` npm package is licensed under Apache-2.0. Each skil
 
 ## Bundled skills
 
-19 skills, sorted by name.
+20 skills, sorted by name.
 
 | Skill | Group | License | Declared in |
 | --- | --- | --- | --- |
+| [`agent-sessions-insight`](skills/agent-sessions-insight.md) | productivity | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/productivity/agent-sessions-insight/SKILL.md) |
 | [`artwallbg`](skills/artwallbg.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/artwallbg/SKILL.md) |
 | [`commentdrop`](skills/commentdrop.md) | image-styles | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/image-styles/commentdrop/SKILL.md) |
 | [`create-issues-update-pr`](skills/create-issues-update-pr.md) | repo-related | MIT | [`SKILL.md`](https://github.com/sugatoray/aiskills/blob/master/skills/development/repo-related/create-issues-update-pr/SKILL.md) |

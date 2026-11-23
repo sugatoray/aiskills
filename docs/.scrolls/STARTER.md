@@ -17,6 +17,23 @@ You're picking up work on **aiskills**, a collection of curated AI agent skills.
 - **PLAN.md**: whenever ticket status changes, or priorities shift based on new requests.
 - **WISDOM.md**: whenever you hit a new trap/bug, make a mistake worth not repeating, or land on a pattern worth reusing.
 
+## Where memory lives (progressive disclosure)
+
+This root scroll set is a **router**. It holds what is repo-wide (cross-family conventions, tooling, releases, the overall backlog) and points down to the dedicated scroll sets. When work touches a folder that has its own scroll set, read that set and record the work there; the root keeps at most a one-line pointer.
+
+| Scope | Scroll set |
+| --- | --- |
+| Repo-wide | `docs/.scrolls/` (this one) |
+| The npm package `@sugatoray-ai/aiskills` | `src/packages/aiskills/docs/.scrolls/` |
+| scrolls family (`skills/scrolls/`) | `src/skills/scrolls/docs/.scrolls/` |
+| productivity family (`skills/productivity/`) | `src/skills/productivity/docs/.scrolls/` |
+| video-related family (`skills/video-related/`) | `src/skills/video-related/docs/.scrolls/` |
+| image-styles family (`skills/image-styles/`) | `src/skills/image-styles/docs/.scrolls/` |
+| development / review (`skills/development/review/`) | `src/skills/development/review/docs/.scrolls/` |
+| development / repo-related (`skills/development/repo-related/`) | `src/skills/development/repo-related/docs/.scrolls/` |
+
+Families without a scroll set yet (diagrams, docs, newsletters, personas, stata) are recorded here until one is set up. A new scroll set gets a row in this table.
+
 ## Development strategy
 
 - Always use Red/Green TDD while developing or fixing code. _This is also mentioned inside **WISDOM.md**_.
@@ -26,7 +43,7 @@ You're picking up work on **aiskills**, a collection of curated AI agent skills.
 
 - **`skills/<group>/<skill>/`** holds the skills themselves: a `SKILL.md` and optional `scripts/`, `assets/`, `tests/` and `meta/`. The groups are development, diagrams, docs, image-styles, newsletters, personas, productivity, scrolls, stata and video-related.
 - **`.claude-plugin/marketplace.json`** registers the skills as Claude Code plugins.
-- **`src/`** holds per-family working memory, with its own scrolls under `src/scrolls/`, `src/development/review/`, `src/productivity/` and `src/packages/aiskills/`. The npm package `@sugatoray-ai/aiskills` lives in `src/packages/aiskills`; its release steps are in `src/packages/aiskills/docs/meta/MAINTAINERS.md`.
+- **`src/`** holds per-family working memory, with its own scrolls under `src/skills/scrolls/`, `src/skills/development/review/`, `src/skills/development/repo-related/`, `src/skills/productivity/`, `src/skills/video-related/`, `src/skills/image-styles/` and `src/packages/aiskills/`. The npm package `@sugatoray-ai/aiskills` lives in `src/packages/aiskills`; its release steps are in `src/packages/aiskills/docs/meta/MAINTAINERS.md`.
 - **`scripts/`** and the root **`Makefile`** hold repository maintenance. Run `make help` for the targets, for example `make link-skills SKILL=<path>`, which symlinks skills into `.agents/skills/` and `.claude/skills/`.
 - **`.github/workflows/`** holds CI.
 

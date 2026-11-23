@@ -89,6 +89,7 @@ describe("vendor-skills.mjs", () => {
     const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
     assert.ok(!("newsletter-ai" in layout.skills), "not in layout.json's skills");
     assert.ok(layout.ignored.includes("newsletters/newsletter-ai/"), `ignored: ${layout.ignored}`);
+    assert.ok(layout.ignored.includes("newsletters/meta/"), `the family's meta/ is left out too: ${layout.ignored}`);
     assert.ok(!existsSync(join(copy.pkg, "skills", "newsletter-ai")), "not vendored");
     assert.ok(!existsSync(join(copy.pkg, ".aiskills", "nested", "newsletters")), "nothing of the family ships");
     // npx skills add sugatoray/aiskills reads the repo itself, where the skill stays.
@@ -146,6 +147,15 @@ describe("npm pack", () => {
     }
     const layout = JSON.parse(readFileSync(join(copy.pkg, ".aiskills", "layout.json"), "utf8"));
     assert.deepEqual(toRepoPaths(files, layout).sort(), shippable(copy.skills, layout).sort());
+  });
+
+  test("ships a meta/ folder only inside a skill: group and subgroup meta/ stay in the repo", (t) => {
+    if (!copy) return t.skip("git not available");
+    const metas = [...new Set(files.filter((p) => p.includes("/meta/")).map((p) => p.slice(0, p.indexOf("/meta/"))))];
+    const outside = metas.filter((dir) => !files.includes(dir + "/SKILL.md"));
+    assert.deepEqual(outside, [], "every shipped meta/ sits next to a SKILL.md");
+    assert.ok(files.includes("skills/meeting-agenda/meta/MAINTAINERS.md"), "a skill's own meta/ still ships");
+    assert.ok(metas.length > 1, `skill-level meta/ folders ship: ${metas}`);
   });
 
   test("ships nothing of newsletter-ai", (t) => {

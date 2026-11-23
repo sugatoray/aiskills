@@ -8,13 +8,18 @@ Things you must respect or conform to (external requirements, API contracts, pla
 - **Dates:** use the user's date (US Eastern), not the server's. On 2026-11-13 the user corrected a reply that used the server date, 2026-11-14.
 - **History:** keep it clean. Rebase PR branches onto `master`; never merge `master` into them.
 - **Force pushes** need the user's explicit approval each time. The session's classifier blocks them otherwise.
+- **Nothing from the user's private data goes into this public repo:** not their session logs, chats or private artifacts (not even an artifact ID in a note), and not their real repo or project names used as samples. Demo and test data must be visibly fictional and generic. Check new fixtures, demos, scrolls and PR text for this before pushing.
+- **Every memory folder under `src/skills/` links to its `meta/`.** `src/skills/<group>/` (or `src/skills/development/<subgroup>/`) has a `meta` symlink to `skills/<group>/meta` (relative: one `../` per level, e.g. `../../../skills/productivity/meta`), and its `SCROLLS.md` and `STARTER.md` say which file that reaches: "`meta/MAINTAINERS.md` here opens `skills/<group>/meta/MAINTAINERS.md`". `src/skills/development/meta` links to `skills/development/meta`. Do the same when setting up scrolls for another family, and check with `realpath <folder>/meta/MAINTAINERS.md`.
+- **The root scrolls route; dedicated scroll sets hold the detail.** If work touches a folder with its own scroll set (see `STARTER.md` → "Where memory lives"), update that set, and keep at most a pointer here. One change can belong in several sets (the group `meta/` packaging change touched the package and every family); record each part where it belongs. Before this rule, the root `HANDOFF.md` collected family detail and grew to 30 lines.
 - **PRs:** don't open one unless asked. Edit an existing PR description minimally, and keep its `- Closes #N -- title` issue list in sync.
 
 ## Traps — avoid them always
 Specific bugs that have bitten this project before — avoid repeating them.
 
+- **Moving a folder that holds relative symlinks breaks them silently.** `git mv` keeps the link text, so after moving `src/{scrolls,development,productivity}` one level deeper, every link into `skills/` needed one more `../`. After any such move, list the links (`find <dir> -type l`), re-point them, and check each resolves (`[ -e link ]`), then run `make check-skill-links`.
+- **Two open branches can take the same ticket numbers.** #314 and #320 both used ROOT-16 and AIS-28; the rebase surfaced it. When rebasing onto a `master` that gained scrolls tickets, renumber this branch's tickets (and every scrolls and PR line that cites them).
 - **A rebase onto a release can move CHANGELOG entries into the released section, with no conflict.** When #265 was rebased onto `1.4.0-dev`, its package CHANGELOG entries matched context lines inside `## [1.3.0] - 2026-11-17` and merged there silently. After rebasing package work onto a new `-dev` version, check that every new entry sits under `## [x.y.z] - Unreleased`, not under a dated section.
-- After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
+- After a squash merge, a branch stacked on the merged one must be rebased with `--onto`. The family scrolls hold the exact recipe: `src/skills/development/review/docs/.scrolls/WISDOM.md` and `src/packages/aiskills/docs/.scrolls/WISDOM.md`.
 
 - **Cloud sessions can push branches but not tags** (HTTP 403 from the git proxy), and the GitHub tools here can't create tags either. Make the tags locally, check them, and give the user one command to recreate and push them from their own clone. Then verify what reached GitHub.
 - **This session's network can't reach `sugatoray.github.io`** (403 at the proxy). To verify a docs deploy, read the workflow's build job log (`get_job_logs`): `build-site.mjs` prints each page it wrote and a `site:` summary line, and the artifact step lists every file. Then ask the user to look at the live pages.
@@ -23,7 +28,7 @@ Specific bugs that have bitten this project before — avoid repeating them.
 - **Adding a control to the docs header breaks the phone layout.** The search input can't render narrower than its padding (about 68px), so it overlaps the next button rather than shrinking. Check the header at iPhone width for sideways scroll and overlap; the docs browser tests do this for the version menu.
 
 - **A new skill or group changes hard-coded numbers in the package tests and docs.** After `npm run docs` and `npm run banner:png`, expect to update `banner.test.mjs` (skill and group counts, the `#pills` counts), the `<!-- verify -->` outputs that list groups or skills (`guides/use-from-an-agent.md`, `reference/cli.md`, `tutorial/01`, `02`, `04`), and, for a new `.skillsignore`, the one-line `"ignored"` sample in `reference/files.md`. The package suite only counts git-tracked skills, so `git add` the skill first.
-- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/productivity/docs/.scrolls/WISDOM.md`.
+- **Never write a literal closing script tag inside an inline `<script>`, even in a comment.** It ends the block. Details and other HTML-deck traps are in `src/skills/productivity/docs/.scrolls/WISDOM.md`.
 
 ## Ditches — bad patterns or decisions to avoid
 Bad patterns or decisions to never take, and why they were rejected.

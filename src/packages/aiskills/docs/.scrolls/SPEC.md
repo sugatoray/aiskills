@@ -100,7 +100,9 @@ The Skills tab's left pane shows the overview, then one collapsible group per sk
 Skills tab → Explainers → **Browse the scrolls-compact examples** shows `/scrolls-compact`'s index and all 23 worked examples on one page, one tab each, rendered or as Markdown, with Previous/Next and Jump to. Links between the files open the matching tab, and each example's Premise and Caveats sit in a tinted "Note" box. Every output shown is real: the skill's tests replay each example. The page is the skill's own `assets/example-viewer.html`, embedded, with a full-size view; offline it shows the files as plain text. New in 1.4.0 (#265, published).
 
 ## Bundled skills: the `productivity` group
-`aiskills install -G productivity` (group `productivity-skills`) installs `meeting-agenda`, which turns an agenda into an offline HTML slide deck with a timer per item (see `src/productivity/docs/.scrolls/SPEC.md`). The bundle is 19 skills in 10 groups. New in 1.5.0 (#272, published).
+`aiskills install -G productivity` (group `productivity-skills`) installs `meeting-agenda`, which turns an agenda into an offline HTML slide deck with a timer per item (see `src/skills/productivity/docs/.scrolls/SPEC.md`). The bundle is 19 skills in 10 groups. New in 1.5.0 (#272, published).
+
+Unreleased ([#320](https://github.com/sugatoray/aiskills/pull/320)): the group also gets `agent-sessions-insight`, which turns local coding-agent session logs (Claude Code, Codex CLI, Pi, OpenCode, Copilot CLI, Devin CLI, Grok CLI) into an offline HTML usage report. The bundle becomes 20 skills in 10 groups (`aiskills install -s agent-sessions-insight`).
 
 ## Docs site: embedded pages follow the light/dark button
 Pages embedded in the docs (the example viewer, the CLI outputs page) follow the docs' light/dark choice, in the page and full-size, and switch at once when it changes; before, they followed only the system setting. New in 1.4.0 (#265, published).

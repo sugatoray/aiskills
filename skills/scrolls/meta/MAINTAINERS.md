@@ -74,7 +74,7 @@ and its versioning rule, see that skill's own `meta/MAINTAINERS.md`:
 ## Where the installable artifacts live
 
 Only `skills/scrolls/` is what actually ships and gets installed.
-`src/scrolls/CLAUDE.md`, elsewhere in this repository, is a pointer for
+`src/skills/scrolls/CLAUDE.md`, elsewhere in this repository, is a pointer for
 anyone (human or agent) who lands in `src/` looking for these skills —
 not a second copy. Never duplicate skill content into `src/`; if the
 pointer's install commands or target-folder note go stale, fix them in
@@ -132,7 +132,7 @@ actually makes it inert is simply "the file is no longer named
 
 ## Installing for local testing
 
-See `src/scrolls/CLAUDE.md` for the tested `npx skills add
+See `src/skills/scrolls/CLAUDE.md` for the tested `npx skills add
 sugatoray/aiskills ...` commands (local/project, global/user, and
 install-everywhere forms) — the same commands work against any fork or
 branch by adjusting the `owner/repo` (and optional `#branch`) argument.

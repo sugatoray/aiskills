@@ -24,6 +24,25 @@ In development: `package.json` is `1.6.0-dev` (a SemVer pre-release, so it
 sorts below `1.6.0`) while changes collect here. At release, set it to `1.6.0`
 and date this section.
 
+### Added
+
+- **New bundled skill: `agent-sessions-insight`**, in the `productivity-skills`
+  group (alias `productivity`). It reads the local session logs of Claude Code,
+  Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI and Grok CLI (or any agent that
+  writes JSONL) and turns them into one offline, tabbed HTML report of how often
+  and for what the agents are used. It is read-only, sends nothing anywhere,
+  and runs only when invoked by name. The package now bundles 20 skills in 10
+  groups: `aiskills install -s agent-sessions-insight`. See the skill's own
+  `CHANGELOG.md` for its history.
+
+### Changed
+
+- **Group-level maintainer notes are no longer in the package.** A new
+  `skills/.skillsignore` leaves out every skill group's and subgroup's `meta/`
+  folder (for example `scrolls/meta/`, `development/review/meta/`). They are
+  notes for maintainers of the repo and were shipped under `.aiskills/nested/`
+  by mistake. A `meta/` inside a skill folder still ships with the skill.
+
 ## [1.5.0] - 2026-11-18
 
 ### Added

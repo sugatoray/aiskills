@@ -1,1 +1,0 @@
-../../skills/scrolls/CHANGELOG.md

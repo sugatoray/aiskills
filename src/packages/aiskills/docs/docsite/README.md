@@ -27,7 +27,7 @@ aiskills install -G scrolls -a claude-code
 
 ## Features
 
-- **Skills in one package**: <!-- count:skills -->19<!-- /count --> skills in <!-- count:groups -->10<!-- /count --> groups, at the version you installed.
+- **Skills in one package**: <!-- count:skills -->20<!-- /count --> skills in <!-- count:groups -->10<!-- /count --> groups, at the version you installed.
 - **Nothing happens behind your back**: `npm install` runs no install step. Your agents change only when you run `aiskills install`, so it works the same under npm, pnpm and bun.
 - **Counted on skills.sh**: installs through `aiskills` count towards each skill's installs on skills.sh, like `npx skills add` does; off with `--no-stats`. See [The skills.sh install count](concepts/install-count.md).
 - **Pick what you want**: by skill (`-s`), by group (`-G scrolls`), by agent (`-a codex`), with glob patterns (`-s 'scrolls-*'`), from a list (`-i`), or for the agents you picked last time (`-l`).
@@ -53,7 +53,8 @@ aiskills install -G scrolls -a claude-code
 ### Skills
 
 <!-- skills:start -->
-- [Bundled skills](skills/README.md): all <!-- count:skills -->19<!-- /count --> skills in the package, in <!-- count:groups -->10<!-- /count --> groups, with what each does.
+- [Bundled skills](skills/README.md): all <!-- count:skills -->20<!-- /count --> skills in the package, in <!-- count:groups -->10<!-- /count --> groups, with what each does.
+- [agent-sessions-insight](skills/agent-sessions-insight.md): Analyze how often and for what kinds of work the user uses their coding agents (Claude Code, Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI, Grok…
 - [artwallbg](skills/artwallbg.md): Create a vivid illustrated image of a subject in front of a huge spray-painted wall.
 - [commentdrop](skills/commentdrop.md): Add simulated social-media comment overlays to a still image in the floating comment-drop style used in video editing.
 - [create-issues-update-pr](skills/create-issues-update-pr.md): Files GitHub issue(s) for work already done (or about to be done) on a branch/PR, grouping related issues under a parent epic when there's a genuine…

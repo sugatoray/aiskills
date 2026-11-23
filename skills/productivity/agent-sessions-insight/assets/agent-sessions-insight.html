@@ -1,0 +1,2610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent sessions insight</title>
+<!--
+  agent-sessions-insight report. One self-contained file: no network, no external fonts or scripts.
+  scripts/build_report.py writes the collector's JSON (plus the agent's reading) into the
+  report-data block below; every '<' in it is escaped. All text is set with textContent.
+  As shipped, the block holds demo data, so this file opens as a working example.
+-->
+<style>
+:root {
+  --bg: #f7f7f5; --surface: #ffffff; --surface-2: #f0f0ec; --border: #e2e2dc;
+  --text: #1d1d1b; --muted: #66665f; --accent: #3b5bdb; --accent-soft: #dbe3ff;
+  --judge: #8a5a00; --judge-soft: #fff1d6; --warn: #b42318;
+  --a1: #3b5bdb; --a2: #0f8a6c; --a3: #c2410c; --a4: #7c3aed; --a5: #be185d; --a6: #4d7c0f;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.04);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121214; --surface: #1b1b1f; --surface-2: #24242a; --border: #303038;
+    --text: #ececef; --muted: #a0a0aa; --accent: #8ea6ff; --accent-soft: #26305a;
+    --judge: #f5c46b; --judge-soft: #3a2c10; --warn: #ff8a7a;
+    --a1: #8ea6ff; --a2: #4fd1aa; --a3: #fb923c; --a4: #b794f6; --a5: #f472b6; --a6: #a3e635;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121214; --surface: #1b1b1f; --surface-2: #24242a; --border: #303038;
+  --text: #ececef; --muted: #a0a0aa; --accent: #8ea6ff; --accent-soft: #26305a;
+  --judge: #f5c46b; --judge-soft: #3a2c10; --warn: #ff8a7a;
+  --a1: #8ea6ff; --a2: #4fd1aa; --a3: #fb923c; --a4: #b794f6; --a5: #f472b6; --a6: #a3e635;
+  --shadow: none;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+header h1 { font-size: 1.6rem; line-height: 1.2; margin: 0 0 4px; letter-spacing: -.01em; }
+header p { margin: 0; color: var(--muted); }
+.head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+#theme-toggle { flex: 0 0 auto; font: inherit; font-size: .85rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+#theme-toggle:hover { color: var(--text); }
+.caveat { margin: 14px 0 0; padding: 10px 14px; border-left: 3px solid var(--judge); background: var(--judge-soft); border-radius: 4px; font-size: .92rem; max-width: 80ch; }
+.caveat[hidden] { display: none; }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 72ch; }
+.section-h { font-size: 1.05rem; margin: 4px 0 10px; }
+.habits { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; margin-bottom: 16px; }
+.habits > .card { margin-bottom: 0; }
+.habit p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
+.ev { font-size: .84rem; color: var(--muted); margin: 0; }
+.ev b { color: var(--text); font-weight: 600; }
+.stack-chart .cols { display: flex; align-items: flex-end; gap: 6px; height: 170px; border-bottom: 1px solid var(--border); }
+.stack-chart .col { flex: 1 1 0; min-width: 6px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
+.stack-chart .tot { font-size: .72rem; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.stack-chart .seg { border-radius: 2px; margin-top: 1px; outline-offset: 1px; }
+.stack-chart .seg:focus-visible { outline: 2px solid var(--accent); }
+.stack-chart .labels { display: flex; gap: 6px; font-size: .72rem; color: var(--muted); margin-top: 4px; }
+.stack-chart .labels span { flex: 1 1 0; min-width: 6px; text-align: center; overflow: hidden; white-space: nowrap; }
+.demo-note { margin: 12px 0 0; padding: 8px 12px; border-radius: 8px; background: var(--judge-soft); color: var(--judge); font-size: .9rem; }
+[role="tablist"] {
+  display: flex; gap: 4px; margin: 20px 0 16px; padding: 4px; overflow-x: auto;
+  background: var(--surface-2); border-radius: 10px; scrollbar-width: thin;
+}
+[role="tab"] {
+  flex: 0 0 auto; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: .92rem;
+  padding: 7px 12px; border-radius: 7px; cursor: pointer; white-space: nowrap;
+}
+[role="tab"]:hover { color: var(--text); }
+[role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+[role="tab"]:focus-visible, .bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[role="tab"][hidden] { display: none; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.card h2 { font-size: 1.05rem; margin: 0 0 4px; }
+.card h3 { font-size: .98rem; margin: 0 0 6px; }
+.sub { color: var(--muted); font-size: .88rem; margin: 0 0 12px; }
+.badge { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; vertical-align: middle; margin-left: 6px; }
+.badge.exact { background: var(--accent-soft); color: var(--accent); }
+.badge.judge { background: var(--judge-soft); color: var(--judge); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); }
+.stat .v { font-size: 1.7rem; font-weight: 650; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: .85rem; }
+.prose p { margin: 0 0 8px; }
+.prose p:last-child { margin-bottom: 0; }
+.empty { color: var(--muted); font-style: italic; margin: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.grid2 > .card { margin-bottom: 0; }
+.chart .bars { display: flex; align-items: flex-end; gap: 3px; height: 150px; border-bottom: 1px solid var(--border); padding-top: 6px; }
+.chart .bar { flex: 1 1 0; min-width: 3px; background: var(--accent); border-radius: 3px 3px 0 0; opacity: .9; cursor: default; }
+.chart .bar:hover, .chart .bar:focus { opacity: 1; filter: brightness(1.1); }
+.chart .bar.zero { background: var(--border); }
+.chart .axis { display: flex; gap: 3px; font-size: .72rem; color: var(--muted); margin-top: 4px; }
+.chart .axis span { flex: 1 1 0; min-width: 3px; text-align: center; overflow: hidden; white-space: nowrap; }
+.hbars { display: grid; grid-template-columns: minmax(80px, 34%) 1fr auto; gap: 6px 10px; align-items: center; font-size: .9rem; }
+.hbars .track { background: var(--surface-2); border-radius: 4px; height: 12px; overflow: hidden; }
+.hbars .fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.hbars .n { font-variant-numeric: tabular-nums; color: var(--muted); }
+.timeline { position: relative; height: 180px; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 10px 0 4px 44px; }
+.timeline .dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; opacity: .85; }
+.timeline .ylab { position: absolute; left: -44px; width: 38px; white-space: nowrap; text-align: right; font-size: .7rem; color: var(--muted); transform: translateY(-50%); }
+.tl-x { display: flex; justify-content: space-between; margin-left: 44px; font-size: .72rem; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+details { margin-top: 10px; }
+summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; overflow-wrap: normal; }
+#sessions-table { min-width: 760px; }
+#sessions-table td:nth-child(6) { min-width: 220px; }
+#sessions-table td:first-child { white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+code { font: .85em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.kind { border-left: 3px solid var(--judge); padding-left: 12px; margin-bottom: 14px; }
+.kind:last-child { margin-bottom: 0; }
+.kind .meta { color: var(--muted); font-size: .86rem; }
+.kind ul, .friction ul { margin: 6px 0 0; padding-left: 18px; }
+.friction li { margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--surface-2); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
+input[type="search"] { width: 100%; max-width: 360px; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); margin-bottom: 10px; }
+#tooltip { position: fixed; z-index: 10; pointer-events: none; background: var(--text); color: var(--bg); font-size: .82rem; padding: 5px 8px; border-radius: 6px; max-width: 260px; }
+#tooltip[hidden] { display: none; }
+.foot { color: var(--muted); font-size: .82rem; margin-top: 24px; }
+@media (prefers-reduced-motion: no-preference) {
+  .bar, .seg, .fill, .dot { transition: opacity .15s, filter .15s; }
+  .seg:hover, .fill:hover, .dot:hover { opacity: .8; }
+}
+@media (max-width: 520px) { header h1 { font-size: 1.35rem; } .stat .v { font-size: 1.4rem; } .card { padding: 14px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="head-row">
+      <h1>Agent sessions insight</h1>
+      <button type="button" id="theme-toggle" aria-label="Colour theme">Theme: Auto</button>
+    </div>
+    <p id="subtitle"></p>
+    <div class="caveat" id="caveat" hidden><b>What this is based on.</b> <span id="caveat-text"></span></div>
+    <p class="demo-note" id="demo-note" hidden>Demo data: these are made-up sessions that show what the report looks like. Run the skill to see yours.</p>
+  </header>
+  <nav role="tablist" aria-label="Report sections" id="tabs"></nav>
+  <main id="panels"></main>
+  <p class="foot" id="foot"></p>
+</div>
+<div id="tooltip" role="tooltip" hidden></div>
+
+<script type="application/json" id="report-data">
+{
+ "summary": {
+  "window_days": 90,
+  "sessions": 64,
+  "active_days": 45,
+  "prompts": 301,
+  "first": "2026-08-26T09:01:00+00:00",
+  "last": "2026-11-18T12:47:48+00:00",
+  "median_minutes": 27.75,
+  "longest_minutes": 188.2,
+  "median_gap_days": 1.5,
+  "longest_gap_days": 4,
+  "per_agent": {
+   "claude-code": 40,
+   "codex": 13,
+   "devin": 11
+  },
+  "per_month": {
+   "2026-08": 8,
+   "2026-09": 21,
+   "2026-10": 20,
+   "2026-11": 15
+  },
+  "per_weekday": {
+   "Mon": 18,
+   "Tue": 8,
+   "Thu": 15,
+   "Wed": 14,
+   "Fri": 6,
+   "Sun": 3
+  },
+  "per_hour": {
+   "7": 1,
+   "8": 3,
+   "9": 6,
+   "10": 8,
+   "11": 7,
+   "12": 1,
+   "13": 10,
+   "14": 11,
+   "15": 2,
+   "16": 4,
+   "17": 3,
+   "18": 2,
+   "19": 2,
+   "20": 2,
+   "21": 2
+  },
+  "projects": [
+   [
+    "taskq-cli",
+    21
+   ],
+   [
+    "billing-api",
+    19
+   ],
+   [
+    "infra-scripts",
+    10
+   ],
+   [
+    "docs-site",
+    9
+   ],
+   [
+    "data-notebooks",
+    5
+   ]
+  ],
+  "tools": [
+   [
+    "Edit",
+    220
+   ],
+   [
+    "Bash",
+    207
+   ],
+   [
+    "Write",
+    195
+   ],
+   [
+    "Grep",
+    194
+   ],
+   [
+    "Read",
+    190
+   ],
+   [
+    "apply_patch",
+    97
+   ],
+   [
+    "update_plan",
+    89
+   ],
+   [
+    "shell",
+    87
+   ],
+   [
+    "browser",
+    52
+   ],
+   [
+    "exec",
+    52
+   ],
+   [
+    "read",
+    51
+   ],
+   [
+    "edit",
+    50
+   ]
+  ],
+  "commands": [
+   [
+    "/init",
+    6
+   ],
+   [
+    "/plan",
+    5
+   ],
+   [
+    "/review",
+    4
+   ],
+   [
+    "/compact",
+    3
+   ]
+  ],
+  "doc_edits": {
+   "AGENTS.md": 8,
+   "CLAUDE.md": 19,
+   "CHANGELOG.md": 8,
+   "README.md": 13,
+   "HANDOFF.md": 6
+  },
+  "test_runs": 126
+ },
+ "sessions": [
+  {
+   "agent": "codex",
+   "id": "ea057543",
+   "project": "docs-site",
+   "start": "2026-08-26T09:01:00+00:00",
+   "minutes": 15.9,
+   "prompts": 1,
+   "first_prompt": "Fix broken links in the API reference",
+   "top_tools": [
+    [
+     "update_plan",
+     3
+    ],
+    [
+     "shell",
+     3
+    ],
+    [
+     "apply_patch",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "b4ebf4b6",
+   "project": "taskq-cli",
+   "start": "2026-08-26T10:14:00+00:00",
+   "minutes": 8.8,
+   "prompts": 3,
+   "first_prompt": "Make the release script idempotent",
+   "top_tools": [
+    [
+     "Bash",
+     1
+    ],
+    [
+     "Read",
+     1
+    ],
+    [
+     "Grep",
+     1
+    ]
+   ],
+   "commands": [
+    "/plan"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "8074514c",
+   "project": "taskq-cli",
+   "start": "2026-08-26T16:17:00+00:00",
+   "minutes": 21.7,
+   "prompts": 8,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Write",
+     4
+    ],
+    [
+     "Read",
+     4
+    ],
+    [
+     "Grep",
+     4
+    ],
+    [
+     "Bash",
+     3
+    ]
+   ],
+   "commands": [
+    "/plan"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "c3c9f7e3",
+   "project": "billing-api",
+   "start": "2026-08-27T09:52:00+00:00",
+   "minutes": 57.7,
+   "prompts": 8,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Read",
+     9
+    ],
+    [
+     "Edit",
+     9
+    ],
+    [
+     "Grep",
+     8
+    ],
+    [
+     "Bash",
+     7
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "9e618f36",
+   "project": "taskq-cli",
+   "start": "2026-08-27T14:35:00+00:00",
+   "minutes": 30.5,
+   "prompts": 5,
+   "first_prompt": "Why does `taskq sync` hang on large repos?",
+   "top_tools": [
+    [
+     "Edit",
+     12
+    ],
+    [
+     "Grep",
+     8
+    ],
+    [
+     "Read",
+     6
+    ],
+    [
+     "Write",
+     5
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "0ed90475",
+   "project": "billing-api",
+   "start": "2026-08-31T08:52:00+00:00",
+   "minutes": 29.0,
+   "prompts": 9,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Write",
+     9
+    ],
+    [
+     "Edit",
+     9
+    ],
+    [
+     "Grep",
+     8
+    ],
+    [
+     "Bash",
+     7
+    ]
+   ],
+   "commands": [
+    "/compact"
+   ]
+  },
+  {
+   "agent": "codex",
+   "id": "2ad64ce9",
+   "project": "data-notebooks",
+   "start": "2026-08-31T10:30:00+00:00",
+   "minutes": 30.4,
+   "prompts": 3,
+   "first_prompt": "Plot weekly active users by plan",
+   "top_tools": [
+    [
+     "apply_patch",
+     13
+    ],
+    [
+     "update_plan",
+     9
+    ],
+    [
+     "shell",
+     9
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "f95fe8a0",
+   "project": "infra-scripts",
+   "start": "2026-08-31T14:59:00+00:00",
+   "minutes": 23.0,
+   "prompts": 3,
+   "first_prompt": "Upgrade the Terraform provider and fix the plan",
+   "top_tools": [
+    [
+     "browser",
+     5
+    ],
+    [
+     "read",
+     4
+    ],
+    [
+     "edit",
+     3
+    ],
+    [
+     "exec",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "59d4a28c",
+   "project": "billing-api",
+   "start": "2026-09-01T10:20:00+00:00",
+   "minutes": 20.8,
+   "prompts": 5,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Bash",
+     3
+    ],
+    [
+     "Grep",
+     1
+    ]
+   ],
+   "commands": [
+    "/plan"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "19fcafba",
+   "project": "billing-api",
+   "start": "2026-09-02T14:42:00+00:00",
+   "minutes": 34.8,
+   "prompts": 3,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Edit",
+     4
+    ],
+    [
+     "Write",
+     3
+    ],
+    [
+     "Bash",
+     2
+    ],
+    [
+     "Read",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "244fbafc",
+   "project": "billing-api",
+   "start": "2026-09-04T14:36:00+00:00",
+   "minutes": 59.5,
+   "prompts": 1,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Bash",
+     5
+    ],
+    [
+     "Write",
+     2
+    ],
+    [
+     "Edit",
+     2
+    ],
+    [
+     "Read",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "1886a7ba",
+   "project": "billing-api",
+   "start": "2026-09-04T17:10:00+00:00",
+   "minutes": 18.9,
+   "prompts": 2,
+   "first_prompt": "Refactor the Stripe client into a module",
+   "top_tools": [
+    [
+     "update_plan",
+     9
+    ],
+    [
+     "shell",
+     7
+    ],
+    [
+     "apply_patch",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "08e9500c",
+   "project": "data-notebooks",
+   "start": "2026-09-06T10:02:00+00:00",
+   "minutes": 23.3,
+   "prompts": 9,
+   "first_prompt": "Plot weekly active users by plan",
+   "top_tools": [
+    [
+     "shell",
+     4
+    ],
+    [
+     "update_plan",
+     2
+    ],
+    [
+     "apply_patch",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "89d4ff98",
+   "project": "docs-site",
+   "start": "2026-09-07T11:19:00+00:00",
+   "minutes": 45.4,
+   "prompts": 1,
+   "first_prompt": "Fix broken links in the API reference",
+   "top_tools": [
+    [
+     "update_plan",
+     13
+    ],
+    [
+     "shell",
+     10
+    ],
+    [
+     "apply_patch",
+     9
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "10406af3",
+   "project": "billing-api",
+   "start": "2026-09-08T09:42:00+00:00",
+   "minutes": 13.5,
+   "prompts": 9,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Read",
+     7
+    ],
+    [
+     "Edit",
+     4
+    ],
+    [
+     "Write",
+     3
+    ],
+    [
+     "Grep",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "b8e3621b",
+   "project": "infra-scripts",
+   "start": "2026-09-10T14:41:00+00:00",
+   "minutes": 24.0,
+   "prompts": 4,
+   "first_prompt": "Add a nightly backup job",
+   "top_tools": [
+    [
+     "exec",
+     8
+    ],
+    [
+     "edit",
+     8
+    ],
+    [
+     "browser",
+     8
+    ],
+    [
+     "read",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "2a244cae",
+   "project": "infra-scripts",
+   "start": "2026-09-14T13:09:00+00:00",
+   "minutes": 37.3,
+   "prompts": 9,
+   "first_prompt": "Rotate the staging certificates",
+   "top_tools": [
+    [
+     "read",
+     7
+    ],
+    [
+     "browser",
+     6
+    ],
+    [
+     "exec",
+     5
+    ],
+    [
+     "edit",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "80c981cf",
+   "project": "taskq-cli",
+   "start": "2026-09-16T09:27:00+00:00",
+   "minutes": 24.4,
+   "prompts": 8,
+   "first_prompt": "Make the release script idempotent",
+   "top_tools": [
+    [
+     "Edit",
+     16
+    ],
+    [
+     "Grep",
+     8
+    ],
+    [
+     "Bash",
+     6
+    ],
+    [
+     "Read",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "0f5cb6a8",
+   "project": "taskq-cli",
+   "start": "2026-09-17T13:34:00+00:00",
+   "minutes": 58.1,
+   "prompts": 6,
+   "first_prompt": "Why does `taskq sync` hang on large repos?",
+   "top_tools": [
+    [
+     "Bash",
+     10
+    ],
+    [
+     "Write",
+     10
+    ],
+    [
+     "Edit",
+     6
+    ],
+    [
+     "Grep",
+     5
+    ]
+   ],
+   "commands": [
+    "/review"
+   ]
+  },
+  {
+   "agent": "devin",
+   "id": "26debfdb",
+   "project": "infra-scripts",
+   "start": "2026-09-17T13:58:00+00:00",
+   "minutes": 45.7,
+   "prompts": 9,
+   "first_prompt": "Add a nightly backup job",
+   "top_tools": [
+    [
+     "exec",
+     6
+    ],
+    [
+     "browser",
+     2
+    ],
+    [
+     "read",
+     1
+    ],
+    [
+     "edit",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "d0f00a15",
+   "project": "infra-scripts",
+   "start": "2026-09-18T19:26:00+00:00",
+   "minutes": 37.7,
+   "prompts": 9,
+   "first_prompt": "Upgrade the Terraform provider and fix the plan",
+   "top_tools": [
+    [
+     "exec",
+     10
+    ],
+    [
+     "browser",
+     7
+    ],
+    [
+     "read",
+     5
+    ],
+    [
+     "edit",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "2f733b05",
+   "project": "docs-site",
+   "start": "2026-09-21T10:15:00+00:00",
+   "minutes": 34.5,
+   "prompts": 3,
+   "first_prompt": "Fix broken links in the API reference",
+   "top_tools": [
+    [
+     "update_plan",
+     11
+    ],
+    [
+     "shell",
+     8
+    ],
+    [
+     "apply_patch",
+     7
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "041dcd94",
+   "project": "taskq-cli",
+   "start": "2026-09-21T14:32:00+00:00",
+   "minutes": 42.1,
+   "prompts": 4,
+   "first_prompt": "Why does `taskq sync` hang on large repos?",
+   "top_tools": [
+    [
+     "Write",
+     3
+    ],
+    [
+     "Bash",
+     3
+    ],
+    [
+     "Grep",
+     2
+    ],
+    [
+     "Edit",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "b2715945",
+   "project": "billing-api",
+   "start": "2026-09-22T13:53:00+00:00",
+   "minutes": 13.9,
+   "prompts": 2,
+   "first_prompt": "Refactor the Stripe client into a module",
+   "top_tools": [
+    [
+     "Grep",
+     7
+    ],
+    [
+     "Read",
+     6
+    ],
+    [
+     "Bash",
+     3
+    ],
+    [
+     "Edit",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "f132bf2d",
+   "project": "taskq-cli",
+   "start": "2026-09-22T14:15:00+00:00",
+   "minutes": 188.2,
+   "prompts": 5,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Bash",
+     8
+    ],
+    [
+     "Grep",
+     7
+    ],
+    [
+     "Edit",
+     7
+    ],
+    [
+     "Read",
+     5
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "c1a624dc",
+   "project": "billing-api",
+   "start": "2026-09-23T10:04:00+00:00",
+   "minutes": 46.7,
+   "prompts": 4,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Read",
+     10
+    ],
+    [
+     "Grep",
+     7
+    ],
+    [
+     "Bash",
+     6
+    ],
+    [
+     "Edit",
+     6
+    ]
+   ],
+   "commands": [
+    "/compact"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "efce3323",
+   "project": "billing-api",
+   "start": "2026-09-24T16:56:00+00:00",
+   "minutes": 83.8,
+   "prompts": 5,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Bash",
+     9
+    ],
+    [
+     "Edit",
+     7
+    ],
+    [
+     "Read",
+     7
+    ],
+    [
+     "Write",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "0dd09e51",
+   "project": "taskq-cli",
+   "start": "2026-09-28T07:12:00+00:00",
+   "minutes": 9.8,
+   "prompts": 1,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Edit",
+     3
+    ],
+    [
+     "Write",
+     3
+    ],
+    [
+     "Read",
+     2
+    ],
+    [
+     "Grep",
+     1
+    ]
+   ],
+   "commands": [
+    "/review"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "43e15c55",
+   "project": "taskq-cli",
+   "start": "2026-09-30T20:40:00+00:00",
+   "minutes": 39.2,
+   "prompts": 2,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Grep",
+     11
+    ],
+    [
+     "Edit",
+     10
+    ],
+    [
+     "Read",
+     8
+    ],
+    [
+     "Write",
+     4
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "341aa3ee",
+   "project": "billing-api",
+   "start": "2026-10-02T11:17:00+00:00",
+   "minutes": 53.7,
+   "prompts": 8,
+   "first_prompt": "Refactor the Stripe client into a module",
+   "top_tools": [
+    [
+     "Write",
+     11
+    ],
+    [
+     "Bash",
+     11
+    ],
+    [
+     "Grep",
+     8
+    ],
+    [
+     "Edit",
+     5
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "390ff0f4",
+   "project": "taskq-cli",
+   "start": "2026-10-05T21:28:00+00:00",
+   "minutes": 13.4,
+   "prompts": 1,
+   "first_prompt": "Make the release script idempotent",
+   "top_tools": [
+    [
+     "Grep",
+     9
+    ],
+    [
+     "Bash",
+     4
+    ],
+    [
+     "Read",
+     4
+    ],
+    [
+     "Write",
+     3
+    ]
+   ],
+   "commands": [
+    "/plan"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "1eeae938",
+   "project": "taskq-cli",
+   "start": "2026-10-06T14:54:00+00:00",
+   "minutes": 23.7,
+   "prompts": 6,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Edit",
+     9
+    ],
+    [
+     "Write",
+     8
+    ],
+    [
+     "Bash",
+     7
+    ],
+    [
+     "Grep",
+     6
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "e56d5404",
+   "project": "billing-api",
+   "start": "2026-10-07T13:16:00+00:00",
+   "minutes": 13.7,
+   "prompts": 3,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Edit",
+     11
+    ],
+    [
+     "Read",
+     7
+    ],
+    [
+     "Write",
+     5
+    ],
+    [
+     "Bash",
+     4
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "1a09a840",
+   "project": "data-notebooks",
+   "start": "2026-10-07T20:48:00+00:00",
+   "minutes": 20.4,
+   "prompts": 1,
+   "first_prompt": "Plot weekly active users by plan",
+   "top_tools": [
+    [
+     "apply_patch",
+     9
+    ],
+    [
+     "update_plan",
+     5
+    ],
+    [
+     "shell",
+     4
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "62bfb10e",
+   "project": "docs-site",
+   "start": "2026-10-07T21:10:00+00:00",
+   "minutes": 35.4,
+   "prompts": 8,
+   "first_prompt": "Draft a migration guide",
+   "top_tools": [
+    [
+     "Write",
+     7
+    ],
+    [
+     "Edit",
+     5
+    ],
+    [
+     "Bash",
+     4
+    ],
+    [
+     "Read",
+     4
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "a5f08356",
+   "project": "docs-site",
+   "start": "2026-10-08T11:25:00+00:00",
+   "minutes": 29.3,
+   "prompts": 6,
+   "first_prompt": "Update the getting-started guide for v2",
+   "top_tools": [
+    [
+     "apply_patch",
+     15
+    ],
+    [
+     "update_plan",
+     12
+    ],
+    [
+     "shell",
+     10
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "3cb77b2e",
+   "project": "data-notebooks",
+   "start": "2026-10-09T14:24:00+00:00",
+   "minutes": 16.2,
+   "prompts": 7,
+   "first_prompt": "Plot weekly active users by plan",
+   "top_tools": [
+    [
+     "apply_patch",
+     8
+    ],
+    [
+     "shell",
+     5
+    ],
+    [
+     "update_plan",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "526256de",
+   "project": "docs-site",
+   "start": "2026-10-11T14:06:00+00:00",
+   "minutes": 25.4,
+   "prompts": 1,
+   "first_prompt": "Update the getting-started guide for v2",
+   "top_tools": [
+    [
+     "edit",
+     8
+    ],
+    [
+     "read",
+     6
+    ],
+    [
+     "browser",
+     5
+    ],
+    [
+     "exec",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "ca73cd73",
+   "project": "billing-api",
+   "start": "2026-10-12T16:41:00+00:00",
+   "minutes": 24.8,
+   "prompts": 3,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Edit",
+     7
+    ],
+    [
+     "Bash",
+     5
+    ],
+    [
+     "Read",
+     4
+    ],
+    [
+     "Grep",
+     3
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "5b7042df",
+   "project": "taskq-cli",
+   "start": "2026-10-14T13:03:00+00:00",
+   "minutes": 16.1,
+   "prompts": 7,
+   "first_prompt": "Add a --json flag to the status command",
+   "top_tools": [
+    [
+     "Edit",
+     10
+    ],
+    [
+     "Bash",
+     7
+    ],
+    [
+     "Grep",
+     5
+    ],
+    [
+     "Write",
+     5
+    ]
+   ],
+   "commands": [
+    "/compact"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "dc7a615d",
+   "project": "billing-api",
+   "start": "2026-10-15T17:49:00+00:00",
+   "minutes": 15.7,
+   "prompts": 6,
+   "first_prompt": "Fix the rounding bug in proration",
+   "top_tools": [
+    [
+     "Read",
+     9
+    ],
+    [
+     "Grep",
+     6
+    ],
+    [
+     "Write",
+     5
+    ],
+    [
+     "Edit",
+     5
+    ]
+   ],
+   "commands": [
+    "/review"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "f4c1f93e",
+   "project": "taskq-cli",
+   "start": "2026-10-19T11:10:00+00:00",
+   "minutes": 8.8,
+   "prompts": 9,
+   "first_prompt": "Why does `taskq sync` hang on large repos?",
+   "top_tools": [
+    [
+     "Write",
+     6
+    ],
+    [
+     "Grep",
+     5
+    ],
+    [
+     "Edit",
+     4
+    ],
+    [
+     "Read",
+     4
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "76c32dcd",
+   "project": "billing-api",
+   "start": "2026-10-22T14:14:00+00:00",
+   "minutes": 33.1,
+   "prompts": 1,
+   "first_prompt": "Add retry with backoff to the invoice webhook",
+   "top_tools": [
+    [
+     "Edit",
+     9
+    ],
+    [
+     "Write",
+     7
+    ],
+    [
+     "Read",
+     6
+    ],
+    [
+     "Bash",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "413649b2",
+   "project": "taskq-cli",
+   "start": "2026-10-26T08:25:00+00:00",
+   "minutes": 25.7,
+   "prompts": 1,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Write",
+     14
+    ],
+    [
+     "Read",
+     7
+    ],
+    [
+     "Bash",
+     6
+    ],
+    [
+     "Grep",
+     5
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "b1491e24",
+   "project": "infra-scripts",
+   "start": "2026-10-26T13:46:00+00:00",
+   "minutes": 19.0,
+   "prompts": 6,
+   "first_prompt": "Upgrade the Terraform provider and fix the plan",
+   "top_tools": [
+    [
+     "exec",
+     6
+    ],
+    [
+     "browser",
+     5
+    ],
+    [
+     "edit",
+     4
+    ],
+    [
+     "read",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "4479c074",
+   "project": "docs-site",
+   "start": "2026-10-26T13:56:00+00:00",
+   "minutes": 43.8,
+   "prompts": 5,
+   "first_prompt": "Update the getting-started guide for v2",
+   "top_tools": [
+    [
+     "apply_patch",
+     9
+    ],
+    [
+     "update_plan",
+     7
+    ],
+    [
+     "shell",
+     7
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "4d4ca9c7",
+   "project": "infra-scripts",
+   "start": "2026-10-26T19:25:00+00:00",
+   "minutes": 26.6,
+   "prompts": 3,
+   "first_prompt": "Add a nightly backup job",
+   "top_tools": [
+    [
+     "read",
+     5
+    ],
+    [
+     "exec",
+     3
+    ],
+    [
+     "browser",
+     1
+    ],
+    [
+     "edit",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "9d106a37",
+   "project": "docs-site",
+   "start": "2026-10-27T11:48:00+00:00",
+   "minutes": 17.5,
+   "prompts": 5,
+   "first_prompt": "Update the getting-started guide for v2",
+   "top_tools": [
+    [
+     "apply_patch",
+     17
+    ],
+    [
+     "shell",
+     12
+    ],
+    [
+     "update_plan",
+     11
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "aafb4294",
+   "project": "billing-api",
+   "start": "2026-10-29T08:35:00+00:00",
+   "minutes": 95.1,
+   "prompts": 6,
+   "first_prompt": "Fix the rounding bug in proration",
+   "top_tools": [
+    [
+     "Grep",
+     10
+    ],
+    [
+     "Write",
+     7
+    ],
+    [
+     "Edit",
+     5
+    ],
+    [
+     "Bash",
+     5
+    ]
+   ],
+   "commands": [
+    "/review"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "4519feb0",
+   "project": "taskq-cli",
+   "start": "2026-11-02T18:15:00+00:00",
+   "minutes": 19.8,
+   "prompts": 5,
+   "first_prompt": "Add a --json flag to the status command",
+   "top_tools": [
+    [
+     "Write",
+     8
+    ],
+    [
+     "Bash",
+     5
+    ],
+    [
+     "Read",
+     5
+    ],
+    [
+     "Edit",
+     4
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "8d200f6a",
+   "project": "taskq-cli",
+   "start": "2026-11-03T09:46:00+00:00",
+   "minutes": 11.7,
+   "prompts": 6,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Bash",
+     8
+    ],
+    [
+     "Read",
+     6
+    ],
+    [
+     "Edit",
+     5
+    ],
+    [
+     "Write",
+     5
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "codex",
+   "id": "78e19be6",
+   "project": "data-notebooks",
+   "start": "2026-11-03T13:26:00+00:00",
+   "minutes": 28.9,
+   "prompts": 4,
+   "first_prompt": "Plot weekly active users by plan",
+   "top_tools": [
+    [
+     "shell",
+     5
+    ],
+    [
+     "update_plan",
+     4
+    ],
+    [
+     "apply_patch",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "66c13550",
+   "project": "taskq-cli",
+   "start": "2026-11-04T15:10:00+00:00",
+   "minutes": 8.2,
+   "prompts": 2,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Edit",
+     4
+    ],
+    [
+     "Bash",
+     4
+    ],
+    [
+     "Write",
+     3
+    ],
+    [
+     "Grep",
+     2
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "2188287e",
+   "project": "infra-scripts",
+   "start": "2026-11-04T15:38:00+00:00",
+   "minutes": 18.2,
+   "prompts": 1,
+   "first_prompt": "Rotate the staging certificates",
+   "top_tools": [
+    [
+     "edit",
+     5
+    ],
+    [
+     "read",
+     3
+    ],
+    [
+     "browser",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "5f52208c",
+   "project": "taskq-cli",
+   "start": "2026-11-05T11:39:00+00:00",
+   "minutes": 13.5,
+   "prompts": 1,
+   "first_prompt": "Make the release script idempotent",
+   "top_tools": [
+    [
+     "Bash",
+     10
+    ],
+    [
+     "Read",
+     8
+    ],
+    [
+     "Grep",
+     5
+    ],
+    [
+     "Edit",
+     5
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "da135667",
+   "project": "taskq-cli",
+   "start": "2026-11-06T18:07:00+00:00",
+   "minutes": 34.3,
+   "prompts": 5,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Edit",
+     3
+    ],
+    [
+     "Bash",
+     2
+    ],
+    [
+     "Read",
+     2
+    ],
+    [
+     "Write",
+     1
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "d26f1d76",
+   "project": "billing-api",
+   "start": "2026-11-09T16:24:00+00:00",
+   "minutes": 10.3,
+   "prompts": 7,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Bash",
+     8
+    ],
+    [
+     "Read",
+     8
+    ],
+    [
+     "Grep",
+     6
+    ],
+    [
+     "Edit",
+     2
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "claude-code",
+   "id": "482c9cbc",
+   "project": "taskq-cli",
+   "start": "2026-11-12T09:14:00+00:00",
+   "minutes": 44.1,
+   "prompts": 1,
+   "first_prompt": "Add shell completions",
+   "top_tools": [
+    [
+     "Grep",
+     10
+    ],
+    [
+     "Write",
+     8
+    ],
+    [
+     "Bash",
+     8
+    ],
+    [
+     "Read",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "c17a9262",
+   "project": "billing-api",
+   "start": "2026-11-12T10:02:00+00:00",
+   "minutes": 49.2,
+   "prompts": 3,
+   "first_prompt": "Fix the rounding bug in proration",
+   "top_tools": [
+    [
+     "Bash",
+     10
+    ],
+    [
+     "Write",
+     9
+    ],
+    [
+     "Edit",
+     7
+    ],
+    [
+     "Read",
+     6
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "eeae4612",
+   "project": "infra-scripts",
+   "start": "2026-11-12T11:35:00+00:00",
+   "minutes": 43.2,
+   "prompts": 5,
+   "first_prompt": "Upgrade the Terraform provider and fix the plan",
+   "top_tools": [
+    [
+     "browser",
+     4
+    ],
+    [
+     "read",
+     2
+    ],
+    [
+     "edit",
+     1
+    ],
+    [
+     "exec",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "539ef49c",
+   "project": "billing-api",
+   "start": "2026-11-12T13:44:00+00:00",
+   "minutes": 29.4,
+   "prompts": 6,
+   "first_prompt": "Write tests for the tax calculator",
+   "top_tools": [
+    [
+     "Write",
+     5
+    ],
+    [
+     "Read",
+     4
+    ],
+    [
+     "Edit",
+     4
+    ],
+    [
+     "Grep",
+     2
+    ]
+   ],
+   "commands": [
+    "/init"
+   ]
+  },
+  {
+   "agent": "codex",
+   "id": "7e8e5f15",
+   "project": "docs-site",
+   "start": "2026-11-15T17:05:00+00:00",
+   "minutes": 34.1,
+   "prompts": 7,
+   "first_prompt": "Fix broken links in the API reference",
+   "top_tools": [
+    [
+     "shell",
+     3
+    ],
+    [
+     "apply_patch",
+     2
+    ],
+    [
+     "update_plan",
+     1
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "devin",
+   "id": "fc44e14b",
+   "project": "infra-scripts",
+   "start": "2026-11-16T10:32:00+00:00",
+   "minutes": 55.3,
+   "prompts": 8,
+   "first_prompt": "Add a nightly backup job",
+   "top_tools": [
+    [
+     "edit",
+     13
+    ],
+    [
+     "read",
+     10
+    ],
+    [
+     "exec",
+     9
+    ],
+    [
+     "browser",
+     8
+    ]
+   ],
+   "commands": []
+  },
+  {
+   "agent": "claude-code",
+   "id": "3d895a43",
+   "project": "taskq-cli",
+   "start": "2026-11-18T12:03:00+00:00",
+   "minutes": 44.8,
+   "prompts": 6,
+   "first_prompt": "Why does `taskq sync` hang on large repos?",
+   "top_tools": [
+    [
+     "Bash",
+     5
+    ],
+    [
+     "Grep",
+     4
+    ],
+    [
+     "Write",
+     4
+    ],
+    [
+     "Read",
+     3
+    ]
+   ],
+   "commands": [
+    "/plan"
+   ]
+  }
+ ],
+ "insights": {
+  "overview": [
+   "You used coding agents on 45 of the last 90 days, 64 sessions in all: steady weekday use with short gaps (a median of 1.5 days between active days).",
+   "Most of the work is building and fixing two codebases, billing-api and taskq-cli; docs, infrastructure and data analysis fill the rest.",
+   "Claude Code carries the coding, Codex the docs and notebooks, and Devin the infrastructure chores.",
+   "Tests run often next to edits, which suggests a test-first habit; a few very long sessions are worth a look."
+  ],
+  "kinds": [
+   {
+    "name": "Building features",
+    "sessions": 30,
+    "projects": [
+     "billing-api",
+     "taskq-cli"
+    ],
+    "examples": [
+     "Add retry with backoff to the invoice webhook",
+     "Add a --json flag to the status command"
+    ],
+    "evidence": "first prompts that start with Add or Make"
+   },
+   {
+    "name": "Fixing bugs",
+    "sessions": 10,
+    "projects": [
+     "billing-api",
+     "taskq-cli"
+    ],
+    "examples": [
+     "Fix the rounding bug in proration",
+     "Why does `taskq sync` hang on large repos?"
+    ],
+    "evidence": "first prompts that start with Fix or Why"
+   },
+   {
+    "name": "Docs and writing",
+    "sessions": 9,
+    "projects": [
+     "docs-site"
+    ],
+    "examples": [
+     "Draft a migration guide"
+    ],
+    "evidence": "project name"
+   },
+   {
+    "name": "Infrastructure",
+    "sessions": 10,
+    "projects": [
+     "infra-scripts"
+    ],
+    "examples": [
+     "Rotate the staging certificates"
+    ],
+    "evidence": "project name and first prompts"
+   },
+   {
+    "name": "Data analysis",
+    "sessions": 5,
+    "projects": [
+     "data-notebooks"
+    ],
+    "examples": [
+     "Plot weekly active users by plan"
+    ],
+    "evidence": "project name"
+   }
+  ],
+  "habits": [
+   {
+    "title": "Tests next to edits",
+    "detail": "126 test runs in 64 sessions; tests usually run in the same session as the edits, which suggests a test-first habit.",
+    "evidence": "pytest in Bash and shell calls across billing-api and taskq-cli"
+   },
+   {
+    "title": "A weekday rhythm",
+    "detail": "Monday is the busiest weekday, and most sessions start between 09:00 and 17:00.",
+    "evidence": "the weekday and hour charts"
+   },
+   {
+    "title": "Docs as session memory",
+    "detail": "CLAUDE.md, HANDOFF.md and README.md get edited along the way, so context carries over between sessions.",
+    "evidence": "54 doc-file edits, most in billing-api and taskq-cli"
+   },
+   {
+    "title": "One agent per kind of work",
+    "detail": "Claude Code does the coding, Codex the docs and notebooks, Devin the infrastructure chores.",
+    "evidence": "the Agents tab and the projects behind each agent"
+   }
+  ],
+  "friction": [
+   {
+    "title": "Very long sessions.",
+    "detail": "The longest ran 188.2 minutes: a session left open, or a task that should have been split.",
+    "evidence": "the Longest sessions table below"
+   },
+   {
+    "title": "Repeated first prompts.",
+    "detail": "The same few prompts open many sessions, which may mean a task was restarted rather than finished.",
+    "evidence": "first prompts in the Data tab, for example the proration rounding fix"
+   },
+   {
+    "title": "Gaps.",
+    "detail": "The longest break between active days was 4 days.",
+    "evidence": "the timeline on the Frequency tab"
+   }
+  ],
+  "agents": [
+   "Claude Code has 40 sessions, Codex 13 and Devin 11. Each agent mostly sticks to its own projects."
+  ],
+  "threads": [
+   {
+    "thread": "taskq-cli: sync on large repos",
+    "next": "Profile `taskq sync` on a large repo before changing the walker.",
+    "when": "last seen in November"
+   },
+   {
+    "thread": "billing-api: Stripe client refactor",
+    "next": "Finish moving the client into its own module and rerun the tax tests.",
+    "when": "last seen in November"
+   },
+   {
+    "thread": "infra-scripts: certificate rotation",
+    "next": "Check the staging certificates were actually rotated.",
+    "when": "last seen in October"
+   }
+  ],
+  "caveat": "The session logs of Claude Code, Codex CLI and Devin CLI on this machine, over the last 90 days. No Pi, OpenCode or Copilot CLI logs were found. Devin's log format is undocumented, so its tool counts may be low."
+ },
+ "meta": {
+  "generated": "2026-11-22T18:00:00+00:00",
+  "window_days": 90,
+  "agents": [
+   "claude-code",
+   "codex",
+   "devin"
+  ],
+  "demo": true
+ }
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var R = JSON.parse(document.getElementById("report-data").textContent || "{}");
+  var S = R.summary || {}, ROWS = R.sessions || [], INS = R.insights || {}, META = R.meta || {};
+  var WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  var AGENT_COLORS = ["--a1", "--a2", "--a3", "--a4", "--a5", "--a6"];
+  var agentNames = Object.keys(S.per_agent || {}).sort(function (a, b) { return S.per_agent[b] - S.per_agent[a]; });
+  var TABS = [
+    ["overview", "Overview"], ["frequency", "Frequency"], ["kinds", "Kinds of work"], ["habits", "Habits"],
+    ["friction", "Friction"], ["agents", "Agents"], ["numbers", "Exact numbers"], ["data", "Data"]
+  ];
+
+  // ---------- tiny DOM helpers (text only, never HTML) ----------
+  function el(tag, attrs) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === "text") n.textContent = attrs[k];
+      else if (k === "cls") n.className = attrs[k];
+      else if (k === "style") n.setAttribute("style", attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      n.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(String(c)) : c);
+    }
+    return n;
+  }
+  function badge(kind) { return el("span", { cls: "badge " + kind, text: kind === "exact" ? "exact" : "judgement" }); }
+  function card(title, kind, sub) {
+    var c = el("section", { cls: "card" }, el("h2", null, title, kind ? badge(kind) : null));
+    if (sub) c.appendChild(el("p", { cls: "sub", text: sub }));
+    return c;
+  }
+  function empty(text) { return el("p", { cls: "empty", text: text }); }
+  function lead(p, text) { p.appendChild(el("p", { cls: "lead", text: text })); }
+  function seen(evidence) { return evidence ? el("p", { cls: "ev" }, el("b", { text: "Seen in:" }), " " + evidence) : null; }
+  function fmt(n) { return typeof n === "number" ? (Math.round(n * 10) / 10).toLocaleString() : String(n); }
+  function plural(n, w) { return fmt(n) + " " + w + (n === 1 ? "" : "s"); }
+  function color(i) { return "var(" + AGENT_COLORS[i % AGENT_COLORS.length] + ")"; }
+  function agentColor(a) { var i = agentNames.indexOf(a); return color(i < 0 ? 0 : i); }
+  function day(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); }
+  function when(iso) { var d = new Date(iso); return isNaN(d) ? String(iso || "") : d.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); }
+  function table(head, rows, numeric) {
+    var t = el("table"), tr = el("tr");
+    head.forEach(function (h) { tr.appendChild(el("th", { text: h })); });
+    t.appendChild(el("thead", null, tr));
+    var tb = el("tbody");
+    rows.forEach(function (r) {
+      var row = el("tr");
+      r.forEach(function (v, i) { row.appendChild(el("td", { cls: numeric && numeric[i] ? "num" : "", text: v == null ? "" : String(v) })); });
+      tb.appendChild(row);
+    });
+    t.appendChild(tb);
+    return el("div", { cls: "scroll" }, t);
+  }
+
+  // ---------- tooltip ----------
+  var tip = document.getElementById("tooltip");
+  function showTip(e) {
+    var t = e.currentTarget.getAttribute("data-tip");
+    if (!t) return;
+    tip.textContent = t; tip.hidden = false;
+    var r = e.currentTarget.getBoundingClientRect();
+    var x = e.clientX != null && e.type !== "focus" ? e.clientX : r.left + r.width / 2;
+    var y = e.clientY != null && e.type !== "focus" ? e.clientY : r.top;
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x - w / 2)) + "px";
+    tip.style.top = Math.max(8, y - h - 10) + "px";
+  }
+  function hideTip() { tip.hidden = true; }
+  function tipped(n, text) {
+    n.setAttribute("data-tip", text);
+    n.addEventListener("mouseenter", showTip); n.addEventListener("mousemove", showTip);
+    n.addEventListener("focus", showTip); n.addEventListener("mouseleave", hideTip); n.addEventListener("blur", hideTip);
+    return n;
+  }
+
+  // ---------- charts ----------
+  function barChart(name, title, pairs, unit, labelEvery) {
+    var max = Math.max.apply(null, pairs.map(function (p) { return p[1]; }).concat([1]));
+    var bars = el("div", { cls: "bars", role: "img", "aria-label": title + ": see the table below" });
+    var axis = el("div", { cls: "axis", "aria-hidden": "true" });
+    pairs.forEach(function (p, i) {
+      var b = el("div", { cls: "bar" + (p[1] ? "" : " zero"), tabindex: "0",
+        style: "height:" + (p[1] ? Math.max(2, p[1] / max * 100) : 1) + "%" });
+      bars.appendChild(tipped(b, p[0] + ": " + plural(p[1], unit)));
+      axis.appendChild(el("span", { text: !labelEvery || i % labelEvery === 0 ? p[0] : "" }));
+    });
+    var c = el("div", { cls: "chart", "data-chart": name }, el("h3", { text: title }), bars, axis,
+      el("details", null, el("summary", { text: "Show as a table" }), table([title.split(" by ")[1] || "Label", "Sessions"],
+        pairs.map(function (p) { return [p[0], p[1]]; }), [false, true])));
+    return c;
+  }
+  function monthKey(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); }
+  function monthChart() {
+    var by = {};
+    ROWS.forEach(function (r) { var m = monthKey(r.start); if (!m) return; by[m] = by[m] || {}; by[m][r.agent] = (by[m][r.agent] || 0) + 1; });
+    Object.keys(S.per_month || {}).forEach(function (m) { if (!by[m]) { by[m] = {}; by[m]["all agents"] = S.per_month[m]; } });
+    var months = Object.keys(by).sort();
+    var totals = months.map(function (m) { return Object.keys(by[m]).reduce(function (s, a) { return s + by[m][a]; }, 0); });
+    var max = Math.max.apply(null, totals.concat([1]));
+    var cols = el("div", { cls: "cols", role: "img", "aria-label": "Sessions by month, stacked by agent: see the table below" });
+    var labels = el("div", { cls: "labels", "aria-hidden": "true" });
+    months.forEach(function (m, i) {
+      var col = el("div", { cls: "col" }, el("div", { cls: "tot", text: String(totals[i]) }));
+      agentNames.concat(["all agents"]).forEach(function (a) {
+        var n = by[m][a];
+        if (!n) return;
+        col.appendChild(tipped(el("div", { cls: "seg", tabindex: "0", style: "height:" + (n / max * 85) + "%;background:" + (a === "all agents" ? "var(--muted)" : agentColor(a)) }),
+          m + ": " + plural(n, "session") + " (" + a + ")"));
+      });
+      cols.appendChild(col);
+      labels.appendChild(el("span", { text: m }));
+    });
+    var legend = el("div", { cls: "legend" });
+    if (agentNames.length > 1) agentNames.forEach(function (a) { legend.appendChild(el("span", null, el("i", { style: "background:" + agentColor(a) }), a)); });
+    var head = ["Month"].concat(agentNames, ["Total"]);
+    var rows = months.map(function (m, i) { return [m].concat(agentNames.map(function (a) { return by[m][a] || 0; }), [totals[i]]); });
+    return el("div", { cls: "chart stack-chart", "data-chart": "month" }, el("h3", { text: "Sessions by month" }), legend, cols, labels,
+      el("details", null, el("summary", { text: "Show as a table" }), table(head, rows, head.map(function (_, i) { return i > 0; }))));
+  }
+  function hbars(pairs, unit, colorFn) {
+    var max = Math.max.apply(null, pairs.map(function (p) { return p[1]; }).concat([1]));
+    var g = el("div", { cls: "hbars" });
+    pairs.forEach(function (p) {
+      var fill = el("div", { cls: "fill", style: "width:" + (p[1] / max * 100) + "%" + (colorFn ? ";background:" + colorFn(p[0]) : "") });
+      g.appendChild(el("div", { text: p[0] }));
+      g.appendChild(tipped(el("div", { cls: "track" }, fill), p[0] + ": " + plural(p[1], unit)));
+      g.appendChild(el("div", { cls: "n", text: fmt(p[1]) }));
+    });
+    return g;
+  }
+  function timeline() {
+    var end = new Date(META.generated || S.last || Date.now());
+    var start = new Date(end.getTime() - (S.window_days || 30) * 864e5);
+    var span = end - start || 1;
+    var box = el("div", { cls: "timeline", role: "img", "aria-label": "Each session as a dot: date across, hour of day down" });
+    [0, 6, 12, 18, 24].forEach(function (h) { box.appendChild(el("span", { cls: "ylab", style: "top:" + (h / 24 * 100) + "%", text: String(h).padStart(2, "0") + ":00" })); });
+    ROWS.forEach(function (r) {
+      var d = new Date(r.start);
+      if (isNaN(d)) return;
+      var x = Math.max(0, Math.min(1, (d - start) / span)), y = (d.getHours() + d.getMinutes() / 60) / 24;
+      box.appendChild(tipped(el("div", { cls: "dot", style: "left:" + (x * 100) + "%;top:" + (y * 100) + "%;background:" + agentColor(r.agent) }),
+        when(r.start) + " · " + r.agent + " · " + (r.project || "?") + " · " + plural(r.minutes, "min")));
+    });
+    var legend = el("div", { cls: "legend" });
+    if (agentNames.length > 1) agentNames.forEach(function (a) { legend.appendChild(el("span", null, el("i", { style: "background:" + agentColor(a) }), a)); });
+    return el("div", { cls: "chart", "data-chart": "timeline" }, el("h3", { text: "Every session across the window" }), box,
+      el("div", { cls: "tl-x", "aria-hidden": "true" }, el("span", { text: day(start.toISOString()) }), el("span", { text: day(end.toISOString()) })), legend,
+      el("details", null, el("summary", { text: "Show as a table" }), table(["Start", "Agent", "Project", "Minutes"],
+        ROWS.map(function (r) { return [when(r.start), r.agent, r.project, fmt(r.minutes)]; }), [false, false, false, true])));
+  }
+
+  // ---------- panels ----------
+  function notes(list, emptyText) {
+    if (!list || !list.length) return empty(emptyText);
+    var d = el("div", { cls: "prose" });
+    list.forEach(function (s) { d.appendChild(el("p", { text: s })); });
+    return d;
+  }
+  function stat(key, label, value) {
+    return el("div", { cls: "stat" }, el("div", { cls: "v", "data-stat": key, text: fmt(value) }), el("div", { cls: "l", text: label }));
+  }
+  var P = {};
+  P.overview = function (p) {
+    lead(p, "The headline numbers from the logs, then the agent's reading of them in plain language.");
+    p.appendChild(el("div", { cls: "stats" },
+      stat("sessions", "sessions", S.sessions), stat("active_days", "active days of " + S.window_days, S.active_days),
+      stat("prompts", "prompts", S.prompts), stat("median_minutes", "median minutes per session", S.median_minutes),
+      stat("longest_minutes", "longest session (min)", S.longest_minutes), stat("test_runs", "test runs", S.test_runs)));
+    var c = card("In plain language", "judge", "The agent's reading of the numbers. Every figure is in Exact numbers.");
+    c.appendChild(notes(INS.overview, "No reading was added. The numbers above are exact; ask the agent for its summary."));
+    p.appendChild(c);
+  };
+  P.frequency = function (p) {
+    lead(p, "When sessions happen: by month (split by agent), weekday and hour, and every session on one timeline.");
+    var wd = WEEKDAYS.map(function (d) { return [d, (S.per_weekday || {})[d] || 0]; });
+    var hours = []; for (var h = 0; h < 24; h++) hours.push([String(h).padStart(2, "0"), (S.per_hour || {})[h] || (S.per_hour || {})[String(h)] || 0]);
+    var c = card("How often", "exact", "Sessions by when they started, in this machine's local time. Median gap between active days: " +
+      plural(S.median_gap_days, "day") + "; longest: " + plural(S.longest_gap_days, "day") + ".");
+    c.appendChild(el("div", { cls: "grid2" }, monthChart(), barChart("weekday", "Sessions by weekday", wd, "session")));
+    p.appendChild(c);
+    var c2 = card("Time of day", "exact");
+    c2.appendChild(barChart("hour", "Sessions by hour", hours, "session", 3));
+    p.appendChild(c2);
+    var c3 = card("Timeline", "exact");
+    c3.appendChild(timeline());
+    p.appendChild(c3);
+  };
+  P.kinds = function (p) {
+    lead(p, "What the sessions were for. The groups are the agent's reading; the project counts under them are exact.");
+    var c = card("Kinds of work", "judge", "Grouped by the agent from project names and first prompts. A reading, not a count of labels.");
+    var kinds = INS.kinds || [];
+    if (!kinds.length) c.appendChild(empty("No reading of the kinds of work was added. The projects below are exact."));
+    kinds.forEach(function (k) {
+      var d = el("div", { cls: "kind" }, el("h3", { text: k.name }),
+        el("div", { cls: "meta", text: plural(k.sessions, "session") + (k.projects && k.projects.length ? " · " + k.projects.join(", ") : "") }));
+      if (k.examples && k.examples.length) {
+        var ul = el("ul"); k.examples.forEach(function (x) { ul.appendChild(el("li", { text: x })); }); d.appendChild(ul);
+      }
+      if (k.evidence) d.appendChild(el("div", { cls: "meta", text: "Based on: " + k.evidence }));
+      c.appendChild(d);
+    });
+    p.appendChild(c);
+    var c2 = card("Projects", "exact", "Sessions per project (the working folder's name).");
+    c2.appendChild((S.projects || []).length ? hbars(S.projects, "session") : empty("No projects."));
+    p.appendChild(c2);
+  };
+  P.habits = function (p) {
+    lead(p, "Habits that repeat across sessions, each with where it shows, then the counts behind them.");
+    p.appendChild(el("h2", { cls: "section-h" }, "Habits", badge("judge")));
+    var hs = INS.habits || [];
+    if (!hs.length) p.appendChild(el("section", { cls: "card" }, empty("No reading was added. The counts below are exact.")));
+    else {
+      var grid = el("div", { cls: "habits" });
+      hs.forEach(function (h, i) {
+        var o = typeof h === "string" ? { title: h } : h;
+        grid.appendChild(el("section", { cls: "card habit" }, el("h3", { text: (i + 1) + ". " + o.title }),
+          o.detail ? el("p", { text: o.detail }) : null, seen(o.evidence)));
+      });
+      p.appendChild(grid);
+    }
+    p.appendChild(el("h2", { cls: "section-h" }, "Counts", badge("exact")));
+    var g = el("div", { cls: "grid2" });
+    var t = card("Tools", "exact", "Tool calls across all sessions.");
+    t.appendChild((S.tools || []).length ? hbars(S.tools, "call") : empty("No tool calls recorded."));
+    g.appendChild(t);
+    var cm = card("Slash commands", "exact");
+    cm.appendChild((S.commands || []).length ? hbars(S.commands, "use") : empty("No slash commands recorded."));
+    g.appendChild(cm);
+    var ts = card("Tests", "exact");
+    ts.appendChild(el("p", { cls: "prose", text: plural(S.test_runs, "test run") + " in " + plural(S.sessions, "session") +
+      " (" + fmt(S.sessions ? S.test_runs / S.sessions : 0) + " per session)." }));
+    g.appendChild(ts);
+    var de = card("Doc-file edits", "exact", "Edits to CLAUDE.md, AGENTS.md, README.md and similar.");
+    var docs = Object.keys(S.doc_edits || {}).map(function (k) { return [k, S.doc_edits[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+    de.appendChild(docs.length ? hbars(docs, "edit") : empty("No doc-file edits recorded."));
+    g.appendChild(de);
+    p.appendChild(g);
+  };
+  P.friction = function (p) {
+    lead(p, "Snags that recur, work that looks unfinished, and the longest sessions. Treat each as a lead, not a verdict.");
+    var c = card("Possible friction", "judge", "Patterns worth a look. Each is a possibility, not a conclusion.");
+    var fr = INS.friction || [];
+    if (!fr.length) c.appendChild(empty("No reading of friction was added."));
+    else {
+      var ul = el("ul", { cls: "friction" });
+      fr.forEach(function (f) { ul.appendChild(el("li", null, el("strong", { text: f.title }), " ", el("span", { text: f.detail }), seen(f.evidence))); });
+      c.appendChild(ul);
+    }
+    p.appendChild(c);
+    var th = card("Open threads", "judge", "Work that looked unfinished at its last session, and the next step.");
+    var threads = INS.threads || [];
+    if (!threads.length) th.appendChild(empty("No open threads were noted."));
+    else {
+      var tt = el("table", { id: "threads" }), tb = el("tbody");
+      tt.appendChild(el("thead", null, el("tr", null, el("th", { text: "Thread" }), el("th", { text: "Next step" }))));
+      threads.forEach(function (x) {
+        tb.appendChild(el("tr", null, el("td", null, el("div", { text: x.thread }), x.when ? el("div", { cls: "ev", text: x.when }) : null), el("td", { text: x.next })));
+      });
+      tt.appendChild(tb);
+      th.appendChild(el("div", { cls: "scroll" }, tt));
+    }
+    p.appendChild(th);
+    var longest = ROWS.slice().sort(function (a, b) { return b.minutes - a.minutes; }).slice(0, 5);
+    var c2 = card("Longest sessions", "exact", "First to last event, so a session left open reads long.");
+    c2.appendChild(longest.length ? table(["Start", "Agent", "Project", "Minutes", "Prompts"],
+      longest.map(function (r) { return [when(r.start), r.agent, r.project, fmt(r.minutes), r.prompts]; }), [false, false, false, true, true]) : empty("No sessions."));
+    p.appendChild(c2);
+  };
+  P.agents = function (p) {
+    lead(p, "How the sessions split between agents, and how each one is used.");
+    var c = card("Sessions per agent", "exact");
+    c.appendChild(hbars(agentNames.map(function (a) { return [a, S.per_agent[a]]; }), "session", agentColor));
+    var rows = agentNames.map(function (a) {
+      var mine = ROWS.filter(function (r) { return r.agent === a; });
+      var days = {}; mine.forEach(function (r) { days[new Date(r.start).toDateString()] = 1; });
+      var mins = mine.map(function (r) { return r.minutes; }).sort(function (x, y) { return x - y; });
+      var med = mins.length ? (mins.length % 2 ? mins[(mins.length - 1) / 2] : (mins[mins.length / 2 - 1] + mins[mins.length / 2]) / 2) : 0;
+      return [a, S.per_agent[a], Object.keys(days).length, fmt(med), mine.reduce(function (s, r) { return s + (r.prompts || 0); }, 0)];
+    });
+    c.appendChild(el("div", { style: "margin-top:14px" }, table(["Agent", "Sessions", "Active days", "Median minutes", "Prompts"], rows, [false, true, true, true, true])));
+    p.appendChild(c);
+    var c2 = card("How the work is split", "judge");
+    c2.appendChild(notes(INS.agents, "No reading was added."));
+    p.appendChild(c2);
+  };
+  P.numbers = function (p) {
+    lead(p, "Every figure the collector counted, unchanged. Check any claim in the other tabs against this table.");
+    var c = card("Exact numbers", "exact", "Everything the collector counted. Check any claim in the other tabs here.");
+    var t = el("table"), tb = el("tbody");
+    t.appendChild(el("thead", null, el("tr", null, el("th", { text: "Key" }), el("th", { text: "Value" }))));
+    Object.keys(S).forEach(function (k) {
+      var v = S[k], s;
+      if (Array.isArray(v)) s = v.map(function (x) { return Array.isArray(x) ? x[0] + " (" + x[1] + ")" : String(x); }).join(", ");
+      else if (v && typeof v === "object") s = Object.keys(v).map(function (x) { return x + ": " + v[x]; }).join(", ");
+      else s = typeof v === "number" ? fmt(v) : String(v);
+      tb.appendChild(el("tr", null, el("td", null, el("code", { "data-key": k, text: k })), el("td", { text: s || "—" })));
+    });
+    t.appendChild(tb);
+    c.appendChild(el("div", { cls: "scroll" }, t));
+    p.appendChild(c);
+  };
+  P.data = function (p) {
+    lead(p, "One row per session in the window, and how the data was collected.");
+    var c = card("Sessions", "exact", "One row per session in the window. Prompts are cut to 160 characters.");
+    var input = el("input", { type: "search", id: "filter", placeholder: "Filter by agent, project or prompt", "aria-label": "Filter sessions" });
+    c.appendChild(input);
+    var t = el("table", { id: "sessions-table" }), tb = el("tbody");
+    var head = el("tr");
+    ["Start", "Agent", "Project", "Minutes", "Prompts", "First prompt", "Top tools"].forEach(function (h) { head.appendChild(el("th", { text: h })); });
+    t.appendChild(el("thead", null, head));
+    var rows = ROWS.slice().sort(function (a, b) { return a.start < b.start ? 1 : -1; }).map(function (r) {
+      var tools = (r.top_tools || []).map(function (x) { return x[0] + " " + x[1]; }).join(", ");
+      var tr = el("tr", null, el("td", { text: when(r.start) }), el("td", { text: r.agent }), el("td", { text: r.project || "" }),
+        el("td", { cls: "num", text: fmt(r.minutes) }), el("td", { cls: "num", text: r.prompts }), el("td", { text: r.first_prompt || "" }), el("td", { text: tools }));
+      tr.dataset.search = [r.agent, r.project, r.first_prompt, tools, r.id].join(" ").toLowerCase();
+      tb.appendChild(tr);
+      return tr;
+    });
+    t.appendChild(tb);
+    c.appendChild(el("div", { cls: "scroll" }, t));
+    var count = el("p", { cls: "sub", style: "margin-top:8px" });
+    function apply() {
+      var q = input.value.trim().toLowerCase(), n = 0;
+      rows.forEach(function (tr) { var show = !q || tr.dataset.search.indexOf(q) >= 0; tr.hidden = !show; if (show) n++; });
+      count.textContent = n + " of " + rows.length + " sessions";
+    }
+    input.addEventListener("input", apply); apply();
+    c.appendChild(count);
+    p.appendChild(c);
+    var m = card("How this was collected", "exact");
+    m.appendChild(table(["", ""], [["Generated", when(META.generated)], ["Window", plural(S.window_days, "day")],
+      ["Agents with sessions", (META.agents || agentNames).join(", ") || "none"], ["First session", when(S.first)], ["Last activity", when(S.last)],
+      ["Collector", "scripts/collect.py (read-only, offline)"]]));
+    p.appendChild(m);
+  };
+
+  // ---------- tabs and routing ----------
+  var tabsEl = document.getElementById("tabs"), panelsEl = document.getElementById("panels"), built = {};
+  var tabs = TABS.map(function (t) {
+    var b = el("button", { role: "tab", type: "button", id: "tab-" + t[0], "data-tab": t[0], "aria-controls": "panel-" + t[0], "aria-selected": "false", tabindex: "-1", text: t[1] });
+    if (t[0] === "agents" && agentNames.length < 2) b.hidden = true;
+    var panel = el("section", { role: "tabpanel", id: "panel-" + t[0], "aria-labelledby": "tab-" + t[0], tabindex: "0" });
+    panel.hidden = true;
+    tabsEl.appendChild(b); panelsEl.appendChild(panel);
+    b.addEventListener("click", function () { go(t[0], true); });
+    b.addEventListener("keydown", function (e) {
+      var vis = tabs.filter(function (x) { return !x.hidden; }), i = vis.indexOf(b), j = null;
+      if (e.key === "ArrowRight") j = (i + 1) % vis.length;
+      else if (e.key === "ArrowLeft") j = (i - 1 + vis.length) % vis.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = vis.length - 1;
+      if (j === null) return;
+      e.preventDefault();
+      go(vis[j].getAttribute("data-tab"), true);
+      vis[j].focus();
+    });
+    return b;
+  });
+  function go(name, push) {
+    var b = document.getElementById("tab-" + name);
+    if (!b || b.hidden) name = "overview";
+    tabs.forEach(function (t) {
+      var on = t.getAttribute("data-tab") === name;
+      t.setAttribute("aria-selected", String(on)); t.tabIndex = on ? 0 : -1;
+      document.getElementById("panel-" + t.getAttribute("data-tab")).hidden = !on;
+    });
+    if (!built[name]) { built[name] = true; P[name](document.getElementById("panel-" + name)); }
+    hideTip();
+    if (push && location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+  }
+  window.addEventListener("hashchange", function () { go(location.hash.slice(1), false); });
+
+  // ---------- header ----------
+  document.getElementById("subtitle").textContent = plural(S.sessions || 0, "session") + " over the last " + plural(S.window_days || 0, "day") +
+    (agentNames.length ? " · " + agentNames.join(", ") : "") + (META.generated ? " · generated " + day(META.generated) : "");
+  document.getElementById("demo-note").hidden = !META.demo;
+  if (INS.caveat) { document.getElementById("caveat-text").textContent = INS.caveat; document.getElementById("caveat").hidden = false; }
+  var THEMES = ["", "light", "dark"], themeBtn = document.getElementById("theme-toggle");
+  function setTheme(v, save) {
+    if (v) document.documentElement.setAttribute("data-theme", v); else document.documentElement.removeAttribute("data-theme");
+    themeBtn.textContent = "Theme: " + (v ? v.charAt(0).toUpperCase() + v.slice(1) : "Auto");
+    if (save) { try { localStorage.setItem("agentSessionsInsightTheme", v); } catch (e) { /* storage blocked: still works for this view */ } }
+  }
+  var savedTheme = ""; try { savedTheme = localStorage.getItem("agentSessionsInsightTheme") || ""; } catch (e) { savedTheme = ""; }
+  setTheme(THEMES.indexOf(savedTheme) >= 0 ? savedTheme : "", false);
+  themeBtn.addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme") || "";
+    setTheme(THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length], true);
+  });
+  document.getElementById("foot").textContent = "Made by agent-sessions-insight from the session logs on this machine. Nothing in this page was sent anywhere.";
+  go(location.hash.slice(1) || "overview", false);
+})();
+</script>
+</body>
+</html>

@@ -108,14 +108,16 @@
     {
       "name": "productivity-skills",
       "source": "./productivity",
-      "description": "Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown per item, a per-item meeting progress bar and an in-page editor.",
+      "description": "Productivity skills: /meeting-agenda turns an agenda into an offline HTML slide deck with a ring countdown per item, a per-item meeting progress bar and an in-page editor; /agent-sessions-insight shows how often and for what you use your coding agents, from their local session logs.",
       "category": "productivity",
       "keywords": [
         "productivity",
         "meetings",
         "agenda",
         "slides",
-        "timer"
+        "timer",
+        "coding-agents",
+        "usage"
       ]
     },
     {

@@ -66,7 +66,7 @@ Written when the package is built, and copied to the install folder.
     "scrolls-setup": "scrolls/scrolls-setup"
   },
   "extras": ["scrolls/README.md", "scrolls/.claude-plugin/plugin.json"],
-  "ignored": ["newsletters/newsletter-ai/", "productivity/meeting-agenda/meta/screenshots/"]
+  "ignored": ["development/meta/", "development/repo-related/meta/", "development/review/meta/", "diagrams/meta/", "docs/meta/", "image-styles/meta/", "newsletters/meta/", "newsletters/newsletter-ai/", "personas/meta/", "productivity/meeting-agenda/meta/screenshots/", "productivity/meta/", "scrolls/meta/", "stata/meta/", "video-related/meta/"]
 }
 ```
 
@@ -75,8 +75,8 @@ Written when the package is built, and copied to the install folder.
 | `format` | number | Version of this file's shape; currently `1`. |
 | `description` | string | A note for people reading the file. |
 | `skills` | object: skill name → string | Each skill's original folder, relative to the repo's `skills/`. Used for `--nested` and for groups. |
-| `extras` | string[] | Files outside any skill folder (READMEs, `plugin.json`, `meta/`), stored in the package under `.aiskills/nested/` at these paths. |
-| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`, and `productivity/meeting-agenda/meta/screenshots/`, from `skills/productivity/meeting-agenda/.skillsignore`. |
+| `extras` | string[] | Files outside any skill folder (READMEs and `plugin.json`), stored in the package under `.aiskills/nested/` at these paths. |
+| `ignored` | string[] | Paths a `.skillsignore` left out of the package. Folders end with `/`. In this version: every group's and subgroup's `meta/` folder, from `skills/.skillsignore`; `newsletters/newsletter-ai/`, from `skills/newsletters/.skillsignore`; and `productivity/meeting-agenda/meta/screenshots/`, from `skills/productivity/meeting-agenda/.skillsignore`. A `meta/` inside a skill folder ships. |
 
 ## The package
 
