@@ -279,7 +279,7 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
   test("edits are saved in the browser, kept after a reload, and Reset restores the original", () =>
     open(async (p) => {
       await p.click("#editToggle");
-      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 14); // incl. both install commands
+      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 15); // includes both install commands and the social handle
       await p.locator("#banner .tagline").evaluate((el) => (el.textContent = "Edited."));
       await p.locator("#pills .pill").last().click();
       await p.keyboard.press("End");
