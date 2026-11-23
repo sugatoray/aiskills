@@ -11,8 +11,8 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 The review skills live at `skills/development/review/`, not here. Two symlinks reach their governance docs from `src/` without duplicating them:
 
 - `README.md` → `../../../../skills/development/review/README.md` (the subgroup's README)
-- `meta` → `../../../../skills/development/review/meta` (the subgroup's `MAINTAINERS.md`)
+- `meta` → `../../../../skills/development/review/meta`, so `meta/MAINTAINERS.md` here opens `skills/development/review/meta/MAINTAINERS.md` (the subgroup's maintainer notes)
 
-One level up, `src/skills/development/meta` → `../../../skills/development/meta` reaches the development family's own `MAINTAINERS.md`.
+One level up, `src/skills/development/meta` → `../../../skills/development/meta`, so `src/skills/development/meta/MAINTAINERS.md` opens `skills/development/meta/MAINTAINERS.md` (the development family's notes).
 
 These are symlinks, not copies: editing through them edits the real files at `skills/development/review/`. There is no subgroup `CHANGELOG.md` to link; each skill keeps its own (`skills/development/review/run-code-review/CHANGELOG.md`).

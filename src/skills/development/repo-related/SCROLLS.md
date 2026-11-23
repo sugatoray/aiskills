@@ -11,8 +11,8 @@ Start with **`docs/.scrolls/STARTER.md`** — it explains the reading order for 
 The repo-related skills live at `skills/development/repo-related/`, not here. Two symlinks reach their governance docs from `src/` without duplicating them:
 
 - `README.md` → `../../../../skills/development/repo-related/README.md` (the subgroup's README)
-- `meta` → `../../../../skills/development/repo-related/meta` (the subgroup's `MAINTAINERS.md`)
+- `meta` → `../../../../skills/development/repo-related/meta`, so `meta/MAINTAINERS.md` here opens `skills/development/repo-related/meta/MAINTAINERS.md` (the subgroup's maintainer notes)
 
-One level up, `src/skills/development/meta` → `../../../skills/development/meta` reaches the development family's own `MAINTAINERS.md`.
+One level up, `src/skills/development/meta` → `../../../skills/development/meta`, so `src/skills/development/meta/MAINTAINERS.md` opens `skills/development/meta/MAINTAINERS.md` (the development family's notes).
 
 These are symlinks, not copies: editing through them edits the real files at `skills/development/repo-related/`. There is no subgroup `CHANGELOG.md` to link; each skill keeps its own (`skills/development/repo-related/create-issues-update-pr/CHANGELOG.md`).
