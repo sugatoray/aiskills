@@ -11,6 +11,11 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 - Branches holding only merged history: `claude/clever-mendel-k9n73h` (#265) and `claude/aiskills-1.4.0` (#302); deleting them is the user's call.
 
 ## What just happened
+0. **Nested scroll sets (2.7.0), on `claude/scrolls-nested-routing`, not merged yet.** At the user's request, after they found that `/scrolls-update` didn't know their "route to the dedicated memory" rule outside this repo:
+   - `/scrolls-update` gained `scripts/route.py` (stdlib; `route.sh`/`route.ps1` launchers) and a step 5 that routes each change to the deepest scroll set covering it, by nesting or by a `## Where memory lives` table. With `-r`, nested sets resolve to the outermost; siblings still make it ask.
+   - `/scrolls-setup` registers a new set in its nearest parent's table, and the `STARTER.md` template ships the section.
+   - All Red/Green: `test_route.sh` 33 checks (failed first, a mutation of the deepest-match rule is caught); every scrolls suite passes; explainer rebuilt (update tab 10 steps, setup 11); npm `test` 520.
+   - Running the script on its own branch found a display bug (`since origin/`), fixed test-first.
 1. **On #320:** the folder move and the packaging change above; `SCROLLS.md` and `STARTER.md` now say `meta/MAINTAINERS.md` here opens `skills/scrolls/meta/MAINTAINERS.md`; `STARTER.md` no longer says `scrolls-compact` is unmerged.
 2. `/scrolls-setup` was used to create three new scroll sets elsewhere in the repo (video-related, repo-related, image-styles); `/scrolls-update` ran several times, ending with the root scroll set becoming a router (see the root `STARTER.md`). Both commands behaved as documented; nothing in the skills needed changing.
 

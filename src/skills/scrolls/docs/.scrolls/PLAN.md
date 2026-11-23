@@ -20,6 +20,9 @@ The ordered, ticketed backlog. Highest priority first. Update ticket status (`[ 
 - [x] Show `/scrolls-compact`'s examples in the docsite's Skills tab: the page "Browse the scrolls-compact examples" (`explainers/scrolls-compact-examples.md`, under Explainers) embeds `assets/example-viewer.html` (2026-11-16).
 - [ ] Run `tests/test_remove.ps1`, `tests/test_restore.ps1`, `tests/test_explain.ps1`, `tests/test_compact.ps1` (and the older `.ps1` suites) somewhere `pwsh` is available.
 - [x] The stale remote branch `claude/confident-maxwell-d6ws37` is gone (checked with `git ls-remote`).
+- [x] Build nested scroll sets and routing Red/Green (2.7.0, the family bumped in lockstep), on `claude/scrolls-nested-routing` (from `0999e6f`): `/scrolls-update` gets `scripts/route.py` (+ `route.sh`/`route.ps1`) and a "Route the work" step; `/scrolls-setup` registers a new set with its parent; the `STARTER.md` template gets a `## Where memory lives` table; the explainer, `/scrolls-help` and READMEs describe it. `test_route.sh`: 33 checks.
+- [ ] Open a PR for `claude/scrolls-nested-routing` when the user asks, file its issues, and get it merged. It touches the same root `STARTER.md` section idea as #320 (which adds this repo's own router table): merge #320 first, or expect a small conflict in `docs/.scrolls/`.
+- [ ] Run `tests/test_route.ps1` where `pwsh` is available (not run yet).
 
 Longer-horizon:
 - [ ] Consider CI for the repo (explicitly out of scope unless the repo owner asks).
