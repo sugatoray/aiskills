@@ -1,0 +1,41 @@
+name: Release verification
+on:
+  push:
+    branches: ["codex/aiskills-1.6.0"]
+    paths: [".github/workflows/aiskills-release-verification.yml"]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: src/packages/aiskills
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/aiskills-tools" playwright
+          echo "NODE_PATH=$RUNNER_TEMP/aiskills-tools/node_modules" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/aiskills-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Generate banner
+        run: npm run banner:png
+      - name: Test package
+        run: npm test
+      - name: Test installation
+        run: npm run test:e2e
+      - name: Audit dependency
+        run: npm run audit:skills
+      - name: Upload banner
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-banner
+          path: src/packages/aiskills/docs/banner/banner_2x.png
+          if-no-files-found: error
