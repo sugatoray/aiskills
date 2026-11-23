@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Red/Green regression test for scripts/setup-conda.sh and scripts/setup-pwsh.sh
-# (make conda, make setup-pwsh). Nothing is downloaded or installed for real:
+# (make setup-conda, make setup-pwsh). Nothing is downloaded or installed for real:
 # fake curl, conda and pwsh commands on PATH stand in, and SETUP_OS/SETUP_ARCH
 # override uname so every platform's installer name can be checked here.
 # Run with: bash scripts/tests/test_setup_tools.sh   (or: make test-scripts)
@@ -160,7 +160,12 @@ done_box
 
 echo; echo "=== Scenario H: the Makefile has both targets ==="
 help="$(make -s -C "$REPO" help 2>&1)"
-assert_match "$help" "make conda" "make help lists make conda"
+assert_match "$help" "make setup-conda" "make help lists make setup-conda"
+assert_no_match "$help" "make conda( |$)" "the old name make conda is gone from make help"
+dryc="$(SETUP_OS=Linux SETUP_ARCH=x86_64 HOME=/nonexistent-home PATH=/usr/bin:/bin make -s -C "$REPO" setup-conda DRY_RUN=1 2>&1)"
+assert_match "$dryc" "Miniforge3-Linux-x86_64\\.sh" "make setup-conda DRY_RUN=1 passes --dry-run through"
+make -s -C "$REPO" conda DRY_RUN=1 >/dev/null 2>&1; code=$?
+assert_exit "$code" 2 "make conda is no longer a target"
 assert_match "$help" "make setup-pwsh" "make help lists make setup-pwsh"
 dry="$(SETUP_OS=Linux SETUP_ARCH=x86_64 HOME=/nonexistent-home PATH=/usr/bin:/bin make -s -C "$REPO" setup-pwsh DRY_RUN=1 2>&1)"
 assert_match "$dry" "conda-forge powershell" "make setup-pwsh DRY_RUN=1 passes --dry-run through"

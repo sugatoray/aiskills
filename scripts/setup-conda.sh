@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install conda (Miniforge: a minimal conda whose default channel is conda-forge).
-# Used by `make conda`, and by setup-pwsh.sh when no conda is found.
+# Used by `make setup-conda`, and by setup-pwsh.sh when no conda is found.
 #
 # Usage: scripts/setup-conda.sh [--dry-run]
 #   CONDA_DIR  where to install (default: ~/miniforge3)

@@ -62,7 +62,7 @@ channel), and PowerShell (`pwsh`) from conda-forge, to run the `.ps1` test suite
 macOS.
 
 ```sh
-make conda                    # Miniforge in ~/miniforge3, unless a conda is already there
+make setup-conda              # Miniforge in ~/miniforge3, unless a conda is already there
 make setup-pwsh               # pwsh in ~/miniforge3/envs/pwsh (installs conda first if needed)
 make setup-pwsh DRY_RUN=1     # show the commands without installing anything
 make setup-pwsh CONDA_DIR=/opt/miniforge3 PWSH_ENV=/opt/pwsh
