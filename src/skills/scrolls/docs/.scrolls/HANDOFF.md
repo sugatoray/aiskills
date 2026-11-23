@@ -3,16 +3,16 @@
 Snapshot of where the project stands *right now*. This file is short-lived: **overwrite** it at the end of every session rather than appending — it's a state snapshot, not a changelog.
 
 ## Current state
-
-- **`master` (`1780fd5`):** all **nine** `scrolls-*` skills at **`2.6.0`**. `/scrolls-compact` merged as [#265](https://github.com/sugatoray/aiskills/pull/265) (`57188d0`); its 13 issues (#266–#271, #295–#301) are closed. See `SPEC.md` for what it does.
-- **npm:** `@sugatoray-ai/aiskills` **1.4.0** (published 2026-11-18T01:25Z, tagged `aiskills-v1.4.0`) bundles the family at 2.6.0, and its docs site has the "Browse the scrolls-compact examples" page. Package detail: `src/packages/aiskills/docs/.scrolls/`.
-- **Branch `claude/aiskills-1.5.0-dev`** (pushed; no PR yet) starts the package's `1.5.0-dev` and carries the scrolls updates for the 1.4.0 release, this one included. Nothing in the scrolls skills changes on it.
+- **`master` (`0999e6f`, `1.6.0-dev`):** all **nine** `scrolls-*` skills at **`2.6.0`**; `/scrolls-compact` merged in [#265](https://github.com/sugatoray/aiskills/pull/265) (`57188d0`).
+- **npm:** `@sugatoray-ai/aiskills` **1.5.0** (published, tagged `aiskills-v1.5.0`) bundles the family at 2.6.0. Package detail: `src/packages/aiskills/docs/.scrolls/`.
+- **On [#320](https://github.com/sugatoray/aiskills/pull/320) (open), nothing in the scrolls skills changes.** Two things around them do:
+  - This memory folder moved from `src/scrolls/` to `src/skills/scrolls/` (its `meta`, `README.md` and `CHANGELOG.md` links got one more `../`). `skills/scrolls/meta/MAINTAINERS.md` was updated for the new path; `skills/scrolls/CHANGELOG.md` keeps the old one as history.
+  - `skills/scrolls/meta/` (the family-wide `MAINTAINERS.md`) no longer ships in the npm package from 1.6.0: `skills/.skillsignore` leaves out every group-level `meta/`. The skills' own `meta/` folders still ship.
 - Branches holding only merged history: `claude/clever-mendel-k9n73h` (#265) and `claude/aiskills-1.4.0` (#302); deleting them is the user's call.
 
 ## What just happened
-
-1. **#265 merged and shipped in 1.4.0.** It added `/scrolls-compact` (designed with the user, built Red/Green), its 23 replay-tested examples, `assets/example-viewer.html` (Lights Out theme, a "Note" box around Premise and Caveats) and its docs-site page, bumped the family to 2.6.0, and renamed `assets/EXAMPLE.md` → `assets/EXAMPLES.md` in three other skills. Before merging it was rebased onto `1.4.0-dev`.
-2. **Scrolls:** `/scrolls-compact` is now in `SPEC.md`, and its PLAN ticket is ticked.
+1. **On #320:** the folder move and the packaging change above; `SCROLLS.md` and `STARTER.md` now say `meta/MAINTAINERS.md` here opens `skills/scrolls/meta/MAINTAINERS.md`; `STARTER.md` no longer says `scrolls-compact` is unmerged.
+2. `/scrolls-setup` was used to create three new scroll sets elsewhere in the repo (video-related, repo-related, image-styles); `/scrolls-update` ran several times, ending with the root scroll set becoming a router (see the root `STARTER.md`). Both commands behaved as documented; nothing in the skills needed changing.
 
 ## Known issues / open threads
 

@@ -10,6 +10,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## What just happened
 - These scrolls were set up on 2026-11-23, laid out like `src/skills/development/review/`, and `SPEC.md` and this file were filled in from the skill's CHANGELOG. No work on the skill itself happened in that session.
+- In the same PR ([#320](https://github.com/sugatoray/aiskills/pull/320), open): the `meta` link here opens `skills/development/repo-related/meta/MAINTAINERS.md`; that subgroup `meta/` no longer ships in the npm package from 1.6.0 (`skills/.skillsignore`), while `create-issues-update-pr/meta/` still does. The skill was also used to file #321–#328 for #320.
 
 ## Known issues / open threads
 - `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md` and `WISDOM.md` still hold the setup placeholders. The skill's `meta/MAINTAINERS.md` holds its layout and design notes (for example, why the subgroup is one level deeper than other groups, and how the single-skill and family plugin manifests relate).

@@ -9,6 +9,7 @@ Snapshot of where the project stands *right now*. This file is short-lived: **ov
 
 ## What just happened
 - These scrolls were set up on 2026-11-23, laid out like `src/skills/video-related/` (with a `meta` link to `skills/image-styles/meta/`), and `SPEC.md` and this file were filled in from the two skills' CHANGELOGs and `SKILL.md` files. No work on the skills themselves happened in that session.
+- 2026-11-22: the family got `skills/image-styles/meta/MAINTAINERS.md` (shared conventions, plugin manifest), reached from here through the `meta` link. Like every group-level `meta/`, it stays out of the npm package. All of this is in [#320](https://github.com/sugatoray/aiskills/pull/320), not yet merged.
 
 ## Known issues / open threads
 - `GAP_ANALYSIS.md`, `GAP_CONTEXT.md`, `PLAN.md` and `WISDOM.md` still hold the setup placeholders.
