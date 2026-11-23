@@ -26,6 +26,8 @@ jobs:
           "$RUNNER_TEMP/aiskills-tools/node_modules/.bin/playwright" install --with-deps chromium
       - name: Generate banner
         run: npm run banner:png
+      - name: Generate documentation
+        run: env -u CI -u GITHUB_ACTIONS npm run docs
       - name: Test package
         run: env -u GITHUB_ACTIONS npm test
       - name: Test installation
@@ -39,5 +41,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-banner
-          path: src/packages/aiskills/docs/banner/banner_2x.png
+          path: |
+            src/packages/aiskills/docs/banner/banner_2x.png
+            src/packages/aiskills/docs/docsite/index.html
+            src/packages/aiskills/docs/docsite/reference/cli-outputs.html
           if-no-files-found: error
