@@ -128,9 +128,17 @@ describe("build-site: the built site", () => {
     const { repo, pkg, dir } = fixtureRepo({ releases: ["1.0.0", "2.0.0", "2.1.0"], next: "2.2.0-dev" });
     try {
       const out = join(dir, "site");
+      const releasedBanner = readFileSync(join(pkg, "docs", "banner", "banner_2x.png"));
+      writeFileSync(join(pkg, "docs", "banner", "banner_2x.png"), Buffer.from("development banner"));
       quiet(() => main(["--out", out, "--ref", "master", "--releases", "2"], { pkgDir: pkg, repo }));
 
       const root = readFileSync(join(out, "index.html"), "utf8");
+      assert.match(root, /<meta property="og:image" content="https:\/\/sugatoray\.github\.io\/aiskills\/social-card\.png">/);
+      assert.match(root, /<meta name="twitter:card" content="summary_large_image">/);
+      assert.match(root, /<meta property="og:url" content="https:\/\/sugatoray\.github\.io\/aiskills\/">/);
+      assert.deepEqual(readFileSync(join(out, "social-card.png")), releasedBanner, "the latest release supplies the share image, not the dev tree");
+      assert.match(root, /<meta property="og:title" content="aiskills documentation">/);
+      assert.match(root, /<meta name="twitter:image" content="https:\/\/sugatoray\.github\.io\/aiskills\/social-card\.png">/);
       assert.equal(summary(root), "v2.1.0");
       assert.deepEqual(menuLinks(root), ["dev/", "./", "v/2.0.0/"]);
       assert.ok(!root.includes('class="channel-note"'));
@@ -138,6 +146,7 @@ describe("build-site: the built site", () => {
       assert.match(data(root).repoBase, /\/blob\/aiskills-v2\.1\.0\//, "its links point at the tag");
 
       const older = readFileSync(join(out, "v", "2.0.0", "index.html"), "utf8");
+      assert.match(older, /<meta property="og:url" content="https:\/\/sugatoray\.github\.io\/aiskills\/v\/2\.0\.0\/">/);
       assert.equal(summary(older), "v2.0.0");
       assert.deepEqual(menuLinks(older), ["../../dev/", "../../", "../../v/2.0.0/"]);
       assert.match(older, /an older release/);
@@ -146,6 +155,7 @@ describe("build-site: the built site", () => {
       assert.ok(!existsSync(join(out, "v", "1.0.0")), "--releases 2 leaves out 1.0.0");
 
       const dev = readFileSync(join(out, "dev", "index.html"), "utf8");
+      assert.match(dev, /<meta property="og:url" content="https:\/\/sugatoray\.github\.io\/aiskills\/dev\/">/);
       assert.equal(summary(dev), "v2.2.0-dev");
       assert.match(dev, /which is not released yet/);
       assert.ok(data(dev).pages[0].md.includes("DEV-ONLY-MARKER"), "dev/ shows the working tree");

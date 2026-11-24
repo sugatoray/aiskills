@@ -122,6 +122,14 @@ describe("render", () => {
     assert.ok(banner.includes("github.com/sugatoray/aiskills"));
   });
 
+  test("the banner shows the social icons and handle", async () => {
+    const { resolveValues, readConfig, render } = await load();
+    const banner = bannerMarkup(render(resolveValues(readConfig())));
+    assert.match(banner, /class="social-signature"/);
+    for (const platform of ["X", "LinkedIn", "GitHub"]) assert.ok(banner.includes(`aria-label="${platform}"`));
+    assert.ok(banner.includes("@sugatoray"));
+  });
+
   test("no install step (AIS-7): the tagline says one npm package, and the box shows npm install, then aiskills install", async () => {
     const { resolveValues, readConfig, render } = await load();
     const v = resolveValues(readConfig());
@@ -271,7 +279,7 @@ describe("the banner page in a browser", { skip: noBrowser }, () => {
   test("edits are saved in the browser, kept after a reload, and Reset restores the original", () =>
     open(async (p) => {
       await p.click("#editToggle");
-      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 14); // incl. both install commands
+      assert.equal(await p.locator("#banner [contenteditable=true]").count(), 15); // includes both install commands and the social handle
       await p.locator("#banner .tagline").evaluate((el) => (el.textContent = "Edited."));
       await p.locator("#pills .pill").last().click();
       await p.keyboard.press("End");

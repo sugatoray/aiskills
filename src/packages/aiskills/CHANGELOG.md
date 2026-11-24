@@ -18,14 +18,15 @@ they are listed under **Changed** or **Removed** with a note.
 This file covers the package and its `aiskills` CLI. Each bundled skill keeps
 its own `CHANGELOG.md` inside its folder under `skills/`.
 
-## [1.6.0] - Unreleased
-
-In development: `package.json` is `1.6.0-dev` (a SemVer pre-release, so it
-sorts below `1.6.0`) while changes collect here. At release, set it to `1.6.0`
-and date this section.
+## [1.6.0] - 2026-11-22
 
 ### Added
 
+- **Documentation social card:** links to the documentation site include
+  Open Graph and X/Twitter metadata and use the current release's banner as
+  a large image preview.
+- The banner and documentation landing page show the X, LinkedIn and GitHub
+  icons alongside `@sugatoray`.
 - **New bundled skill: `agent-sessions-insight`**, in the `productivity-skills`
   group (alias `productivity`). It reads the local session logs of Claude Code,
   Codex CLI, Pi, OpenCode, GitHub Copilot CLI, Devin CLI and Grok CLI (or any agent that
@@ -47,7 +48,13 @@ and date this section.
   when scroll sets are nested (a new `scripts/route.py` with `.sh`/`.ps1`
   launchers), keeping the top-level set as a router; `/scrolls-setup` adds a
   new set to its parent's `## Where memory lives` table, and its `STARTER.md`
-  template has that section. See `skills/scrolls/CHANGELOG.md`.
+  template has that section. The `scrolls-explainer` page now illustrates
+  both steps. See the scrolls skills' changelogs for details.
+
+### Fixed
+
+- **`scrolls-help` on PowerShell:** `open_help.ps1 --stop <port>` now passes
+  the port as one argument, so it can find and stop the help server.
 
 ## [1.5.0] - 2026-11-18
 
