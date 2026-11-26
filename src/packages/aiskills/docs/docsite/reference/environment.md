@@ -45,7 +45,7 @@ Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` t
 
 ### `AISKILLS_STATS`
 
-`0` or `1` (also `false`/`true`, `no`/`yes`, `off`/`on`): the same as `--no-stats` / `--stats` while it's set, but not remembered. `--stats`/`--no-stats` win over it; it wins over the choice remembered in `aiskills.json`. Empty means unset; any other value fails with `AISKILLS_STATS must be 1 or 0`. See [The skills.sh install count](../concepts/install-count.md).
+`0` or `1` (also `false`/`true`, `no`/`yes`, `off`/`on`): the same as `--no-stats` / `--stats` while it's set, but not remembered. `--stats`/`--no-stats` win over it; it wins over the choice remembered in `aiskills.json`. `AISKILLS_STATS=1` also turns the count on when npm uses a registry mirror or a proxy, where it is off by default. Empty means unset; any other value fails with `AISKILLS_STATS must be 1 or 0`. See [The skills.sh install count](../concepts/install-count.md).
 
 ### `AISKILLS_STATS_FOREGROUND`
 

@@ -10,7 +10,7 @@ How to work on, test and release `@sugatoray-ai/aiskills`. How it's built is in
   `docs/.scrolls/STARTER.md`, which gives the reading order for the current
   state (`HANDOFF.md`), known gaps, the backlog (`PLAN.md`) and hard-won
   lessons (`WISDOM.md`). Run `/scrolls-update` at the end of a session.
-- **Requirements:** Node.js 18.17+ and npm; the package has no dependencies.
+- **Requirements:** Node.js 18.17+ and npm; the package's one dependency is the pinned `skills` CLI (which needs Node.js 22.20+ to run).
   For the docs: Python 3 (the create-lib-docs checker and `llms.txt` builder,
   run from `skills/docs/create-lib-docs/scripts/`). Optional: Playwright with
   Chromium, for `npm run banner:png` and the browser tests (skipped without
@@ -244,7 +244,10 @@ code:
 ## Updating the pinned `skills` CLI
 
 `SKILLS_CLI_VERSION` in `src/scripts/core/installer.mjs` is the `skills` version
-every `npx` call runs. To move to a newer one:
+`aiskills` runs, and `"dependencies": { "skills": "<same>" }` in `package.json`
+installs it with the package (exact version, no range; `firewall.test.mjs`
+checks the two match). `aiskills` runs that installed copy, and falls back to
+`npx -y skills@<version>` only without it or for another version. To move to a newer one:
 
 1. `npm run audit:skills <new>`: it resolves the version and its dependency
    tree (without installing), and fails if the version is **less than 7 days
@@ -256,8 +259,8 @@ every `npx` call runs. To move to a newer one:
 2. `AISKILLS_SKILLS_LIB_VERSION=<new> npm run test:e2e` to try it.
 3. Read the new version's changes, especially the output of `find`, the
    "Valid agents:" message and `list --json`, which `aiskills` parses.
-4. Update `SKILLS_CLI_VERSION`, run `npm test` and `npm run test:e2e`, and add
-   a CHANGELOG line.
+4. Update `SKILLS_CLI_VERSION` and the `skills` dependency in `package.json`
+   together, run `npm test` and `npm run test:e2e`, and add a CHANGELOG line.
 5. Run `npm run audit:skills` (no argument: the new pin) once more right
    before `npm publish`; advisories can appear after you picked the version.
 

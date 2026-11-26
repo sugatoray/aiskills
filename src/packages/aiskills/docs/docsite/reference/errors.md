@@ -207,6 +207,25 @@ unknown command: <name>
 
 **Cause:** the registry returned nothing (or there's no network access to `skills.sh`). **Fix:** check the name and network, or give the source as `owner/repo@skill`.
 
+### Could not search the skills registry
+
+```text
+[aiskills] could not search the skills registry for '<name>': 'npx skills find' failed (it asks skills.sh, and npm uses a registry mirror (<host>))
+  pin it with -s owner/repo@skill (cloned from GitHub), or install bundled skills only
+```
+
+**Cause:** `--route` looked up a bare name, and `npx skills find` itself failed: it asks `skills.sh`, which a firewall often blocks. The part after `skills.sh` names a registry mirror or a proxy when npm uses one. Nothing was installed. **Fix:** pin the skill as `owner/repo@skill`, or leave it out and install bundled skills only. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
+
+### Could not install a GitHub source
+
+```text
+[aiskills] could not install <owner/repo@skill>: it is cloned from GitHub with git, not downloaded from the npm registry.
+[aiskills]   Behind a firewall or a registry mirror (Artifactory, Nexus) github.com is often blocked, and npm uses a registry mirror (<host>).
+[aiskills]   Bundled skills install without it: leave out --route and the external skill, or ask for access to github.com.
+```
+
+**Warning,** after `npx skills add <owner/repo@skill>` failed (its own error is above it). **Cause:** an external skill named as `owner/repo`, `owner/repo@skill` or a git URL is fetched with `git clone`, which never goes through your npm registry. The second line names a registry mirror or a proxy when npm uses one. Local paths don't get this warning. **Fix:** install bundled skills only, or ask for access to github.com. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
+
 ### Unsafe registry results ignored
 
 ```text

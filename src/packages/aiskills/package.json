@@ -68,6 +68,9 @@
   "engines": {
     "node": ">=18.17"
   },
+  "dependencies": {
+    "skills": "1.7.6"
+  },
   "publishConfig": {
     "access": "public"
   }

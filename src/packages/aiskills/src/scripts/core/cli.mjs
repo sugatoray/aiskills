@@ -25,6 +25,7 @@ import {
   quote,
   resolveStats,
   STATS_SOURCE,
+  networkRestrictionNow,
   SKILLS_CLI_VERSION,
   runSkills,
   selectedSkills,
@@ -127,7 +128,8 @@ install only:
                          installing bundled skills, aiskills runs 'npx skills add ${STATS_SOURCE}' for
                          them in a temp folder, in the background, so skills.sh counts the install
                          (needs github.com; skipped silently without it). Remembered until --stats;
-                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI;
+                         off by default when npm uses a registry mirror or a proxy.
       --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
@@ -508,7 +510,7 @@ function info(opts) {
       },
       stats: {
         value: tryOr(() => ON(resolveStats(undefined, ROOT))),
-        source: statsOff ?? from("stats", typeof meta?.stats === "boolean" ? "remembered" : "default"),
+        source: statsOff ?? from("stats", typeof meta?.stats === "boolean" ? "remembered" : (networkRestrictionNow() ?? "default")),
       },
       route: { value: ON(env.route), source: from("route", "default") },
       // The setting in effect: NO_COLOR / FORCE_COLOR override the config (--color/--no-color are per run).
@@ -964,7 +966,12 @@ function main() {
         if (picked) log(`bundled: ${bundled.join(", ")}`);
         status = skillsAdd(root, { ...opts, agents, skills: bundled ?? ["*"], cwd });
         // Add it to the skills.sh install count (best effort; see countInstall).
-        if (status === 0 && resolveStats(opts.stats, root)) {
+        const counting = status === 0 && resolveStats(opts.stats, root);
+        if (status === 0 && !counting && resolveStats(opts.stats, root, () => null)) {
+          // Off only because of the mirror or proxy: say so, since the user didn't choose it.
+          log(`not adding this install to the skills.sh count: ${networkRestrictionNow()}; turn on with --stats`);
+        }
+        if (counting) {
           let counted = bundled ?? [...packageSkillNames(root)].sort();
           if (opts.interactive && !bundled && !opts.dryRun) {
             // The picker chose the skills: count the ones now installed from root.

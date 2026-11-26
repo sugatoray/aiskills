@@ -154,7 +154,11 @@ your agent may run **with your permissions**.
   `.npmignore`).
 - The vendor step refuses skill names that aren't safe folder names (e.g.
   `../evil`), two skills with the same name, and skills nested inside skills.
-- The package has **no runtime dependencies**.
+- The package has **one runtime dependency**: the `skills` CLI, pinned to the
+  exact tested version (`"skills": "1.7.6"`, equal to `SKILLS_CLI_VERSION`; a
+  test enforces it). It comes from the npm registry like the package itself,
+  so mirrors and their policies see it at install time. No dependency is a
+  git or URL dependency.
 
 ## Protections against known risks
 

@@ -1,6 +1,6 @@
 # The skills.sh install count
 
-After `aiskills install`, a background `npx skills add sugatoray/aiskills` adds the install to each skill's count on [skills.sh](https://skills.sh); it needs github.com, fails silently without it, and `--no-stats` turns it off.
+After `aiskills install`, a background `npx skills add sugatoray/aiskills` adds the install to each skill's count on [skills.sh](https://skills.sh); it needs github.com, fails silently without it, is off by default when npm uses a registry mirror or a proxy, and `--no-stats` turns it off.
 
 ## Why it exists
 
@@ -34,9 +34,19 @@ Your agents keep using the copy in `~/.config/sugatoray/aiskills`; nothing from 
 | External skills (`--route`, `aix`) | by `npx skills add owner/repo@skill` itself |
 | `aiskills sync` | |
 
+## Behind a registry mirror or a proxy
+
+When npm uses a registry mirror (Artifactory, Nexus, Verdaccio, …) or a proxy, `aiskills` doesn't run the count: there, github.com and git traffic are usually blocked, and a `git clone` started by an npm package is what firewall policies flag. It asks `npm config get registry https-proxy proxy` once, also checks `HTTPS_PROXY`/`HTTP_PROXY`/`ALL_PROXY`, and says why:
+
+```text
+[aiskills] not adding this install to the skills.sh count: npm uses a registry mirror (<host>); turn on with --stats
+```
+
+Only the mirror's host is shown, never its path or credentials, and never a proxy's address. `--stats`, `AISKILLS_STATS=1`, `aiskills config stats true` or a remembered `--stats` still turn it on. `aiskills info` shows the reason as the setting's source. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
+
 ## Without access to github.com
 
-Behind a firewall or a proxy that blocks github.com, the clone (or the check with api.github.com) fails. Then nothing is counted and nothing is shown, and the install's exit status is unchanged: it had already finished. To see what the count does, run it in the foreground:
+Where the count does run but github.com is blocked, the clone (or the check with api.github.com) fails. Then nothing is counted and nothing is shown, and the install's exit status is unchanged: it had already finished. To see what the count does, run it in the foreground:
 
 ```bash
 AISKILLS_STATS_FOREGROUND=1 aiskills install
@@ -51,5 +61,6 @@ AISKILLS_STATS_FOREGROUND=1 aiskills install
 | [`AISKILLS_STATS=0`](../reference/environment.md#aiskills_stats) | While it's set; wins over the remembered choice, not over `--stats` |
 | `DO_NOT_TRACK`, `DISABLE_TELEMETRY` (any value) | Always off, even with `--stats`; they also turn off the `skills` CLI's own telemetry |
 | `CI`, `GITHUB_ACTIONS` set | Always off |
+| npm uses a registry mirror or a proxy | Off by default; any choice above turns it on again |
 
 See also: [Security model](security.md) · [`--no-stats`](../reference/cli.md#--no-stats) · [Environment variables](../reference/environment.md)

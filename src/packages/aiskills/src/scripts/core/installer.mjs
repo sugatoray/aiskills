@@ -302,23 +302,55 @@ export function explainReleaseAge(stderr) {
 }
 
 /**
- * Run `npx -y skills@<version> <args...>`; returns the exit code, or with
+ * The skills CLI that ships with the package: `node_modules/skills` next to
+ * it or in a parent folder (npm and npx hoist it, pnpm keeps it beside the
+ * package). Returns { version, bin } or null.
+ */
+export function bundledSkillsCli(pkgDir = PKG_DIR) {
+  for (let dir = pkgDir; ; dir = dirname(dir)) {
+    const pj = join(dir, "node_modules", "skills", "package.json");
+    const meta = readJson(pj);
+    const bin = typeof meta?.bin === "string" ? meta.bin : meta?.bin?.skills;
+    if (meta?.name === "skills" && typeof meta.version === "string" && typeof bin === "string") {
+      return { version: meta.version, bin: join(dirname(pj), bin) };
+    }
+    if (dirname(dir) === dir) return null;
+  }
+}
+
+/**
+ * How to run `skills <args...>`: the bundled copy with node when it is the
+ * version asked for (the pinned one, unless AISKILLS_SKILLS_LIB_VERSION or
+ * `aiskills config skills-version` asks for another), else `npx -y skills@<spec>`.
+ * Returns { command, argv, shell, display, bundled }. The bundled copy never
+ * runs through a shell, so cmd.exe never sees its arguments on Windows.
+ */
+export function skillsCommand(args, { pkgDir = PKG_DIR } = {}) {
+  const spec = skillsPackageSpec();
+  const local = bundledSkillsCli(pkgDir);
+  if (local && spec === `skills@${local.version}`) {
+    return { command: process.execPath, argv: [local.bin, ...args], shell: false, bundled: true, display: [`${spec} (bundled)`, ...args.map(quote)].join(" ") };
+  }
+  const win = process.platform === "win32";
+  const full = ["-y", spec, ...args];
+  return { command: win ? "npx.cmd" : "npx", argv: win ? cmdArgs(full) : full, shell: win, bundled: false, display: `npx ${full.map(quote).join(" ")}` };
+}
+
+/**
+ * Run the skills CLI (see skillsCommand); returns the exit code, or with
  * capture { status, stdout, stderr }. npx's stderr is read (and then shown,
  * unless captureStderr) so an npm release-age refusal can be explained;
  * interactive=true leaves it on the terminal (the `skills` passthrough).
  */
 export function runSkills(args, { cwd, capture = false, quiet = false, captureStderr = false, timeout, interactive = false } = {}) {
-  const win = process.platform === "win32";
-  const npx = win ? "npx.cmd" : "npx";
-  const full = ["-y", skillsPackageSpec(), ...args];
-  const argv = win ? cmdArgs(full) : full;
-  if (!quiet) log(`running: npx ${full.map(quote).join(" ")}`);
-  const res = spawnSync(npx, argv, {
+  const cmd = skillsCommand(args);
+  if (!quiet) log(`running: ${cmd.display}`);
+  const res = spawnSync(cmd.command, cmd.argv, {
     stdio: [capture ? "ignore" : "inherit", capture ? "pipe" : "inherit", interactive ? "inherit" : "pipe"],
     encoding: "utf8",
     // The install root may not exist (e.g. after --purge); run from $HOME then.
     cwd: cwd && existsSync(cwd) ? cwd : cwd ? homedir() : process.cwd(),
-    shell: process.platform === "win32",
+    shell: cmd.shell,
     env: childEnv(),
     maxBuffer: 64 * 1024 * 1024,
     ...(timeout ? { timeout, killSignal: "SIGKILL" } : {}),
@@ -371,9 +403,15 @@ export function lastSelectedAgents(lockPath = skillsLockPath()) {
   return Array.isArray(agents) ? agents.filter((a) => typeof a === "string" && a) : [];
 }
 
+/** The command a dry run shows: what skillsCommand would run (arguments as typed). */
+const dryRunCommand = (args) => {
+  const cmd = skillsCommand([]);
+  return [cmd.bundled ? cmd.display : `npx -y ${quote(skillsPackageSpec())}`, ...args].join(" ");
+};
+
 /** For install -n: print the exact `npx skills` command instead of running it. */
 function showDryRun(args) {
-  log(`[dry-run] npx -y ${quote(skillsPackageSpec())} ${args.join(" ")}`);
+  log(`[dry-run] ${dryRunCommand(args)}`);
   return 0;
 }
 
@@ -692,10 +730,12 @@ export const isSafeRegistrySpec = (spec) => SAFE_REGISTRY_SPEC.test(spec);
  * Look a skill up on the skills registry via `npx skills find <name>`.
  * Registry text is untrusted: only results that pass isSafeRegistrySpec are
  * returned; the rest are listed in `unsafe`.
- * Returns { hits: [{ spec, source, name, installs }], unsafe: [spec] }.
+ * Returns { hits: [{ spec, source, name, installs }], unsafe: [spec] }, plus
+ * failed: true when `npx skills find` itself failed (skills.sh unreachable, say).
  */
 export function findSkill(query) {
-  const { stdout } = runSkills(["find", query], { capture: true, quiet: true });
+  const { status, stdout } = runSkills(["find", query], { capture: true, quiet: true });
+  if (status !== 0) return { hits: [], unsafe: [], failed: true };
   const hits = [];
   const unsafe = [];
   for (const line of stripAnsi(stdout).split(/\r?\n/)) {
@@ -725,7 +765,16 @@ export function resolveExternal(entries) {
       continue;
     }
     log(`'${entry}' is not bundled; looking it up with 'npx skills find ${entry}' ...`);
-    const { hits, unsafe } = findSkill(entry);
+    const { hits, unsafe, failed } = findSkill(entry);
+    if (failed) {
+      const why = networkRestrictionNow();
+      const also = why ? `, and ${why}` : "";
+      problems.push(
+        `could not search the skills registry for '${entry}': 'npx skills find' failed (it asks skills.sh${also})\n` +
+          `  pin it with -s owner/repo@skill (cloned from GitHub), or install bundled skills only`,
+      );
+      continue;
+    }
     if (unsafe.length) {
       warn(`ignored ${unsafe.length} registry result(s) with unsafe characters: ${unsafe.map((u) => JSON.stringify(u)).join(", ")}`);
     }
@@ -753,7 +802,10 @@ export function skillsAddExternal(spec, { global = true, agents = [], copy = fal
   for (const a of agents) args.push("--agent", a);
   if (copy) args.push("--copy");
   args.push("--yes", ...extra);
-  return dryRun ? showDryRun(args) : runSkills(args, { cwd });
+  if (dryRun) return showDryRun(args);
+  const status = runSkills(args, { cwd });
+  if (status !== 0) explainGitSource(spec);
+  return status;
 }
 
 /**
@@ -767,6 +819,81 @@ export function skillsRemove(names, opts = {}) {
   for (const a of agents) args.push("--agent", a);
   args.push("--yes", ...extra);
   return runSkills(args, { cwd });
+}
+
+// ------------------------------------------------- firewalls and mirrors
+
+// Behind a company firewall npm usually reaches only a registry mirror
+// (Artifactory, Nexus, Verdaccio) or goes through a proxy, and github.com and
+// git traffic are often blocked. Anything aiskills fetches from GitHub (the
+// skills.sh count, --route sources) is then expected to fail.
+const PUBLIC_REGISTRY = /^https:\/\/registry\.(npmjs\.org|yarnpkg\.com)\/?$/i;
+const PROXY_VARS = ["HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy", "ALL_PROXY", "all_proxy"];
+const setValue = (v) => typeof v === "string" && v.trim() !== "" && v.trim() !== "null" && v.trim() !== "undefined";
+
+/** Parse `npm config get registry https-proxy proxy` (key=value lines; npm prints null for unset). */
+export function parseNpmConfigGet(text) {
+  const out = {};
+  const keys = { registry: "registry", "https-proxy": "httpsProxy", proxy: "proxy" };
+  for (const line of String(text ?? "").split(/\r?\n/)) {
+    const m = /^([\w-]+)=(.*)$/.exec(line.trim());
+    if (m && keys[m[1]]) out[keys[m[1]]] = m[2] === "null" ? null : m[2];
+  }
+  return out;
+}
+
+/**
+ * Why npm's network looks restricted, or null: "npm uses a registry mirror
+ * (<host>)" or "npm uses a network proxy". Only the mirror's host is shown
+ * (never credentials or paths), and never a proxy's URL.
+ */
+export function networkRestriction({ registry, httpsProxy, proxy } = {}, env = process.env) {
+  if (setValue(registry) && !PUBLIC_REGISTRY.test(registry.trim())) {
+    let host;
+    try {
+      host = new URL(registry.trim()).hostname;
+    } catch {
+      host = "unknown host";
+    }
+    return `npm uses a registry mirror (${host})`;
+  }
+  if ([httpsProxy, proxy].some(setValue) || PROXY_VARS.some((k) => setValue(env[k]))) return "npm uses a network proxy";
+  return null;
+}
+
+/** npm's registry and proxy settings, through the user's npm config ({} if npm can't say). */
+function npmNetworkConfig() {
+  const win = process.platform === "win32";
+  const res = spawnSync(win ? "npm.cmd" : "npm", ["config", "get", "registry", "https-proxy", "proxy"], {
+    encoding: "utf8",
+    env: childEnv(),
+    shell: win,
+    timeout: 30_000,
+  });
+  return res.status === 0 ? parseNpmConfigGet(res.stdout) : {};
+}
+
+let restriction;
+/** networkRestriction for this machine; npm is asked once per command. */
+export function networkRestrictionNow() {
+  if (restriction === undefined) restriction = networkRestriction(npmNetworkConfig());
+  return restriction;
+}
+
+/** A --route source that the skills CLI clones with git (owner/repo, a git or GitHub URL), not a local path. */
+export function isGitSource(spec) {
+  if (/^(\.{1,2}[\\/]|[\\/]|~|[A-Za-z]:[\\/])/.test(spec)) return false;
+  return /^[\w.-]+\/[\w.-]+(@[^/]*)?$/.test(spec) || /^(https?:\/\/|git@|git\+|ssh:\/\/)/i.test(spec);
+}
+
+/** After a failed install of <spec>: if it comes from GitHub, say why that fails behind a firewall. */
+function explainGitSource(spec) {
+  if (!isGitSource(spec)) return;
+  const why = networkRestrictionNow();
+  const also = why ? `, and ${why}` : "";
+  warn(`could not install ${spec}: it is cloned from GitHub with git, not downloaded from the npm registry.`);
+  warn(`  Behind a firewall or a registry mirror (Artifactory, Nexus) github.com is often blocked${also}.`);
+  warn("  Bundled skills install without it: leave out --route and the external skill, or ask for access to github.com.");
 }
 
 // ------------------------------------------------------- skills.sh count
@@ -789,10 +916,11 @@ const FALSE = /^(0|false|no|off)$/i;
 /**
  * Whether `aiskills install` adds the install to the skills.sh count:
  * --stats / --no-stats, then AISKILLS_STATS, then `aiskills config stats`, then
- * the choice remembered in <root>/aiskills.json, then on. DO_NOT_TRACK, DISABLE_TELEMETRY (which the
+ * the choice remembered in <root>/aiskills.json, then on (off when npm uses a
+ * registry mirror or a proxy: see networkRestriction). DO_NOT_TRACK, DISABLE_TELEMETRY (which the
  * skills CLI honours too) and CI (CI, GITHUB_ACTIONS) always turn it off.
  */
-export function resolveStats(explicit, root = installRoot()) {
+export function resolveStats(explicit, root = installRoot(), restricted = networkRestrictionNow) {
   const e = process.env;
   if (e.DO_NOT_TRACK || e.DISABLE_TELEMETRY || e.CI || e.GITHUB_ACTIONS) return false;
   if (typeof explicit === "boolean") return explicit;
@@ -805,7 +933,9 @@ export function resolveStats(explicit, root = installRoot()) {
   const configured = configValue("stats");
   if (configured) return configured.value;
   const saved = readJson(join(root, "aiskills.json"))?.stats;
-  return typeof saved === "boolean" ? saved : true;
+  if (typeof saved === "boolean") return saved;
+  // Behind a mirror or proxy, github.com (which the count clones) is usually blocked.
+  return !restricted();
 }
 
 /** The `npx skills` arguments of the counted install (agents: the user's -a, else "universal"). */
@@ -825,7 +955,7 @@ export function statsArgs(skills, agents = []) {
 export function countInstall(skills, { agents = [], dryRun = false } = {}) {
   const args = statsArgs(skills, agents);
   if (dryRun) {
-    log(`[dry-run] skills.sh count: npx -y ${quote(skillsPackageSpec())} ${args.join(" ")} (in a temp folder; turn off: --no-stats)`);
+    log(`[dry-run] skills.sh count: ${dryRunCommand(args)} (in a temp folder; turn off: --no-stats)`);
     return;
   }
   log("adding this install to the skills.sh count in the background (turn off: --no-stats)");

@@ -42,13 +42,15 @@ Yes, except for download counts. Everything goes through npm and your npm config
 
 | Command | Needs | With only an npm mirror |
 | --- | --- | --- |
-| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, through `npx` | works |
+| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, installed with `aiskills` | works |
 | `info` | nothing (local files) | works |
-| `info --full` | `npm view`, and `skills` through `npx` | works |
+| `info --full` | `npm view`, and the `skills` package | works |
 | `releases` / `rel` | `npm view` | works; a mirror that strips publish times shows `–` as the date and says so |
 | `rel --downloads` | api.npmjs.org | fails with `could not reach api.npmjs.org`; mirrors don't serve download counts ([fixes](reference/errors.md#could-not-reach-apinpmjsorg)) |
-| the skills.sh install count | github.com | skipped silently; the install is unaffected |
-| `--route` / `aix` lookups | skills.sh | fail with an error; bundled skills don't need them |
+| the skills.sh install count | github.com | off by default, with one line saying why; the install is unaffected |
+| `--route` / `aix` lookups | skills.sh, and github.com (git) for `owner/repo` sources | fail with an error that says why; bundled skills don't need them |
+
+See [Use aiskills behind a firewall](guides/use-behind-a-firewall.md).
 
 The `changelog:` line of `aiskills rel` is only printed, never fetched; its first path is the copy inside the installed package, readable offline. A TLS-inspecting proxy needs `NODE_EXTRA_CA_CERTS` for `--downloads` (npm itself uses `cafile`).
 
@@ -74,7 +76,7 @@ Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and
 
 ### Why don't my installs show up on skills.sh?
 
-The count needs github.com and api.github.com: without them it's skipped silently. It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
+The count needs github.com and api.github.com: without them it's skipped silently. It's off by default when npm uses a registry mirror or a proxy (`aiskills info` says so). It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
 
 ### How do I change how these docs look?
 

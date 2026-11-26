@@ -95,7 +95,7 @@ Other environment variables: `AISKILLS_HOME` (install folder),
 - Single-letter aliases `s`, `l`, `u` (ambiguous; see MAINTAINERS).
 - Shell aliases (`!...`) from a project's `./.aiskills.json`: it usually comes
   with someone else's repo, so it may not run programs.
-- TOML config files: JSON keeps the package free of runtime dependencies.
+- TOML config files: JSON avoids a dependency beyond the pinned `skills` CLI.
 
 ## Planned or under discussion
 

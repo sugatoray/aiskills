@@ -87,6 +87,7 @@ if (a[0] === "add" && a.includes("__aiskills_probe__")) {
   console.log("\\u001b[2m•  Valid agents: " + (process.env.FAKE_AGENTS || "claude-code, codex, cursor, qoder, qoder-cn") + "\\u001b[0m");
   process.exit(1);
 }
+if (a[0] === "find" && process.env.FAKE_FIND_EXIT) { console.error("fetch failed: getaddrinfo ENOTFOUND skills.sh"); process.exit(Number(process.env.FAKE_FIND_EXIT)); }
 if (a[0] === "find") { process.stdout.write(read("FAKE_FIND_FILE", "")); process.exit(0); }
 // The skills.sh install count (aiskills install, stats on): FAKE_STATS_EXIT fakes github.com being unreachable.
 if (a[0] === "add" && a[1] === "sugatoray/aiskills" && process.env.FAKE_STATS_EXIT) { console.error("fatal: unable to access 'https://github.com/sugatoray/aiskills.git/'"); process.exit(Number(process.env.FAKE_STATS_EXIT)); }
@@ -100,7 +101,12 @@ const FAKE_NPM = `#!/usr/bin/env node
 const fs = require("fs");
 const a = process.argv.slice(2);
 if (a[0] === "config" && a[1] === "get" && a[2] === "registry") {
-  console.log(process.env.FAKE_NPM_REGISTRY || "https://registry.npmjs.org/");
+  const registry = process.env.FAKE_NPM_REGISTRY || "https://registry.npmjs.org/";
+  // Several keys: npm prints key=value lines ($FAKE_NPM_HTTPS_PROXY: a proxy in npm's config).
+  if (a.length > 3) {
+    const values = { registry, "https-proxy": process.env.FAKE_NPM_HTTPS_PROXY || "null", proxy: "null" };
+    for (const k of a.slice(2)) console.log(k + "=" + (values[k] ?? "null"));
+  } else console.log(registry);
   process.exit(0);
 }
 if (a[0] === "root" && a[1] === "-g") {
@@ -258,7 +264,8 @@ export function sandbox({ realSkills = false, stats = false, globalNpm = false }
   const baseEnv = () => {
     const env = {};
     for (const [k, v] of Object.entries(process.env)) {
-      if (/^(AISKILLS_|npm_)/i.test(k) || ["CI", "DO_NOT_TRACK", "DISABLE_TELEMETRY", "NO_COLOR", "FORCE_COLOR"].includes(k)) continue;
+      // Proxies too: a proxy turns the skills.sh count off by default (firewall.test.mjs sets one when it wants it).
+      if (/^(AISKILLS_|npm_|https?_proxy$|all_proxy$)/i.test(k) || ["CI", "DO_NOT_TRACK", "DISABLE_TELEMETRY", "NO_COLOR", "FORCE_COLOR"].includes(k)) continue;
       env[k] = v;
     }
     return {

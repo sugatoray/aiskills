@@ -50,8 +50,8 @@ aiskills install        # or, without a global install: npx @sugatoray-ai/aiskil
 which:
 
 1. saves the skills to **`~/.config/sugatoray/aiskills/skills/`** and replaces any copy that's already there, and
-2. runs `npx skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`,
-   which registers every skill with the agents it detects (Claude Code, Codex, ...),
+2. runs `skills add ~/.config/sugatoray/aiskills --global --skill '*' --yes`
+   (the pinned `skills` CLI installed with the package), which registers every skill with the agents it detects (Claude Code, Codex, ...),
    and then
 3. adds the install to the skills' install count on [skills.sh](https://skills.sh),
    in the background (see [The skills.sh install count](#the-skillssh-install-count);
@@ -545,6 +545,10 @@ the same install event any `npx skills add sugatoray/aiskills` sends (after
 asking api.github.com whether the repo is public). Nothing it installs is kept,
 and your agents use the copy in `~/.config/sugatoray/aiskills` as before.
 
+- **Off behind a registry mirror or a proxy:** when npm uses a mirror such as
+  Artifactory or Nexus, or a proxy, the count is off by default (github.com is
+  usually blocked there), and the install says why in one line; `--stats` turns
+  it on. See [Behind a firewall](#behind-a-firewall).
 - **No github.com, no count:** behind a firewall, the clone or the check fails,
   nothing is counted, and nothing is shown. The install itself has already
   succeeded either way.
@@ -559,6 +563,23 @@ and your agents use the copy in `~/.config/sugatoray/aiskills` as before.
 `[aiskills] adding this install to the skills.sh count in the background (turn off: --no-stats)`.
 `AISKILLS_STATS_FOREGROUND=1` waits for it and shows its output, to see why
 a count fails.
+
+## Behind a firewall
+
+`@sugatoray-ai/aiskills` installs through a company npm mirror (JFrog
+Artifactory, Sonatype Nexus, Verdaccio) with no access to github.com:
+
+- The package and its one dependency, the `skills` CLI pinned to an exact
+  version, are ordinary registry packages: no `git+`, `github:` or URL
+  dependencies and no install scripts. Your registry's policies see both at
+  install time, and `aiskills` runs the installed `skills` CLI instead of
+  downloading it with `npx`.
+- Bundled skills need nothing else. The skills.sh count is off by default
+  behind a mirror or a proxy.
+- `--route` sources come from skills.sh and GitHub (`git clone`); when they
+  can't be reached, the error says so.
+
+See [Use aiskills behind a firewall](docs/docsite/guides/use-behind-a-firewall.md).
 
 ## Environment variables
 

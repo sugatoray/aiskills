@@ -644,7 +644,8 @@ install only:
                          installing bundled skills, aiskills runs 'npx skills add sugatoray/aiskills' for
                          them in a temp folder, in the background, so skills.sh counts the install
                          (needs github.com; skipped silently without it). Remembered until --stats;
-                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI;
+                         off by default when npm uses a registry mirror or a proxy.
       --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
@@ -815,7 +816,7 @@ Add installs to the [skills.sh install count](../concepts/install-count.md) (the
 
 ### `--no-stats`
 
-Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
+Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. It is already off by default when npm uses a registry mirror or a proxy; `--stats` turns it on there ([Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)). Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
 
 ### `-i`, `--interactive`
 

@@ -40,7 +40,7 @@ aiskills install -G scrolls -a claude-code
 - **Defaults and aliases that stick**: `aiskills config`, like `git config`, saves your agents, skills, scope or layout, and aliases such as `aiskills gi` for `aiskills install -g`. See [Set default choices](guides/set-defaults.md).
 - **Colored output**: on a terminal; plain when piped, with `--color` / `--no-color` and `NO_COLOR` / `FORCE_COLOR`.
 - **Short commands**: `ais` is `aiskills`; `aix` is `aiskills --route`; `i`, `r`, `ls`, `g`, `f`, `p`, `h` are aliases.
-- **Safe by default**: a pinned `skills` CLI, checked registry results, and no runtime dependencies.
+- **Safe by default**: a pinned `skills` CLI installed with the package, checked registry results, and nothing fetched from git unless you ask. Works [behind a firewall](guides/use-behind-a-firewall.md) with only an npm mirror.
 
 ## Documentation
 
@@ -95,6 +95,7 @@ aiskills install -G scrolls -a claude-code
 - [Remove everything](guides/remove-everything.md): uninstall the skills, the folder and the npm package, in the right order.
 - [Use aiskills from an AI agent or a script](guides/use-from-an-agent.md): run it non-interactively, read its output and exit codes, and handle failures.
 - [Choose the `skills` CLI version](guides/choose-the-skills-cli-version.md): run a different `skills` release than the pinned one.
+- [Use aiskills behind a firewall](guides/use-behind-a-firewall.md): install through an npm mirror such as Artifactory, with no git or GitHub access.
 - [Leave files out of the package](guides/leave-files-out.md): for maintainers: keep files or whole skills out with `.skillsignore`.
 
 ### Concepts

@@ -7,7 +7,7 @@
 The same, as steps:
 
 1. **Sync.** The npm package carries the skills (one folder per skill), a map of their original folders (`.aiskills/layout.json`) and the repo's `marketplace.json`. `aiskills` copies them to the **install folder**, `~/.config/sugatoray/aiskills` (or `AISKILLS_HOME`), replacing `skills/` each time.
-2. **Add.** It runs `npx -y skills@1.7.6 add <install folder>` with your skills, agents and scope.
+2. **Add.** It runs `skills@1.7.6 add <install folder>` with your skills, agents and scope: the copy installed with the package (falling back to `npx -y skills@1.7.6` when there is none).
 3. **Install.** `npx skills` installs the skills into each agent's folder (`~/.claude/skills/`, `~/.agents/skills/`, or the project's folders with `-p`) and records where each one came from.
 
 With `--route`, step 2 also runs `npx skills find` and `npx skills add <owner/repo@skill>` for skills that aren't bundled.
@@ -43,8 +43,8 @@ Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stop
 ## Why it works this way
 
 - **One tool owns the agent folders.** `npx skills` already knows every agent's folder layout and keeps a record. Delegating to it keeps `aiskills` small and gives it new agents for free.
-- **A local folder works offline.** After the npm install, `aiskills install` needs no network except to fetch the `skills` CLI the first time. (The [skills.sh install count](install-count.md) afterwards uses github.com, and is skipped silently without it.)
-- **No runtime dependencies.** The package is plain Node.js.
+- **A local folder works offline.** After the npm install, `aiskills install` needs no network: the `skills` CLI was installed with the package. (The [skills.sh install count](install-count.md) afterwards uses github.com; it is skipped silently without it, and off by default behind a registry mirror or a proxy.)
+- **One runtime dependency.** The package is plain Node.js plus the pinned `skills` CLI, so a registry and its policies see everything `aiskills` runs at install time.
 
 ## Trade-offs and limits
 
