@@ -2,7 +2,7 @@
 
 Install the `aiskills` command with npm, then run `aiskills install` to save the skills and register them with your agents.
 
-**You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
+**You'll need:** Node.js 22.20 or newer, and npm. npm installs the pinned `skills` CLI with the package, from your npm registry (a company mirror works: see [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)).
 
 ## Install
 
@@ -37,7 +37,7 @@ aiskills path
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ~/.config/sugatoray/aiskills
 ```
 

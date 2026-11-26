@@ -106,3 +106,6 @@ Unreleased ([#320](https://github.com/sugatoray/aiskills/pull/320)): the group a
 
 ## Docs site: embedded pages follow the light/dark button
 Pages embedded in the docs (the example viewer, the CLI outputs page) follow the docs' light/dark choice, in the page and full-size, and switch at once when it changes; before, they followed only the system setting. New in 1.4.0 (#265, published).
+
+## Works behind a firewall (npm mirror only)
+Installing through a company mirror (Artifactory, Nexus, Verdaccio) with no github.com works for bundled skills: the package and its one dependency, the `skills` CLI pinned to the tested version, are plain registry packages (no git or URL dependencies, no install scripts), and `aiskills` runs the installed `skills` CLI instead of downloading it with `npx`. The skills.sh count, which clones github.com, is off by default when npm uses a mirror or a proxy, and the install says why (`--stats` turns it on). `--route` sources that need skills.sh or GitHub say so when they fail. Guide: `docs/docsite/guides/use-behind-a-firewall.md`.

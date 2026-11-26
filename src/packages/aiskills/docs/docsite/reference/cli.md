@@ -217,7 +217,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.6.0
+  aiskills version : 2.0.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
@@ -376,7 +376,7 @@ aiskills rel 3
   1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
@@ -406,7 +406,7 @@ aiskills rel --downloads
   0.9.0    2026-11-15 (6 days ago)                           –
   0.8.0    2026-11-12 (9 days ago)                           –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
@@ -439,7 +439,7 @@ aiskills rel 1 --downloads 7d --table
   VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
   1.2.0    2026-11-21 (today)  latest                   –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
@@ -579,7 +579,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.6.0 — Sugato Ray's agent skills
+aiskills 2.0.0-dev — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -644,7 +644,8 @@ install only:
                          installing bundled skills, aiskills runs 'npx skills add sugatoray/aiskills' for
                          them in a temp folder, in the background, so skills.sh counts the install
                          (needs github.com; skipped silently without it). Remembered until --stats;
-                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI;
+                         off by default when npm uses a registry mirror or a proxy.
       --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
@@ -755,7 +756,7 @@ ais -v
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ```
 
 ## Options
@@ -815,7 +816,7 @@ Add installs to the [skills.sh install count](../concepts/install-count.md) (the
 
 ### `--no-stats`
 
-Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
+Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. It is already off by default when npm uses a registry mirror or a proxy; `--stats` turns it on there ([Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)). Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
 
 ### `-i`, `--interactive`
 

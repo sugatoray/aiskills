@@ -51,6 +51,7 @@
 - [Remove everything](guides/remove-everything.md): uninstall the skills, the folder and the npm package, in the right order.
 - [Use aiskills from an AI agent or a script](guides/use-from-an-agent.md): run it non-interactively, read its output and exit codes, and handle failures.
 - [Choose the `skills` CLI version](guides/choose-the-skills-cli-version.md): run a different `skills` release than the pinned one.
+- [Use aiskills behind a firewall](guides/use-behind-a-firewall.md): install through an npm mirror such as Artifactory, with no git or GitHub access.
 - [Leave files out of the package](guides/leave-files-out.md): for maintainers: keep files or whole skills out with `.skillsignore`.
 
 ## Concepts

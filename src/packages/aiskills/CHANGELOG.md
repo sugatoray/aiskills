@@ -18,6 +18,42 @@ they are listed under **Changed** or **Removed** with a note.
 This file covers the package and its `aiskills` CLI. Each bundled skill keeps
 its own `CHANGELOG.md` inside its folder under `skills/`.
 
+## [2.0.0] - Unreleased
+
+A major release: it changes two defaults and raises the Node.js minimum (see **Changed**).
+
+### Added
+
+- **Works behind a firewall:** a new guide, *Use aiskills behind a firewall*,
+  covers installing through a company npm mirror (Artifactory, Nexus,
+  Verdaccio) with no access to github.com.
+- `--route` explains its failures behind a firewall: an `owner/repo` source or
+  git URL that fails to install says it is cloned from GitHub with git, and a
+  lookup that can't reach skills.sh says so, instead of "no skill named
+  '<name>' found".
+
+### Changed
+
+- **Breaking: Node.js 22.20 or newer is required** (was 18.17), the minimum
+  of the `skills` CLI the package now depends on. With an older Node.js, npm
+  warns at install time (or refuses with `engine-strict=true`); the `skills`
+  CLI never supported it, so `aiskills install` couldn't work there anyway.
+- **The `skills` CLI is now a dependency** of the package, pinned to the
+  tested version (`skills@1.7.6`), and `aiskills` runs that copy with `node`
+  instead of downloading it with `npx -y skills@1.7.6` at run time. Registries
+  and their policies (JFrog Xray and Curation, Nexus Firewall) now see it at
+  install time, lockfiles record it, and no shell is used to run it on
+  Windows. A different version from `AISKILLS_SKILLS_LIB_VERSION` or
+  `aiskills config skills-version`, or a missing copy (a source checkout),
+  still runs through `npx`. Commands now print
+  `running: skills@1.7.6 (bundled) …`.
+- **Breaking: the skills.sh install count is off by default when npm uses a registry
+  mirror or a proxy.** The count is a `git clone` of github.com, which such
+  networks usually block and firewall policies flag. The install says why in
+  one line, and `aiskills info` shows the reason as the setting's source.
+  `--stats`, `AISKILLS_STATS=1`, `aiskills config stats true` or a remembered
+  `--stats` turn it on again.
+
 ## [1.6.0] - 2026-11-22
 
 ### Added

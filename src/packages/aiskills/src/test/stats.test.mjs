@@ -20,6 +20,8 @@ const COUNTING = "[aiskills] adding this install to the skills.sh count in the b
 const FIXTURE = ["a1", "a2", "beta-one", "beta-two", "lonely"];
 // Run the count in the foreground, so a test can check it as soon as the command returns.
 const FG = { AISKILLS_STATS_FOREGROUND: "1" };
+// No mirror or proxy, whatever this machine's npm uses (firewall.test.mjs covers those).
+const OPEN = () => null;
 
 const isStats = (c) => skillsArgs(c)[0] === "add" && skillsArgs(c)[1] === STATS_SOURCE;
 const statsCalls = (res) => res.calls.filter(isStats);
@@ -53,32 +55,32 @@ describe("resolveStats: whether to add an install to the skills.sh count", () =>
   const remember = (stats) => writeFileSync(join(root, "aiskills.json"), JSON.stringify({ package: "@sugatoray-ai/aiskills", stats }));
 
   test("on by default", () => {
-    assert.equal(resolveStats(undefined, tempDir()), true);
+    assert.equal(resolveStats(undefined, tempDir(), OPEN), true);
   });
 
   test("--stats / --no-stats win over AISKILLS_STATS, which wins over the remembered choice", () => {
     remember(false);
-    assert.equal(resolveStats(undefined, root), false);
-    assert.equal(withEnv({ AISKILLS_STATS: "1" }, () => resolveStats(undefined, root)), true);
-    assert.equal(withEnv({ AISKILLS_STATS: "1" }, () => resolveStats(false, root)), false);
+    assert.equal(resolveStats(undefined, root, OPEN), false);
+    assert.equal(withEnv({ AISKILLS_STATS: "1" }, () => resolveStats(undefined, root, OPEN)), true);
+    assert.equal(withEnv({ AISKILLS_STATS: "1" }, () => resolveStats(false, root, OPEN)), false);
     remember(true);
-    assert.equal(resolveStats(undefined, root), true);
-    assert.equal(withEnv({ AISKILLS_STATS: "0" }, () => resolveStats(undefined, root)), false);
-    assert.equal(withEnv({ AISKILLS_STATS: "0" }, () => resolveStats(true, root)), true);
+    assert.equal(resolveStats(undefined, root, OPEN), true);
+    assert.equal(withEnv({ AISKILLS_STATS: "0" }, () => resolveStats(undefined, root, OPEN)), false);
+    assert.equal(withEnv({ AISKILLS_STATS: "0" }, () => resolveStats(true, root, OPEN)), true);
   });
 
   test("AISKILLS_STATS takes 1/0, true/false, yes/no, on/off; empty means unset; anything else is an error", () => {
     const dir = tempDir();
-    for (const v of ["1", "true", "YES", "on"]) assert.equal(withEnv({ AISKILLS_STATS: v }, () => resolveStats(undefined, dir)), true, v);
-    for (const v of ["0", "false", "No", "off"]) assert.equal(withEnv({ AISKILLS_STATS: v }, () => resolveStats(undefined, dir)), false, v);
-    assert.equal(withEnv({ AISKILLS_STATS: "" }, () => resolveStats(undefined, dir)), true);
-    assert.throws(() => withEnv({ AISKILLS_STATS: "maybe" }, () => resolveStats(undefined, dir)), /AISKILLS_STATS/);
+    for (const v of ["1", "true", "YES", "on"]) assert.equal(withEnv({ AISKILLS_STATS: v }, () => resolveStats(undefined, dir, OPEN)), true, v);
+    for (const v of ["0", "false", "No", "off"]) assert.equal(withEnv({ AISKILLS_STATS: v }, () => resolveStats(undefined, dir, OPEN)), false, v);
+    assert.equal(withEnv({ AISKILLS_STATS: "" }, () => resolveStats(undefined, dir, OPEN)), true);
+    assert.throws(() => withEnv({ AISKILLS_STATS: "maybe" }, () => resolveStats(undefined, dir, OPEN)), /AISKILLS_STATS/);
   });
 
   test("DO_NOT_TRACK, DISABLE_TELEMETRY and CI always turn it off, even with --stats", () => {
     const dir = tempDir();
     for (const env of [{ DO_NOT_TRACK: "1" }, { DISABLE_TELEMETRY: "1" }, { CI: "true" }, { GITHUB_ACTIONS: "true" }]) {
-      assert.equal(withEnv(env, () => resolveStats(true, dir)), false, JSON.stringify(env));
+      assert.equal(withEnv(env, () => resolveStats(true, dir, OPEN)), false, JSON.stringify(env));
     }
   });
 });

@@ -41,7 +41,7 @@ aiskills install -G scrolls -a claude-code
 - **Defaults and aliases that stick**: `aiskills config`, like `git config`, saves your agents, skills, scope or layout, and aliases such as `aiskills gi` for `aiskills install -g`. See [Set default choices](guides/set-defaults.md).
 - **Colored output**: on a terminal; plain when piped, with `--color` / `--no-color` and `NO_COLOR` / `FORCE_COLOR`.
 - **Short commands**: `ais` is `aiskills`; `aix` is `aiskills --route`; `i`, `r`, `ls`, `g`, `f`, `p`, `h` are aliases.
-- **Safe by default**: a pinned `skills` CLI, checked registry results, and no runtime dependencies.
+- **Safe by default**: a pinned `skills` CLI installed with the package, checked registry results, and nothing fetched from git unless you ask. Works [behind a firewall](guides/use-behind-a-firewall.md) with only an npm mirror.
 
 ## Documentation
 
@@ -96,6 +96,7 @@ aiskills install -G scrolls -a claude-code
 - [Remove everything](guides/remove-everything.md): uninstall the skills, the folder and the npm package, in the right order.
 - [Use aiskills from an AI agent or a script](guides/use-from-an-agent.md): run it non-interactively, read its output and exit codes, and handle failures.
 - [Choose the `skills` CLI version](guides/choose-the-skills-cli-version.md): run a different `skills` release than the pinned one.
+- [Use aiskills behind a firewall](guides/use-behind-a-firewall.md): install through an npm mirror such as Artifactory, with no git or GitHub access.
 - [Leave files out of the package](guides/leave-files-out.md): for maintainers: keep files or whole skills out with `.skillsignore`.
 
 ### Concepts
@@ -170,7 +171,7 @@ See also: [How aiskills works](../concepts/how-it-works.md) · [Installation](in
 
 Install the `aiskills` command with npm, then run `aiskills install` to save the skills and register them with your agents.
 
-**You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
+**You'll need:** Node.js 22.20 or newer, and npm. npm installs the pinned `skills` CLI with the package, from your npm registry (a company mirror works: see [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)).
 
 ## Install
 
@@ -205,7 +206,7 @@ aiskills path
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ~/.config/sugatoray/aiskills
 ```
 
@@ -2776,7 +2777,7 @@ See also: [CLI reference](../reference/cli.md) · [Errors and exit codes](../ref
 
 Use this when you need a different release of the `skills` CLI than the one `aiskills` pins, or when npm's release-age rule (`min-release-age`, `before`) refuses the pinned one.
 
-Every `npx` call that `aiskills` makes runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, was removed in 1.0.0 and is no longer read.
+`aiskills` runs one tested version of the `skills` CLI, `skills@1.7.6`, so a new release (or a compromised one) is never picked up without testing. That version is installed with the package and run from there; another version is run through `npx`, which downloads it. `AISKILLS_SKILLS_LIB_VERSION` (the `skills` CLI library's version, not the bundled skills') overrides it with a version, a tag, an npm range or an interval. Its old name, `AISKILLS_SKILLS_VERSION`, was removed in 1.0.0 and is no longer read.
 
 ## Steps
 
@@ -2891,6 +2892,58 @@ With `min-release-age=7` (or `before=<date>`) in your `.npmrc`, npm refuses a ve
 
 See also: [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) · [Security model](../concepts/security.md)
 
+<!-- source: guides/use-behind-a-firewall.md -->
+# How to use aiskills behind a firewall
+
+Use this when npm can reach only a company registry mirror (JFrog Artifactory, Sonatype Nexus, Verdaccio, …), and github.com or git traffic is blocked.
+
+`@sugatoray-ai/aiskills` and its one dependency, the pinned `skills` CLI, are ordinary npm registry packages: no `git+`, `github:` or URL dependencies and no install scripts. Installing bundled skills needs nothing else. Only two features reach GitHub, and both say so when they can't.
+
+## Steps
+
+1. Allow the packages in your registry. A remote repository that proxies `registry.npmjs.org` needs `@sugatoray-ai/aiskills` and `skills`, plus the `skills` CLI's own dependencies, `tar` and `yaml` (and theirs). With JFrog Curation or a similar policy, the exact versions are the ones in the package's `package.json`.
+
+2. Install the package through your mirror, as usual:
+
+   ```bash
+   npm install -g @sugatoray-ai/aiskills
+   ```
+
+   npm installs the pinned `skills` CLI with it, so `aiskills` never downloads anything at run time.
+
+3. Install the skills:
+
+   ```bash
+   aiskills install -a claude-code
+   ```
+
+   Behind a mirror or a proxy, the [skills.sh install count](../concepts/install-count.md) (a `git clone` of github.com in the background) is off by default, and the install says so:
+
+   ```text
+   [aiskills] not adding this install to the skills.sh count: npm uses a registry mirror (<host>); turn on with --stats
+   ```
+
+4. Check the setup: `aiskills info` shows `stats off` with the reason as its source.
+
+## What needs GitHub
+
+| Feature | Reaches | Behind a firewall |
+| --- | --- | --- |
+| Bundled skills (`install`, `uninstall`, `installed`, `upgrade`) | your npm registry only | works |
+| The skills.sh install count | github.com, api.github.com, skills.sh | off by default; `--stats` turns it on |
+| `--route` / `aix` with a bare name | skills.sh, then github.com | fails with [Could not search the skills registry](../reference/errors.md#could-not-search-the-skills-registry) |
+| `--route` / `aix` with `owner/repo@skill` or a git URL | github.com, with `git clone` | fails with [Could not install a GitHub source](../reference/errors.md#could-not-install-a-github-source) |
+| `--route` with a local path | nothing | works |
+
+## Notes
+
+- **What counts as a mirror:** any npm `registry` other than `registry.npmjs.org` or `registry.yarnpkg.com`. **A proxy:** npm's `https-proxy` or `proxy` setting, or `HTTPS_PROXY`, `HTTP_PROXY` or `ALL_PROXY`. Only the mirror's host is ever printed.
+- **The pinned `skills` CLI is used only at its exact version.** With [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) set to another version, `aiskills` runs that version through `npx`, which downloads it from your registry at run time. See [Choose the `skills` CLI version](choose-the-skills-cli-version.md).
+- **Node.js 22.20 or newer**, the `skills` CLI's minimum. With `engine-strict=true` in your `.npmrc`, `npm install` refuses an older Node.js.
+- **A release-age rule** (`min-release-age`, JFrog Curation's "immature package" condition) may block a new `skills` version for a few days or weeks after it is published. See [When npm's release-age rule blocks the pinned version](choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
+
+See also: [The skills.sh install count](../concepts/install-count.md) · [Security model](../concepts/security.md) · [FAQ: does aiskills work behind a firewall?](../faq.md#does-aiskills-work-behind-a-firewall-or-with-an-npm-mirror)
+
 <!-- source: guides/leave-files-out.md -->
 # How to leave files out of the package
 
@@ -2952,7 +3005,7 @@ See also: [`.skillsignore` reference](../reference/skillsignore.md) · [Files an
 The same, as steps:
 
 1. **Sync.** The npm package carries the skills (one folder per skill), a map of their original folders (`.aiskills/layout.json`) and the repo's `marketplace.json`. `aiskills` copies them to the **install folder**, `~/.config/sugatoray/aiskills` (or `AISKILLS_HOME`), replacing `skills/` each time.
-2. **Add.** It runs `npx -y skills@1.7.6 add <install folder>` with your skills, agents and scope.
+2. **Add.** It runs `skills@1.7.6 add <install folder>` with your skills, agents and scope: the copy installed with the package (falling back to `npx -y skills@1.7.6` when there is none).
 3. **Install.** `npx skills` installs the skills into each agent's folder (`~/.claude/skills/`, `~/.agents/skills/`, or the project's folders with `-p`) and records where each one came from.
 
 With `--route`, step 2 also runs `npx skills find` and `npx skills add <owner/repo@skill>` for skills that aren't bundled.
@@ -2988,8 +3041,8 @@ Every check and lookup in steps 1, 3, 4 and 5 runs before step 6. A problem stop
 ## Why it works this way
 
 - **One tool owns the agent folders.** `npx skills` already knows every agent's folder layout and keeps a record. Delegating to it keeps `aiskills` small and gives it new agents for free.
-- **A local folder works offline.** After the npm install, `aiskills install` needs no network except to fetch the `skills` CLI the first time. (The [skills.sh install count](install-count.md) afterwards uses github.com, and is skipped silently without it.)
-- **No runtime dependencies.** The package is plain Node.js.
+- **A local folder works offline.** After the npm install, `aiskills install` needs no network: the `skills` CLI was installed with the package. (The [skills.sh install count](install-count.md) afterwards uses github.com; it is skipped silently without it, and off by default behind a registry mirror or a proxy.)
+- **One runtime dependency.** The package is plain Node.js plus the pinned `skills` CLI, so a registry and its policies see everything `aiskills` runs at install time.
 
 ## Trade-offs and limits
 
@@ -3168,14 +3221,14 @@ The full policy, including how to report a vulnerability, is in the package's [S
 Each one is covered by the test suite.
 
 - **No install step.** The package has no `preinstall`, `install` or `postinstall` script, so `npm install` (or pnpm, or bun) only puts files in npm's own folder: no network calls, nothing written to your home folder, no agent changed. Your agents change only when you run `aiskills install`.
-- **Pinned `skills` CLI.** Every call is `npx -y skills@1.7.6 ...`, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) overrides it with a version, `latest`, `next`, an npm range or an interval (`[1.7.4, 1.8.0)`), and refuses anything that isn't made of version characters. Before a new version is pinned, `npm run audit:skills` checks it has no high or critical advisory and is at least 7 days old.
+- **Pinned `skills` CLI, installed with the package.** `skills@1.7.6` is the package's one dependency, pinned exactly, so your registry and its policies (Artifactory, Xray, Curation, Nexus Firewall) see it at install time, and `aiskills` runs that copy with `node`, never through a shell. Only when it is missing (a source checkout) or another version is asked for does a call fall back to `npx -y skills@<version> ...`. Either way, the version is pinned, so a new or compromised release isn't used until it has been tested. [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) overrides it with a version, `latest`, `next`, an npm range or an interval (`[1.7.4, 1.8.0)`), and refuses anything that isn't made of version characters. Before a new version is pinned, `npm run audit:skills` checks it has no high or critical advisory and is at least 7 days old.
 - **Registry results are checked.** With `--route`, a `find` result is used only if its `owner/repo@skill` is made of letters, digits, `.`, `_` and `-`, and a bare name needs exactly one exact match.
 - **Found skills are confirmed.** A skill the registry lookup chose is shown (source, install count) and installed only after you answer `y`, or pass `-y`. Without a terminal and without `-y`, nothing is installed. Pinned `owner/repo@skill` specs aren't asked about. See [`-y`](../reference/cli.md#-y---yes).
-- **No shell syntax on Windows.** `npx.cmd` runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
+- **No shell syntax on Windows.** The bundled `skills` CLI runs without a shell; when `aiskills` falls back to `npx.cmd`, that runs through `cmd.exe`, so `aiskills` refuses arguments containing `& | < > ^ % ! " ( )`.
 - **Only its own folders are replaced or deleted.** `sync`, `install` and `uninstall --purge` refuse a folder that has other files but no `aiskills.json`. This guards against an `AISKILLS_HOME` pointed at the wrong place.
 - **npm's own variables are removed** before `npx` runs (registry, proxy and certificate settings are kept).
 - **A project's config file can't run programs.** Shell aliases (`!...`) are read only from your own config file; one in a project's `./.aiskills.json`, which usually comes with someone else's repo, is skipped with a [warning](../reference/errors.md#shell-alias-in-a-project-file-warning). An alias can never replace a command. A project file can still set that folder's defaults (such as `route` or `skills-version`): see them with `aiskills config --list --show-origin`.
-- **No runtime dependencies.**
+- **One runtime dependency:** the pinned `skills` CLI (itself depending on `tar` and `yaml`). Nothing is fetched from git or GitHub unless you ask for it (`--route` with an `owner/repo` source) or the [skills.sh count](install-count.md) runs, which is off by default behind a registry mirror or a proxy.
 
 ## Skills are code
 
@@ -3190,7 +3243,7 @@ See also: [Errors and exit codes](../reference/errors.md) · [Choose the `skills
 <!-- source: concepts/install-count.md -->
 # The skills.sh install count
 
-After `aiskills install`, a background `npx skills add sugatoray/aiskills` adds the install to each skill's count on [skills.sh](https://skills.sh); it needs github.com, fails silently without it, and `--no-stats` turns it off.
+After `aiskills install`, a background `npx skills add sugatoray/aiskills` adds the install to each skill's count on [skills.sh](https://skills.sh); it needs github.com, fails silently without it, is off by default when npm uses a registry mirror or a proxy, and `--no-stats` turns it off.
 
 ## Why it exists
 
@@ -3224,9 +3277,19 @@ Your agents keep using the copy in `~/.config/sugatoray/aiskills`; nothing from 
 | External skills (`--route`, `aix`) | by `npx skills add owner/repo@skill` itself |
 | `aiskills sync` | |
 
+## Behind a registry mirror or a proxy
+
+When npm uses a registry mirror (Artifactory, Nexus, Verdaccio, …) or a proxy, `aiskills` doesn't run the count: there, github.com and git traffic are usually blocked, and a `git clone` started by an npm package is what firewall policies flag. It asks `npm config get registry https-proxy proxy` once, also checks `HTTPS_PROXY`/`HTTP_PROXY`/`ALL_PROXY`, and says why:
+
+```text
+[aiskills] not adding this install to the skills.sh count: npm uses a registry mirror (<host>); turn on with --stats
+```
+
+Only the mirror's host is shown, never its path or credentials, and never a proxy's address. `--stats`, `AISKILLS_STATS=1`, `aiskills config stats true` or a remembered `--stats` still turn it on. `aiskills info` shows the reason as the setting's source. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
+
 ## Without access to github.com
 
-Behind a firewall or a proxy that blocks github.com, the clone (or the check with api.github.com) fails. Then nothing is counted and nothing is shown, and the install's exit status is unchanged: it had already finished. To see what the count does, run it in the foreground:
+Where the count does run but github.com is blocked, the clone (or the check with api.github.com) fails. Then nothing is counted and nothing is shown, and the install's exit status is unchanged: it had already finished. To see what the count does, run it in the foreground:
 
 ```bash
 AISKILLS_STATS_FOREGROUND=1 aiskills install
@@ -3241,6 +3304,7 @@ AISKILLS_STATS_FOREGROUND=1 aiskills install
 | [`AISKILLS_STATS=0`](../reference/environment.md#aiskills_stats) | While it's set; wins over the remembered choice, not over `--stats` |
 | `DO_NOT_TRACK`, `DISABLE_TELEMETRY` (any value) | Always off, even with `--stats`; they also turn off the `skills` CLI's own telemetry |
 | `CI`, `GITHUB_ACTIONS` set | Always off |
+| npm uses a registry mirror or a proxy | Off by default; any choice above turns it on again |
 
 See also: [Security model](security.md) · [`--no-stats`](../reference/cli.md#--no-stats) · [Environment variables](../reference/environment.md)
 
@@ -3464,7 +3528,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.6.0
+  aiskills version : 2.0.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
@@ -3623,7 +3687,7 @@ aiskills rel 3
   1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
@@ -3653,7 +3717,7 @@ aiskills rel --downloads
   0.9.0    2026-11-15 (6 days ago)                           –
   0.8.0    2026-11-12 (9 days ago)                           –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
@@ -3686,7 +3750,7 @@ aiskills rel 1 --downloads 7d --table
   VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
   1.2.0    2026-11-21 (today)  latest                   –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
@@ -3826,7 +3890,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.6.0 — Sugato Ray's agent skills
+aiskills 2.0.0-dev — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -3891,7 +3955,8 @@ install only:
                          installing bundled skills, aiskills runs 'npx skills add sugatoray/aiskills' for
                          them in a temp folder, in the background, so skills.sh counts the install
                          (needs github.com; skipped silently without it). Remembered until --stats;
-                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI.
+                         also accepted by sync. Always off with DO_NOT_TRACK, DISABLE_TELEMETRY or CI;
+                         off by default when npm uses a registry mirror or a proxy.
       --stats            Count installs on skills.sh again (the default)
   -y, --yes              Install skills that --route found by a registry lookup without asking
                          (needed when there is no terminal to ask in); pinned owner/repo@skill never asks
@@ -4002,7 +4067,7 @@ ais -v
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ```
 
 ## Options
@@ -4062,7 +4127,7 @@ Add installs to the [skills.sh install count](../concepts/install-count.md) (the
 
 ### `--no-stats`
 
-Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
+Don't add this install to the skills.sh count: no background `npx skills add sugatoray/aiskills`, no temp folder, no call to github.com or skills.sh for it. Remembered in `aiskills.json` until `--stats`; `aiskills sync --no-stats` sets it without installing. It is already off by default when npm uses a registry mirror or a proxy; `--stats` turns it on there ([Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)). Env: [`AISKILLS_STATS=0`](environment.md#aiskills_stats). See [The skills.sh install count](../concepts/install-count.md).
 
 ### `-i`, `--interactive`
 
@@ -4346,7 +4411,7 @@ Truthy = `--route`. The `aix` command sets it. Lets names in `AISKILLS_SKILLS` t
 
 ### `AISKILLS_STATS`
 
-`0` or `1` (also `false`/`true`, `no`/`yes`, `off`/`on`): the same as `--no-stats` / `--stats` while it's set, but not remembered. `--stats`/`--no-stats` win over it; it wins over the choice remembered in `aiskills.json`. Empty means unset; any other value fails with `AISKILLS_STATS must be 1 or 0`. See [The skills.sh install count](../concepts/install-count.md).
+`0` or `1` (also `false`/`true`, `no`/`yes`, `off`/`on`): the same as `--no-stats` / `--stats` while it's set, but not remembered. `--stats`/`--no-stats` win over it; it wins over the choice remembered in `aiskills.json`. `AISKILLS_STATS=1` also turns the count on when npm uses a registry mirror or a proxy, where it is off by default. Empty means unset; any other value fails with `AISKILLS_STATS must be 1 or 0`. See [The skills.sh install count](../concepts/install-count.md).
 
 ### `AISKILLS_STATS_FOREGROUND`
 
@@ -4803,6 +4868,25 @@ unknown command: <name>
 ```
 
 **Cause:** the registry returned nothing (or there's no network access to `skills.sh`). **Fix:** check the name and network, or give the source as `owner/repo@skill`.
+
+### Could not search the skills registry
+
+```text
+[aiskills] could not search the skills registry for '<name>': 'npx skills find' failed (it asks skills.sh, and npm uses a registry mirror (<host>))
+  pin it with -s owner/repo@skill (cloned from GitHub), or install bundled skills only
+```
+
+**Cause:** `--route` looked up a bare name, and `npx skills find` itself failed: it asks `skills.sh`, which a firewall often blocks. The part after `skills.sh` names a registry mirror or a proxy when npm uses one. Nothing was installed. **Fix:** pin the skill as `owner/repo@skill`, or leave it out and install bundled skills only. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
+
+### Could not install a GitHub source
+
+```text
+[aiskills] could not install <owner/repo@skill>: it is cloned from GitHub with git, not downloaded from the npm registry.
+[aiskills]   Behind a firewall or a registry mirror (Artifactory, Nexus) github.com is often blocked, and npm uses a registry mirror (<host>).
+[aiskills]   Bundled skills install without it: leave out --route and the external skill, or ask for access to github.com.
+```
+
+**Warning,** after `npx skills add <owner/repo@skill>` failed (its own error is above it). **Cause:** an external skill named as `owner/repo`, `owner/repo@skill` or a git URL is fetched with `git clone`, which never goes through your npm registry. The second line names a registry mirror or a proxy when npm uses one. Local paths don't get this warning. **Fix:** install bundled skills only, or ask for access to github.com. See [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md).
 
 ### Unsafe registry results ignored
 
@@ -5374,13 +5458,15 @@ Yes, except for download counts. Everything goes through npm and your npm config
 
 | Command | Needs | With only an npm mirror |
 | --- | --- | --- |
-| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, through `npx` | works |
+| `install`, `uninstall`, `installed`, `list`, `skills` | the `skills` package, installed with `aiskills` | works |
 | `info` | nothing (local files) | works |
-| `info --full` | `npm view`, and `skills` through `npx` | works |
+| `info --full` | `npm view`, and the `skills` package | works |
 | `releases` / `rel` | `npm view` | works; a mirror that strips publish times shows `–` as the date and says so |
 | `rel --downloads` | api.npmjs.org | fails with `could not reach api.npmjs.org`; mirrors don't serve download counts ([fixes](reference/errors.md#could-not-reach-apinpmjsorg)) |
-| the skills.sh install count | github.com | skipped silently; the install is unaffected |
-| `--route` / `aix` lookups | skills.sh | fail with an error; bundled skills don't need them |
+| the skills.sh install count | github.com | off by default, with one line saying why; the install is unaffected |
+| `--route` / `aix` lookups | skills.sh, and github.com (git) for `owner/repo` sources | fail with an error that says why; bundled skills don't need them |
+
+See [Use aiskills behind a firewall](guides/use-behind-a-firewall.md).
 
 The `changelog:` line of `aiskills rel` is only printed, never fetched; its first path is the copy inside the installed package, readable offline. A TLS-inspecting proxy needs `NODE_EXTRA_CA_CERTS` for `--downloads` (npm itself uses `cafile`).
 
@@ -5406,7 +5492,7 @@ Your npm has a release-age rule (`min-release-age` or `before` in `.npmrc`), and
 
 ### Why don't my installs show up on skills.sh?
 
-The count needs github.com and api.github.com: without them it's skipped silently. It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
+The count needs github.com and api.github.com: without them it's skipped silently. It's off by default when npm uses a registry mirror or a proxy (`aiskills info` says so). It's also off with `--no-stats` (check `"stats"` in `~/.config/sugatoray/aiskills/aiskills.json`), `AISKILLS_STATS=0`, `DO_NOT_TRACK`, `DISABLE_TELEMETRY` or `CI`. `AISKILLS_STATS_FOREGROUND=1 aiskills install` shows what happens.
 
 ### How do I change how these docs look?
 
