@@ -10,7 +10,7 @@ How to work on, test and release `@sugatoray-ai/aiskills`. How it's built is in
   `docs/.scrolls/STARTER.md`, which gives the reading order for the current
   state (`HANDOFF.md`), known gaps, the backlog (`PLAN.md`) and hard-won
   lessons (`WISDOM.md`). Run `/scrolls-update` at the end of a session.
-- **Requirements:** Node.js 18.17+ and npm; the package's one dependency is the pinned `skills` CLI (which needs Node.js 22.20+ to run).
+- **Requirements:** Node.js 22.20+ (the pinned `skills` CLI's minimum, which `engines` follows) and npm; the package's one dependency is that CLI.
   For the docs: Python 3 (the create-lib-docs checker and `llms.txt` builder,
   run from `skills/docs/create-lib-docs/scripts/`). Optional: Playwright with
   Chromium, for `npm run banner:png` and the browser tests (skipped without

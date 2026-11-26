@@ -1,6 +1,6 @@
 {
   "name": "@sugatoray-ai/aiskills",
-  "version": "1.6.0",
+  "version": "2.0.0-dev",
   "description": "Curated agent skills (scrolls agentic memory and more) for every coding agent, in one npm package.",
   "keywords": [
     "agent-skills",
@@ -66,7 +66,7 @@
     "audit:skills": "node src/scripts/pack/audit-skills.mjs"
   },
   "engines": {
-    "node": ">=18.17"
+    "node": ">=22.20.0"
   },
   "dependencies": {
     "skills": "1.7.6"

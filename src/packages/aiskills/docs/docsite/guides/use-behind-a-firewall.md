@@ -44,7 +44,7 @@ Use this when npm can reach only a company registry mirror (JFrog Artifactory, S
 
 - **What counts as a mirror:** any npm `registry` other than `registry.npmjs.org` or `registry.yarnpkg.com`. **A proxy:** npm's `https-proxy` or `proxy` setting, or `HTTPS_PROXY`, `HTTP_PROXY` or `ALL_PROXY`. Only the mirror's host is ever printed.
 - **The pinned `skills` CLI is used only at its exact version.** With [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) set to another version, `aiskills` runs that version through `npx`, which downloads it from your registry at run time. See [Choose the `skills` CLI version](choose-the-skills-cli-version.md).
-- **The `skills` CLI needs Node.js 22.20 or newer.** With `engine-strict=true` in your `.npmrc`, `npm install` refuses an older Node.js.
+- **Node.js 22.20 or newer**, the `skills` CLI's minimum. With `engine-strict=true` in your `.npmrc`, `npm install` refuses an older Node.js.
 - **A release-age rule** (`min-release-age`, JFrog Curation's "immature package" condition) may block a new `skills` version for a few days or weeks after it is published. See [When npm's release-age rule blocks the pinned version](choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 See also: [The skills.sh install count](../concepts/install-count.md) · [Security model](../concepts/security.md) · [FAQ: does aiskills work behind a firewall?](../faq.md#does-aiskills-work-behind-a-firewall-or-with-an-npm-mirror)

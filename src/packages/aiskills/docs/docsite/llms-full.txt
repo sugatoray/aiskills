@@ -171,7 +171,7 @@ See also: [How aiskills works](../concepts/how-it-works.md) · [Installation](in
 
 Install the `aiskills` command with npm, then run `aiskills install` to save the skills and register them with your agents.
 
-**You'll need:** Node.js 18.17 or newer, and npm. `npx` (which comes with npm) must be able to reach the npm registry the first time it downloads the `skills` CLI.
+**You'll need:** Node.js 22.20 or newer, and npm. npm installs the pinned `skills` CLI with the package, from your npm registry (a company mirror works: see [Use aiskills behind a firewall](../guides/use-behind-a-firewall.md)).
 
 ## Install
 
@@ -206,7 +206,7 @@ aiskills path
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ~/.config/sugatoray/aiskills
 ```
 
@@ -2939,7 +2939,7 @@ Use this when npm can reach only a company registry mirror (JFrog Artifactory, S
 
 - **What counts as a mirror:** any npm `registry` other than `registry.npmjs.org` or `registry.yarnpkg.com`. **A proxy:** npm's `https-proxy` or `proxy` setting, or `HTTPS_PROXY`, `HTTP_PROXY` or `ALL_PROXY`. Only the mirror's host is ever printed.
 - **The pinned `skills` CLI is used only at its exact version.** With [`AISKILLS_SKILLS_LIB_VERSION`](../reference/environment.md#aiskills_skills_lib_version) set to another version, `aiskills` runs that version through `npx`, which downloads it from your registry at run time. See [Choose the `skills` CLI version](choose-the-skills-cli-version.md).
-- **The `skills` CLI needs Node.js 22.20 or newer.** With `engine-strict=true` in your `.npmrc`, `npm install` refuses an older Node.js.
+- **Node.js 22.20 or newer**, the `skills` CLI's minimum. With `engine-strict=true` in your `.npmrc`, `npm install` refuses an older Node.js.
 - **A release-age rule** (`min-release-age`, JFrog Curation's "immature package" condition) may block a new `skills` version for a few days or weeks after it is published. See [When npm's release-age rule blocks the pinned version](choose-the-skills-cli-version.md#when-npms-release-age-rule-blocks-the-pinned-version).
 
 See also: [The skills.sh install count](../concepts/install-count.md) · [Security model](../concepts/security.md) · [FAQ: does aiskills work behind a firewall?](../faq.md#does-aiskills-work-behind-a-firewall-or-with-an-npm-mirror)
@@ -3528,7 +3528,7 @@ aiskills info
 ```
 
 ```text
-  aiskills version : 1.6.0
+  aiskills version : 2.0.0-dev
 …
       install root : ~/.config/sugatoray/aiskills  (AISKILLS_HOME)
        user config : ~/.config/sugatoray/aiskillsconfig.json  (not created)
@@ -3687,7 +3687,7 @@ aiskills rel 3
   1.1.0    2026-11-20 (1 day ago)
   1.0.0    2026-11-18 (3 days ago)
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 changelog: /usr/local/lib/node_modules/@sugatoray-ai/aiskills/CHANGELOG.md
@@ -3717,7 +3717,7 @@ aiskills rel --downloads
   0.9.0    2026-11-15 (6 days ago)                           –
   0.8.0    2026-11-12 (9 days ago)                           –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 all time (2026-11-09 → 2026-11-10)
@@ -3750,7 +3750,7 @@ aiskills rel 1 --downloads 7d --table
   VERSION  PUBLISHED           TAG     DOWNLOADS (7 DAYS)
   1.2.0    2026-11-21 (today)  latest                   –
 
-installed: 1.6.0 (not published on npm)
+installed: 2.0.0-dev (not published on npm)
 more: aiskills rel all
 
 downloads, all versions: 424 in the last 7 days (2026-11-04 → 2026-11-10)
@@ -3890,7 +3890,7 @@ aiskills --help
 ```
 
 ```text
-aiskills 1.6.0 — Sugato Ray's agent skills
+aiskills 2.0.0-dev — Sugato Ray's agent skills
 
 Usage: aiskills <command> [options]
        ais <command> [options]     (same as aiskills)
@@ -4067,7 +4067,7 @@ ais -v
 ```
 
 ```text
-1.6.0
+2.0.0-dev
 ```
 
 ## Options

@@ -136,6 +136,12 @@ describe("the skills CLI ships as a pinned dependency", () => {
     assert.deepEqual(pj.dependencies, { skills: SKILLS_CLI_VERSION });
   });
 
+  test("engines.node is the skills CLI's own minimum, Node.js 22.20", () => {
+    // skills@1.7.6 declares "node": ">=22.20.0"; raise this with any skills bump that raises it.
+    const pj = JSON.parse(readFileSync(join(PKG_SRC, "package.json"), "utf8"));
+    assert.equal(pj.engines.node, ">=22.20.0");
+  });
+
   /** A stand-in skills package at <dir>/node_modules/skills. */
   const fakeSkills = (dir, version = SKILLS_CLI_VERSION) => {
     const at = join(dir, "node_modules", "skills");
