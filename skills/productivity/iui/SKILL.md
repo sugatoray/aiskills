@@ -17,8 +17,8 @@ Interpret `/iui [[ topic or task ]]` and `/IUI [[ topic or task ]]` identically.
 
 ## Options
 
-- `--format auto|walkthrough|compare|calculator|diagram`: default `auto`; select a form that helps the specific task. Do not silently treat an unknown format as supported.
-- `--output auto|inline|html`: default `auto`. Prefer a working native interactive surface if actually available; otherwise generate and deliver a self-contained downloadable HTML file. For `html`, always deliver the actual file. For `inline`, report if the host cannot render it and offer the HTML fallback.
+- `-f` or `--format` `auto|walkthrough|compare|calculator|diagram`: default `auto`; select a form that helps the specific task. Do not silently treat an unknown format as supported.
+- `-o` or `--output` `auto|inline|html`: default `auto`. Prefer a working native interactive surface if actually available; otherwise generate and deliver a self-contained downloadable HTML file. For `html`, always deliver the actual file. For `inline`, report if the host cannot render it and offer the HTML fallback.
 - `--theme light|dark`: default light. Respect explicit styling requests.
 
 ## Workflow
@@ -33,7 +33,7 @@ Interpret `/iui [[ topic or task ]]` and `/IUI [[ topic or task ]]` identically.
 
 ```text
 /iui [[ Explain how a RAG system retrieves and cites evidence. ]] --format walkthrough --output html
-/IUI [[ Compare three model deployment approaches. ]] --format compare
+/IUI [[ Compare three model deployment approaches. ]] -f compare -o html
 /iui [[ Explore a fixed-rate mortgage by changing rate and principal. ]] --format calculator
 ```
 
