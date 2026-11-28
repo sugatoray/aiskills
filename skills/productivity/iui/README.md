@@ -3,8 +3,10 @@
 Create an interactive answer, walkthrough, comparison, calculator, or diagram.
 
 ```text
-/iui [[ Explain how a RAG system retrieves and cites evidence. ]] --format walkthrough --output html
+/iui [[ Explain how a RAG system retrieves and cites evidence. ]] -f walkthrough -o html
 ```
+
+`-f` is short for `--format`, and `-o` is short for `--output`. Both forms accept the same values.
 
 Open [the example](assets/examples/rag_demo.html) and select the stages. `/IUI` is an accepted prompt alias; the portable skill name is `iui`.
 
