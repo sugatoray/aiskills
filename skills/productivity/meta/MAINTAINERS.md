@@ -4,6 +4,7 @@ Family-wide maintainer notes for the skills under `skills/productivity/`. Not re
 request; each skill's own `SKILL.md` is what's read at invocation time. For a skill's own layout and
 versioning, see its `meta/MAINTAINERS.md`:
 
+- [`iui/meta/MAINTAINERS.md`](../iui/meta/MAINTAINERS.md)
 - [`meeting-agenda/meta/MAINTAINERS.md`](../meeting-agenda/meta/MAINTAINERS.md)
 - [`agent-sessions-insight/meta/MAINTAINERS.md`](../agent-sessions-insight/meta/MAINTAINERS.md)
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "IUI"
+  short_description: "Create interactive visual explanations"
+  default_prompt: "Create an interactive visual explanation of my topic."
+
+policy:
+  allow_implicit_invocation: false
